@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  vcpkg-update-baseline:
+  update-vcpkg:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,30 +18,26 @@ jobs:
 
       - name: Install vcpkg
         run: |
-          git clone --single-branch https://github.com/microsoft/vcpkg.git
+          git clone --filter=tree:0 --single-branch https://github.com/microsoft/vcpkg.git
           vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
       - name: Update vcpkg baseline
         id: update
         run: |
+          echo "before=$(jq -r '.["builtin-baseline"]' < vcpkg.json)" | tee -a "$GITHUB_OUTPUT"
           vcpkg/vcpkg x-update-baseline
-          echo "changed-files=$(git diff --name-only)" > "$GITHUB_OUTPUT"
-          echo "short=$(jq -r '.["builtin-baseline"][:7]' < vcpkg.json)" > "$GITHUB_OUTPUT"
-          echo "long=$(jq -r '.["builtin-baseline"]' < vcpkg.json)" > "$GITHUB_OUTPUT"
+          echo "after=$(jq -r '.["builtin-baseline"]' < vcpkg.json)" | tee -a "$GITHUB_OUTPUT"
+          echo "short=$(jq -r '.["builtin-baseline"][:7]' < vcpkg.json)" | tee -a "$GITHUB_OUTPUT"
 
       - name: Commit updated vcpkg manifest
-        if: contains(steps.update.outputs.changed-files, 'vcpkg.json')
+        if: steps.update.outputs.before != steps.update.outputs.after
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git checkout -b chore/vcpkg-update-baseline-${{ steps.update.outputs.short }}
           git add vcpkg.json
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "Update vcpkg baseline to ${{ steps.update.outputs.short }}"
+          git commit -m "chore(vcpkg): update baseline to ${{ steps.update.outputs.short }}"
           git push origin chore/vcpkg-update-baseline-${{ steps.update.outputs.short }}
-
-      - name: Create pull request
-        if: contains(steps.update.outputs.changed-files, 'vcpkg.json')
-        run: |
           gh pr create --title "chore(vcpkg): update baseline to ${{ steps.update.outputs.short }}" --body "This PR updates the vcpkg baseline to [${{ steps.update.outputs.long }}](https://github.com/microsoft/vcpkg/tree/${{ steps.update.outputs.long }})." --base dev --head chore/vcpkg-update-baseline-${{ steps.update.outputs.short }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
