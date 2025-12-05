@@ -33,7 +33,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <mysql/mysql.h>
 #include <optional>
 #include <print>
 #include <pugixml.hpp>
@@ -56,6 +55,12 @@
 #include <luajit/lua.hpp>
 #else
 #include <lua.hpp>
+#endif
+
+#if __has_include("mariadb/mysql.h")
+#include <mariadb/mysql.h>
+#else
+#include <mysql/mysql.h>
 #endif
 
 #endif // FS_OTPCH_H
