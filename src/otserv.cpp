@@ -24,14 +24,13 @@
 #include "gitmetadata.h"
 #endif
 
-DatabaseTasks g_databaseTasks;
-Dispatcher g_dispatcher;
-Scheduler g_scheduler;
-
-Game g_game;
-Monsters g_monsters;
-Vocations g_vocations;
+extern DatabaseTasks g_databaseTasks;
+extern Dispatcher g_dispatcher;
+extern Game g_game;
+extern Monsters g_monsters;
+extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
+extern Vocations g_vocations;
 
 std::mutex g_loaderLock;
 std::condition_variable g_loaderSignal;

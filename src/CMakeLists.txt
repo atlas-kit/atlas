@@ -43,7 +43,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/movement.cpp
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/npc.cpp
-	${CMAKE_CURRENT_LIST_DIR}/otserv.cpp
 	${CMAKE_CURRENT_LIST_DIR}/outfit.cpp
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/party.cpp
@@ -159,8 +158,10 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/xtea.h
 	)
 
-add_executable(tfs ${tfs_SRC})
-target_link_libraries(tfs PRIVATE
+set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
+
+add_library(tfslib ${tfs_SRC})
+target_link_libraries(tfslib PRIVATE
 	Boost::iostreams
 	Boost::system
 	OpenSSL::Crypto
@@ -171,18 +172,21 @@ target_link_libraries(tfs PRIVATE
 	${LUA_LIBRARIES}
 	${MYSQL_CLIENT_LIBS}
 	)
-set_target_properties(tfs PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
+set_target_properties(tfslib PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 if (APPLE)
-	target_link_libraries(tfs PRIVATE Iconv::Iconv)
+	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
 endif()
 
 if (HTTP)
 	add_subdirectory(http)
-	target_link_libraries(tfs PRIVATE http)
+	target_link_libraries(tfslib PRIVATE http)
 endif ()
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC})
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
+
+add_executable(tfs ${tfs_MAIN})
+target_link_libraries(tfs PRIVATE tfslib)
 
 if (BUILD_TESTING)
     add_subdirectory(tests)

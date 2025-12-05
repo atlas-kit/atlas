@@ -50,7 +50,8 @@ project(tfs CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if (NOT WIN32)
-    add_compile_options(-Wall -Wextra -Wnon-virtual-dtor -Wold-style-cast -pedantic -Werror -pipe -fvisibility=hidden)
+    # zlib 1.3.1 has an old-style cast
+    add_compile_options(-Wall -Wextra -Wnon-virtual-dtor -Wno-error=old-style-cast -pedantic -Werror -pipe -fvisibility=hidden)
 endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -117,6 +118,7 @@ endif()
 
 # Option to disable unity builds
 option(ENABLE_UNITY_BUILD "Enable unity build" ON)
+set(CMAKE_UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 ### INTERPROCEDURAL_OPTIMIZATION ###
 include(CheckIPOSupported)
