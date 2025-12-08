@@ -1525,7 +1525,7 @@ void Player::onAttacking(uint32_t)
 
 	addInFightTicks();
 
-	if (const auto player = attackedCreature->getPlayer()) {
+	if (const auto& player = attackedCreature->getPlayer()) {
 		player->addInFightTicks();
 	}
 

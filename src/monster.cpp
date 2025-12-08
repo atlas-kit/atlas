@@ -777,7 +777,7 @@ void Monster::onAttacking(uint32_t interval)
 		return;
 	}
 
-	if (const auto player = attackedCreature->getPlayer()) {
+	if (const auto& player = attackedCreature->getPlayer()) {
 		player->addInFightTicks();
 	}
 

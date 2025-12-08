@@ -680,7 +680,7 @@ BlockType_t Creature::blockHit(const std::shared_ptr<Creature>& attacker, Combat
 	}
 
 	if (combatType != COMBAT_HEALING) {
-		if (const auto player = getPlayer()) {
+		if (const auto& player = getPlayer()) {
 			player->addInFightTicks();
 		}
 	}
@@ -702,7 +702,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 	creature->addFollower(getCreature());
 	onAttackedCreature(creature);
 
-	if (const auto player = creature->getPlayer()) {
+	if (const auto& player = creature->getPlayer()) {
 		player->addInFightTicks();
 	}
 
