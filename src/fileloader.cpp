@@ -73,4 +73,52 @@ Loader load(std::string_view filename, std::string_view acceptedIdentifier)
 	return {std::move(file), parseTree(++first, file.end())};
 }
 
+[[nodiscard]] std::string readBytes(OTB::iterator& first, const OTB::iterator last, const size_t len)
+{
+	std::string out;
+	out.reserve(len);
+
+	auto end = first + len;
+	while (first < end) {
+		if (*first == Node::ESCAPE) [[unlikely]] {
+			++first, ++end;
+		}
+
+		if (first == last) [[unlikely]] {
+			throw std::invalid_argument("Not enough bytes to read.");
+		}
+
+		out.push_back(*first++);
+	}
+
+	if (first > last) [[unlikely]] {
+		throw std::invalid_argument("Not enough bytes to read.");
+	}
+
+	return out;
+}
+
+[[nodiscard]] std::string readString(OTB::iterator& first, const OTB::iterator last)
+{
+	const auto len = read<uint16_t>(first, last);
+
+	return readBytes(first, last, len);
+}
+
+void skip(OTB::iterator& first, const OTB::iterator last, const size_t len)
+{
+	auto end = first + len;
+	while (first < end) {
+		if (*first == Node::ESCAPE) [[unlikely]] {
+			++first;
+			++end;
+		}
+		++first;
+	}
+
+	if (first > last) [[unlikely]] {
+		throw std::invalid_argument("Not enough bytes to skip.");
+	}
+}
+
 } // namespace OTB

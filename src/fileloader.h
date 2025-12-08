@@ -43,75 +43,17 @@ private:
 
 Loader load(std::string_view filename, std::string_view acceptedIdentifier);
 
+[[nodiscard]] std::string readBytes(OTB::iterator& first, const OTB::iterator last, const size_t len);
+[[nodiscard]] std::string readString(OTB::iterator& first, const OTB::iterator last);
+void skip(OTB::iterator& first, const OTB::iterator last, const size_t len);
+
 template <class T>
-[[nodiscard]] T read(auto& first, const auto last)
+[[nodiscard]] T read(OTB::iterator& first, const OTB::iterator last)
 {
-	std::array<char, sizeof(T)> buf;
-	auto it = buf.begin();
-
-	auto end = first + sizeof(T);
-	while (first < end) {
-		if (*first == Node::ESCAPE) [[unlikely]] {
-			++first, ++end;
-		}
-
-		if (first == last) [[unlikely]] {
-			throw std::invalid_argument("Not enough bytes to read.");
-		}
-
-		*it++ = *first++;
-	}
-
-	if (first > last) [[unlikely]] {
-		throw std::invalid_argument("Not enough bytes to read.");
-	}
-
 	T out;
+	auto buf = readBytes(first, last, sizeof(T));
 	std::memcpy(reinterpret_cast<char*>(&out), buf.data(), buf.size());
 	return out;
-}
-
-[[nodiscard]] std::string readString(auto& first, const auto last)
-{
-	const auto len = read<uint16_t>(first, last);
-
-	std::string out;
-	out.reserve(len);
-
-	auto end = first + len;
-	while (first < end) {
-		if (*first == Node::ESCAPE) [[unlikely]] {
-			++first, ++end;
-		}
-
-		if (first == last) [[unlikely]] {
-			throw std::invalid_argument("Not enough bytes to read.");
-		}
-
-		out.push_back(*first++);
-	}
-
-	if (first > last) [[unlikely]] {
-		throw std::invalid_argument("Not enough bytes to read as string.");
-	}
-
-	return out;
-}
-
-void skip(auto& first, const auto last, const std::size_t len)
-{
-	auto end = first + len;
-	while (first < end) {
-		if (*first == Node::ESCAPE) [[unlikely]] {
-			++first;
-			++end;
-		}
-		++first;
-	}
-
-	if (first > last) [[unlikely]] {
-		throw std::invalid_argument("Not enough bytes to skip.");
-	}
 }
 
 } // namespace OTB
