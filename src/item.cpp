@@ -26,7 +26,7 @@ Items Item::items;
 std::shared_ptr<Item> Item::CreateItem(const uint16_t type, uint16_t count /*= 0*/)
 {
 	const ItemType& it = Item::items[type];
-	if (it.id != 0 && it.group != ITEM_GROUP_DEPRECATED) [[unlikely]] {
+	if (it.id == 0 || it.group == ITEM_GROUP_DEPRECATED) [[unlikely]] {
 		return nullptr;
 	}
 
@@ -108,10 +108,8 @@ uint16_t Item::getPersistentId(uint16_t id)
 
 		case ITEM_WILDGROWTH:
 			return ITEM_WILDGROWTH_PERSISTENT;
-
-		default:
-			return id;
 	}
+	return id;
 }
 
 Item::Item(const uint16_t type, uint16_t count /*= 0*/) : id{type}
