@@ -54,6 +54,11 @@ template <class T>
 		if (*first == Node::ESCAPE) [[unlikely]] {
 			++first, ++end;
 		}
+
+		if (first == last) [[unlikely]] {
+			throw std::invalid_argument("Not enough bytes to read.");
+		}
+
 		*it++ = *first++;
 	}
 
@@ -78,6 +83,11 @@ template <class T>
 		if (*first == Node::ESCAPE) [[unlikely]] {
 			++first, ++end;
 		}
+
+		if (first == last) [[unlikely]] {
+			throw std::invalid_argument("Not enough bytes to read.");
+		}
+
 		out.push_back(*first++);
 	}
 
