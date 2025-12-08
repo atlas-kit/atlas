@@ -22,16 +22,15 @@ FROM debian:forky-slim
 RUN apt-get update -q && apt-get install -yq \
   libboost-iostreams1.88.0 \
   libboost-json1.88.0 \
-  libboost-system1.88.0 \
   liblua5.4-0 \
   libmariadb3 \
   libpugixml1v5 \
   libsimdutf27 \
-  libssl3t64
+  libssl3t64 \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /usr/src/forgottenserver/build/RelWithDebInfo/tfs /bin/tfs
-COPY data /srv/data/
-COPY LICENSE README.md *.dist *.sql key.pem /srv/
+COPY LICENSE key.pem /srv/
 
 EXPOSE 7171 7172
 WORKDIR /srv
