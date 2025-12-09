@@ -267,6 +267,9 @@
     <ClCompile Include="..\src\http\session.cpp">
       <Filter>Source Files\http</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\http\serverinfo.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\actions.h">
@@ -534,6 +537,9 @@
       <Filter>Header Files\http</Filter>
     </ClInclude>
     <ClInclude Include="..\src\http\error.h">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\http\serverinfo.h">
       <Filter>Header Files\http</Filter>
     </ClInclude>
   </ItemGroup>
