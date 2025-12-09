@@ -550,7 +550,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="theforgottenserver.rc">
+    <ResourceCompile Include="atlas.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

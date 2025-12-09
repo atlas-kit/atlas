@@ -344,7 +344,7 @@
     <ClInclude Include="..\src\xtea.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="theforgottenserver.rc" />
+    <ResourceCompile Include="atlas.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

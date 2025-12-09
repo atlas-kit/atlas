@@ -14,7 +14,7 @@ on:
       - dev
 
 env:
-  IMAGE_NAME: forgottenserver
+  IMAGE_NAME: atlas
 
 jobs:
   # Push image to GitHub Package Registry.
