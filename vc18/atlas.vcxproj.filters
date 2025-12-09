@@ -183,12 +183,6 @@
     <ClCompile Include="..\src\protocolgame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\protocollogin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\protocolold.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\rsa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -446,12 +440,6 @@
     <ClInclude Include="..\src\protocolgame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\protocollogin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\protocolold.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\pugicast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -550,7 +538,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="theforgottenserver.rc">
+    <ResourceCompile Include="atlas.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
