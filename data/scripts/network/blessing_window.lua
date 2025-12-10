@@ -1,20 +1,16 @@
 local handler = PacketHandler(0xCF)
 
 function handler.onReceive(player)
+	local blessings = Game.getBlessings()
+
 	local msg = NetworkMessage()
 
 	msg:addByte(0x9B)
 	msg:addByte(SERVER_BLESSINGS_COUNT)
 
-	for bless = 1, SERVER_BLESSINGS_COUNT do
-		msg:addU16(blessFlags[bless])
-
-		if not player:hasBlessing(bless) then
-			msg:addByte(0)
-		else
-			msg:addByte(1)
-		end
-
+	for i = 1, SERVER_BLESSINGS_COUNT do
+		msg:addU16(blessings[i])
+		msg:addByte(player:hasBlessing(i) and 1 or 0)
 		msg:addByte(0)
 	end
 

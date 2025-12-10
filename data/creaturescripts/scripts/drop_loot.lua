@@ -24,16 +24,10 @@ function onDeath(player, corpse, killer, mostDamageKiller, lastHitUnjustified, m
 	else
 		for i = CONST_SLOT_HEAD, CONST_SLOT_AMMO do
 			local item = player:getSlotItem(i)
-			local lossPercent = player:getLossPercent()
 			if item then
-				local chanceToLostItem = 0
-				if item:isContainer() then
-					chanceToLostItem = lossPercent.container
-				else
-					chanceToLostItem = lossPercent.other
-				end
-
-				if isRedOrBlack or (math.random(0, 1000) <= chanceToLostItem * 10) then
+				local lossPercent = player:getLossPercent()
+				local lostChance = item:isContainer() and lossPercent.container or lossPercent.other
+				if isRedOrBlack or (math.random(0, 1000) <= lostChance * 10) then
 					if not item:moveTo(corpse) then
 						item:remove()
 					end

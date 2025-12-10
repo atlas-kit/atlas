@@ -713,45 +713,37 @@ function Player.disableLoginMusic(self)
 	return true
 end
 
--- Global so it can also be accessed in blessing_window.lua
-blessFlags = {
-	[1] = BLESS_TYPE_WISDOM_OF_SOLITUDE,
-	[2] = BLESS_TYPE_SPARK_OF_PHOENIX,
-	[3] = BLESS_TYPE_FIRE_OF_THE_SUNS,
-	[4] = BLESS_TYPE_SPIRITUAL_SHIELD,
-	[5] = BLESS_TYPE_THE_EMBRACE_OF_THE_WORLD
-}
-
 function Player.getBlessings(self)
+	local blessings = Game.getBlessings()
+
 	local n = 0
 	local flags = 0
 	for i = 1, SERVER_BLESSINGS_COUNT do
 		if self:hasBlessing(i) then
 			n = n + 1
-			flags = flags + blessFlags[i]
+			flags = flags + blessings[i]
 		end
 	end
 	return n, flags
 end
 
 local function getBlessingStatus(n)
-	if n >= SERVER_BLESSINGS_COUNT then
+	if n == SERVER_BLESSINGS_COUNT then
 		return BLESSINGS_STATUS_FULL
 	elseif n > 0 then
 		return BLESSINGS_STATUS_PARTIAL
-	else
-		return BLESSINGS_STATUS_NONE
 	end
+	return BLESSINGS_STATUS_NONE
 end
 
 function Player.sendBlessings(self)
 	local n, flags = self:getBlessings()
-	local blessingStatus = getBlessingStatus(n)
+	local statuses = getBlessingStatus(n)
 
 	local msg = NetworkMessage()
 	msg:addByte(0x9C)
 	msg:addU16(flags)
-	msg:addByte(blessingStatus)
+	msg:addByte(statuses)
 	msg:sendToPlayer(self)
 	msg:delete()
 	return true
