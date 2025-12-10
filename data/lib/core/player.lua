@@ -36,25 +36,6 @@ function Player.hasFlag(self, flag)
 	return self:getGroup():hasFlag(flag)
 end
 
-function Player.getLossPercent(self)
-	local blessings = 0
-	local lossPercent = {
-		[0] = 100,
-		[1] = 70,
-		[2] = 45,
-		[3] = 25,
-		[4] = 10,
-		[5] = 0
-	}
-
-	for i = 1, 5 do
-		if self:hasBlessing(i) then
-			blessings = blessings + 1
-		end
-	end
-	return lossPercent[blessings]
-end
-
 function Player.getPremiumTime(self)
 	return math.max(0, self:getPremiumEndsAt() - os.time())
 end
@@ -390,7 +371,11 @@ end
 
 function Player.isPromoted(self)
 	local vocation = self:getVocation()
-	local fromVocId = vocation:getDemotion():getId()
+	local fromVocId = vocation:getId()
+
+	if vocation:getDemotion() then
+		fromVocId = vocation:getDemotion():getId()
+	end
 	return vocation:getId() ~= fromVocId
 end
 
@@ -728,7 +713,8 @@ function Player.disableLoginMusic(self)
 	return true
 end
 
-local blessFlags = {
+-- Global so it can also be accessed in blessing_window.lua
+blessFlags = {
 	[1] = BLESS_TYPE_WISDOM_OF_SOLITUDE,
 	[2] = BLESS_TYPE_SPARK_OF_PHOENIX,
 	[3] = BLESS_TYPE_FIRE_OF_THE_SUNS,
@@ -769,4 +755,25 @@ function Player.sendBlessings(self)
 	msg:sendToPlayer(self)
 	msg:delete()
 	return true
+end
+
+do
+	local lossPercent = {
+		[0] = { container = 100, other = 10, skills = 0 },
+		[1] = { container = 70,	other = 7, skills = 8 },
+		[2] = { container = 45,	other = 4.5, skills = 16 },
+		[3] = { container = 25,	other = 2.5, skills = 24 },
+		[4] = { container = 10, other = 1, skills = 32 },
+		[5] = { container = 0, other = 0, skills = 40 },
+	}
+
+	function Player.getLossPercent(self)
+		local blessings = 0
+		for i = 1, SERVER_BLESSINGS_COUNT do
+			if self:hasBlessing(i) then
+				blessings = blessings + 1
+			end
+		end
+		return lossPercent[blessings]
+	end
 end
