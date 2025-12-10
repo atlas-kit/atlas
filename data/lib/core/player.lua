@@ -737,21 +737,21 @@ local blessFlags = {
 }
 
 function Player.getBlessings(self)
-	local blessings = 0
+	local n = 0
 	local flags = 0
 	for i = 1, SERVER_BLESSINGS_COUNT do
 		if self:hasBlessing(i) then
-			blessings = blessings + 1
+			n = n + 1
 			flags = flags + blessFlags[i]
 		end
 	end
-	return blessings, flags
+	return n, flags
 end
 
 local function getBlessingStatus(n)
-	if blessCount >= SERVER_BLESSINGS_COUNT then
+	if n >= SERVER_BLESSINGS_COUNT then
 		return 3
-	elseif blessCount > 0 then
+	elseif n > 0 then
 		return 2
 	else
 		return 1
@@ -759,11 +759,11 @@ local function getBlessingStatus(n)
 end
 
 function Player.sendBlessings(self)
+	local n, flags = self:getBlessings()
+	local blessingStatus = getBlessingStatus(n)
+
 	local msg = NetworkMessage()
 	msg:addByte(0x9C)
-
-	local blessCount, flags = self:getBlessings()
-	local blessingStatus = getBlessingStatus(n)
 	msg:addU16(flags)
 	msg:addByte(blessingStatus)
 	msg:sendToPlayer(self)
