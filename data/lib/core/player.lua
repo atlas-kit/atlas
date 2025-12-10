@@ -736,11 +736,11 @@ end
 
 local function getBlessingStatus(n)
 	if n >= SERVER_BLESSINGS_COUNT then
-		return 3
+		return BLESSINGS_STATUS_FULL
 	elseif n > 0 then
-		return 2
+		return BLESSINGS_STATUS_PARTIAL
 	else
-		return 1
+		return BLESSINGS_STATUS_NONE
 	end
 end
 
