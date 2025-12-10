@@ -4694,17 +4694,18 @@ void Game::checkDecay()
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 	size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
 
-	auto it = decayItems[bucket].begin();
-	while (it != decayItems[bucket].end()) {
+	auto& decayItemBucket = decayItems[bucket];
+	auto it = decayItemBucket.begin();
+	while (it != decayItemBucket.end()) {
 		const auto item = it->lock();
 		if (!item) {
-			it = decayItems[bucket].erase(it);
+			it = decayItemBucket.erase(it);
 			continue;
 		}
 
 		if (!item->canDecay()) {
 			item->setDecaying(DECAYING_FALSE);
-			it = decayItems[bucket].erase(it);
+			it = decayItemBucket.erase(it);
 			continue;
 		}
 
