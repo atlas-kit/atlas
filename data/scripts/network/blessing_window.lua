@@ -11,7 +11,7 @@ function handler.onReceive(player)
 	for i = 1, SERVER_BLESSINGS_COUNT do
 		msg:addU16(blessings[i])
 		msg:addByte(player:hasBlessing(i) and 1 or 0)
-		msg:addByte(0)
+		msg:addByte(0) -- store bless
 	end
 
 	local premiumReduction = 0
@@ -20,19 +20,20 @@ function handler.onReceive(player)
 	end
 
 	msg:addByte(2) -- premium (only work with premium days)
-	msg:addByte(premiumReduction)
+	msg:addByte(premiumReduction) -- exp loss lower
 
-	local lossPercent = player:getLossPercent()
-	local expLost = premiumReduction + lossPercent.skills
+	local lossPercents = player:getLossPercent()
+	local expLost = premiumReduction + lossPercents.skills
 	msg:addByte(expLost) -- exp skill loss min pvp death
 	msg:addByte(expLost) -- exp skill loss max pvp death
 	msg:addByte(expLost) -- exp skill pve death
-	msg:addByte(lossPercent.container) -- equip container lose pvp death
-	msg:addByte(lossPercent.container) -- equip container pve death
+	msg:addByte(lossPercents.container) -- equip container lose pvp death
+	msg:addByte(lossPercents.container) -- equip container pve death
 
 	msg:addByte(0) -- ??
 	msg:addByte(0) -- ??
 
+	-- History
 	local historyAmount = 1
 	msg:addByte(historyAmount)
 
