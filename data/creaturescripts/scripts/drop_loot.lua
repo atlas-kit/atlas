@@ -26,8 +26,9 @@ function onDeath(player, corpse, killer, mostDamageKiller, lastHitUnjustified, m
 			local item = player:getSlotItem(i)
 			if item then
 				local lossPercent = player:getLossPercent()
-				local lostChance = item:isContainer() and lossPercent.container or lossPercent.other
-				if isRedOrBlack or (math.random(0, 1000) <= lostChance * 10) then
+				local lossChance = item:isContainer() and lossPercent.container or lossPercent.other
+
+				if isRedOrBlack or (math.random(0, 1000) <= lossChance * 10) then
 					if not item:moveTo(corpse) then
 						item:remove()
 					end
