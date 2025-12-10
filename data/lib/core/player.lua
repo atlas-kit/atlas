@@ -736,7 +736,7 @@ local blessFlags = {
 	[5] = BLESS_TYPE_THE_EMBRACE_OF_THE_WORLD
 }
 
-function Player.getBlessingCount(self)
+function Player.getBlessings(self)
 	local blessings = 0
 	local flags = 0
 	for i = 1, SERVER_BLESSINGS_COUNT do
@@ -748,7 +748,7 @@ function Player.getBlessingCount(self)
 	return blessings, flags
 end
 
-local function blessStatus(blessCount)
+local function getBlessingStatus(n)
 	if blessCount >= SERVER_BLESSINGS_COUNT then
 		return 3
 	elseif blessCount > 0 then
@@ -758,14 +758,15 @@ local function blessStatus(blessCount)
 	end
 end
 
-function Player.updateClientBlessDisplay(self)
+function Player.sendBlessings(self)
 	local msg = NetworkMessage()
 	msg:addByte(0x9C)
 
-	local blessCount, flags = self:getBlessingCount()
-	local blessingStatus = blessStatus(blessCount)
+	local blessCount, flags = self:getBlessings()
+	local blessingStatus = getBlessingStatus(n)
 	msg:addU16(flags)
 	msg:addByte(blessingStatus)
+	msg:sendToPlayer(self)
 	msg:delete()
 	return true
 end

@@ -26,7 +26,7 @@ function onLogin(player)
 	player:updateClientExpDisplay()
 	player:sendHotkeyPreset()
 	player:disableLoginMusic()
-	player:updateClientBlessDisplay()
+	player:sendBlessings()
 
 	-- achievements points for highscores
 	if not player:getStorageValue(PlayerStorageKeys.achievementsTotal) then
