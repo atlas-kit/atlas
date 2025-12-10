@@ -3534,6 +3534,7 @@ void Player::onEndCondition(ConditionType_t type)
 
 		if (getSkull() != SKULL_RED && getSkull() != SKULL_BLACK) {
 			setSkull(SKULL_NONE);
+			g_game.updateCreatureSkull(getPlayer());
 		}
 	}
 
@@ -3611,6 +3612,7 @@ void Player::onAttackedCreature(const std::shared_ptr<Creature>& target, bool ad
 
 				if (targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE) {
 					setSkull(SKULL_WHITE);
+					g_game.updateCreatureSkull(getPlayer());
 				}
 
 				if (getSkull() == SKULL_NONE) {
@@ -4000,6 +4002,8 @@ void Player::addUnjustifiedDead(const std::shared_ptr<const Player>& attacked)
 		                            static_cast<int64_t>(getNumber(ConfigManager::FRAG_TIME))) {
 			setSkull(SKULL_RED);
 		}
+
+		g_game.updateCreatureSkull(getPlayer());
 	}
 }
 
@@ -4015,6 +4019,7 @@ void Player::checkSkullTicks(int64_t ticks)
 	const auto skull = getSkull();
 	if ((skull == SKULL_RED || skull == SKULL_BLACK) && skullTicks < 1 && !hasCondition(CONDITION_INFIGHT)) {
 		setSkull(SKULL_NONE);
+		g_game.updateCreatureSkull(getPlayer());
 	}
 }
 
