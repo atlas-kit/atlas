@@ -142,6 +142,7 @@ bool Npc::loadFromXml()
 
 	if ((attr = npcNode.attribute("skull"))) {
 		setSkull(getSkullType(boost::algorithm::to_lower_copy<std::string>(attr.as_string())));
+		g_game.updateCreatureSkull(getNpc());
 	}
 
 	pugi::xml_node healthNode = npcNode.child("health");
@@ -290,7 +291,7 @@ void Npc::onCreatureMove(const std::shared_ptr<Creature>& creature, const std::s
 			const auto& player = creature->getPlayer();
 
 			// if player is now in range, add to spectators list, otherwise erase
-			if (player->canSee(position)) {
+			if (player->canSee(getPosition())) {
 				spectators.insert(player);
 			} else {
 				spectators.erase(player);

@@ -123,7 +123,7 @@ public:
 	virtual RaceType_t getRace() const { return RACE_NONE; }
 
 	virtual Skulls_t getSkull() const { return skull; }
-	void setSkull(Skulls_t skull);
+	void setSkull(Skulls_t skull) { this->skull = skull; }
 
 	Direction getDirection() const { return direction; }
 	void setDirection(Direction dir) { direction = dir; }
@@ -395,8 +395,6 @@ protected:
 		int64_t ticks;
 	};
 
-	Position position;
-
 	CreatureEventList eventsList;
 	std::vector<Condition*> conditions;
 	CreatureIconHashMap creatureIcons;
@@ -423,7 +421,6 @@ protected:
 	Outfit_t defaultOutfit;
 	uint16_t currentMount;
 
-	Position lastPosition;
 	LightInfo internalLight;
 
 	bool isInternalRemoved = false;
@@ -472,6 +469,9 @@ private:
 
 	std::map<uint32_t, CountBlock_t> damageMap;
 	std::map<uint32_t, int32_t> storageMap;
+
+	Position position;
+	Position lastPosition;
 
 	Skulls_t skull = SKULL_NONE;
 	Direction direction = DIRECTION_SOUTH;
