@@ -83,6 +83,7 @@ find_package(Lua REQUIRED)
 find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
 find_package(PugiXML CONFIG REQUIRED)
 find_package(simdutf CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
