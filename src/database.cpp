@@ -159,7 +159,8 @@ retry:
 	}
 
 	// retrieving results of query
-	if (const auto result = std::make_shared<DBResult>(std::move(res))) {
+	const auto result = std::make_shared<DBResult>(std::move(res));
+	if (result->hasNext()) {
 		return result;
 	}
 	return nullptr;
