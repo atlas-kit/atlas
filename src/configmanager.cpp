@@ -186,7 +186,7 @@ bool ConfigManager::load()
 			string[IP] = getGlobalString(L, "ip", "127.0.0.1");
 		}
 
-		string[MAP_NAME] = getGlobalString(L, "mapName", "atlas");
+		string[MAP_NAME] = getGlobalString(L, "mapName", "forgotten");
 		string[MAP_AUTHOR] = getGlobalString(L, "mapAuthor", "Unknown");
 		string[HOUSE_RENT_PERIOD] = getGlobalString(L, "houseRentPeriod", "never");
 		string[MYSQL_HOST] = getEnv("MYSQL_HOST", getGlobalString(L, "mysqlHost", ""));
