@@ -807,7 +807,7 @@ public:
 		if (!sendAll) {
 			// update one slot
 			if (const auto& slotThing = getThing(CONST_SLOT_RIGHT)) {
-				if (const auto& slotItem = slotThing->getItem()) {
+				if (const auto& slotItem = slotThing->asItem()) {
 					if (slotItem->getWeaponType() == WEAPON_QUIVER) {
 						sendInventoryItem(CONST_SLOT_RIGHT, slotItem);
 					}
@@ -818,7 +818,7 @@ public:
 			constexpr auto slots = std::array{CONST_SLOT_RIGHT, CONST_SLOT_LEFT, CONST_SLOT_AMMO};
 			for (const auto& slot : slots) {
 				if (const auto& slotThing = getThing(slot)) {
-					if (const auto& slotItem = slotThing->getItem()) {
+					if (const auto& slotItem = slotThing->asItem()) {
 						if (slotItem->getWeaponType() == WEAPON_QUIVER) {
 							sendInventoryItem(slot, slotItem);
 						}
@@ -1229,7 +1229,7 @@ public:
 
 	void addExperience(const std::shared_ptr<Creature>& source, uint64_t exp, bool sendText = false);
 	void removeExperience(uint64_t exp, bool sendText = false);
-	double getLostPercent() const;
+	double getLossPercent() const;
 
 private:
 	std::forward_list<Condition*> getMuteConditions() const;
@@ -1413,7 +1413,7 @@ private:
 
 	uint64_t getLostExperience() const override
 	{
-		return skillLoss ? static_cast<uint64_t>(experience * getLostPercent()) : 0;
+		return skillLoss ? static_cast<uint64_t>(experience * getLossPercent()) : 0;
 	}
 	uint32_t getDamageImmunities() const override { return damageImmunities; }
 	uint32_t getConditionImmunities() const override { return conditionImmunities; }
