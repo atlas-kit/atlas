@@ -459,8 +459,8 @@ public:
 	Item& operator=(const Item&) = delete;
 	bool operator==(const Item& otherItem) const;
 
-	std::shared_ptr<Item> getItem() override final { return std::static_pointer_cast<Item>(shared_from_this()); }
-	std::shared_ptr<const Item> getItem() const override final
+	std::shared_ptr<Item> asItem() override final { return std::static_pointer_cast<Item>(shared_from_this()); }
+	std::shared_ptr<const Item> asItem() const override final
 	{
 		return std::static_pointer_cast<const Item>(shared_from_this());
 	}
@@ -691,7 +691,7 @@ public:
 	virtual void serializeAttr(PropWriteStream& propWriteStream) const;
 
 	bool isPushable() const { return isMoveable(); }
-	int32_t getThrowRange() const override final { return (isPickupable() ? 15 : 2); }
+	int32_t getThrowRange() const { return (isPickupable() ? 15 : 2); }
 
 	uint16_t getID() const { return id; }
 	uint16_t getClientID() const { return items[id].clientId; }

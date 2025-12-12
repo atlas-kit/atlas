@@ -459,7 +459,7 @@ void Tile::onRemoveTileItem(const SpectatorVec& spectators, const std::vector<in
 ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, uint32_t, uint32_t flags,
                            const std::shared_ptr<Creature>&) const
 {
-	if (const auto& creature = thing->getCreature()) {
+	if (const auto& creature = thing->asCreature()) {
 		if (hasBitSet(FLAG_NOLIMIT, flags)) {
 			return RETURNVALUE_NOERROR;
 		}
@@ -613,7 +613,7 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 				}
 			}
 		}
-	} else if (const auto& item = thing->getItem()) {
+	} else if (const auto& item = thing->asItem()) {
 		const TileItemVector* items = getItemList();
 		if (items && items->size() >= 0xFFFF) {
 			return RETURNVALUE_NOTPOSSIBLE;
@@ -705,7 +705,7 @@ ReturnValue Tile::queryRemove(const std::shared_ptr<const Thing>& thing, uint32_
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
 
-	const auto& item = thing->getItem();
+	const auto& item = thing->asItem();
 	if (!item) {
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
@@ -808,7 +808,7 @@ std::shared_ptr<Thing> Tile::queryDestination(int32_t&, const std::shared_ptr<co
 
 	if (destTile) {
 		if (const auto& destThing = destTile->getTopDownItem()) {
-			destItem = destThing->getItem();
+			destItem = destThing->asItem();
 		}
 	}
 	return destTile;
@@ -816,7 +816,7 @@ std::shared_ptr<Thing> Tile::queryDestination(int32_t&, const std::shared_ptr<co
 
 void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 {
-	if (const auto& creature = thing->getCreature()) {
+	if (const auto& creature = thing->asCreature()) {
 		g_game.map.clearSpectatorCache();
 		if (creature->getPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
@@ -825,7 +825,7 @@ void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 		creature->setParent(getTile());
 		CreatureVector* creatures = makeCreatures();
 		creatures->insert(creatures->begin(), creature);
-	} else if (const auto& item = thing->getItem()) {
+	} else if (const auto& item = thing->asItem()) {
 		TileItemVector* items = getItemList();
 		if (items && items->size() >= 0xFFFF) {
 			return /*RETURNVALUE_NOTPOSSIBLE*/;
@@ -920,7 +920,7 @@ void Tile::updateThing(const std::shared_ptr<Thing>& thing, uint16_t itemId, uin
 		return /*RETURNVALUE_NOTPOSSIBLE*/;
 	}
 
-	const auto& item = thing->getItem();
+	const auto& item = thing->asItem();
 	if (!item) {
 		return /*RETURNVALUE_NOTPOSSIBLE*/;
 	}
@@ -938,7 +938,7 @@ void Tile::replaceThing(uint32_t index, const std::shared_ptr<Thing>& thing)
 {
 	int32_t pos = index;
 
-	const auto& item = thing->getItem();
+	const auto& item = thing->asItem();
 	if (!item) {
 		return /*RETURNVALUE_NOTPOSSIBLE*/;
 	}
@@ -1007,7 +1007,7 @@ void Tile::replaceThing(uint32_t index, const std::shared_ptr<Thing>& thing)
 
 void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 {
-	if (const auto& creature = thing->getCreature()) {
+	if (const auto& creature = thing->asCreature()) {
 		CreatureVector* creatures = getCreatures();
 		if (creatures) {
 			auto it = std::find(creatures->begin(), creatures->end(), thing);
@@ -1023,7 +1023,7 @@ void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 		return;
 	}
 
-	const auto& item = thing->getItem();
+	const auto& item = thing->asItem();
 	if (!item) {
 		return;
 	}
@@ -1120,7 +1120,7 @@ int32_t Tile::getThingIndex(const std::shared_ptr<const Thing>& thing) const
 
 	const TileItemVector* items = getItemList();
 	if (items) {
-		const auto& item = thing->getItem();
+		const auto& item = thing->asItem();
 		if (item && item->isAlwaysOnTop()) {
 			for (auto it = items->getBeginTopItem(), end = items->getEndTopItem(); it != end; ++it) {
 				++n;
@@ -1134,7 +1134,7 @@ int32_t Tile::getThingIndex(const std::shared_ptr<const Thing>& thing) const
 	}
 
 	if (const CreatureVector* creatures = getCreatures()) {
-		if (thing->getCreature()) {
+		if (thing->asCreature()) {
 			for (const auto& creature : *creatures) {
 				++n;
 				if (creature == thing) {
@@ -1147,7 +1147,7 @@ int32_t Tile::getThingIndex(const std::shared_ptr<const Thing>& thing) const
 	}
 
 	if (items) {
-		const auto& item = thing->getItem();
+		const auto& item = thing->asItem();
 		if (item && !item->isAlwaysOnTop()) {
 			for (auto it = items->getBeginDownItem(), end = items->getEndDownItem(); it != end; ++it) {
 				++n;
@@ -1308,9 +1308,9 @@ void Tile::postAddNotification(const std::shared_ptr<Thing>& thing, const std::s
 		}
 
 		// calling movement scripts
-		if (const auto& creature = thing->getCreature()) {
+		if (const auto& creature = thing->asCreature()) {
 			g_moveEvents->onCreatureMove(creature, getTile(), MOVE_EVENT_STEP_IN);
-		} else if (const auto& item = thing->getItem()) {
+		} else if (const auto& item = thing->asItem()) {
 			g_moveEvents->onItemMove(item, getTile(), true);
 		}
 	}
@@ -1338,9 +1338,9 @@ void Tile::postRemoveNotification(const std::shared_ptr<Thing>& thing, const std
 
 	// calling movement scripts
 
-	if (const auto& creature = thing->getCreature()) {
+	if (const auto& creature = thing->asCreature()) {
 		g_moveEvents->onCreatureMove(creature, getTile(), MOVE_EVENT_STEP_OUT);
-	} else if (const auto& item = thing->getItem()) {
+	} else if (const auto& item = thing->asItem()) {
 		g_moveEvents->onItemMove(item, getTile(), false);
 	}
 }
@@ -1349,7 +1349,7 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 {
 	thing->setParent(getTile());
 
-	if (const auto& creature = thing->getCreature()) {
+	if (const auto& creature = thing->asCreature()) {
 		g_game.map.clearSpectatorCache();
 		if (creature->getPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
@@ -1357,7 +1357,7 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 
 		CreatureVector* creatures = makeCreatures();
 		creatures->insert(creatures->begin(), creature);
-	} else if (const auto& item = thing->getItem()) {
+	} else if (const auto& item = thing->asItem()) {
 		const ItemType& itemType = Item::items[item->getID()];
 		if (itemType.isGroundTile()) {
 			if (!ground) {
@@ -1530,7 +1530,7 @@ std::shared_ptr<Item> Tile::getUseItem(int32_t index) const
 
 	// try getting thing by index
 	if (const auto& thing = getThing(index)) {
-		if (const auto& item = thing->getItem()) {
+		if (const auto& item = thing->asItem()) {
 			return item;
 		}
 	}
