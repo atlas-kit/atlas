@@ -20,7 +20,7 @@ function handler.onReceive(player)
 	end
 
 	local isPromoted = player:isPromoted()
-	msg:addByte(isPromoted and 0x01 or 0x00)
+	msg:addByte(isPromoted)
 	msg:addByte(premiumReduction) -- exp loss lower
 
 	local lossPercents = player:getLossPercent()
@@ -30,21 +30,23 @@ function handler.onReceive(player)
 	msg:addByte(expLost) -- exp skill pve death
 
 	local hasSkull = player:getSkull() == SKULL_RED or player:getSkull() == SKULL_BLACK
+	local usingAol = false
+	local amulet = player:getSlotItem(CONST_SLOT_NECKLACE)
+	if amulet and amulet:getId() == ITEM_AMULETOFLOSS then
+		usingAol = true
+	end
+
 	local containerLossPercent = lossPercents.container
 	if hasSkull then
 		containerLossPercent = 100
+	elseif usingAol then
+		containerLossPercent = 0
 	end
 
 	msg:addByte(containerLossPercent)
 	msg:addByte(containerLossPercent)
 	msg:addByte(hasSkull and 0x01 or 0x00)
-
-	local amulet = player:getSlotItem(CONST_SLOT_NECKLACE)
-	if amulet and amulet:getId() == ITEM_AMULETOFLOSS then
-		msg:addByte(0x01)
-	else
-		msg:addByte(0x00)
-	end
+	msg:addByte(usingAol and 0x01 or 0x00)
 
 	-- History
 	local historyAmount = 1
