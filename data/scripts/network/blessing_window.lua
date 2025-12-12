@@ -19,7 +19,8 @@ function handler.onReceive(player)
 		premiumReduction = 30
 	end
 
-	msg:addByte(2) -- premium (only work with premium days)
+	local isPromoted = player:isPromoted()
+	msg:addByte(isPromoted and 0x01 or 0x00)
 	msg:addByte(premiumReduction) -- exp loss lower
 
 	local lossPercents = player:getLossPercent()
@@ -27,11 +28,23 @@ function handler.onReceive(player)
 	msg:addByte(expLost) -- exp skill loss min pvp death
 	msg:addByte(expLost) -- exp skill loss max pvp death
 	msg:addByte(expLost) -- exp skill pve death
-	msg:addByte(lossPercents.container) -- equip container lose pvp death
-	msg:addByte(lossPercents.container) -- equip container pve death
 
-	msg:addByte(0) -- ??
-	msg:addByte(0) -- ??
+	local hasSkull = player:getSkull() == SKULL_RED or player:getSkull() == SKULL_BLACK
+	local containerLossPercent = lossPercents.container
+	if hasSkull then
+		containerLossPercent = 100
+	end
+
+	msg:addByte(containerLossPercent)
+	msg:addByte(containerLossPercent)
+	msg:addByte(hasSkull and 0x01 or 0x00)
+
+	local amulet = player:getSlotItem(CONST_SLOT_NECKLACE)
+	if amulet and amulet:getId() == ITEM_AMULETOFLOSS then
+		msg:addByte(0x01)
+	else
+		msg:addByte(0x00)
+	end
 
 	-- History
 	local historyAmount = 1
