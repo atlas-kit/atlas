@@ -3784,7 +3784,15 @@ int LuaScriptInterface::luaIsMoveable(lua_State* L)
 	// isMoveable(uid)
 	// isMovable(uid)
 	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
-	tfs::lua::pushBoolean(L, thing && thing->isPushable());
+	if (const auto& item = thing->getItem()) {
+		tfs::lua::pushBoolean(L, item->isPushable());
+	} else if (const auto& creature = thing->getCreature()) {
+		tfs::lua::pushBoolean(L, creature->isPushable());
+	} else if (const auto& tile = thing->getTile()) {
+		tfs::lua::pushBoolean(L, false);
+	} else {
+		tfs::lua::pushBoolean(L, false);
+	}
 	return 1;
 }
 
