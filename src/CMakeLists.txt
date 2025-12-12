@@ -155,25 +155,23 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/weapons.h
 	${CMAKE_CURRENT_LIST_DIR}/wildcardtree.h
 	${CMAKE_CURRENT_LIST_DIR}/xtea.h
-	${CMAKE_CURRENT_LIST_DIR}/logger/logger.h
 	)
 
 set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 
 add_library(tfslib ${tfs_SRC})
-target_link_libraries(${PROJECT_NAME} PRIVATE
-	${MYSQL_CLIENT_LIBS}
-	${LUA_LIBRARIES}
-	PugiXML::pugixml
-	ZLIB::ZLIB
+target_link_libraries(tfslib PRIVATE
+	Boost::iostreams
+	Boost::system
 	OpenSSL::Crypto
+	pugixml::pugixml
 	simdutf::simdutf
-	Threads::Threads
-	${Boost_LIBRARIES}
 	spdlog::spdlog
+	ZLIB::ZLIB
 	${CMAKE_THREAD_LIBS_INIT}
+	${LUA_LIBRARIES}
+	${MYSQL_CLIENT_LIBS}
 	)
-
 set_target_properties(tfslib PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 if (APPLE)

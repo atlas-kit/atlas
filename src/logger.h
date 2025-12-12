@@ -8,8 +8,8 @@
 
 // Simple wrapper to initialize spdlog
 namespace logger {
-    void init();
-    void shutdown();
-}
+void init();
+void shutdown();
+} // namespace logger
 
 #endif // FS_LOGGER_H
