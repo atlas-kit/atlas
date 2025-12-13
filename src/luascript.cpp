@@ -2823,6 +2823,7 @@ void LuaScriptInterface::registerFunctions()
 
 	registerMethod(L, "Player", "isPzLocked", LuaScriptInterface::luaPlayerIsPzLocked);
 
+	registerMethod(L, "Player", "hasClient", LuaScriptInterface::luaPlayerHasClient);
 	registerMethod(L, "Player", "getClient", LuaScriptInterface::luaPlayerGetClient);
 
 	registerMethod(L, "Player", "getHouse", LuaScriptInterface::luaPlayerGetHouse);
@@ -2848,6 +2849,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "Player", "isNearDepotBox", LuaScriptInterface::luaPlayerIsNearDepotBox);
 
 	registerMethod(L, "Player", "getIdleTime", LuaScriptInterface::luaPlayerGetIdleTime);
+	registerMethod(L, "Player", "setIdleTime", LuaScriptInterface::luaPlayerSetIdleTime);
 	registerMethod(L, "Player", "resetIdleTime", LuaScriptInterface::luaPlayerResetIdleTime);
 
 	registerMethod(L, "Player", "sendCreatureSquare", LuaScriptInterface::luaPlayerSendCreatureSquare);
@@ -10631,6 +10633,17 @@ int LuaScriptInterface::luaPlayerIsPzLocked(lua_State* L)
 	return 1;
 }
 
+int LuaScriptInterface::luaPlayerHasClient(lua_State* L)
+{
+	// player:hasClient()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		tfs::lua::pushBoolean(L, player->hasClient());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaPlayerGetClient(lua_State* L)
 {
 	// player:getClient()
@@ -10970,6 +10983,20 @@ int LuaScriptInterface::luaPlayerGetIdleTime(lua_State* L)
 	}
 
 	tfs::lua::pushNumber(L, player->getIdleTime());
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerSetIdleTime(lua_State* L)
+{
+	// player:setIdleTime(ms)
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	player->setIdleTime(tfs::lua::getNumber<uint32_t>(L, 2));
+	tfs::lua::pushNumber(L, true);
 	return 1;
 }
 
