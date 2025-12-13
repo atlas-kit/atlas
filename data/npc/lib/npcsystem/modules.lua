@@ -124,11 +124,11 @@ if not Modules then
 	end
 
 	local blessings = {
-		[BLESSING_WISDOM_OF_SOLITUDE] = { name = "Wisdom of Solitude" },
-		[BLESSING_SPARK_OF_THE_PHOENIX] = { name = "Spark of the Phoenix" },
-		[BLESSING_FIRE_OF_THE_SUNS] = { name = "Fire of the Suns" },
-		[BLESSING_SPIRITUAL_SHIELDING] = { name = "Spiritual Shielding" },
-		[BLESSING_EMBRACE_OF_THE_WORLD] = { name = "Embrace of the World" },
+		[BLESSING_ID_WISDOM_OF_SOLITUDE] = { name = "Wisdom of Solitude" },
+		[BLESSING_ID_SPARK_OF_THE_PHOENIX] = { name = "Spark of the Phoenix" },
+		[BLESSING_ID_FIRE_OF_THE_SUNS] = { name = "Fire of the Suns" },
+		[BLESSING_ID_SPIRITUAL_SHIELDING] = { name = "Spiritual Shielding" },
+		[BLESSING_ID_EMBRACE_OF_THE_WORLD] = { name = "Embrace of the World" },
 	}
 
 	function StdModule.bless(cid, message, keywords, parameters, node)
