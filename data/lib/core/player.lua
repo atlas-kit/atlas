@@ -775,50 +775,40 @@ function Player.getMaxTrackedBestiary(self)
 end
 
 function Player.setTrackedBestiary(self, raceId, checked)
-	local trackedBestiary = self:getTrackedBestiary()
-	if checked and #trackedBestiary >= self:getMaxTrackedBestiary() then
+	local trackedCount = self:getTrackedBestiaryCount()
+	if checked and trackedCount >= self:getMaxTrackedBestiary() then
 		self:sendTextMessage(MESSAGE_STATUS_WARNING, "You have reached the maximum number of trackable creatures.\nYou have to remove one of your currently tracked creatures before you can add another one.")
 		return false
 	end
 
+	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, checked and 1 or -1)
+
+	local trackedBestiary = Game.getTrackedBestiary()[self:getId()] or {}
 	local index = table.indexOf(trackedBestiary, raceId)
-	if not checked then
-		if index ~= nil then
-			table.remove(trackedBestiary, index)
-		end
-	else
-		if index == nil then
-			table.insert(trackedBestiary, raceId)
-		end
-	end
 
-	for k = 1, self:getMaxTrackedBestiary() do
-		self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + k, -1)
-	end
-
-	for k = 1, #trackedBestiary do
-		self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + k, trackedBestiary[k])
+	if checked and not index then
+		table.insert(trackedBestiary, raceId)
+	elseif not checked and index then
+		table.remove(trackedBestiary, index)
 	end
 
 	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
 	return true
 end
 
+function Player.getTrackedBestiaryCount(self)
+	local count = 0
+	local trackedBestiary = self:getTrackedBestiary()
+	return #trackedBestiary
+end
+
 function Player.getTrackedBestiary(self)
-	local trackedBestiary = Game.getTrackedBestiary()[self:getId()]
-	if trackedBestiary then
-		return trackedBestiary
+	local cachedData = Game.getTrackedBestiary()[self:getId()]
+	if cachedData then
+		return cachedData
 	end
 
-	trackedBestiary = {}
-
-	for k = 1, self:getMaxTrackedBestiary() do
-		local raceId = self:getStorageValue(PlayerStorageKeys.bestiaryTrackerBase + k)
-		if raceId > 0 then
-			table.insert(trackedBestiary, raceId)
-		end
-	end
-
+	local trackedBestiary = {}
 	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
 	return trackedBestiary
 end
