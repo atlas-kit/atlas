@@ -769,3 +769,29 @@ do
 		return lossPercents[blessingCount]
 	end
 end
+
+function Player.addBlessingsHistory(self, event, type)
+	local playerId = self:getGuid()
+	local currentTime = os.time()
+
+	return db.query(string.format("INSERT INTO `blessings_history` (`player_id`, `type`, `event`, `inserted`) VALUES (%d, %d, %s, %d)", playerId, type, db.escapeString(event), currentTime))
+end
+
+function Player.getBlessingsHistory(self)
+	local resultId = db.storeQuery(string.format("SELECT `type`, `event`, `inserted` FROM `blessings_history` WHERE `player_id` = %d ORDER BY `inserted` DESC", self:getGuid()))
+	if not resultId then
+		return {}
+	end
+
+	local history = {}
+	repeat
+		history[#history + 1] = {
+			type = result.getNumber(resultId, "type"),
+			event = result.getString(resultId, "event"),
+			ts = result.getNumber(resultId, "inserted")
+		}
+	until not result.next(resultId)
+	result.free(resultId)
+
+	return history
+end

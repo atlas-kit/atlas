@@ -49,13 +49,13 @@ function handler.onReceive(player)
 	msg:addByte(usingAol and 0x01 or 0x00)
 
 	-- History
-	local historyAmount = 1
-	msg:addByte(historyAmount)
+	local history = player:getBlessingsHistory()
+	msg:addByte(#history)
 
-	for i = 1, historyAmount do
-		msg:addU32(os.time())
-		msg:addByte(0) -- color message (0 - red | 1 = white)
-		msg:addString("Blessing Purchased")
+	for _, entry in ipairs(history) do
+		msg:addU32(entry.ts)
+		msg:addByte(entry.type)
+		msg:addString(entry.event)
 	end
 
 	msg:sendToPlayer(player)
