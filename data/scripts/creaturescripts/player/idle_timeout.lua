@@ -2,7 +2,7 @@ local event = CreatureEvent("Idle Timeout")
 
 function event.onThink(player, interval)
 	if player:getGroup():getAccess() then
-		--return
+		return
 	end
 
 	local tile = player:getTile()
