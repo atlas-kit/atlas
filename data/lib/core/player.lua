@@ -804,16 +804,14 @@ function Player.setTrackedBestiary(self, raceId, checked)
 	return true
 end
 
-function Player.getTrackedBestiary(self, isLogin)
-	if isLogin == nil then
-		isLogin = false
+function Player.getTrackedBestiary(self)
+	local trackedBestiary = Game.getTrackedBestiary()[self:getId()]
+	if trackedBestiary then
+		return trackedBestiary
 	end
 
-	if not isLogin then
-		return Game.getTrackedBestiary()[self:getId()]
-	end
+	trackedBestiary = {}
 
-	local trackedBestiary = {}
 	for k = 1, self:getMaxTrackedBestiary() do
 		local raceId = self:getStorageValue(PlayerStorageKeys.bestiaryTrackerBase + k)
 		if raceId > 0 then
@@ -822,7 +820,6 @@ function Player.getTrackedBestiary(self, isLogin)
 	end
 
 	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
-
 	return trackedBestiary
 end
 
