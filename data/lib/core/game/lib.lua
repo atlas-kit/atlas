@@ -140,3 +140,11 @@ function Game.getBlessings()
 		[5] = BLESS_TYPE_THE_EMBRACE_OF_THE_WORLD
 	}
 end
+
+do
+	local trackedBestiary = {}
+
+	function Game.getTrackedBestiary()
+		return trackedBestiary
+	end
+end
