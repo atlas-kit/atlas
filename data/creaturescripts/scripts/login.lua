@@ -27,16 +27,11 @@ function onLogin(player)
 	player:sendHotkeyPreset()
 	player:disableLoginMusic()
 	player:sendBlessings()
+	player:sendBestiaryTracker()
 
 	-- achievements points for highscores
 	if not player:getStorageValue(PlayerStorageKeys.achievementsTotal) then
 		player:setStorageValue(PlayerStorageKeys.achievementsTotal, player:getAchievementPoints())
-	end
-
-	-- Bestiary tracker
-	local trackedBestiary = player:getTrackedBestiary(true)
-	if #trackedBestiary > 0 then
-		player:sendBestiaryTracker()
 	end
 
 	-- Events

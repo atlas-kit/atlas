@@ -775,31 +775,36 @@ function Player.getMaxTrackedBestiary(self)
 end
 
 function Player.setTrackedBestiary(self, raceId, checked)
-	local trackedCount = self:getTrackedBestiaryCount()
-	if checked and trackedCount >= self:getMaxTrackedBestiary() then
-		self:sendTextMessage(MESSAGE_STATUS_WARNING, "You have reached the maximum number of trackable creatures.\nYou have to remove one of your currently tracked creatures before you can add another one.")
-		return false
+	if checked then
+		local resultId = db.storeQuery(string.format("SELECT COUNT(*) as count FROM `player_bestiary_tracker` WHERE `player_id` = %d", self:getGuid()))
+		if resultId then
+			local count = result.getDataInt(resultId, 'count')
+			result.free(resultId)
+			if count >= self:getMaxTrackedBestiary() then
+				self:sendTextMessage(MESSAGE_STATUS_WARNING, "You have reached the maximum number of trackable creatures.\nYou have to remove one of your currently tracked creatures before you can add another one.")
+				return false
+			end
+		end
 	end
 
-	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, checked and 1 or -1)
-
-	local trackedBestiary = Game.getTrackedBestiary()[self:getId()] or {}
-	local index = table.indexOf(trackedBestiary, raceId)
-
-	if checked and not index then
-		table.insert(trackedBestiary, raceId)
-	elseif not checked and index then
-		table.remove(trackedBestiary, index)
+	if checked then
+		db.asyncQuery(string.format("INSERT IGNORE INTO `player_bestiary_tracker` (`player_id`, `race_id`) VALUES (%d, %d)", self:getGuid(), raceId))
+	else
+		db.asyncQuery(string.format("DELETE FROM `player_bestiary_tracker` WHERE `player_id` = %d AND `race_id` = %d", self:getGuid(), raceId))
 	end
 
-	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
+	Game.getTrackedBestiary()[self:getId()] = nil
 	return true
 end
 
 function Player.getTrackedBestiaryCount(self)
-	local count = 0
-	local trackedBestiary = self:getTrackedBestiary()
-	return #trackedBestiary
+	local resultId = db.storeQuery(string.format("SELECT COUNT(*) as count FROM `player_bestiary_tracker` WHERE `player_id` = %d", self:getGuid()))
+	if resultId then
+		local count = result.getDataInt(resultId, 'count')
+		result.free(resultId)
+		return count
+	end
+	return 0
 end
 
 function Player.getTrackedBestiary(self)
@@ -809,6 +814,15 @@ function Player.getTrackedBestiary(self)
 	end
 
 	local trackedBestiary = {}
+	local resultId = db.storeQuery(string.format("SELECT `race_id` FROM `player_bestiary_tracker` WHERE `player_id` = %d ORDER BY `created_at`", self:getGuid()))
+
+	if resultId then
+		repeat
+			table.insert(trackedBestiary, result.getDataInt(resultId, 'race_id'))
+		until not result.next(resultId)
+		result.free(resultId)
+	end
+
 	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
 	return trackedBestiary
 end
