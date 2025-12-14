@@ -79,7 +79,7 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 
 	auto accountId = result->getNumber<uint64_t>("id");
 	auto premiumEndsAt = result->getNumber<int64_t>("premium_ends_at");
-	bool freePremium = getBoolean(ConfigManager::FREE_PREMIUM);
+	auto freePremium = getBoolean(ConfigManager::FREE_PREMIUM);
 
 	std::string sessionKey = randomBytes(16);
 	if (!db.executeQuery(
