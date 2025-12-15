@@ -774,59 +774,31 @@ function Player.getMaxTrackedBestiary(self)
 	return 50
 end
 
-function Player.loadTrackedBestiary(self)
-	local trackedBestiary = {}
-	local maxRaceId = Game.getMaxRaceId()
-
-	for raceId = 1, maxRaceId do
-		local storage = PlayerStorageKeys.bestiaryTrackerBase + raceId
-		if self:getStorageValue(storage) == 1 then
-			table.insert(trackedBestiary, raceId)
-		end
-	end
-
-	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
+function Player.isBestiaryTracked(self, raceId)
+	return self:getStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId) == 1
 end
 
-function Player.setTrackedBestiary(self, raceId, checked)
-	local trackedCount = self:getTrackedBestiaryCount()
-	if checked and trackedCount >= self:getMaxTrackedBestiary() then
-		self:sendTextMessage(MESSAGE_STATUS_WARNING, "You have reached the maximum number of trackable creatures.\nYou have to remove one of your currently tracked creatures before you can add another one.")
-		return false
-	end
-
-	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, checked and 1 or -1)
-
-	local trackedBestiary = Game.getTrackedBestiary()[self:getId()] or {}
-	local index = table.indexOf(trackedBestiary, raceId)
-
-	if checked and not index then
-		table.insert(trackedBestiary, raceId)
-	elseif not checked and index then
-		table.remove(trackedBestiary, index)
-	end
-
-	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
-	return true
+function Player.trackBestiary(self, raceId)
+	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, 1)
 end
 
-function Player.getTrackedBestiaryCount(self)
-	local trackedBestiary = self:getTrackedBestiary()
-	return #trackedBestiary
+function Player.untrackBestiary(self, raceId)
+	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, -1)
 end
 
 function Player.getTrackedBestiary(self)
-	local cachedData = Game.getTrackedBestiary()[self:getId()]
-	if cachedData then
-		return cachedData
-	end
+	local result = {}
 
-	local trackedBestiary = {}
-	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
-	return trackedBestiary
+	local maxRaceId = Game.getMaxRaceId()
+	for raceId = 1, maxRaceId do
+		if self:isBestiaryTracked(raceId) then
+			table.insert(result, raceId)
+		end
+	end
+	return result
 end
 
-function Player.sendBestiaryTracker(self)
+function Player.sendTrackedBestiary(self)
 	local msg = NetworkMessage()
 	msg:addByte(0xB9)
 

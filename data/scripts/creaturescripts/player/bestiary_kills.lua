@@ -37,9 +37,8 @@ function creatureEvent.onKill(player, target)
 	for _, killer in pairs(getKillersForBestiary(monster)) do
 		killer:addBestiaryKills(raceId)
 
-		local trackedBestiary = killer:getTrackedBestiary()
-		if #trackedBestiary > 0 and table.contains(trackedBestiary, raceId) then
-			killer:sendBestiaryTracker()
+		if killer:isBestiaryTracked(raceId) then
+			killer:sendTrackedBestiary()
 		end
 	end
 	return true

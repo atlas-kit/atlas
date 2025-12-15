@@ -141,14 +141,6 @@ function Game.getBlessings()
 	}
 end
 
-do
-	local trackedBestiary = {}
-
-	function Game.getTrackedBestiary()
-		return trackedBestiary
-	end
-end
-
 function Game.getMaxRaceId()
 	local maxRaceId = 0
 	local monsterTypes = Game.getMonsterTypes()
