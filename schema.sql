@@ -121,6 +121,15 @@ CREATE TABLE IF NOT EXISTS `ip_bans` (
   FOREIGN KEY (`banned_by`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+  `ip` varbinary(16) NOT NULL,
+  `attempts` int unsigned NOT NULL DEFAULT 0,
+  `last_attempt` bigint NOT NULL,
+  `blocked_until` bigint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ip`),
+  KEY `blocked_until` (`blocked_until`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `player_namelocks` (
   `player_id` int NOT NULL,
   `reason` varchar(255) NOT NULL,

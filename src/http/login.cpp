@@ -32,6 +32,21 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 {
 	using namespace std::chrono;
 
+	thread_local auto& db = Database::getInstance();
+	auto now = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+	const auto& blockedResult = db.storeQuery(std::format(
+	    "SELECT `blocked_until` FROM `login_attempts` WHERE `ip` = INET6_ATON({:s}) AND `blocked_until` > {:d}",
+	    db.escapeString(ip), now));
+
+	if (blockedResult) {
+		auto blockedUntil = blockedResult->getNumber<int64_t>("blocked_until");
+		int minutesRemaining = (blockedUntil - now) / 60;
+		return make_error_response(
+		    {.code = 4,
+		     .message =
+		         std::format("Too many failed login attempts. Please try again in {} minutes.", minutesRemaining)});
+	}
+
 	auto emailField = body.if_contains("email");
 	if (!emailField || !emailField->is_string()) {
 		return make_error_response(
@@ -44,8 +59,6 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
 
-	thread_local auto& db = Database::getInstance();
-
 	const auto& result = db.storeQuery(std::format(
 	    "SELECT `id`, UNHEX(`password`) AS `password`, `secret`, `premium_ends_at` FROM `accounts` WHERE `email` = {:s}",
 	    db.escapeString(emailField->get_string())));
@@ -56,11 +69,28 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 
 	auto password = result->getString("password");
 	if (password != transformToSHA1(passwordField->get_string())) {
+		db.executeQuery(
+		    std::format("INSERT INTO `login_attempts` (`ip`, `attempts`, `last_attempt`, `blocked_until`) "
+		                "VALUES (INET6_ATON({:s}), 1, {:d}, 0) "
+		                "ON DUPLICATE KEY UPDATE "
+		                "`attempts` = IF(`blocked_until` > {:d}, `attempts`, `attempts` + 1), "
+		                "`last_attempt` = {:d}, "
+		                "`blocked_until` = IF(`attempts` >= 2, {:d} + 1800, `blocked_until`)",
+		                db.escapeString(ip), now, now, now, now));
+
+		auto attemptsResult = db.storeQuery(
+		    std::format("SELECT `attempts` FROM `login_attempts` WHERE `ip` = INET6_ATON({:s})", db.escapeString(ip)));
+
+		if (attemptsResult && attemptsResult->getNumber<uint32_t>("attempts") >= 3) {
+			return make_error_response(
+			    {.code = 4, .message = "Too many failed login attempts. Please try again in 30 minutes."});
+		}
+
 		return make_error_response(
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
 
-	auto now = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+	db.executeQuery(std::format("DELETE FROM `login_attempts` WHERE `ip` = INET6_ATON({:s})", db.escapeString(ip)));
 
 	auto secret = result->getString("secret");
 	if (!secret.empty()) {
