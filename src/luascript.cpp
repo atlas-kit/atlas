@@ -4712,12 +4712,12 @@ int LuaScriptInterface::luaGameGetTowns(lua_State* L)
 int LuaScriptInterface::luaGameGetHouses(lua_State* L)
 {
 	// Game.getHouses()
-	const auto& houses = g_game.map.houses.getHouses();
+	const auto& houses = g_game.getHouses();
 	lua_createtable(L, houses.size(), 0);
 
 	int index = 0;
 	for (auto&& house : houses | std::views::values | std::views::as_const) {
-		tfs::lua::pushUserdata(L, house.get());
+		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
 		lua_rawseti(L, -2, ++index);
 	}
@@ -5956,7 +5956,7 @@ int LuaScriptInterface::luaTileGetHouse(lua_State* L)
 	}
 
 	if (const auto& houseTile = tile->getHouseTile()) {
-		tfs::lua::pushUserdata(L, houseTile->getHouse());
+		tfs::lua::pushSharedPtr(L, houseTile->getHouse());
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {
 		lua_pushnil(L);
@@ -10654,9 +10654,9 @@ int LuaScriptInterface::luaPlayerGetHouse(lua_State* L)
 		return 1;
 	}
 
-	House* house = g_game.map.houses.getHouseByPlayerId(player->getGUID());
+	const auto& house = g_game.getHouseByPlayerId(player->getGUID());
 	if (house) {
-		tfs::lua::pushUserdata(L, house);
+		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {
 		lua_pushnil(L);
@@ -10673,7 +10673,7 @@ int LuaScriptInterface::luaPlayerSendHouseWindow(lua_State* L)
 		return 1;
 	}
 
-	House* house = tfs::lua::getUserdata<House>(L, 2);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 2);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -10694,7 +10694,7 @@ int LuaScriptInterface::luaPlayerSetEditHouse(lua_State* L)
 		return 1;
 	}
 
-	House* house = tfs::lua::getUserdata<House>(L, 2);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 2);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12212,9 +12212,9 @@ int LuaScriptInterface::luaVocationAllowsPvp(lua_State* L)
 int LuaScriptInterface::luaHouseCreate(lua_State* L)
 {
 	// House(id)
-	House* house = g_game.map.houses.getHouse(tfs::lua::getNumber<uint32_t>(L, 2));
+	const auto& house = g_game.getHouseById(tfs::lua::getNumber<uint32_t>(L, 2));
 	if (house) {
-		tfs::lua::pushUserdata(L, house);
+		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {
 		lua_pushnil(L);
@@ -12225,7 +12225,7 @@ int LuaScriptInterface::luaHouseCreate(lua_State* L)
 int LuaScriptInterface::luaHouseGetId(lua_State* L)
 {
 	// house:getId()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getId());
 	} else {
@@ -12237,7 +12237,7 @@ int LuaScriptInterface::luaHouseGetId(lua_State* L)
 int LuaScriptInterface::luaHouseGetName(lua_State* L)
 {
 	// house:getName()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushString(L, house->getName());
 	} else {
@@ -12249,7 +12249,7 @@ int LuaScriptInterface::luaHouseGetName(lua_State* L)
 int LuaScriptInterface::luaHouseGetTown(lua_State* L)
 {
 	// house:getTown()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12267,7 +12267,7 @@ int LuaScriptInterface::luaHouseGetTown(lua_State* L)
 int LuaScriptInterface::luaHouseGetExitPosition(lua_State* L)
 {
 	// house:getExitPosition()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushPosition(L, house->getEntryPosition());
 	} else {
@@ -12279,7 +12279,7 @@ int LuaScriptInterface::luaHouseGetExitPosition(lua_State* L)
 int LuaScriptInterface::luaHouseGetRent(lua_State* L)
 {
 	// house:getRent()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getRent());
 	} else {
@@ -12292,7 +12292,7 @@ int LuaScriptInterface::luaHouseSetRent(lua_State* L)
 {
 	// house:setRent(rent)
 	uint32_t rent = tfs::lua::getNumber<uint32_t>(L, 2);
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		house->setRent(rent);
 		tfs::lua::pushBoolean(L, true);
@@ -12305,7 +12305,7 @@ int LuaScriptInterface::luaHouseSetRent(lua_State* L)
 int LuaScriptInterface::luaHouseGetPaidUntil(lua_State* L)
 {
 	// house:getPaidUntil()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getPaidUntil());
 	} else {
@@ -12318,7 +12318,7 @@ int LuaScriptInterface::luaHouseSetPaidUntil(lua_State* L)
 {
 	// house:setPaidUntil(timestamp)
 	time_t timestamp = tfs::lua::getNumber<time_t>(L, 2);
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		house->setPaidUntil(timestamp);
 		tfs::lua::pushBoolean(L, true);
@@ -12331,7 +12331,7 @@ int LuaScriptInterface::luaHouseSetPaidUntil(lua_State* L)
 int LuaScriptInterface::luaHouseGetPayRentWarnings(lua_State* L)
 {
 	// house:getPayRentWarnings()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getPayRentWarnings());
 	} else {
@@ -12344,7 +12344,7 @@ int LuaScriptInterface::luaHouseSetPayRentWarnings(lua_State* L)
 {
 	// house:setPayRentWarnings(warnings)
 	uint32_t warnings = tfs::lua::getNumber<uint32_t>(L, 2);
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		house->setPayRentWarnings(warnings);
 		tfs::lua::pushBoolean(L, true);
@@ -12357,7 +12357,7 @@ int LuaScriptInterface::luaHouseSetPayRentWarnings(lua_State* L)
 int LuaScriptInterface::luaHouseGetOwnerName(lua_State* L)
 {
 	// house:getOwnerName()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushString(L, house->getOwnerName());
 	} else {
@@ -12369,7 +12369,7 @@ int LuaScriptInterface::luaHouseGetOwnerName(lua_State* L)
 int LuaScriptInterface::luaHouseGetOwnerGuid(lua_State* L)
 {
 	// house:getOwnerGuid()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getOwner());
 	} else {
@@ -12381,7 +12381,7 @@ int LuaScriptInterface::luaHouseGetOwnerGuid(lua_State* L)
 int LuaScriptInterface::luaHouseSetOwnerGuid(lua_State* L)
 {
 	// house:setOwnerGuid(guid[, updateDatabase = true])
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		uint32_t guid = tfs::lua::getNumber<uint32_t>(L, 2);
 		bool updateDatabase = tfs::lua::getBoolean(L, 3, true);
@@ -12396,7 +12396,7 @@ int LuaScriptInterface::luaHouseSetOwnerGuid(lua_State* L)
 int LuaScriptInterface::luaHouseStartTrade(lua_State* L)
 {
 	// house:startTrade(player, tradePartner)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
 	const auto& tradePartner = tfs::lua::getSharedPtr<Player>(L, 3);
 
@@ -12415,7 +12415,7 @@ int LuaScriptInterface::luaHouseStartTrade(lua_State* L)
 		return 1;
 	}
 
-	if (g_game.map.houses.getHouseByPlayerId(tradePartner->getGUID())) {
+	if (g_game.getHouseByPlayerId(tradePartner->getGUID())) {
 		tfs::lua::pushNumber(L, RETURNVALUE_TRADEPLAYERALREADYOWNSAHOUSE);
 		return 1;
 	}
@@ -12443,7 +12443,7 @@ int LuaScriptInterface::luaHouseStartTrade(lua_State* L)
 int LuaScriptInterface::luaHouseGetBeds(lua_State* L)
 {
 	// house:getBeds()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12464,7 +12464,7 @@ int LuaScriptInterface::luaHouseGetBeds(lua_State* L)
 int LuaScriptInterface::luaHouseGetBedCount(lua_State* L)
 {
 	// house:getBedCount()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getBedCount());
 	} else {
@@ -12476,7 +12476,7 @@ int LuaScriptInterface::luaHouseGetBedCount(lua_State* L)
 int LuaScriptInterface::luaHouseGetDoors(lua_State* L)
 {
 	// house:getDoors()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12497,7 +12497,7 @@ int LuaScriptInterface::luaHouseGetDoors(lua_State* L)
 int LuaScriptInterface::luaHouseGetDoorCount(lua_State* L)
 {
 	// house:getDoorCount()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getDoors().size());
 	} else {
@@ -12509,7 +12509,7 @@ int LuaScriptInterface::luaHouseGetDoorCount(lua_State* L)
 int LuaScriptInterface::luaHouseGetDoorIdByPosition(lua_State* L)
 {
 	// house:getDoorIdByPosition(position)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12526,7 +12526,7 @@ int LuaScriptInterface::luaHouseGetDoorIdByPosition(lua_State* L)
 int LuaScriptInterface::luaHouseGetTiles(lua_State* L)
 {
 	// house:getTiles()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12547,7 +12547,7 @@ int LuaScriptInterface::luaHouseGetTiles(lua_State* L)
 int LuaScriptInterface::luaHouseGetItems(lua_State* L)
 {
 	// house:getItems()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12572,7 +12572,7 @@ int LuaScriptInterface::luaHouseGetItems(lua_State* L)
 int LuaScriptInterface::luaHouseGetTileCount(lua_State* L)
 {
 	// house:getTileCount()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		tfs::lua::pushNumber(L, house->getTiles().size());
 	} else {
@@ -12584,7 +12584,7 @@ int LuaScriptInterface::luaHouseGetTileCount(lua_State* L)
 int LuaScriptInterface::luaHouseCanEditAccessList(lua_State* L)
 {
 	// house:canEditAccessList(listId, player)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12600,7 +12600,7 @@ int LuaScriptInterface::luaHouseCanEditAccessList(lua_State* L)
 int LuaScriptInterface::luaHouseGetAccessList(lua_State* L)
 {
 	// house:getAccessList(listId)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12619,7 +12619,7 @@ int LuaScriptInterface::luaHouseGetAccessList(lua_State* L)
 int LuaScriptInterface::luaHouseSetAccessList(lua_State* L)
 {
 	// house:setAccessList(listId, list)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12635,7 +12635,7 @@ int LuaScriptInterface::luaHouseSetAccessList(lua_State* L)
 int LuaScriptInterface::luaHouseKickPlayer(lua_State* L)
 {
 	// house:kickPlayer(player, targetPlayer)
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -12648,7 +12648,7 @@ int LuaScriptInterface::luaHouseKickPlayer(lua_State* L)
 int LuaScriptInterface::luaHouseSave(lua_State* L)
 {
 	// house:save()
-	House* house = tfs::lua::getUserdata<House>(L, 1);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
