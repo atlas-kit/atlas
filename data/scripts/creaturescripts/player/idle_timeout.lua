@@ -17,7 +17,7 @@ function event.onThink(player, interval)
 
 	local idleTime = player:getIdleTime()
 	if idleTime == IDLE_LIMIT_MINUTES then
-		player:sendTextMessage(MESSAGE_STATUS_WARNING, "There was no variation in your behaviour for " .. IDLE_LIMIT_MINUTES / 60000 .. " minutes. You will be disconnected in one minute if there is no change in your actions until then.");
+		player:sendTextMessage(MESSAGE_STATUS_WARNING, "There was no variation in your behaviour for " .. IDLE_LIMIT_MINUTES / 60000 .. " minutes. You will be disconnected in one minute if there is no change in your actions until then.")
 		return
 	end
 
