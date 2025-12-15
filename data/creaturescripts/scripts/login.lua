@@ -27,6 +27,7 @@ function onLogin(player)
 	player:sendHotkeyPreset()
 	player:disableLoginMusic()
 	player:sendBlessings()
+	player:loadTrackedBestiary()
 	player:sendBestiaryTracker()
 
 	-- achievements points for highscores

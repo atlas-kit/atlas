@@ -44,4 +44,5 @@ PlayerStorageKeys = {
 	-- Bestiary:
 	bestiaryKillsBase = 400000,
 	bestiaryTrackerBase = 500000,
+	bestiaryTrackerMax = 502000,
 }

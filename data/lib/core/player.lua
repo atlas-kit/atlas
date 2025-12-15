@@ -774,6 +774,19 @@ function Player.getMaxTrackedBestiary(self)
 	return 50
 end
 
+function Player.loadTrackedBestiary(self)
+	local trackedBestiary = {}
+
+	for storage = PlayerStorageKeys.bestiaryTrackerBase, PlayerStorageKeys.bestiaryTrackerMax do
+		if self:getStorageValue(storage) == 1 then
+			local raceId = storage - PlayerStorageKeys.bestiaryTrackerBase
+			table.insert(trackedBestiary, raceId)
+		end
+	end
+
+	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
+end
+
 function Player.setTrackedBestiary(self, raceId, checked)
 	local trackedCount = self:getTrackedBestiaryCount()
 	if checked and trackedCount >= self:getMaxTrackedBestiary() then
