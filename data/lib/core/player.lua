@@ -769,3 +769,71 @@ do
 		return lossPercents[blessingCount]
 	end
 end
+
+function Player.getMaxTrackedBestiary(self)
+	return 50
+end
+
+function Player.setTrackedBestiary(self, raceId, checked)
+	local trackedCount = self:getTrackedBestiaryCount()
+	if checked and trackedCount >= self:getMaxTrackedBestiary() then
+		self:sendTextMessage(MESSAGE_STATUS_WARNING, "You have reached the maximum number of trackable creatures.\nYou have to remove one of your currently tracked creatures before you can add another one.")
+		return false
+	end
+
+	self:setStorageValue(PlayerStorageKeys.bestiaryTrackerBase + raceId, checked and 1 or -1)
+
+	local trackedBestiary = Game.getTrackedBestiary()[self:getId()] or {}
+	local index = table.indexOf(trackedBestiary, raceId)
+
+	if checked and not index then
+		table.insert(trackedBestiary, raceId)
+	elseif not checked and index then
+		table.remove(trackedBestiary, index)
+	end
+
+	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
+	return true
+end
+
+function Player.getTrackedBestiaryCount(self)
+	local trackedBestiary = self:getTrackedBestiary()
+	return #trackedBestiary
+end
+
+function Player.getTrackedBestiary(self)
+	local cachedData = Game.getTrackedBestiary()[self:getId()]
+	if cachedData then
+		return cachedData
+	end
+
+	local trackedBestiary = {}
+	Game.getTrackedBestiary()[self:getId()] = trackedBestiary
+	return trackedBestiary
+end
+
+function Player.sendBestiaryTracker(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xB9)
+
+	local trackedBestiary = self:getTrackedBestiary()
+	msg:addByte(#trackedBestiary)
+
+	for _, raceId in ipairs(trackedBestiary) do
+		msg:addU16(raceId)
+
+		local kills = self:getBestiaryKills(raceId)
+		msg:addU32(kills)
+
+		local monsterType = MonsterType(raceId)
+		local info = monsterType and monsterType:getBestiaryInfo() or {prowess = 1, expertise = 2, mastery = 3}
+		msg:addU16(info.prowess)
+		msg:addU16(info.expertise)
+		msg:addU16(info.mastery)
+		msg:addByte(kills >= info.mastery and 0x01 or 0x00)
+	end
+
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end

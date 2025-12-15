@@ -92,19 +92,6 @@ function getLootRandom()
 	return math.random(0, MAX_LOOTCHANCE) / configManager.getNumber(configKeys.RATE_LOOT)
 end
 
-table.contains = function(array, value)
-	for _, targetColumn in pairs(array) do
-		if targetColumn == value then
-			return true
-		end
-	end
-	return false
-end
-
-table.slice = function(array, from, to)
-	return {unpack(array, from or 1, to or #array)}
-end
-
 string.split = function(str, sep)
 	local res = {}
 	for v in str:gmatch("([^" .. sep .. "]+)") do
