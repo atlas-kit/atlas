@@ -30,7 +30,7 @@ static constexpr auto AUTHENTICATOR_PERIOD = 30U;
 #define _USE_MATH_DEFINES
 #endif
 
-#ifdef _WIN32
+#ifdef _WIN64
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif

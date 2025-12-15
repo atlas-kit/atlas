@@ -40,7 +40,7 @@ extern LuaEnvironment g_luaEnvironment;
 
 namespace {
 
-#ifndef _WIN32
+#ifndef _WIN64
 void sigusr1Handler()
 {
 	// Dispatcher thread
@@ -136,7 +136,7 @@ void dispatchSignalHandler(int signal)
 		case SIGTERM: // Shuts the server down
 			g_dispatcher.addTask(sigtermHandler);
 			break;
-#ifndef _WIN32
+#ifndef _WIN64
 		case SIGHUP: // Reload config/data
 			g_dispatcher.addTask(sighupHandler);
 			break;
@@ -163,7 +163,7 @@ Signals::Signals(boost::asio::io_context& ioc) : set(ioc)
 {
 	set.add(SIGINT);
 	set.add(SIGTERM);
-#ifndef _WIN32
+#ifndef _WIN64
 	set.add(SIGUSR1);
 	set.add(SIGHUP);
 #else

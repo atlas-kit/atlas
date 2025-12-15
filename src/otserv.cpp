@@ -56,7 +56,7 @@ void mainLoader(ServiceManager* services)
 	g_game.setGameState(GAME_STATE_STARTUP);
 
 	srand(static_cast<unsigned int>(OTSYS_TIME()));
-#ifdef _WIN32
+#ifdef _WIN64
 	SetConsoleTitle(STATUS_SERVER_NAME);
 
 	// fixes a problem with escape characters not being processed in Windows consoles
@@ -92,7 +92,7 @@ void mainLoader(ServiceManager* services)
 		return;
 	}
 
-#ifdef _WIN32
+#ifdef _WIN64
 	const std::string& defaultPriority = getString(ConfigManager::DEFAULT_PRIORITY);
 	if (boost::iequals(defaultPriority, "high")) {
 		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
@@ -251,7 +251,7 @@ void mainLoader(ServiceManager* services)
 
 	std::cout << ">> Loaded all modules, server starting up..." << std::endl;
 
-#ifndef _WIN32
+#ifndef _WIN64
 	if (getuid() == 0 || geteuid() == 0) {
 		std::cout << "> Warning: " << STATUS_SERVER_NAME
 		          << " has been executed as root user, please consider running it as a normal user." << std::endl;
