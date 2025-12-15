@@ -776,10 +776,11 @@ end
 
 function Player.loadTrackedBestiary(self)
 	local trackedBestiary = {}
+	local maxRaceId = Game.getMaxRaceId()
 
-	for storage = PlayerStorageKeys.bestiaryTrackerBase, PlayerStorageKeys.bestiaryTrackerMax do
+	for raceId = 1, maxRaceId do
+		local storage = PlayerStorageKeys.bestiaryTrackerBase + raceId
 		if self:getStorageValue(storage) == 1 then
-			local raceId = storage - PlayerStorageKeys.bestiaryTrackerBase
 			table.insert(trackedBestiary, raceId)
 		end
 	end

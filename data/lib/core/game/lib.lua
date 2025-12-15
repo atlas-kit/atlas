@@ -148,3 +148,17 @@ do
 		return trackedBestiary
 	end
 end
+
+function Game.getMaxRaceId()
+	local maxRaceId = 0
+	local monsterTypes = Game.getMonsterTypes()
+
+	for _, monsterType in pairs(monsterTypes) do
+		local raceId = monsterType:bestiaryInfo().raceId
+		if raceId then
+			maxRaceId = math.max(raceId, maxRaceId)
+		end
+	end
+
+	return math.floor(maxRaceId)
+end
