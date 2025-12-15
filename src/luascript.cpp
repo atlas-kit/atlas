@@ -1761,6 +1761,7 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(L, ITEM_WILDGROWTH_PERSISTENT);
 	registerEnum(L, ITEM_WILDGROWTH_SAFE);
 	registerEnum(L, ITEM_DECORATION_KIT);
+	registerEnum(L, ITEM_MARKET);
 
 	registerEnum(L, WIELDINFO_NONE);
 	registerEnum(L, WIELDINFO_LEVEL);
@@ -5042,7 +5043,7 @@ int LuaScriptInterface::luaGameCreateMonsterType(lua_State* L)
 		return 1;
 	}
 
-	MonsterType* monsterType = g_monsters.getMonsterType(name, false);
+	MonsterType* monsterType = g_monsters.getMonsterType(name);
 	if (!monsterType) {
 		monsterType = &g_monsters.monsters[boost::algorithm::to_lower_copy(name)];
 		monsterType->name = name;
