@@ -839,6 +839,10 @@ function Player.sendBestiaryTracker(self)
 		msg:addU32(kills)
 
 		local monsterType = MonsterType(raceId)
+		if not monsterType then
+			print(string.format("[Warning] MonsterType with raceId %d does not exist.", raceId))
+		end
+
 		local info = monsterType and monsterType:getBestiaryInfo() or {prowess = 1, expertise = 2, mastery = 3}
 		msg:addU16(info.prowess)
 		msg:addU16(info.expertise)
