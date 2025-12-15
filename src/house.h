@@ -65,7 +65,7 @@ public:
 	void onRemoved() override;
 
 private:
-	void setHouse(std::shared_ptr<House> house);
+	void setHouse(const std::shared_ptr<House>& house);
 
 	std::weak_ptr<House> house;
 	std::unique_ptr<AccessList> accessList;

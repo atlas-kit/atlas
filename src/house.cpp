@@ -487,13 +487,13 @@ void Door::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator&
 	Item::readAttr(attr, first, last);
 }
 
-void Door::setHouse(std::shared_ptr<House> house)
+void Door::setHouse(const std::shared_ptr<House>& house)
 {
 	if (!this->house.expired()) {
 		return;
 	}
 
-	this->house = std::move(house);
+	this->house = house;
 
 	if (!accessList) {
 		accessList.reset(new AccessList());
