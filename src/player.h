@@ -230,7 +230,6 @@ public:
 
 		return client->getVersion();
 	}
-	bool hasClient() const { return client != nullptr; }
 
 	bool hasSecureMode() const { return secureMode; }
 

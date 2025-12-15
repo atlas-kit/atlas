@@ -2822,7 +2822,6 @@ void LuaScriptInterface::registerFunctions()
 
 	registerMethod(L, "Player", "isPzLocked", LuaScriptInterface::luaPlayerIsPzLocked);
 
-	registerMethod(L, "Player", "hasClient", LuaScriptInterface::luaPlayerHasClient);
 	registerMethod(L, "Player", "getClient", LuaScriptInterface::luaPlayerGetClient);
 
 	registerMethod(L, "Player", "getHouse", LuaScriptInterface::luaPlayerGetHouse);
@@ -10626,17 +10625,6 @@ int LuaScriptInterface::luaPlayerIsPzLocked(lua_State* L)
 	// player:isPzLocked()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
 		tfs::lua::pushBoolean(L, player->isPzLocked());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaPlayerHasClient(lua_State* L)
-{
-	// player:hasClient()
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushBoolean(L, player->hasClient());
 	} else {
 		lua_pushnil(L);
 	}
