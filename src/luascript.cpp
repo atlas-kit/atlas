@@ -10995,7 +10995,7 @@ int LuaScriptInterface::luaPlayerSetIdleTime(lua_State* L)
 	}
 
 	player->setIdleTime(tfs::lua::getNumber<uint32_t>(L, 2));
-	tfs::lua::pushNumber(L, true);
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
