@@ -59,27 +59,21 @@ local function configureActionEvent(node)
     local checkFloor = tobool(node:attribute("checkfloor"))
     if checkFloor ~= nil then action:checkFloor(checkFloor) end
 
-    local function_ = node:attribute("function")
     local script = node:attribute("script")
-    if not function_ and not script then
-        io.write("[Warning] function or script attribute missing for action '" .. name .. "'.\n")
+    if not script then
+        io.write("[Warning] script attribute missing for action in 'data/actions/actions.xml'.\n")
         return nil
     end
 
-    if script then
-        local scriptFile = "data/actions/scripts/" .. script
-        dofile(scriptFile)
-        if not onUse then
-            io.write("[Error] Can not load action script, check '" .. scriptFile .. "' for a missing onUse callback\n")
-            return nil
-        end
-
-        action:onUse(onUse)
-
-        -- let it be garbage collected
-        onUse = nil
+    local scriptFile = "data/actions/scripts/" .. script
+    dofile(scriptFile)
+    if not onUse then
+        io.write("[Error] Can not load action script, check '" .. scriptFile .. "' for a missing onUse callback\n")
+        return nil
     end
 
+    action:onUse(onUse)
+    onUse = nil
     return action
 end
 
