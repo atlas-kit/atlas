@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_read_string_escape)
 {
 	auto s =
 	    "\x05\x00"
-	    "atl\xFDas"
+	    "atl\x{FD}as"
 	    "\x07\x00"
 	    "ser\xFD\xFDver"sv;
 	BOOST_TEST(s.size() == 18, "expected 18 bytes, got " << s.size());
