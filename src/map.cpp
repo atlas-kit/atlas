@@ -8,7 +8,6 @@
 #include "combat.h"
 #include "creature.h"
 #include "game.h"
-#include "inbox.h"
 #include "iomap.h"
 #include "iomapserialize.h"
 #include "pugicast.h"
