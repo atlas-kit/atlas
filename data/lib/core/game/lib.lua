@@ -141,16 +141,14 @@ function Game.getBlessings()
 	}
 end
 
-function Game.getMaxRaceId()
-	local maxRaceId = 0
-	local monsterTypes = Game.getMonsterTypes()
+function Game.getMaxBestiaryRaceId()
+	local max = 0
 
-	for _, monsterType in pairs(monsterTypes) do
-		local raceId = monsterType:bestiaryInfo().raceId
-		if raceId then
-			maxRaceId = math.max(raceId, maxRaceId)
+	for _, monsterType in pairs(Game.getMonsterTypes()) do
+		local info = monsterType:bestiaryInfo()
+		if info.raceId then
+			max = math.max(info.raceId, max)
 		end
 	end
-
-	return math.floor(maxRaceId)
+	return math.floor(max)
 end

@@ -789,7 +789,7 @@ end
 function Player.getTrackedBestiary(self)
 	local result = {}
 
-	local maxRaceId = Game.getMaxRaceId()
+	local maxRaceId = Game.getMaxBestiaryRaceId()
 	for raceId = 1, maxRaceId do
 		if self:isBestiaryTracked(raceId) then
 			table.insert(result, raceId)
