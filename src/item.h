@@ -871,8 +871,9 @@ public:
 
 	std::shared_ptr<Thing> getTopParent();
 	std::shared_ptr<const Thing> getTopParent() const;
-	std::shared_ptr<Tile> getTile() override final;
-	std::shared_ptr<const Tile> getTile() const override final;
+	std::shared_ptr<Tile> getTile();
+	std::shared_ptr<const Tile> getTile() const;
+	const Position& getPosition() const override final;
 	bool isRemoved() const override { return !getParent() || getParent()->isRemoved(); }
 
 protected:

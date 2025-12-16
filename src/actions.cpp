@@ -214,7 +214,17 @@ ReturnValue Actions::internalUseItem(const std::shared_ptr<Player>& player, cons
 		// depot container
 		if (const auto& depot = container->getDepotLocker()) {
 			container = player->getDepotLocker();
-			container->setParent(depot->getParent()->getTile());
+
+			std::shared_ptr<Tile> parentTile = nullptr;
+			if (const auto& item = depot->getParent()->asItem()) {
+				parentTile = item->getTile();
+			} else if (const auto& creature = depot->getParent()->asCreature()) {
+				parentTile = creature->getTile();
+			} else if (const auto& tile = depot->getParent()->asTile()) {
+				parentTile = tile;
+			}
+
+			container->setParent(parentTile);
 		}
 
 		// open/close container

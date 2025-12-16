@@ -21,13 +21,19 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 {
 	auto id = OTB::read<uint16_t>(first, last);
 
-	std::shared_ptr<Tile> tile = nullptr;
+	std::shared_ptr<Tile> parentTile = nullptr;
 	if (!parent->hasParent()) {
-		tile = parent->getTile();
+		if (const auto& item = parent->asItem()) {
+			parentTile = item->getTile();
+		} else if (const auto& creature = parent->asCreature()) {
+			parentTile = creature->getTile();
+		} else {
+			parentTile = parent->asTile();
+		}
 	}
 
 	const ItemType& iType = Item::items[id];
-	if (iType.moveable || iType.forceSerialize || !tile) {
+	if (iType.moveable || iType.forceSerialize || !parentTile) {
 		// create a new item
 		if (const auto& item = Item::CreateItem(id)) {
 			item->unserializeAttr(first, last);
@@ -41,7 +47,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 	} else {
 		// Stationary items like doors/beds/blackboards/bookcases
 		std::shared_ptr<Item> item = nullptr;
-		if (const TileItemVector* items = tile->getItemList()) {
+		if (const TileItemVector* items = parentTile->getItemList()) {
 			for (const auto& findItem : *items) {
 				if (findItem->getID() == id) {
 					item = findItem;

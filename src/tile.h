@@ -129,8 +129,8 @@ public:
 	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
 	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
 
-	std::shared_ptr<Tile> getTile() override final { return std::static_pointer_cast<Tile>(shared_from_this()); }
-	std::shared_ptr<const Tile> getTile() const override final
+	std::shared_ptr<Tile> asTile() override final { return std::static_pointer_cast<Tile>(shared_from_this()); }
+	std::shared_ptr<const Tile> asTile() const override final
 	{
 		return std::static_pointer_cast<const Tile>(shared_from_this());
 	}
