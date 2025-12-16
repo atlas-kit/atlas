@@ -27,6 +27,7 @@ function onLogin(player)
 	player:sendHotkeyPreset()
 	player:disableLoginMusic()
 	player:sendBlessings()
+	player:sendTrackedBestiary()
 
 	-- achievements points for highscores
 	if not player:getStorageValue(PlayerStorageKeys.achievementsTotal) then
@@ -37,5 +38,6 @@ function onLogin(player)
 	player:registerEvent("PlayerDeath")
 	player:registerEvent("DropLoot")
 	player:registerEvent("BestiaryKills")
+	player:registerEvent("Idle Timeout")
 	return true
 end
