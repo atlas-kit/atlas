@@ -6,6 +6,7 @@
 #include "../database.h"
 #include "../game.h"
 #include "error.h"
+#include "login_attempts.h"
 
 extern Game g_game;
 extern Vocations g_vocations;
@@ -32,14 +33,22 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 {
 	using namespace std::chrono;
 
+	if (const int minutes_left = tfs::http::login_attempts::get_remaining_block_time_minutes(ip); minutes_left > 0) {
+		return make_error_response({.code = 3,
+		                            .message = std::format("Too many failed login attempts. Please try again in {} {} ",
+		                                                   minutes_left, minutes_left == 1 ? "minute" : "minutes")});
+	}
+
 	auto emailField = body.if_contains("email");
 	if (!emailField || !emailField->is_string()) {
+		tfs::http::login_attempts::record_failure(ip);
 		return make_error_response(
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
 
 	auto passwordField = body.if_contains("password");
 	if (!passwordField || !passwordField->is_string()) {
+		tfs::http::login_attempts::record_failure(ip);
 		return make_error_response(
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
@@ -50,15 +59,19 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 	    "SELECT `id`, UNHEX(`password`) AS `password`, `secret`, `premium_ends_at` FROM `accounts` WHERE `email` = {:s}",
 	    db.escapeString(emailField->get_string())));
 	if (!result) {
+		tfs::http::login_attempts::record_failure(ip);
 		return make_error_response(
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
 
 	auto password = result->getString("password");
 	if (password != transformToSHA1(passwordField->get_string())) {
+		tfs::http::login_attempts::record_failure(ip);
 		return make_error_response(
 		    {.code = 3, .message = "Tibia account email address or Tibia password is not correct."});
 	}
+
+	tfs::http::login_attempts::record_success(ip);
 
 	auto now = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
 

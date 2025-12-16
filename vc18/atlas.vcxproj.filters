@@ -275,6 +275,9 @@
     <ClCompile Include="..\src\storeinbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\http\login_attempts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\http\http.h">
@@ -548,6 +551,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\vocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\http\login_attempts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

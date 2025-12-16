@@ -151,6 +151,7 @@
     <ClCompile Include="..\src\http\http.cpp" />
     <ClCompile Include="..\src\http\listener.cpp" />
     <ClCompile Include="..\src\http\login.cpp" />
+    <ClCompile Include="..\src\http\login_attempts.cpp" />
     <ClCompile Include="..\src\http\router.cpp" />
     <ClCompile Include="..\src\http\serverinfo.cpp" />
     <ClCompile Include="..\src\http\session.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="..\src\http\http.h" />
     <ClInclude Include="..\src\http\listener.h" />
     <ClInclude Include="..\src\http\login.h" />
+    <ClInclude Include="..\src\http\login_attempts.h" />
     <ClInclude Include="..\src\http\router.h" />
     <ClInclude Include="..\src\http\serverinfo.h" />
     <ClInclude Include="..\src\http\session.h" />
