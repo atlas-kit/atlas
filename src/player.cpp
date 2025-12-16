@@ -34,7 +34,7 @@ MuteCountMap Player::muteCountMap;
 uint32_t Player::playerAutoID = 0x10000000;
 uint32_t Player::playerIDLimit = 0x20000000;
 
-Player::Player(ProtocolGame_ptr p) : Creature{}, lastPing{OTSYS_TIME()}, lastPong{lastPing}, client{std::move(p)} {}
+Player::Player(ProtocolGame_ptr p) : Creature{}, client{std::move(p)} {}
 
 void Player::setID()
 {
@@ -788,49 +788,6 @@ void Player::sendStats()
 	}
 }
 
-void Player::sendPing()
-{
-	int64_t timeNow = OTSYS_TIME();
-
-	bool hasLostConnection = false;
-	if ((timeNow - lastPing) >= 5000) {
-		lastPing = timeNow;
-		if (client) {
-			client->sendPing();
-		} else {
-			hasLostConnection = true;
-		}
-	}
-
-	int64_t noPongTime = timeNow - lastPong;
-	if (const auto& attackedCreature = getAttackedCreature()) {
-		if ((hasLostConnection || noPongTime >= 7000) && attackedCreature->getPlayer()) {
-			removeAttackedCreature();
-		}
-	}
-
-	int32_t noPongKickTime = vocation->getNoPongKickTime();
-	if (pzLocked && noPongKickTime < 60000) {
-		noPongKickTime = 60000;
-	}
-
-	if (noPongTime >= noPongKickTime) {
-		if (isConnecting || getTile()->hasFlag(TILESTATE_NOLOGOUT)) {
-			return;
-		}
-
-		if (!g_creatureEvents->playerLogout(getPlayer())) {
-			return;
-		}
-
-		if (client) {
-			client->logout(true, true);
-		} else {
-			g_game.removeCreature(getPlayer(), true);
-		}
-	}
-}
-
 std::shared_ptr<Item> Player::getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen)
 {
 	windowTextId = this->windowTextId;
@@ -1493,16 +1450,10 @@ void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
 
-	sendPing();
-
 	MessageBufferTicks += interval;
 	if (MessageBufferTicks >= 1500) {
 		MessageBufferTicks = 0;
 		addMessageBuffer();
-	}
-
-	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
-		checkSkullTicks(interval / 1000);
 	}
 
 	addOfflineTrainingTime(interval);
@@ -3987,22 +3938,6 @@ void Player::addUnjustifiedDead(const std::shared_ptr<const Player>& attacked)
 			setSkull(SKULL_RED);
 		}
 
-		g_game.updateCreatureSkull(getPlayer());
-	}
-}
-
-void Player::checkSkullTicks(int64_t ticks)
-{
-	int64_t newTicks = skullTicks - ticks;
-	if (newTicks < 0) {
-		skullTicks = 0;
-	} else {
-		skullTicks = newTicks;
-	}
-
-	const auto skull = getSkull();
-	if ((skull == SKULL_RED || skull == SKULL_BLACK) && skullTicks < 1 && !hasCondition(CONDITION_INFIGHT)) {
-		setSkull(SKULL_NONE);
 		g_game.updateCreatureSkull(getPlayer());
 	}
 }
