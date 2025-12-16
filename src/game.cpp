@@ -963,8 +963,8 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 		return;
 	}
 
-	const auto& playerPos = player->getPosition();
-	const auto& mapFromPos = fromThing->getTile()->getPosition();
+	const Position& playerPos = player->getPosition();
+	const Position& mapFromPos = fromThing->getTile()->getPosition();
 	if (playerPos.z != mapFromPos.z) {
 		player->sendCancelMessage(playerPos.z > mapFromPos.z ? RETURNVALUE_FIRSTGOUPSTAIRS
 		                                                     : RETURNVALUE_FIRSTGODOWNSTAIRS);
@@ -990,7 +990,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 	}
 
 	const auto& toThingTile = toThing->getTile();
-	const auto& mapToPos = toThingTile->getPosition();
+	const Position& mapToPos = toThingTile->getPosition();
 
 	// hangable item specific code
 	if (item->isHangable() && toThingTile->hasFlag(TILESTATE_SUPPORTS_HANGABLE)) {
