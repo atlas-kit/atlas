@@ -11,7 +11,9 @@ class House;
 class HouseTile final : public DynamicTile
 {
 public:
-	HouseTile(uint16_t x, uint16_t y, uint8_t z, std::shared_ptr<House> house) : DynamicTile{x, y, z}, house{std::move(house)} {}
+	HouseTile(uint16_t x, uint16_t y, uint8_t z, std::shared_ptr<House> house) :
+	    DynamicTile{x, y, z}, house{std::move(house)}
+	{}
 
 	std::shared_ptr<HouseTile> getHouseTile() override
 	{
