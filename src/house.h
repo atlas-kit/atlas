@@ -89,9 +89,9 @@ enum AccessHouseLevel_t
 class HouseTransferItem final : public Item
 {
 public:
-	static std::shared_ptr<HouseTransferItem> createHouseTransferItem(std::shared_ptr<House> house);
+	static std::shared_ptr<HouseTransferItem> createHouseTransferItem(const std::shared_ptr<House>& house);
 
-	explicit HouseTransferItem(std::shared_ptr<House> house) : Item{0}, house{std::move(house)} {}
+	explicit HouseTransferItem(const std::shared_ptr<House>& house) : Item{0}, house{house} {}
 
 	void onTradeEvent(TradeEvents_t event, const std::shared_ptr<Player>& owner) override;
 	bool canTransform() const override { return false; }

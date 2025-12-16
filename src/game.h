@@ -524,7 +524,7 @@ private:
 
 	WildcardTreeNode wildcardTree{false};
 
-	std::map<uint32_t, std::shared_ptr<House>> houses;
+	boost::container::flat_map<uint32_t, std::shared_ptr<House>> houses;
 
 	std::map<uint32_t, std::weak_ptr<Npc>> npcs;
 	std::map<uint32_t, std::weak_ptr<Monster>> monsters;

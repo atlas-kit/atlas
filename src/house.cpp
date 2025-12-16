@@ -335,7 +335,7 @@ void House::resetTransferItem()
 	}
 }
 
-std::shared_ptr<HouseTransferItem> HouseTransferItem::createHouseTransferItem(std::shared_ptr<House> house)
+std::shared_ptr<HouseTransferItem> HouseTransferItem::createHouseTransferItem(const std::shared_ptr<House>& house)
 {
 	const auto transferItem = std::make_shared<HouseTransferItem>(house);
 	transferItem->setID(ITEM_DOCUMENT_RO);
