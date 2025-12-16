@@ -1,43 +1,26 @@
 function Creature:onChangeOutfit(outfit)
-	if hasEvent.onChangeMount then
-		if not Event.onChangeMount(self, outfit.lookMount) then
-			return false
-		end
+	if not Event.onChangeMount(self, outfit.lookMount) then
+		return false
 	end
-	if hasEvent.onChangeOutfit then
-		return Event.onChangeOutfit(self, outfit)
-	end
-	return true
+	return Event.onChangeOutfit(self, outfit) or true
 end
 
 function Creature:onAreaCombat(tile, isAggressive)
-	if hasEvent.onAreaCombat then
-		return Event.onAreaCombat(self, tile, isAggressive)
-	end
-	return RETURNVALUE_NOERROR
+	return Event.onAreaCombat(self, tile, isAggressive) or RETURNVALUE_NOERROR
 end
 
 function Creature:onTargetCombat(target)
-	if hasEvent.onTargetCombat then
-		return Event.onTargetCombat(self, target)
-	end
-	return RETURNVALUE_NOERROR
+	return Event.onTargetCombat(self, target) or RETURNVALUE_NOERROR
 end
 
 function Creature:onHear(speaker, words, type)
-	if hasEvent.onHear then
-		Event.onHear(self, speaker, words, type)
-	end
+	Event.onHear(self, speaker, words, type)
 end
 
 function Creature:onChangeZone(fromZone, toZone)
-	if hasEvent.onChangeZone then
-		Event.onChangeZone(self, fromZone, toZone)
-	end
+	Event.onChangeZone(self, fromZone, toZone)
 end
 
 function Creature:onUpdateStorage(key, value, oldValue, isSpawn)
-	if hasEvent.onUpdateStorage then
-		Event.onUpdateStorage(self, key, value, oldValue, isSpawn)
-	end
+	Event.onUpdateStorage(self, key, value, oldValue, isSpawn)
 end
