@@ -269,17 +269,8 @@ ReturnValue Container::queryAdd(int32_t index, const std::shared_ptr<const Thing
 
 	const auto& topParent = getTopParent();
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
-		std::shared_ptr<const Tile> topParentTile = nullptr;
-		if (const auto& item = topParent->asItem()) {
-			topParentTile = item->getTile();
-		} else if (const auto& creature = topParent->asCreature()) {
-			topParentTile = creature->getTile();
-		} else if (const auto& tile = topParent->asTile()) {
-			topParentTile = tile;
-		}
-
-		if (topParentTile) {
-			if (const auto& houseTile = topParentTile->getHouseTile()) {
+		if (const auto& tile = topParent->getTile()) {
+			if (const auto& houseTile = tile->getHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->getPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}
@@ -369,18 +360,8 @@ ReturnValue Container::queryRemove(const std::shared_ptr<const Thing>& thing, ui
 
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		const auto& topParent = getTopParent();
-
-		std::shared_ptr<const Tile> topParentTile = nullptr;
-		if (const auto& item = topParent->asItem()) {
-			topParentTile = item->getTile();
-		} else if (const auto& creature = topParent->asCreature()) {
-			topParentTile = creature->getTile();
-		} else if (const auto& tile = topParent->asTile()) {
-			topParentTile = tile;
-		}
-
-		if (topParentTile) {
-			if (const auto& houseTile = topParentTile->getHouseTile()) {
+		if (const auto& tile = topParent->getTile()) {
+			if (const auto& houseTile = tile->getHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->getPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}
@@ -648,18 +629,9 @@ void Container::postAddNotification(const std::shared_ptr<Thing>& thing, const s
 {
 	const auto& topParent = getTopParent();
 	if (topParent.get() == this) {
-		std::shared_ptr<Tile> topParentTile = nullptr;
-		if (const auto& item = topParent->asItem()) {
-			topParentTile = item->getTile();
-		} else if (const auto& creature = topParent->asCreature()) {
-			topParentTile = creature->getTile();
-		} else if (const auto& tile = topParent->asTile()) {
-			topParentTile = tile;
-		}
-
-		if (topParentTile) {
+		if (const auto& tile = topParent->getTile()) {
 			// Container is at the top level, on the ground
-			topParentTile->postAddNotification(thing, oldParent, index, LINK_NEAR);
+			tile->postAddNotification(thing, oldParent, index, LINK_NEAR);
 		}
 	} else if (const auto& creature = topParent->asCreature()) {
 		if (const auto& player = creature->getPlayer()) {
@@ -677,18 +649,9 @@ void Container::postRemoveNotification(const std::shared_ptr<Thing>& thing,
 {
 	const auto& topParent = getTopParent();
 	if (topParent.get() == this) {
-		std::shared_ptr<Tile> topParentTile = nullptr;
-		if (const auto& item = topParent->asItem()) {
-			topParentTile = item->getTile();
-		} else if (const auto& creature = topParent->asCreature()) {
-			topParentTile = creature->getTile();
-		} else if (const auto& tile = topParent->asTile()) {
-			topParentTile = tile;
-		}
-
-		if (topParentTile) {
+		if (const auto& tile = topParent->getTile()) {
 			// Container is at the top level, on the ground
-			topParentTile->postRemoveNotification(thing, newParent, index, LINK_NEAR);
+			tile->postRemoveNotification(thing, newParent, index, LINK_NEAR);
 		}
 	} else if (const auto& creature = topParent->asCreature()) {
 		if (const auto& player = creature->getPlayer()) {

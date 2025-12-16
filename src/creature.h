@@ -362,22 +362,14 @@ public:
 	std::shared_ptr<Thing> getParent() const override final { return tile.lock(); }
 	void setParent(const std::shared_ptr<Thing>& thing) override final
 	{
-		if (const auto& item = thing->asItem()) {
-			tile = item->getTile();
-			position = item->getTile()->getPosition();
-		} else if (const auto& creature = thing->asCreature()) {
-			tile = creature->getTile();
-			position = creature->getTile()->getPosition();
-		} else if (const auto& tile = thing->asTile()) {
-			this->tile = tile;
-			position = tile->getPosition();
-		}
+		tile = thing->getTile();
+		position = thing->getTile()->getPosition();
 	}
 
 	const Position& getPosition() const override final { return position; }
 
-	std::shared_ptr<Tile> getTile() { return tile.lock(); }
-	std::shared_ptr<const Tile> getTile() const { return tile.lock(); }
+	std::shared_ptr<Tile> getTile() override final { return tile.lock(); }
+	std::shared_ptr<const Tile> getTile() const override final { return tile.lock(); }
 
 	const Position& getLastPosition() const { return lastPosition; }
 	void setLastPosition(Position newLastPos) { lastPosition = newLastPos; }

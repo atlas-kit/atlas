@@ -321,17 +321,8 @@ static std::pair<Position, uint8_t> internalGetPosition(const std::shared_ptr<It
 			}
 		}
 
-		std::shared_ptr<const Tile> topParentTile = nullptr;
-		if (const auto& item = topParent->asItem()) {
-			topParentTile = item->getTile();
-		} else if (const auto& creature = topParent->asCreature()) {
-			topParentTile = creature->getTile();
-		} else if (const auto& tile = topParent->asTile()) {
-			topParentTile = tile;
-		}
-
-		if (topParentTile) {
-			return std::make_pair(topParentTile->getPosition(), topParentTile->getThingIndex(item));
+		if (const auto& tile = topParent->getTile()) {
+			return std::make_pair(tile->getPosition(), tile->getThingIndex(item));
 		}
 	}
 
@@ -869,16 +860,7 @@ ReturnValue Game::internalMoveCreature(const std::shared_ptr<Creature>& creature
 	uint32_t n = 0;
 
 	while ((subThing = toThing->queryDestination(index, creature, toItem, flags)) != toThing) {
-		std::shared_ptr<Tile> subThingTile = nullptr;
-		if (const auto& item = subThing->asItem()) {
-			subThingTile = item->getTile();
-		} else if (const auto& creature = subThing->asCreature()) {
-			subThingTile = creature->getTile();
-		} else if (const auto& tile = subThing->asTile()) {
-			subThingTile = tile;
-		}
-
-		map.moveCreature(creature, subThingTile);
+		map.moveCreature(creature, subThing->getTile());
 
 		if (creature->getParent() != subThing) {
 			// could happen if a script move the creature
@@ -981,17 +963,8 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 		return;
 	}
 
-	std::shared_ptr<Tile> fromThingTile = nullptr;
-	if (const auto& item = fromThing->asItem()) {
-		fromThingTile = item->getTile();
-	} else if (const auto& creature = fromThing->asCreature()) {
-		fromThingTile = creature->getTile();
-	} else if (const auto& tile = fromThing->asTile()) {
-		fromThingTile = tile;
-	}
-
 	const auto& playerPos = player->getPosition();
-	const auto& mapFromPos = fromThingTile->getPosition();
+	const auto& mapFromPos = fromThing->getTile()->getPosition();
 	if (playerPos.z != mapFromPos.z) {
 		player->sendCancelMessage(playerPos.z > mapFromPos.z ? RETURNVALUE_FIRSTGOUPSTAIRS
 		                                                     : RETURNVALUE_FIRSTGODOWNSTAIRS);
@@ -1016,16 +989,8 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 		return;
 	}
 
-	std::shared_ptr<Tile> toThingTile = nullptr;
-	if (const auto& item = toThing->asItem()) {
-		toThingTile = item->getTile();
-	} else if (const auto& creature = toThing->asCreature()) {
-		toThingTile = creature->getTile();
-	} else if (const auto& tile = toThing->asTile()) {
-		toThingTile = tile;
-	}
-
-	const Position& mapToPos = toThingTile->getPosition();
+	const auto& toThingTile = toThing->getTile();
+	const auto& mapToPos = toThingTile->getPosition();
 
 	// hangable item specific code
 	if (item->isHangable() && toThingTile->hasFlag(TILESTATE_SUPPORTS_HANGABLE)) {
@@ -1136,19 +1101,10 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 		}
 	}
 
-	std::shared_ptr<Tile> fromThingTile = nullptr;
-	if (const auto& item = fromThing->asItem()) {
-		fromThingTile = item->getTile();
-	} else if (const auto& creature = fromThing->asCreature()) {
-		fromThingTile = creature->getTile();
-	} else if (const auto& tile = fromThing->asTile()) {
-		fromThingTile = tile;
-	}
-
-	if (fromThingTile) {
-		auto it = browseFields.find(fromThingTile.get());
+	if (const auto& fromTile = fromThing->getTile()) {
+		auto it = browseFields.find(fromTile.get());
 		if (it != browseFields.end() && it->second == fromThing) {
-			fromThing = fromThingTile;
+			fromThing = fromTile;
 		}
 	}
 
@@ -1446,19 +1402,10 @@ ReturnValue Game::internalRemoveItem(const std::shared_ptr<Item>& item, int32_t 
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
 
-	std::shared_ptr<Tile> parentTile = nullptr;
-	if (const auto& item = parent->asItem()) {
-		parentTile = item->getTile();
-	} else if (const auto& creature = parent->asCreature()) {
-		parentTile = creature->getTile();
-	} else if (const auto& tile = parent->asTile()) {
-		parentTile = tile;
-	}
-
-	if (parentTile) {
-		auto it = browseFields.find(parentTile.get());
+	if (const auto& fromTile = parent->getTile()) {
+		auto it = browseFields.find(fromTile.get());
 		if (it != browseFields.end() && it->second == parent) {
-			parent = parentTile;
+			parent = fromTile;
 		}
 	}
 
@@ -1654,16 +1601,7 @@ void Game::addMoney(const std::shared_ptr<Thing>& thing, uint64_t money, uint32_
 
 			ReturnValue ret = internalAddItem(thing, remaindItem, INDEX_WHEREEVER, flags);
 			if (ret != RETURNVALUE_NOERROR) {
-				std::shared_ptr<Tile> thingTile = nullptr;
-				if (const auto& item = thing->asItem()) {
-					thingTile = item->getTile();
-				} else if (const auto& creature = thing->asCreature()) {
-					thingTile = creature->getTile();
-				} else if (const auto& tile = thing->asTile()) {
-					thingTile = tile;
-				}
-
-				internalAddItem(thingTile, remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				internalAddItem(thing->getTile(), remaindItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 			}
 
 			currencyCoins -= count;
@@ -1683,19 +1621,10 @@ std::shared_ptr<Item> Game::transformItem(const std::shared_ptr<Item>& item, uin
 		return nullptr;
 	}
 
-	std::shared_ptr<Tile> parentTile = nullptr;
-	if (const auto& item = parent->asItem()) {
-		parentTile = item->getTile();
-	} else if (const auto& creature = parent->asCreature()) {
-		parentTile = creature->getTile();
-	} else if (const auto& tile = parent->asTile()) {
-		parentTile = tile;
-	}
-
-	if (parentTile) {
-		auto it = browseFields.find(parentTile.get());
+	if (const auto& fromTile = parent->getTile()) {
+		auto it = browseFields.find(fromTile.get());
 		if (it != browseFields.end() && it->second == parent) {
-			parent = parentTile;
+			parent = fromTile;
 		}
 	}
 
