@@ -408,8 +408,8 @@ void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone
 	scriptInterface.callVoidFunction(3);
 }
 
-void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
-                     std::optional<int32_t> oldValue, bool isSpawn)
+void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint64_t key, std::optional<int64_t> value,
+                     std::optional<int64_t> oldValue, bool isSpawn)
 {
 	// Creature:onUpdateStorage(key, value, oldValue, isSpawn)
 	if (creatureHandlers.onUpdateStorage == -1) {

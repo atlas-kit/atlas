@@ -275,7 +275,7 @@ public:
 
 	bool canOpenCorpse(uint32_t ownerId) const;
 
-	void setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn = false) override;
+	void setStorageValue(uint64_t key, std::optional<int64_t> value, bool isSpawn = false) override;
 
 	void setGroup(Group* newGroup) { group = newGroup; }
 	Group* getGroup() const { return group; }

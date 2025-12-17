@@ -1436,7 +1436,7 @@ bool Creature::getPathTo(const Position& targetPos, std::vector<Direction>& dirL
 	return getPathTo(targetPos, dirList, fpp);
 }
 
-void Creature::setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn)
+void Creature::setStorageValue(uint64_t key, std::optional<int64_t> value, bool isSpawn)
 {
 	auto oldValue = getStorageValue(key);
 	if (value) {
@@ -1447,7 +1447,7 @@ void Creature::setStorageValue(uint32_t key, std::optional<int32_t> value, bool 
 	tfs::events::creature::onUpdateStorage(asCreature(), key, oldValue, value, isSpawn);
 }
 
-std::optional<int32_t> Creature::getStorageValue(uint32_t key) const
+std::optional<int64_t> Creature::getStorageValue(uint64_t key) const
 {
 	auto it = storageMap.find(key);
 	if (it == storageMap.end()) {

@@ -39,8 +39,8 @@ ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std:
 void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& speaker,
             const std::string& words, SpeakClasses type);
 void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone);
-void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
-                     std::optional<int32_t> oldValue, bool isSpawn);
+void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint64_t key, std::optional<int64_t> value,
+                     std::optional<int64_t> oldValue, bool isSpawn);
 
 } // namespace tfs::events::creature
 

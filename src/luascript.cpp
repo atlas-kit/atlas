@@ -8752,7 +8752,7 @@ int LuaScriptInterface::luaCreatureGetStorageValue(lua_State* L)
 		return 1;
 	}
 
-	uint32_t key = tfs::lua::getNumber<uint32_t>(L, 2);
+	const auto key = tfs::lua::getNumber<uint64_t>(L, 2);
 	if (auto storage = creature->getStorageValue(key)) {
 		tfs::lua::pushNumber(L, storage.value());
 	} else {
@@ -8770,7 +8770,7 @@ int LuaScriptInterface::luaCreatureSetStorageValue(lua_State* L)
 		return 1;
 	}
 
-	uint32_t key = tfs::lua::getNumber<uint32_t>(L, 2);
+	const auto key = tfs::lua::getNumber<uint64_t>(L, 2);
 	if (IS_IN_KEYRANGE(key, RESERVED_RANGE)) {
 		reportErrorFunc(L, std::format("Accessing reserved range: {:d}", key));
 		tfs::lua::pushBoolean(L, false);
@@ -8780,7 +8780,7 @@ int LuaScriptInterface::luaCreatureSetStorageValue(lua_State* L)
 	if (lua_isnoneornil(L, 3)) {
 		creature->setStorageValue(key, std::nullopt);
 	} else {
-		int32_t value = tfs::lua::getNumber<int32_t>(L, 3);
+		const auto value = tfs::lua::getNumber<int64_t>(L, 3);
 		creature->setStorageValue(key, value);
 	}
 

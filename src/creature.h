@@ -382,8 +382,8 @@ public:
 	               int32_t maxTargetDist, bool fullPathSearch = true, bool clearSight = true,
 	               int32_t maxSearchDist = 0) const;
 
-	virtual void setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn = false);
-	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
+	virtual void setStorageValue(uint64_t key, std::optional<int64_t> value, bool isSpawn = false);
+	virtual std::optional<int64_t> getStorageValue(uint64_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
 
 	CreatureEventList getCreatureEvents(CreatureEventType_t type);
@@ -468,7 +468,7 @@ private:
 	std::vector<std::weak_ptr<Creature>> summons;
 
 	std::map<uint32_t, CountBlock_t> damageMap;
-	std::map<uint32_t, int32_t> storageMap;
+	std::map<uint32_t, int64_t> storageMap;
 
 	Position position;
 	Position lastPosition;

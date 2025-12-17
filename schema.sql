@@ -105,8 +105,8 @@ CREATE TABLE IF NOT EXISTS `account_ban_history` (
 
 CREATE TABLE IF NOT EXISTS `account_storage` (
   `account_id` int NOT NULL,
-  `key` int unsigned NOT NULL,
-  `value` int NOT NULL,
+  `key` bigint unsigned NOT NULL,
+  `value` bigint NOT NULL,
   PRIMARY KEY (`account_id`, `key`),
   FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -336,8 +336,8 @@ CREATE TABLE IF NOT EXISTS `player_spells` (
 
 CREATE TABLE IF NOT EXISTS `player_storage` (
   `player_id` int NOT NULL DEFAULT '0',
-  `key` int unsigned NOT NULL DEFAULT '0',
-  `value` int NOT NULL DEFAULT '0',
+  `key` bigint unsigned NOT NULL DEFAULT '0',
+  `value` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`player_id`,`key`),
   FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -391,7 +391,7 @@ CREATE TABLE IF NOT EXISTS `towns` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
-INSERT INTO `server_config` (`config`, `value`) VALUES ('db_version', '37'), ('players_record', '0');
+INSERT INTO `server_config` (`config`, `value`) VALUES ('db_version', '38'), ('players_record', '0');
 
 DROP TRIGGER IF EXISTS `ondelete_players`;
 DROP TRIGGER IF EXISTS `oncreate_guilds`;

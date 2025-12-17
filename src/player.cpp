@@ -625,7 +625,7 @@ uint16_t Player::getLookCorpse() const
 	return ITEM_MALE_CORPSE;
 }
 
-void Player::setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn /* = false*/)
+void Player::setStorageValue(uint64_t key, std::optional<int64_t> value, bool isSpawn /* = false*/)
 {
 	if (IS_IN_KEYRANGE(key, RESERVED_RANGE)) {
 		std::cout << "Warning: unknown reserved key: " << key << " player: " << getName() << std::endl;

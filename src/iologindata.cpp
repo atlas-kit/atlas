@@ -464,7 +464,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	if (const auto& result = db.storeQuery(
 	        std::format("SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = {:d}", player->getGUID()))) {
 		do {
-			player->setStorageValue(result->getNumber<uint32_t>("key"), result->getNumber<int32_t>("value"), true);
+			player->setStorageValue(result->getNumber<uint64_t>("key"), result->getNumber<int64_t>("value"), true);
 		} while (result->next());
 	}
 
