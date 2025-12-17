@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
+#include "lua/meta.h"
 #include "luavariant.h"
 #include "pugicast.h"
 

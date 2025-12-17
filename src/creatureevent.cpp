@@ -7,6 +7,7 @@
 
 #include "item.h"
 #include "lua/error.h"
+#include "lua/meta.h"
 
 CreatureEvents::CreatureEvents() : scriptInterface("CreatureScript Interface") { scriptInterface.initState(); }
 

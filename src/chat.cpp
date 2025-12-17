@@ -7,6 +7,7 @@
 
 #include "game.h"
 #include "lua/error.h"
+#include "lua/meta.h"
 #include "pugicast.h"
 #include "scheduler.h"
 

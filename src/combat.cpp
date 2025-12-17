@@ -9,6 +9,7 @@
 #include "events.h"
 #include "game.h"
 #include "lua/error.h"
+#include "lua/meta.h"
 #include "matrixarea.h"
 #include "weapons.h"
 

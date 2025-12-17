@@ -1442,11 +1442,6 @@ void pushSharedPtr(lua_State* L, std::shared_ptr<T> value)
 	new (lua_newuserdata(L, sizeof(std::shared_ptr<T>))) std::shared_ptr<T>(std::move(value));
 }
 
-// Metatables
-void setMetatable(lua_State* L, int32_t index, std::string_view name);
-void setItemMetatable(lua_State* L, int32_t index, const std::shared_ptr<const Item>& item);
-void setCreatureMetatable(lua_State* L, int32_t index, const std::shared_ptr<const Creature>& creature);
-
 // Get
 template <typename T>
 std::enable_if_t<std::is_enum_v<T> || std::is_integral_v<T> || std::is_floating_point_v<T>, T> getNumber(

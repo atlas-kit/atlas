@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "game.h"
 #include "lua/error.h"
+#include "lua/meta.h"
 #include "pugicast.h"
 
 extern Game g_game;

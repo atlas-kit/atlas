@@ -6,8 +6,9 @@
 #include "npc.h"
 
 #include "game.h"
-#include "pugicast.h"
 #include "lua/error.h"
+#include "lua/meta.h"
+#include "pugicast.h"
 
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
