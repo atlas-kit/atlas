@@ -1,10 +1,12 @@
 set(lua_SRC
+	${CMAKE_CURRENT_LIST_DIR}/api.cpp
 	${CMAKE_CURRENT_LIST_DIR}/env.cpp
 	${CMAKE_CURRENT_LIST_DIR}/error.cpp
 	${CMAKE_CURRENT_LIST_DIR}/meta.cpp
 	)
 
 set(lua_HDR
+	${CMAKE_CURRENT_LIST_DIR}/api.h
 	${CMAKE_CURRENT_LIST_DIR}/env.h
 	${CMAKE_CURRENT_LIST_DIR}/error.h
 	${CMAKE_CURRENT_LIST_DIR}/meta.h

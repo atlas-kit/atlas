@@ -10,6 +10,7 @@
 #include "events.h"
 #include "game.h"
 #include "lua/meta.h"
+#include "lua/env.h"
 #include "spells.h"
 #include "tasks.h"
 

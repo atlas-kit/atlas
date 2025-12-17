@@ -10,7 +10,7 @@
 #include "game.h"
 #include "lua/env.h"
 #include "lua/meta.h"
-#include "luavariant.h"
+#include "lua/variant.h"
 #include "pugicast.h"
 
 extern Game g_game;

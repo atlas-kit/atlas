@@ -5,6 +5,8 @@
 
 #include "talkaction.h"
 
+#include "lua/env.h"
+#include "lua/meta.h"
 #include "player.h"
 
 TalkActions::TalkActions() : scriptInterface("TalkAction Interface") { scriptInterface.initState(); }

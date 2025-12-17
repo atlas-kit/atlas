@@ -10,7 +10,7 @@
 #include "events.h"
 #include "game.h"
 #include "lua/meta.h"
-#include "luavariant.h"
+#include "lua/variant.h"
 #include "monsters.h"
 #include "pugicast.h"
 

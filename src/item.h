@@ -5,6 +5,7 @@
 #define FS_ITEM_H
 
 #include "items.h"
+#include "lua/api.h"
 #include "luascript.h"
 #include "thing.h"
 
