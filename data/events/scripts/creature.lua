@@ -2,15 +2,15 @@ function Creature:onChangeOutfit(outfit)
 	if Event.onChangeMount and not Event.onChangeMount(self, outfit.lookMount) then
 		return false
 	end
-	return Event.onChangeOutfit and Event.onChangeOutfit(self, outfit)
+	return Event.onChangeOutfit and Event.onChangeOutfit(self, outfit) or true
 end
 
 function Creature:onAreaCombat(tile, isAggressive)
-	return Event.onAreaCombat and Event.onAreaCombat(self, tile, isAggressive)
+	return Event.onAreaCombat and Event.onAreaCombat(self, tile, isAggressive) or RETURNVALUE_NOERROR
 end
 
 function Creature:onTargetCombat(target)
-	return Event.onTargetCombat and Event.onTargetCombat(self, target)
+	return Event.onTargetCombat and Event.onTargetCombat(self, target) or RETURNVALUE_NOERROR
 end
 
 function Creature:onHear(speaker, words, type)

@@ -1,5 +1,5 @@
 function Player:onBrowseField(position)
-	return Event.onBrowseField and Event.onBrowseField(self, position)
+	return Event.onBrowseField and Event.onBrowseField(self, position) or true
 end
 
 function Player:onLook(thing, position, distance)
@@ -49,7 +49,7 @@ function Player:onItemMoved(item, count, fromPosition, toPosition, fromThing, to
 end
 
 function Player:onMoveCreature(creature, fromPosition, toPosition)
-	return Event.onMoveCreature and Event.onMoveCreature(self, creature, fromPosition, toPosition)
+	return Event.onMoveCreature and Event.onMoveCreature(self, creature, fromPosition, toPosition) or true
 end
 
 function Player:onReportRuleViolation(targetName, reportType, reportReason, comment, translation)
@@ -59,7 +59,7 @@ function Player:onReportRuleViolation(targetName, reportType, reportReason, comm
 end
 
 function Player:onReportBug(message, position)
-	return Event.onReportBug and Event.onReportBug(self, message, position)
+	return Event.onReportBug and Event.onReportBug(self, message, position) or true
 end
 
 function Player:onRotateItem(item)
@@ -71,15 +71,15 @@ function Player:onRotateItem(item)
 end
 
 function Player:onTurn(direction)
-	return Event.onTurn and Event.onTurn(self, direction)
+	return Event.onTurn and Event.onTurn(self, direction) or true
 end
 
 function Player:onTradeRequest(target, item)
-	return Event.onTradeRequest and Event.onTradeRequest(self, target, item)
+	return Event.onTradeRequest and Event.onTradeRequest(self, target, item) or true
 end
 
 function Player:onTradeAccept(target, item, targetItem)
-	return Event.onTradeAccept and Event.onTradeAccept(self, target, item, targetItem)
+	return Event.onTradeAccept and Event.onTradeAccept(self, target, item, targetItem) or true
 end
 
 function Player:onTradeCompleted(target, item, targetItem, isSuccess)
@@ -252,5 +252,5 @@ function Player:onNetworkMessage(recvByte, msg)
 end
 
 function Player:onSpellCheck(spell)
-	return Event.onSpellCheck and Event.onSpellCheck(self, spell)
+	return Event.onSpellCheck and Event.onSpellCheck(self, spell) or true
 end

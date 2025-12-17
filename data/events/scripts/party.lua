@@ -1,25 +1,25 @@
 function Party:onJoin(player)
-	return Event.onJoin and Event.onJoin(self, player)
+	return Event.onJoin and Event.onJoin(self, player) or true
 end
 
 function Party:onLeave(player)
-	return Event.onLeave and Event.onLeave(self, player)
+	return Event.onLeave and Event.onLeave(self, player) or true
 end
 
 function Party:onDisband()
-	return Event.onDisband and Event.onDisband(self)
+	return Event.onDisband and Event.onDisband(self) or true
 end
 
 function Party:onInvite(player)
-	return Event.onInvite and Event.onInvite(self, player)
+	return Event.onInvite and Event.onInvite(self, player) or true
 end
 
 function Party:onRevokeInvitation(player)
-	return Event.onRevokeInvitation and Event.onRevokeInvitation(self, player)
+	return Event.onRevokeInvitation and Event.onRevokeInvitation(self, player) or true
 end
 
 function Party:onPassLeadership(player)
-	return Event.onPassLeadership and Event.onPassLeadership(self, player)
+	return Event.onPassLeadership and Event.onPassLeadership(self, player) or true
 end
 
 function Party:onShareExperience(exp)

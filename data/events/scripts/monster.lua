@@ -10,5 +10,5 @@ function Monster:onDropLoot(corpse)
 end
 
 function Monster:onSpawn(position, startup, artificial)
-	return Event.onSpawn and Event.onSpawn(self, position, startup, artificial)
+	return Event.onSpawn and Event.onSpawn(self, position, startup, artificial) or true
 end
