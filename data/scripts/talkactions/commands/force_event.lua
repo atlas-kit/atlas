@@ -15,5 +15,4 @@ end
 
 talkaction:separator(" ")
 talkaction:access(true)
-talkaction:accountType(ACCOUNT_TYPE_GAMEMASTER)
 talkaction:register()
