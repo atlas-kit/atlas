@@ -783,7 +783,7 @@ void Creature::updateFollowersPaths()
 		return;
 	}
 
-	followers = followers | tfs::views::lock_weak_ptrs | std::views::filter([=](const auto& creature) {
+	followers = followers | tfs::views::lock_weak_ptrs | std::views::filter([this](const auto& creature) {
 		            const auto& followerPosition = creature->getPosition();
 		            if (position.z != followerPosition.z) {
 			            return false;
