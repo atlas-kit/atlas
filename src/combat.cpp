@@ -8,6 +8,7 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "lua/error.h"
 #include "matrixarea.h"
 #include "weapons.h"
 
@@ -1055,14 +1056,14 @@ void ValueCallback::getMinMaxValues(const std::shared_ptr<Player>& player, Comba
 
 	int size0 = lua_gettop(L);
 	if (lua_pcall(L, parameters, 2, 0) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		damage.primary.value = normal_random(tfs::lua::getNumber<int32_t>(L, -2), tfs::lua::getNumber<int32_t>(L, -1));
 		lua_pop(L, 2);
 	}
 
 	if ((lua_gettop(L) + parameters + 1) != size0) {
-		reportErrorFunc(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!");
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -1136,11 +1137,11 @@ void TargetCallback::onTargetCombat(const std::shared_ptr<Creature>& creature,
 	int size0 = lua_gettop(L);
 
 	if (lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	}
 
 	if ((lua_gettop(L) + 2 /*nParams*/ + 1) != size0) {
-		reportErrorFunc(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!");
 	}
 
 	tfs::lua::resetScriptEnv();

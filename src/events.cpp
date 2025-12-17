@@ -6,7 +6,10 @@
 #include "events.h"
 
 #include "item.h"
+#include "lua/error.h"
 #include "player.h"
+
+using namespace tfs::lua;
 
 namespace {
 
@@ -299,7 +302,7 @@ ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::s
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 3, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -340,7 +343,7 @@ ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std:
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -636,7 +639,7 @@ void onShareExperience(Party* party, uint64_t& exp)
 	tfs::lua::pushNumber(L, exp);
 
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -870,7 +873,7 @@ ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 7, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -1260,7 +1263,7 @@ void onGainExperience(const std::shared_ptr<Player>& player, const std::shared_p
 	tfs::lua::pushBoolean(L, sendText);
 
 	if (tfs::lua::protectedCall(L, 5, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -1293,7 +1296,7 @@ void onLoseExperience(const std::shared_ptr<Player>& player, uint64_t& exp)
 	tfs::lua::pushNumber(L, exp);
 
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -1327,7 +1330,7 @@ void onGainSkillTries(const std::shared_ptr<Player>& player, skills_t skill, uin
 	tfs::lua::pushNumber(L, tries);
 
 	if (tfs::lua::protectedCall(L, 3, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		tries = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);

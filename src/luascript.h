@@ -98,23 +98,6 @@ private:
 	bool timerEvent;
 };
 
-enum ErrorCode_t
-{
-	LUA_ERROR_PLAYER_NOT_FOUND,
-	LUA_ERROR_CREATURE_NOT_FOUND,
-	LUA_ERROR_ITEM_NOT_FOUND,
-	LUA_ERROR_THING_NOT_FOUND,
-	LUA_ERROR_TILE_NOT_FOUND,
-	LUA_ERROR_HOUSE_NOT_FOUND,
-	LUA_ERROR_COMBAT_NOT_FOUND,
-	LUA_ERROR_CONDITION_NOT_FOUND,
-	LUA_ERROR_AREA_NOT_FOUND,
-	LUA_ERROR_CONTAINER_NOT_FOUND,
-	LUA_ERROR_VARIANT_NOT_FOUND,
-	LUA_ERROR_VARIANT_UNKNOWN,
-	LUA_ERROR_SPELL_NOT_FOUND,
-};
-
 class LuaScriptInterface
 {
 public:
@@ -1414,10 +1397,6 @@ ScriptEnvironment* getScriptEnv();
 bool reserveScriptEnv();
 void resetScriptEnv();
 
-void reportError(std::string_view function, std::string_view error_desc, lua_State* L = nullptr,
-                 bool stack_trace = false);
-#define reportErrorFunc(L, a) tfs::lua::reportError(__FUNCTION__, a, L, true)
-
 // push/pop common structures
 void pushThing(lua_State* L, const std::shared_ptr<Thing>& thing);
 void pushVariant(lua_State* L, const LuaVariant& var);
@@ -1534,7 +1513,6 @@ void pushOutfit(lua_State* L, const Outfit* outfit);
 //
 int protectedCall(lua_State* L, int nargs, int nresults);
 void registerMethod(lua_State* L, std::string_view globalName, std::string_view methodName, lua_CFunction func);
-std::string getErrorDesc(ErrorCode_t code);
 
 } // namespace tfs::lua
 

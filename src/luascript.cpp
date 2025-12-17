@@ -19,6 +19,7 @@
 #include "iomapserialize.h"
 #include "iomarket.h"
 #include "item.h"
+#include "lua/error.h"
 #include "luavariant.h"
 #include "matrixarea.h"
 #include "movement.h"
@@ -217,13 +218,6 @@ std::string getStackTrace(lua_State* L, std::string_view error_desc)
 	return tfs::lua::popString(L);
 }
 
-int luaErrorHandler(lua_State* L)
-{
-	std::string errorMessage = tfs::lua::popString(L);
-	tfs::lua::pushString(L, getStackTrace(L, errorMessage));
-	return 1;
-}
-
 bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 {
 	lua_pushnil(L);
@@ -269,7 +263,7 @@ bool ScriptEnvironment::setCallbackId(int32_t callbackId, LuaScriptInterface* sc
 	if (this->callbackId != 0) {
 		// nested callbacks are not allowed
 		if (interface) {
-			reportErrorFunc(interface->getLuaState(), "Nested callbacks!");
+			tfs::lua::reportError(interface->getLuaState(), "Nested callbacks!");
 		}
 		return false;
 	}
@@ -391,40 +385,6 @@ static std::shared_ptr<DBResult> getResultByID(uint32_t id)
 	return it->second;
 }
 
-std::string tfs::lua::getErrorDesc(ErrorCode_t code)
-{
-	switch (code) {
-		case LUA_ERROR_PLAYER_NOT_FOUND:
-			return "Player not found";
-		case LUA_ERROR_CREATURE_NOT_FOUND:
-			return "Creature not found";
-		case LUA_ERROR_ITEM_NOT_FOUND:
-			return "Item not found";
-		case LUA_ERROR_THING_NOT_FOUND:
-			return "Thing not found";
-		case LUA_ERROR_TILE_NOT_FOUND:
-			return "Tile not found";
-		case LUA_ERROR_HOUSE_NOT_FOUND:
-			return "House not found";
-		case LUA_ERROR_COMBAT_NOT_FOUND:
-			return "Combat not found";
-		case LUA_ERROR_CONDITION_NOT_FOUND:
-			return "Condition not found";
-		case LUA_ERROR_AREA_NOT_FOUND:
-			return "Area not found";
-		case LUA_ERROR_CONTAINER_NOT_FOUND:
-			return "Container not found";
-		case LUA_ERROR_VARIANT_NOT_FOUND:
-			return "Variant not found";
-		case LUA_ERROR_VARIANT_UNKNOWN:
-			return "Unknown variant type";
-		case LUA_ERROR_SPELL_NOT_FOUND:
-			return "Spell not found";
-		default:
-			return "Bad error code";
-	}
-}
-
 static std::array<ScriptEnvironment, 16> scriptEnv = {};
 static int32_t scriptEnvIndex = -1;
 
@@ -450,7 +410,7 @@ bool LuaScriptInterface::reInitState()
 int tfs::lua::protectedCall(lua_State* L, int nargs, int nresults)
 {
 	int error_index = lua_gettop(L) - nargs;
-	lua_pushcfunction(L, luaErrorHandler);
+	lua_pushcfunction(L, tfs::lua::luaErrorHandler);
 	lua_insert(L, error_index);
 
 	int ret = lua_pcall(L, nargs, nresults, error_index);
@@ -487,7 +447,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_
 	// execute it
 	ret = tfs::lua::protectedCall(L, 0, 0);
 	if (ret != 0) {
-		reportErrorFunc(nullptr, tfs::lua::popString(L));
+		tfs::lua::reportError(tfs::lua::popString(L));
 		tfs::lua::resetScriptEnv();
 		return -1;
 	}
@@ -593,38 +553,6 @@ const std::string& LuaScriptInterface::getFileById(int32_t scriptId)
 	return it->second;
 }
 
-void tfs::lua::reportError(std::string_view function, std::string_view error_desc, lua_State* L /*= nullptr*/,
-                           bool stack_trace /*= false*/)
-{
-	auto [scriptId, luaScriptInterface, callbackId, timerEvent] = getScriptEnv()->getEventInfo();
-
-	std::cout << "\nLua Script Error: ";
-
-	if (luaScriptInterface) {
-		std::cout << '[' << luaScriptInterface->getInterfaceName() << "]\n";
-
-		if (timerEvent) {
-			std::cout << "in a timer event called from:\n";
-		}
-
-		if (callbackId) {
-			std::cout << "in callback: " << luaScriptInterface->getFileById(callbackId) << '\n';
-		}
-
-		std::cout << luaScriptInterface->getFileById(scriptId) << '\n';
-	}
-
-	if (!function.empty()) {
-		std::cout << function << "(). ";
-	}
-
-	if (L && stack_trace) {
-		std::cout << getStackTrace(L, error_desc) << '\n';
-	} else {
-		std::cout << error_desc << '\n';
-	}
-}
-
 bool LuaScriptInterface::pushFunction(int32_t functionId)
 {
 	lua_rawgeti(L, LUA_REGISTRYINDEX, eventTableRef);
@@ -670,14 +598,14 @@ bool LuaScriptInterface::callFunction(int params)
 	bool result = false;
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 1) != 0) {
-		reportErrorFunc(nullptr, tfs::lua::getString(L, -1));
+		tfs::lua::reportError(tfs::lua::getString(L, -1));
 	} else {
 		result = tfs::lua::getBoolean(L, -1);
 	}
 
 	lua_pop(L, 1);
 	if ((lua_gettop(L) + params + 1) != size) {
-		reportErrorFunc(nullptr, "Stack size changed!");
+		tfs::lua::reportError("Stack size changed!");
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -688,11 +616,11 @@ void LuaScriptInterface::callVoidFunction(int params)
 {
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 0) != 0) {
-		reportErrorFunc(nullptr, tfs::lua::popString(L));
+		tfs::lua::reportError(tfs::lua::popString(L));
 	}
 
 	if ((lua_gettop(L) + params + 1) != size) {
-		reportErrorFunc(nullptr, "Stack size changed!");
+		tfs::lua::reportError("Stack size changed!");
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -3533,7 +3461,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
 	// default: 1>subtype)
 	const auto& player = tfs::lua::getPlayer(L, 1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3569,7 +3497,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
 
 		const auto& newItem = Item::CreateItem(itemId, stackCount);
 		if (!newItem) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -3604,7 +3532,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
 int LuaScriptInterface::luaDebugPrint(lua_State* L)
 {
 	// debugPrint(text)
-	reportErrorFunc(L, tfs::lua::getString(L, -1));
+	tfs::lua::reportError(L, tfs::lua::getString(L, -1));
 	return 0;
 }
 
@@ -3633,7 +3561,7 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State* L)
 	// createCombatArea({area}, <optional> {extArea})
 	ScriptEnvironment* env = tfs::lua::getScriptEnv();
 	if (env->getScriptId() != EVENT_ID_LOADING) {
-		reportErrorFunc(L, "This function can only be used while loading the script.");
+		tfs::lua::reportError(L, "This function can only be used while loading the script.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3646,7 +3574,7 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State* L)
 		uint32_t rowsExtArea;
 		std::vector<uint32_t> vecExtArea;
 		if (!lua_istable(L, 2) || !getArea(L, vecExtArea, rowsExtArea)) {
-			reportErrorFunc(L, "Invalid extended area table.");
+			tfs::lua::reportError(L, "Invalid extended area table.");
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -3656,7 +3584,7 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State* L)
 	uint32_t rowsArea = 0;
 	std::vector<uint32_t> vecArea;
 	if (!lua_istable(L, 1) || !getArea(L, vecArea, rowsArea)) {
-		reportErrorFunc(L, "Invalid area table.");
+		tfs::lua::reportError(L, "Invalid area table.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3672,7 +3600,7 @@ int LuaScriptInterface::luaDoAreaCombat(lua_State* L)
 	// false[, ignoreResistances = false]]]])
 	const auto& creature = tfs::lua::getCreature(L, 1);
 	if (!creature && (!isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3698,7 +3626,7 @@ int LuaScriptInterface::luaDoAreaCombat(lua_State* L)
 		Combat::doAreaCombat(creature, tfs::lua::getPosition(L, 3), area, damage, params);
 		tfs::lua::pushBoolean(L, true);
 	} else {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_AREA_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 	}
 	return 1;
@@ -3710,14 +3638,14 @@ int LuaScriptInterface::luaDoTargetCombat(lua_State* L)
 	// false[, ignoreResistances = false]]]])
 	const auto& creature = tfs::lua::getCreature(L, 1);
 	if (!creature && (!isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& target = tfs::lua::getCreature(L, 2);
 	if (!target) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3751,14 +3679,14 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State* L)
 	// doChallengeCreature(cid, target[, force = false])
 	const auto& creature = tfs::lua::getCreature(L, 1);
 	if (!creature) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& target = tfs::lua::getCreature(L, 2);
 	if (!target) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3807,14 +3735,14 @@ int LuaScriptInterface::luaGetDepotId(lua_State* L)
 
 	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(uid);
 	if (!container) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CONTAINER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& depotLocker = container->getDepotLocker();
 	if (!depotLocker) {
-		reportErrorFunc(L, "Depot not found");
+		tfs::lua::reportError(L, "Depot not found");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3828,19 +3756,19 @@ int LuaScriptInterface::luaAddEvent(lua_State* L)
 	// addEvent(callback, delay, ...)
 	int parameters = lua_gettop(L);
 	if (parameters < 2) {
-		reportErrorFunc(L, std::format("Not enough parameters: {:d}.", parameters));
+		tfs::lua::reportError(L, std::format("Not enough parameters: {:d}.", parameters));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	if (!lua_isfunction(L, 1)) {
-		reportErrorFunc(L, "callback parameter should be a function.");
+		tfs::lua::reportError(L, "callback parameter should be a function.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	if (!isNumber(L, 2)) {
-		reportErrorFunc(L, "delay parameter should be a number.");
+		tfs::lua::reportError(L, "delay parameter should be a number.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -3888,7 +3816,7 @@ int LuaScriptInterface::luaAddEvent(lua_State* L)
 					warningString += " is unsafe";
 				}
 
-				reportErrorFunc(L, warningString);
+				tfs::lua::reportError(L, warningString);
 			}
 
 			if (ConfigManager::getBoolean(ConfigManager::CONVERT_UNSAFE_SCRIPTS)) {
@@ -3988,14 +3916,14 @@ int LuaScriptInterface::luaIsInWar(lua_State* L)
 	// isInWar(cid, target)
 	const auto& player = tfs::lua::getPlayer(L, 1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& targetPlayer = tfs::lua::getPlayer(L, 2);
 	if (!targetPlayer) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -4058,7 +3986,7 @@ int LuaScriptInterface::luaIsScriptsInterface(lua_State* L)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() == &g_scripts->getScriptInterface()) {
 		tfs::lua::pushBoolean(L, true);
 	} else {
-		reportErrorFunc(L, "Event: can only be called inside (data/scripts/)");
+		tfs::lua::reportError(L, "Event: can only be called inside (data/scripts/)");
 		tfs::lua::pushBoolean(L, false);
 	}
 	return 1;
@@ -5035,7 +4963,7 @@ int LuaScriptInterface::luaGameCreateMonsterType(lua_State* L)
 {
 	// Game.createMonsterType(name)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "MonsterTypes can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "MonsterTypes can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -5891,7 +5819,7 @@ int LuaScriptInterface::luaTileAddItem(lua_State* L)
 		int32_t stackCount = std::min<int32_t>(subType, ITEM_STACK_SIZE);
 		const auto& item = Item::CreateItem(itemId, stackCount);
 		if (!item) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 			if (!hasTable) {
 				lua_pushnil(L);
 			}
@@ -5939,7 +5867,7 @@ int LuaScriptInterface::luaTileAddItemEx(lua_State* L)
 	}
 
 	if (item->hasParent()) {
-		reportErrorFunc(L, "Item already has a parent");
+		tfs::lua::reportError(L, "Item already has a parent");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -6161,7 +6089,7 @@ int LuaScriptInterface::luaNetworkMessageAddItem(lua_State* L)
 	// networkMessage:addItem(item)
 	const auto& item = tfs::lua::getSharedPtr<Item>(L, 2);
 	if (!item) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -6253,7 +6181,7 @@ int LuaScriptInterface::luaNetworkMessageSendToPlayer(lua_State* L)
 		player->sendNetworkMessage(*message);
 		tfs::lua::pushBoolean(L, true);
 	} else {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnil(L);
 	}
 	return 1;
@@ -6896,7 +6824,7 @@ int LuaScriptInterface::luaItemSetAttribute(lua_State* L)
 
 	if (ItemAttributes::isIntAttrType(attribute)) {
 		if (attribute == ITEM_ATTRIBUTE_UNIQUEID) {
-			reportErrorFunc(L, "Attempt to set protected key \"uid\"");
+			tfs::lua::reportError(L, "Attempt to set protected key \"uid\"");
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -6932,7 +6860,7 @@ int LuaScriptInterface::luaItemRemoveAttribute(lua_State* L)
 	if (ret) {
 		item->removeAttribute(attribute);
 	} else {
-		reportErrorFunc(L, "Attempt to erase protected key \"uid\"");
+		tfs::lua::reportError(L, "Attempt to erase protected key \"uid\"");
 	}
 	tfs::lua::pushBoolean(L, ret);
 	return 1;
@@ -7429,7 +7357,7 @@ int LuaScriptInterface::luaContainerAddItem(lua_State* L)
 		int32_t stackCount = std::min<int32_t>(subType, ITEM_STACK_SIZE);
 		const auto& item = Item::CreateItem(itemId, stackCount);
 		if (!item) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 			if (!hasTable) {
 				lua_pushnil(L);
 			}
@@ -7477,7 +7405,7 @@ int LuaScriptInterface::luaContainerAddItemEx(lua_State* L)
 	}
 
 	if (item->hasParent()) {
-		reportErrorFunc(L, "Item already has a parent");
+		tfs::lua::reportError(L, "Item already has a parent");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -7820,7 +7748,7 @@ int LuaScriptInterface::luaCreatureCanSeeCreature(lua_State* L)
 	if (const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1)) {
 		const auto& otherCreature = tfs::lua::getCreature(L, 2);
 		if (!otherCreature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -7838,7 +7766,7 @@ int LuaScriptInterface::luaCreatureCanSeeGhostMode(lua_State* L)
 	if (const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1)) {
 		const auto& otherCreature = tfs::lua::getCreature(L, 2);
 		if (!otherCreature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -8085,7 +8013,7 @@ int LuaScriptInterface::luaCreatureChangeSpeed(lua_State* L)
 	// creature:changeSpeed(delta)
 	const auto& creature = tfs::lua::getCreature(L, 1);
 	if (!creature) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -8503,7 +8431,7 @@ int LuaScriptInterface::luaCreatureSay(lua_State* L)
 	if (parameters >= 6) {
 		position = tfs::lua::getPosition(L, 6);
 		if (!position.x || !position.y) {
-			reportErrorFunc(L, "Invalid position specified.");
+			tfs::lua::reportError(L, "Invalid position specified.");
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -8689,7 +8617,7 @@ int LuaScriptInterface::luaCreatureSetIcon(lua_State* L)
 
 	auto iconId = tfs::lua::getNumber<CreatureIcon_t>(L, 2);
 	if (iconId > CREATURE_ICON_LAST) {
-		reportErrorFunc(L, "Invalid Creature Icon Id");
+		tfs::lua::reportError(L, "Invalid Creature Icon Id");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -8772,7 +8700,7 @@ int LuaScriptInterface::luaCreatureSetStorageValue(lua_State* L)
 
 	uint32_t key = tfs::lua::getNumber<uint32_t>(L, 2);
 	if (IS_IN_KEYRANGE(key, RESERVED_RANGE)) {
-		reportErrorFunc(L, std::format("Accessing reserved range: {:d}", key));
+		tfs::lua::reportError(L, std::format("Accessing reserved range: {:d}", key));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -9798,7 +9726,7 @@ int LuaScriptInterface::luaPlayerSetBankBalance(lua_State* L)
 
 	int64_t balance = tfs::lua::getNumber<int64_t>(L, 2);
 	if (balance < 0) {
-		reportErrorFunc(L, "Invalid bank balance value.");
+		tfs::lua::reportError(L, "Invalid bank balance value.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -9899,7 +9827,7 @@ int LuaScriptInterface::luaPlayerAddItemEx(lua_State* L)
 	// player:addItemEx(item[, canDropOnMap = true[, slot = CONST_SLOT_WHEREEVER]])
 	const auto& item = tfs::lua::getSharedPtr<Item>(L, 2);
 	if (!item) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -9911,7 +9839,7 @@ int LuaScriptInterface::luaPlayerAddItemEx(lua_State* L)
 	}
 
 	if (item->hasParent()) {
-		reportErrorFunc(L, "Item already has a parent");
+		tfs::lua::reportError(L, "Item already has a parent");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -9960,14 +9888,14 @@ int LuaScriptInterface::luaPlayerSendSupplyUsed(lua_State* L)
 	// player:sendSupplyUsed(item)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& item = tfs::lua::getSharedPtr<Item>(L, 2);
 	if (!item) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -10046,7 +9974,7 @@ int LuaScriptInterface::luaPlayerShowTextDialog(lua_State* L)
 	}
 
 	if (!item) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -10511,7 +10439,7 @@ int LuaScriptInterface::luaPlayerCanLearnSpell(lua_State* L)
 	const std::string& spellName = tfs::lua::getString(L, 2);
 	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
 	if (!spell) {
-		reportErrorFunc(L, "Spell \"" + spellName + "\" not found");
+		tfs::lua::reportError(L, "Spell \"" + spellName + "\" not found");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -11016,7 +10944,7 @@ int LuaScriptInterface::luaPlayerSendCreatureSquare(lua_State* L)
 
 	const auto& creature = tfs::lua::getCreature(L, 2);
 	if (!creature) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -11259,7 +11187,7 @@ int LuaScriptInterface::luaMonsterIsTarget(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11277,7 +11205,7 @@ int LuaScriptInterface::luaMonsterIsOpponent(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11295,7 +11223,7 @@ int LuaScriptInterface::luaMonsterIsFriend(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11313,7 +11241,7 @@ int LuaScriptInterface::luaMonsterAddFriend(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11332,7 +11260,7 @@ int LuaScriptInterface::luaMonsterRemoveFriend(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11388,7 +11316,7 @@ int LuaScriptInterface::luaMonsterAddTarget(lua_State* L)
 
 	const auto& creature = tfs::lua::getCreature(L, 2);
 	if (!creature) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -11410,7 +11338,7 @@ int LuaScriptInterface::luaMonsterRemoveTarget(lua_State* L)
 
 	const auto& creature = tfs::lua::getCreature(L, 2);
 	if (!creature) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -11457,7 +11385,7 @@ int LuaScriptInterface::luaMonsterSelectTarget(lua_State* L)
 	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
 		const auto& creature = tfs::lua::getCreature(L, 2);
 		if (!creature) {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -11526,7 +11454,7 @@ int LuaScriptInterface::luaMonsterSetIcon(lua_State* L)
 
 	auto iconId = tfs::lua::getNumber<MonsterIcon_t>(L, 2);
 	if (iconId > MONSTER_ICON_LAST) {
-		reportErrorFunc(L, "Invalid Monster Icon Id");
+		tfs::lua::reportError(L, "Invalid Monster Icon Id");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -13653,7 +13581,7 @@ int LuaScriptInterface::luaCombatSetParameter(lua_State* L)
 	// combat:setParameter(key, value)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13675,7 +13603,7 @@ int LuaScriptInterface::luaCombatGetParameter(lua_State* L)
 	// combat:getParameter(key)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13695,7 +13623,7 @@ int LuaScriptInterface::luaCombatSetFormula(lua_State* L)
 	// combat:setFormula(type, mina, minb, maxa, maxb)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13714,21 +13642,21 @@ int LuaScriptInterface::luaCombatSetArea(lua_State* L)
 {
 	// combat:setArea(area)
 	if (tfs::lua::getScriptEnv()->getScriptId() != EVENT_ID_LOADING) {
-		reportErrorFunc(L, "This function can only be used while loading the script.");
+		tfs::lua::reportError(L, "This function can only be used while loading the script.");
 		lua_pushnil(L);
 		return 1;
 	}
 
 	const AreaCombat* area = g_luaEnvironment.getAreaObject(tfs::lua::getNumber<uint32_t>(L, 2));
 	if (!area) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_AREA_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
 
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13743,7 +13671,7 @@ int LuaScriptInterface::luaCombatAddCondition(lua_State* L)
 	// combat:addCondition(condition)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13763,7 +13691,7 @@ int LuaScriptInterface::luaCombatClearConditions(lua_State* L)
 	// combat:clearConditions()
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13778,7 +13706,7 @@ int LuaScriptInterface::luaCombatSetCallback(lua_State* L)
 	// combat:setCallback(key, function)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13805,7 +13733,7 @@ int LuaScriptInterface::luaCombatSetOrigin(lua_State* L)
 	// combat:setOrigin(origin)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13820,7 +13748,7 @@ int LuaScriptInterface::luaCombatExecute(lua_State* L)
 	// combat:execute(creature, variant)
 	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -13879,7 +13807,7 @@ int LuaScriptInterface::luaCombatExecute(lua_State* L)
 		}
 
 		case VARIANT_NONE: {
-			reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_VARIANT_NOT_FOUND));
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_VARIANT_NOT_FOUND));
 			tfs::lua::pushBoolean(L, false);
 			return 1;
 		}
@@ -16902,7 +16830,7 @@ int LuaScriptInterface::luaCreateAction(lua_State* L)
 {
 	// Action()
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "Actions can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "Actions can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -17053,7 +16981,7 @@ int LuaScriptInterface::luaCreateTalkaction(lua_State* L)
 {
 	// TalkAction(words)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "TalkActions can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "TalkActions can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -17143,7 +17071,7 @@ int LuaScriptInterface::luaCreateCreatureEvent(lua_State* L)
 {
 	// CreatureEvent(eventName)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "CreatureEvents can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "CreatureEvents can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -17238,7 +17166,7 @@ int LuaScriptInterface::luaCreateMoveEvent(lua_State* L)
 {
 	// MoveEvent()
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "MoveEvents can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "MoveEvents can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -17552,7 +17480,7 @@ int LuaScriptInterface::luaCreateGlobalEvent(lua_State* L)
 {
 	// GlobalEvent(eventName)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "GlobalEvents can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "GlobalEvents can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}
@@ -17714,7 +17642,7 @@ int LuaScriptInterface::luaCreateWeapon(lua_State* L)
 {
 	// Weapon(type)
 	if (tfs::lua::getScriptEnv()->getScriptInterface() != &g_scripts->getScriptInterface()) {
-		reportErrorFunc(L, "Weapons can only be registered in the Scripts interface.");
+		tfs::lua::reportError(L, "Weapons can only be registered in the Scripts interface.");
 		lua_pushnil(L);
 		return 1;
 	}

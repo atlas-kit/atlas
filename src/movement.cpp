@@ -7,6 +7,7 @@
 
 #include "combat.h"
 #include "game.h"
+#include "lua/error.h"
 #include "pugicast.h"
 
 extern Game g_game;
@@ -643,7 +644,7 @@ uint32_t MoveEvent::StepInField(const std::shared_ptr<Creature>& creature, const
 		return 1;
 	}
 
-	return LUA_ERROR_ITEM_NOT_FOUND;
+	return tfs::lua::LUA_ERROR_ITEM_NOT_FOUND;
 }
 
 uint32_t MoveEvent::StepOutField(const std::shared_ptr<Creature>&, const std::shared_ptr<Item>&, const Position&)
@@ -662,7 +663,7 @@ uint32_t MoveEvent::AddItemField(const std::shared_ptr<Item>& item, const std::s
 		}
 		return 1;
 	}
-	return LUA_ERROR_ITEM_NOT_FOUND;
+	return tfs::lua::LUA_ERROR_ITEM_NOT_FOUND;
 }
 
 uint32_t MoveEvent::RemoveItemField(const std::shared_ptr<Item>&, const std::shared_ptr<Item>&, const Position&)

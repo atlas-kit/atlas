@@ -6,6 +6,7 @@
 #include "creatureevent.h"
 
 #include "item.h"
+#include "lua/error.h"
 
 CreatureEvents::CreatureEvents() : scriptInterface("CreatureScript Interface") { scriptInterface.initState(); }
 
@@ -559,7 +560,7 @@ void CreatureEvent::executeHealthChange(const std::shared_ptr<Creature>& creatur
 	pushCombatDamage(L, damage);
 
 	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
-		reportErrorFunc(nullptr, tfs::lua::popString(L));
+		tfs::lua::reportError(tfs::lua::popString(L));
 	} else {
 		damage.primary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -4));
 		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3);
@@ -603,7 +604,7 @@ void CreatureEvent::executeManaChange(const std::shared_ptr<Creature>& creature,
 	pushCombatDamage(L, damage);
 
 	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
-		reportErrorFunc(nullptr, tfs::lua::popString(L));
+		tfs::lua::reportError(tfs::lua::popString(L));
 	} else {
 		damage.primary.value = tfs::lua::getNumber<int32_t>(L, -4);
 		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3);

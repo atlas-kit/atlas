@@ -6,6 +6,7 @@
 #include "chat.h"
 
 #include "game.h"
+#include "lua/error.h"
 #include "pugicast.h"
 #include "scheduler.h"
 
@@ -242,7 +243,7 @@ bool ChatChannel::executeOnSpeakEvent(const std::shared_ptr<const Player>& playe
 	int size0 = lua_gettop(L);
 	int ret = tfs::lua::protectedCall(L, 3, 1);
 	if (ret != 0) {
-		reportErrorFunc(nullptr, tfs::lua::popString(L));
+		tfs::lua::reportError(tfs::lua::popString(L));
 	} else if (lua_gettop(L) > 0) {
 		if (lua_isboolean(L, -1)) {
 			result = tfs::lua::getBoolean(L, -1);
@@ -254,7 +255,7 @@ bool ChatChannel::executeOnSpeakEvent(const std::shared_ptr<const Player>& playe
 	}
 
 	if ((lua_gettop(L) + 4) != size0) {
-		reportErrorFunc(nullptr, "Stack size changed!");
+		tfs::lua::reportError("Stack size changed!");
 	}
 	tfs::lua::resetScriptEnv();
 	return result;
