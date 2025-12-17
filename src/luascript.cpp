@@ -19,6 +19,7 @@
 #include "iomapserialize.h"
 #include "iomarket.h"
 #include "item.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "luavariant.h"
@@ -70,8 +71,6 @@ enum LuaDataType
 };
 
 // result map
-uint32_t lastResultId = 0;
-std::map<uint32_t, std::shared_ptr<DBResult>> tempResults = {};
 
 bool isNumber(lua_State* L, int32_t arg) { return lua_type(L, arg) == LUA_TNUMBER; }
 
@@ -245,150 +244,6 @@ bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 
 } // namespace
 
-ScriptEnvironment::ScriptEnvironment() { resetEnv(); }
-
-ScriptEnvironment::~ScriptEnvironment() { resetEnv(); }
-
-void ScriptEnvironment::resetEnv()
-{
-	scriptId = 0;
-	callbackId = 0;
-	timerEvent = false;
-	interface = nullptr;
-	localMap.clear();
-	tempResults.clear();
-}
-
-bool ScriptEnvironment::setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface)
-{
-	if (this->callbackId != 0) {
-		// nested callbacks are not allowed
-		if (interface) {
-			tfs::lua::reportError(interface->getLuaState(), "Nested callbacks!");
-		}
-		return false;
-	}
-
-	this->callbackId = callbackId;
-	interface = scriptInterface;
-	return true;
-}
-
-uint32_t ScriptEnvironment::addThing(const std::shared_ptr<Thing>& thing)
-{
-	if (!thing || thing->isRemoved()) {
-		return 0;
-	}
-
-	if (const auto& creature = thing->asCreature()) {
-		return creature->getID();
-	}
-
-	const auto& item = thing->asItem();
-	if (item && item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
-		return item->getUniqueId();
-	}
-
-	for (auto&& [uid, localItem] : localMap | std::views::as_const) {
-		if (localItem == item) {
-			return uid;
-		}
-	}
-
-	localMap[++lastUID] = item;
-	return lastUID;
-}
-
-void ScriptEnvironment::insertItem(uint32_t uid, const std::shared_ptr<Item>& item)
-{
-	auto result = localMap.emplace(uid, item);
-	if (!result.second) {
-		std::cout << "\nLua Script Error: Thing uid already taken.";
-	}
-}
-
-std::shared_ptr<Thing> ScriptEnvironment::getThingByUID(uint32_t uid)
-{
-	if (uid >= CREATURE_ID_MIN) {
-		return g_game.getCreatureByID(uid);
-	}
-
-	if (uid <= std::numeric_limits<uint16_t>::max()) {
-		if (const auto& item = g_game.getUniqueItem(uid)) {
-			if (!item->isRemoved()) {
-				return item;
-			}
-		}
-		return nullptr;
-	}
-
-	auto it = localMap.find(uid);
-	if (it != localMap.end()) {
-		const auto& item = it->second;
-		if (!item->isRemoved()) {
-			return item;
-		}
-	}
-	return nullptr;
-}
-
-std::shared_ptr<Item> ScriptEnvironment::getItemByUID(uint32_t uid)
-{
-	const auto& thing = getThingByUID(uid);
-	if (!thing) {
-		return nullptr;
-	}
-	return thing->asItem();
-}
-
-std::shared_ptr<Container> ScriptEnvironment::getContainerByUID(uint32_t uid)
-{
-	const auto& item = getItemByUID(uid);
-	if (!item) {
-		return nullptr;
-	}
-	return item->getContainer();
-}
-
-void ScriptEnvironment::removeItemByUID(uint32_t uid)
-{
-	if (uid <= std::numeric_limits<uint16_t>::max()) {
-		g_game.removeUniqueItem(uid);
-		return;
-	}
-
-	localMap.erase(uid);
-}
-
-static uint32_t addResult(std::shared_ptr<DBResult> result)
-{
-	tempResults[++lastResultId] = std::move(result);
-	return lastResultId;
-}
-
-static bool removeResult(uint32_t id)
-{
-	auto it = tempResults.find(id);
-	if (it == tempResults.end()) {
-		return false;
-	}
-
-	tempResults.erase(it);
-	return true;
-}
-
-static std::shared_ptr<DBResult> getResultByID(uint32_t id)
-{
-	auto it = tempResults.find(id);
-	if (it == tempResults.end()) {
-		return nullptr;
-	}
-	return it->second;
-}
-
-static std::array<ScriptEnvironment, 16> scriptEnv = {};
-static int32_t scriptEnvIndex = -1;
-
 LuaScriptInterface::LuaScriptInterface(std::string interfaceName) : interfaceName(std::move(interfaceName))
 {
 	if (!g_luaEnvironment.getLuaState()) {
@@ -405,18 +260,6 @@ bool LuaScriptInterface::reInitState()
 
 	closeState();
 	return initState();
-}
-
-/// Same as lua_pcall, but adds stack trace to error strings in called function.
-int tfs::lua::protectedCall(lua_State* L, int nargs, int nresults)
-{
-	int error_index = lua_gettop(L) - nargs;
-	lua_pushcfunction(L, tfs::lua::luaErrorHandler);
-	lua_insert(L, error_index);
-
-	int ret = lua_pcall(L, nargs, nresults, error_index);
-	lua_remove(L, error_index);
-	return ret;
 }
 
 int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_ptr<Npc>& npc /* = nullptr*/)
@@ -441,7 +284,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_
 		return -1;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
 	env->setNpc(npc);
 
@@ -3349,20 +3192,6 @@ void LuaScriptInterface::registerFunctions()
 #undef registerEnum
 #undef registerEnumIn
 
-ScriptEnvironment* tfs::lua::getScriptEnv()
-{
-	assert(scriptEnvIndex >= 0 && scriptEnvIndex < static_cast<int32_t>(scriptEnv.size()));
-	return &scriptEnv[scriptEnvIndex];
-}
-
-bool tfs::lua::reserveScriptEnv() { return ++scriptEnvIndex < static_cast<int32_t>(scriptEnv.size()); }
-
-void tfs::lua::resetScriptEnv()
-{
-	assert(scriptEnvIndex >= 0);
-	scriptEnv[scriptEnvIndex--].resetEnv();
-}
-
 // Get
 bool tfs::lua::getBoolean(lua_State* L, int32_t arg) { return lua_toboolean(L, arg) != 0; }
 bool tfs::lua::getBoolean(lua_State* L, int32_t arg, bool defaultValue)
@@ -3492,7 +3321,7 @@ int LuaScriptInterface::luaGetSubTypeName(lua_State* L)
 int LuaScriptInterface::luaCreateCombatArea(lua_State* L)
 {
 	// createCombatArea({area}, <optional> {extArea})
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	if (env->getScriptId() != EVENT_ID_LOADING) {
 		tfs::lua::reportError(L, "This function can only be used while loading the script.");
 		tfs::lua::pushBoolean(L, false);
@@ -4048,7 +3877,7 @@ int LuaScriptInterface::luaDatabaseStoreQuery(lua_State* L)
 {
 	// db.storeQuery(query)
 	if (const auto& result = Database::getInstance().storeQuery(tfs::lua::getString(L, -1))) {
-		tfs::lua::pushNumber(L, addResult(result));
+		tfs::lua::pushNumber(L, tfs::lua::addResult(result));
 	} else {
 		tfs::lua::pushBoolean(L, false);
 	}
@@ -4075,7 +3904,7 @@ int LuaScriptInterface::luaDatabaseAsyncStoreQuery(lua_State* L)
 
 			lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
 			if (result) {
-				tfs::lua::pushNumber(L, addResult(result));
+				tfs::lua::pushNumber(L, tfs::lua::addResult(result));
 			} else {
 				tfs::lua::pushBoolean(L, false);
 			}
@@ -4126,7 +3955,7 @@ const luaL_Reg LuaScriptInterface::luaResultTable[] = {
 
 int LuaScriptInterface::luaResultGetNumber(lua_State* L)
 {
-	const auto& result = getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
+	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
 	if (!result) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -4139,7 +3968,7 @@ int LuaScriptInterface::luaResultGetNumber(lua_State* L)
 
 int LuaScriptInterface::luaResultGetString(lua_State* L)
 {
-	const auto& result = getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
+	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
 	if (!result) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -4152,7 +3981,7 @@ int LuaScriptInterface::luaResultGetString(lua_State* L)
 
 int LuaScriptInterface::luaResultGetStream(lua_State* L)
 {
-	const auto& result = getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
+	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
 	if (!result) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -4166,7 +3995,7 @@ int LuaScriptInterface::luaResultGetStream(lua_State* L)
 
 int LuaScriptInterface::luaResultNext(lua_State* L)
 {
-	const auto& result = getResultByID(tfs::lua::getNumber<uint32_t>(L, -1));
+	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, -1));
 	if (!result) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -4178,7 +4007,7 @@ int LuaScriptInterface::luaResultNext(lua_State* L)
 
 int LuaScriptInterface::luaResultFree(lua_State* L)
 {
-	tfs::lua::pushBoolean(L, removeResult(tfs::lua::getNumber<uint32_t>(L, -1)));
+	tfs::lua::pushBoolean(L, tfs::lua::removeResult(tfs::lua::getNumber<uint32_t>(L, -1)));
 	return 1;
 }
 
@@ -6491,7 +6320,7 @@ int LuaScriptInterface::luaItemSplit(lua_State* L)
 
 	splitItem->setItemCount(count);
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	uint32_t uid = env->addThing(item);
 
 	if (item->isRemoved()) {
@@ -6985,7 +6814,7 @@ int LuaScriptInterface::luaItemTransform(lua_State* L)
 		subType = std::min<int32_t>(subType, ITEM_STACK_SIZE);
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	uint32_t uid = env->addThing(item);
 
 	const auto& newItem = g_game.transformItem(item, itemId, subType);
@@ -18492,7 +18321,7 @@ void LuaEnvironment::executeTimerEvent(uint32_t eventIndex)
 
 	// call the function
 	if (tfs::lua::reserveScriptEnv()) {
-		ScriptEnvironment* env = tfs::lua::getScriptEnv();
+		const auto env = tfs::lua::getScriptEnv();
 		env->setTimerEvent();
 		env->setScriptId(timerEventDesc.scriptId, this);
 		callFunction(timerEventDesc.parameters.size());

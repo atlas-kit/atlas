@@ -6,6 +6,7 @@
 #include "npc.h"
 
 #include "game.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "pugicast.h"
@@ -677,7 +678,7 @@ int NpcScriptInterface::luaActionFollow(lua_State* L)
 int NpcScriptInterface::luagetDistanceTo(lua_State* L)
 {
 	// getDistanceTo(uid)
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 
 	const auto& npc = env->getNpc();
 	if (!npc) {
@@ -1092,7 +1093,7 @@ void NpcEventsHandler::onCreatureAppear(const std::shared_ptr<Creature>& creatur
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureAppearEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1115,7 +1116,7 @@ void NpcEventsHandler::onCreatureDisappear(const std::shared_ptr<Creature>& crea
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureDisappearEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1139,7 +1140,7 @@ void NpcEventsHandler::onCreatureMove(const std::shared_ptr<Creature>& creature,
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureMoveEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1165,7 +1166,7 @@ void NpcEventsHandler::onCreatureSay(const std::shared_ptr<Creature>& creature, 
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureSayEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1191,7 +1192,7 @@ void NpcEventsHandler::onPlayerTrade(const std::shared_ptr<Player>& player, int3
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(-1, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1219,7 +1220,7 @@ void NpcEventsHandler::onPlayerCloseChannel(const std::shared_ptr<Player>& playe
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerCloseChannelEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1242,7 +1243,7 @@ void NpcEventsHandler::onPlayerEndTrade(const std::shared_ptr<Player>& player)
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerEndTradeEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1265,7 +1266,7 @@ void NpcEventsHandler::onThink()
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(thinkEvent, scriptInterface.get());
 	env->setNpc(npc);
 

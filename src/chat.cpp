@@ -6,6 +6,7 @@
 #include "chat.h"
 
 #include "game.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "pugicast.h"
@@ -152,7 +153,7 @@ bool ChatChannel::executeCanJoinEvent(const std::shared_ptr<const Player>& playe
 	}
 
 	LuaScriptInterface* scriptInterface = g_chat->getScriptInterface();
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(canJoinEvent, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -177,7 +178,7 @@ bool ChatChannel::executeOnJoinEvent(const std::shared_ptr<const Player>& player
 	}
 
 	LuaScriptInterface* scriptInterface = g_chat->getScriptInterface();
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(onJoinEvent, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -202,7 +203,7 @@ bool ChatChannel::executeOnLeaveEvent(const std::shared_ptr<const Player>& playe
 	}
 
 	LuaScriptInterface* scriptInterface = g_chat->getScriptInterface();
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(onLeaveEvent, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -228,7 +229,7 @@ bool ChatChannel::executeOnSpeakEvent(const std::shared_ptr<const Player>& playe
 	}
 
 	LuaScriptInterface* scriptInterface = g_chat->getScriptInterface();
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(onSpeakEvent, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();

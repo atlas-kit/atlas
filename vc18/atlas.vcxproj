@@ -162,6 +162,7 @@
     <ClCompile Include="..\src\item.cpp" />
     <ClCompile Include="..\src\items.cpp" />
     <ClCompile Include="..\src\luascript.cpp" />
+    <ClCompile Include="..\src\lua\env.cpp" />
     <ClCompile Include="..\src\lua\error.cpp" />
     <ClCompile Include="..\src\lua\meta.cpp" />
     <ClCompile Include="..\src\mailbox.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="..\src\lockfree.h" />
     <ClInclude Include="..\src\luascript.h" />
     <ClInclude Include="..\src\luavariant.h" />
+    <ClInclude Include="..\src\lua\env.h" />
     <ClInclude Include="..\src\lua\error.h" />
     <ClInclude Include="..\src\lua\meta.h" />
     <ClInclude Include="..\src\mailbox.h" />

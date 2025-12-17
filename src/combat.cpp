@@ -999,7 +999,7 @@ void ValueCallback::getMinMaxValues(const std::shared_ptr<Player>& player, Comba
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	if (!env->setCallbackId(scriptId, scriptInterface)) {
 		tfs::lua::resetScriptEnv();
 		return;
@@ -1080,7 +1080,7 @@ void TileCallback::onTileCombat(const std::shared_ptr<Creature>& creature, const
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	if (!env->setCallbackId(scriptId, scriptInterface)) {
 		tfs::lua::resetScriptEnv();
 		return;
@@ -1111,7 +1111,7 @@ void TargetCallback::onTargetCombat(const std::shared_ptr<Creature>& creature,
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	if (!env->setCallbackId(scriptId, scriptInterface)) {
 		tfs::lua::resetScriptEnv();
 		return;

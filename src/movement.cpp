@@ -7,6 +7,7 @@
 
 #include "combat.h"
 #include "game.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "pugicast.h"
@@ -951,7 +952,7 @@ bool MoveEvent::executeStep(const std::shared_ptr<Creature>& creature, const std
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -989,7 +990,7 @@ bool MoveEvent::executeEquip(const std::shared_ptr<Player>& player, const std::s
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -1023,7 +1024,7 @@ bool MoveEvent::executeAddRemItem(const std::shared_ptr<Item>& item, const std::
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();

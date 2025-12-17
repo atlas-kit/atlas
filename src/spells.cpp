@@ -329,7 +329,7 @@ bool CombatSpell::executeCastSpell(const std::shared_ptr<Creature>& creature, co
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -1032,7 +1032,7 @@ bool InstantSpell::executeCastSpell(const std::shared_ptr<Creature>& creature, c
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -1211,7 +1211,7 @@ bool RuneSpell::executeCastSpell(const std::shared_ptr<Creature>& creature, cons
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();

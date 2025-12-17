@@ -8,6 +8,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
+#include "lua/env.h"
 #include "lua/meta.h"
 #include "luavariant.h"
 #include "pugicast.h"
@@ -402,7 +403,7 @@ bool Weapon::executeUseWeapon(const std::shared_ptr<Player>& player, const LuaVa
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
