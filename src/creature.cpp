@@ -784,13 +784,12 @@ void Creature::updateFollowersPaths()
 	}
 
 	followers = followers | tfs::views::lock_weak_ptrs | std::views::filter([this](const auto& creature) {
-		            const auto& followerPosition = creature->getPosition();
-		            if (position.z != followerPosition.z) {
+		            if (position.z != creature->position.z) {
 			            return false;
 		            }
 
-		            return position.getDistanceX(followerPosition) < Map::maxViewportX &&
-		                   position.getDistanceY(followerPosition) < Map::maxViewportY;
+		            return position.getDistanceX(creature->position) < Map::maxViewportX &&
+		                   position.getDistanceY(creature->position) < Map::maxViewportY;
 	            }) |
 	            std::ranges::to<decltype(followers)>();
 
