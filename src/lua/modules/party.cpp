@@ -1,0 +1,289 @@
+#include "../api.h"
+#include "../meta.h"
+#include "../register.h"
+#include "../script.h"
+
+namespace {
+
+	int32_t luaPartyCreate(lua_State* L)
+{
+	// Party(userdata)
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	Party* party = player->getParty();
+	if (!party) {
+		party = new Party(player);
+		g_game.updatePlayerShield(player);
+		player->sendCreatureSkull(player);
+		tfs::lua::pushUserdata(L, party);
+		tfs::lua::setMetatable(L, -1, "Party");
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyDisband(lua_State* L)
+{
+	// party:disband()
+	Party** partyPtr = tfs::lua::getRawUserdata<Party>(L, 1);
+	if (partyPtr && *partyPtr) {
+		Party*& party = *partyPtr;
+		party->disband();
+		party = nullptr;
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyGetLeader(lua_State* L)
+{
+	// party:getLeader()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (!party) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	if (const auto& leader = party->getLeader()) {
+		tfs::lua::pushSharedPtr(L, leader);
+		tfs::lua::setMetatable(L, -1, "Player");
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartySetLeader(lua_State* L)
+{
+	// party:setLeader(player)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->passPartyLeadership(player, true));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyGetMembers(lua_State* L)
+{
+	// party:getMembers()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (!party) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	lua_createtable(L, members.size(), 0);
+
+	int index = 0;
+	for (const auto& player : members) {
+		tfs::lua::pushSharedPtr(L, player);
+		tfs::lua::setMetatable(L, -1, "Player");
+		lua_rawseti(L, -2, ++index);
+	}
+	return 1;
+}
+
+int luaPartyGetMemberCount(lua_State* L)
+{
+	// party:getMemberCount()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		tfs::lua::pushNumber(
+		    L, std::ranges::count_if(party->getMembers(), [](const auto& member) { return !member.expired(); }));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyGetInvitees(lua_State* L)
+{
+	// party:getInvitees()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (!party) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	lua_createtable(L, invitees.size(), 0);
+
+	int index = 0;
+	for (const auto& player : invitees) {
+		tfs::lua::pushSharedPtr(L, player);
+		tfs::lua::setMetatable(L, -1, "Player");
+		lua_rawseti(L, -2, ++index);
+	}
+	return 1;
+}
+
+int luaPartyGetInviteeCount(lua_State* L)
+{
+	// party:getInviteeCount()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		tfs::lua::pushNumber(
+		    L, std::ranges::count_if(party->getInvitees(), [](const auto& invitee) { return !invitee.expired(); }));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyAddInvite(lua_State* L)
+{
+	// party:addInvite(player)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->invitePlayer(player));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyRemoveInvite(lua_State* L)
+{
+	// party:removeInvite(player)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->removeInvite(player));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyAddMember(lua_State* L)
+{
+	// party:addMember(player)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->joinParty(player));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyRemoveMember(lua_State* L)
+{
+	// party:removeMember(player)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->leaveParty(player));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyIsSharedExperienceActive(lua_State* L)
+{
+	// party:isSharedExperienceActive()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		tfs::lua::pushBoolean(L, party->isSharedExperienceActive());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyIsSharedExperienceEnabled(lua_State* L)
+{
+	// party:isSharedExperienceEnabled()
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		tfs::lua::pushBoolean(L, party->isSharedExperienceEnabled());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyIsMemberSharingExp(lua_State* L)
+{
+	// party:isMemberSharingExp(player)
+	const auto& player = tfs::lua::getSharedPtr<const Player>(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party && player) {
+		tfs::lua::pushBoolean(L, party->getMemberSharedExperienceStatus(player) == SHAREDEXP_OK);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartyShareExperience(lua_State* L)
+{
+	// party:shareExperience(experience)
+	uint64_t experience = tfs::lua::getNumber<uint64_t>(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		party->shareExperience(experience);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPartySetSharedExperience(lua_State* L)
+{
+	// party:setSharedExperience(active)
+	bool active = tfs::lua::getBoolean(L, 2);
+	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	if (party) {
+		tfs::lua::pushBoolean(L, party->setSharedExperience(party->getLeader(), active));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+} // namespace
+
+void tfs::lua::registerParty(LuaScriptInterface& i)
+{
+	i.registerClass("Party", "", luaPartyCreate);
+	i.registerMetaMethod("Party", "__eq", tfs::lua::luaUserdataCompare);
+
+	i.registerMethod("Party", "disband", luaPartyDisband);
+
+	i.registerMethod("Party", "getLeader", luaPartyGetLeader);
+	i.registerMethod("Party", "setLeader", luaPartySetLeader);
+
+	i.registerMethod("Party", "getMembers", luaPartyGetMembers);
+	i.registerMethod("Party", "getMemberCount", luaPartyGetMemberCount);
+
+	i.registerMethod("Party", "getInvitees", luaPartyGetInvitees);
+	i.registerMethod("Party", "getInviteeCount", luaPartyGetInviteeCount);
+
+	i.registerMethod("Party", "addInvite", luaPartyAddInvite);
+	i.registerMethod("Party", "removeInvite", luaPartyRemoveInvite);
+
+	i.registerMethod("Party", "addMember", luaPartyAddMember);
+	i.registerMethod("Party", "removeMember", luaPartyRemoveMember);
+
+	i.registerMethod("Party", "isSharedExperienceActive", luaPartyIsSharedExperienceActive);
+	i.registerMethod("Party", "isSharedExperienceEnabled", luaPartyIsSharedExperienceEnabled);
+	i.registerMethod("Party", "isMemberSharingExp", luaPartyIsMemberSharingExp);
+	i.registerMethod("Party", "shareExperience", luaPartyShareExperience);
+	i.registerMethod("Party", "setSharedExperience", luaPartySetSharedExperience);
+}
