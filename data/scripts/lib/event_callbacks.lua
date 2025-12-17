@@ -126,13 +126,13 @@ Event = setmetatable({
 	__index = function(self, key)
 		local callback = callbacks[key]
 		if not callback then
-			return function(...) end
+			return
 		end
 
 		local events = EventData[callback]
 		local eventsCount = events.maxn
 		if eventsCount == 0 then
-			return function(...) end
+			return
 		end
 
 		local updateableParams = updateableParameters[callback]
