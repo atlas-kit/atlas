@@ -252,7 +252,6 @@ bool ConfigManager::load()
 	string[URL] = getGlobalString(L, "url", "");
 	string[LOCATION] = getGlobalString(L, "location", "");
 	string[WORLD_TYPE] = getGlobalString(L, "worldType", "pvp");
-	string[LOG_LEVEL] = getGlobalString(L, "logLevel", "info");
 
 	integer[MAX_PLAYERS] = getGlobalNumber(L, "maxPlayers");
 	integer[PZ_LOCKED] = getGlobalNumber(L, "pzLocked", 60000);

@@ -69,7 +69,6 @@ enum string_config_t
 	DEFAULT_PRIORITY,
 	MAP_AUTHOR,
 	CONFIG_FILE,
-	LOG_LEVEL,
 
 	LAST_STRING_CONFIG /* this must be the last one */
 };
