@@ -34,6 +34,7 @@ jobs:
 
     env:
       CXX: g++-14
+      VCPKG_BUILD_TYPE: release
 
     steps:
       - uses: actions/checkout@v6
@@ -61,3 +62,5 @@ jobs:
         with:
           workflowPreset: ci
           configurePresetAdditionalArgs: "['-DASAN=ON', '-DBUILD_TESTING=ON']"
+          buildPresetAdditionalArgs: "['--config', 'Debug']"
+          testPresetAdditionalArgs: "['--build-config', 'Debug']"

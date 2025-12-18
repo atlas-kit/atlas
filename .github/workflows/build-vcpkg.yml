@@ -61,8 +61,8 @@ jobs:
       - name: Build with CMake
         uses: lukka/run-cmake@v10
         with:
-          buildPreset: vcpkg
           configurePreset: vcpkg
+          buildPreset: vcpkg
 
       - name: Upload build logs
         uses: actions/upload-artifact@v6
