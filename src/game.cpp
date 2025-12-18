@@ -5722,7 +5722,7 @@ std::shared_ptr<House> Game::addHouse(uint32_t id)
 		return it->second;
 	}
 
-	auto&& [it, _] = houses.emplace(id, std::make_unique<House>(id));
+	auto&& [it, _] = houses.emplace(id, std::make_shared<House>(id));
 	return it->second;
 }
 
