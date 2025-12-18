@@ -1,5 +1,11 @@
 {
-  "version": 3,
+  "$schema": "https://cmake.org/cmake/help/v3.30/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+  "version": 9,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 30,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "default",
@@ -29,11 +35,36 @@
   "testPresets": [
     {
       "name": "default",
-      "configurePreset": "default"
+      "configurePreset": "default",
+      "output": {
+        "outputOnFailure": true
+      }
     },
     {
       "name": "vcpkg",
-      "configurePreset": "vcpkg"
+      "configurePreset": "vcpkg",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "ci",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "vcpkg"
+        },
+        {
+          "type": "build",
+          "name": "vcpkg"
+        },
+        {
+          "type": "test",
+          "name": "vcpkg"
+        }
+      ]
     }
   ]
 }
