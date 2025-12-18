@@ -55,6 +55,12 @@ endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-fno-strict-aliasing)
+
+    if (APPLE)
+        # MacOS SDK is not compatible with GCC
+        # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=116827
+        set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+    endif ()
 endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
