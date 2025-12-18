@@ -37,7 +37,7 @@ public:
 	void addThing(int32_t index, const std::shared_ptr<Thing>& thing) override;
 	void internalAddThing(uint32_t index, const std::shared_ptr<Thing>& thing) override;
 
-	const auto getHouse() const { return house.lock(); }
+	std::shared_ptr<House> getHouse() const { return house.lock(); }
 
 private:
 	void updateHouse(const std::shared_ptr<Item>& item);

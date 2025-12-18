@@ -27,7 +27,7 @@ public:
 
 	uint32_t getSleeper() const { return sleeperGUID; }
 
-	const auto getHouse() const { return house.lock(); }
+	std::shared_ptr<House> getHouse() const { return house.lock(); }
 	void setHouse(const std::shared_ptr<House>& house) { this->house = house; }
 
 	bool canUse(const std::shared_ptr<Player>& player);

@@ -48,7 +48,7 @@ public:
 		return std::static_pointer_cast<const Door>(shared_from_this());
 	}
 
-	const auto getHouse() { return house.lock(); }
+	std::shared_ptr<House> getHouse() { return house.lock(); }
 
 	// serialization
 	void readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator& last) override;
@@ -96,7 +96,7 @@ public:
 	void onTradeEvent(TradeEvents_t event, const std::shared_ptr<Player>& owner) override;
 	bool canTransform() const override { return false; }
 
-	const auto getHouse() const { return house.lock(); }
+	std::shared_ptr<House> getHouse() const { return house.lock(); }
 
 private:
 	std::weak_ptr<House> house;
