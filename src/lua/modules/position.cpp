@@ -91,7 +91,7 @@ int luaPositionSendDistanceEffect(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerXml(LuaScriptInterface& i)
+void tfs::lua::registerPosition(LuaScriptInterface& i)
 {
 	registerEnum(i, DIRECTION_NORTH);
 	registerEnum(i, DIRECTION_EAST);

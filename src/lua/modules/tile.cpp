@@ -712,7 +712,7 @@ int luaTileGetHouse(lua_State* L)
 	}
 
 	if (const auto& houseTile = tile->getHouseTile()) {
-		tfs::lua::pushUserdata(L, houseTile->getHouse());
+		tfs::lua::pushSharedPtr(L, houseTile->getHouse());
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {
 		lua_pushnil(L);

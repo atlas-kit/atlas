@@ -148,7 +148,6 @@ T getField(lua_State* L, int32_t arg, std::string_view key, T&& defaultValue)
 
 std::string getFieldString(lua_State* L, int32_t arg, std::string_view key);
 
-// Push
 void pushBoolean(lua_State* L, bool value);
 void pushSpell(lua_State* L, const Spell& spell);
 void pushPosition(lua_State* L, const Position& position, int32_t stackpos = 0);

@@ -1,11 +1,7 @@
-// Copyright 2023 The Forgotten Server Authors. All rights reserved.
-// Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
+#pragma once
 
-#ifndef FS_LUASCRIPT_H
-#define FS_LUASCRIPT_H
-
-#include "enums.h"
-#include "position.h"
+#include "../enums.h"
+#include "../position.h"
 
 #if LUA_VERSION_NUM >= 502
 #ifndef LUA_COMPAT_ALL
@@ -243,5 +239,3 @@ private:
 	friend class LuaScriptInterface;
 	friend class CombatSpell;
 };
-
-#endif // FS_LUASCRIPT_H
