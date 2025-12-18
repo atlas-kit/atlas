@@ -1190,7 +1190,7 @@ public:
 	uint32_t setWriteItem(const std::shared_ptr<Item>& item, uint16_t maxWriteLen = 0);
 
 	std::shared_ptr<House> getEditHouse(uint32_t& windowTextId, uint32_t& listId);
-	void setEditHouse(std::shared_ptr<House> house, uint32_t listId = 0);
+	void setEditHouse(const std::shared_ptr<House>& house, uint32_t listId = 0);
 
 	void learnInstantSpell(const std::string& spellName);
 	void forgetInstantSpell(const std::string& spellName);

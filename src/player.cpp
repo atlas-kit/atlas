@@ -814,10 +814,10 @@ std::shared_ptr<House> Player::getEditHouse(uint32_t& windowTextId, uint32_t& li
 	return editHouse.lock();
 }
 
-void Player::setEditHouse(std::shared_ptr<House> house, uint32_t listId /*= 0*/)
+void Player::setEditHouse(const std::shared_ptr<House>& house, uint32_t listId /*= 0*/)
 {
 	windowTextId++;
-	editHouse = std::move(house);
+	editHouse = house;
 	editListId = listId;
 }
 
