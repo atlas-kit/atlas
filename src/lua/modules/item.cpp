@@ -789,6 +789,23 @@ int luaItemGetBoostPercent(lua_State* L)
 
 void tfs::lua::registerItem(LuaScriptInterface& i)
 {
+	registerEnum(i, CONST_PROP_BLOCKSOLID);
+	registerEnum(i, CONST_PROP_HASHEIGHT);
+	registerEnum(i, CONST_PROP_BLOCKPROJECTILE);
+	registerEnum(i, CONST_PROP_BLOCKPATH);
+	registerEnum(i, CONST_PROP_ISVERTICAL);
+	registerEnum(i, CONST_PROP_ISHORIZONTAL);
+	registerEnum(i, CONST_PROP_MOVEABLE);
+	registerEnum(i, CONST_PROP_IMMOVABLEBLOCKSOLID);
+	registerEnum(i, CONST_PROP_IMMOVABLEBLOCKPATH);
+	registerEnum(i, CONST_PROP_IMMOVABLENOFIELDBLOCKPATH);
+	registerEnum(i, CONST_PROP_NOFIELDBLOCKPATH);
+	registerEnum(i, CONST_PROP_SUPPORTHANGABLE);
+
+	registerEnum(i, DECAYING_FALSE);
+	registerEnum(i, DECAYING_TRUE);
+	registerEnum(i, DECAYING_PENDING);
+
 	i.registerClass("Item", "", luaItemCreate);
 	i.registerMetaMethod("Item", "__eq", tfs::lua::luaUserdataCompare);
 

@@ -458,6 +458,9 @@ int luaHouseSave(lua_State* L)
 
 void tfs::lua::registerXml(LuaScriptInterface& i)
 {
+	registerEnum(i, GUEST_LIST);
+	registerEnum(i, SUBOWNER_LIST);
+
 	i.registerClass("House", "", luaHouseCreate);
 	i.registerMetaMethod("House", "__eq", tfs::lua::luaUserdataCompare);
 

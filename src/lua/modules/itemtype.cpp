@@ -978,6 +978,20 @@ void tfs::lua::registerItemType(LuaScriptInterface& i)
 	registerEnum(i, ITEM_GROUP_DEPRECATED);
 	registerEnum(i, ITEM_GROUP_PODIUM);
 
+	registerEnum(i, SLOTP_WHEREEVER);
+	registerEnum(i, SLOTP_HEAD);
+	registerEnum(i, SLOTP_NECKLACE);
+	registerEnum(i, SLOTP_BACKPACK);
+	registerEnum(i, SLOTP_ARMOR);
+	registerEnum(i, SLOTP_RIGHT);
+	registerEnum(i, SLOTP_LEFT);
+	registerEnum(i, SLOTP_LEGS);
+	registerEnum(i, SLOTP_FEET);
+	registerEnum(i, SLOTP_RING);
+	registerEnum(i, SLOTP_AMMO);
+	registerEnum(i, SLOTP_DEPOT);
+	registerEnum(i, SLOTP_TWO_HAND);
+
 	i.registerClass("ItemType", "", luaItemTypeCreate);
 	i.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);
 

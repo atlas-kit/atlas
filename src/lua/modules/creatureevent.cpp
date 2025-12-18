@@ -105,6 +105,21 @@ int luaCreatureEventOnCallback(lua_State* L)
 
 void tfs::lua::registerCreatureEvent(LuaScriptInterface& i)
 {
+	registerEnum(i, CREATURE_EVENT_NONE);
+	registerEnum(i, CREATURE_EVENT_LOGIN);
+	registerEnum(i, CREATURE_EVENT_LOGOUT);
+	registerEnum(i, CREATURE_EVENT_RECONNECT);
+	registerEnum(i, CREATURE_EVENT_THINK);
+	registerEnum(i, CREATURE_EVENT_PREPAREDEATH);
+	registerEnum(i, CREATURE_EVENT_DEATH);
+	registerEnum(i, CREATURE_EVENT_KILL);
+	registerEnum(i, CREATURE_EVENT_ADVANCE);
+	registerEnum(i, CREATURE_EVENT_MODALWINDOW);
+	registerEnum(i, CREATURE_EVENT_TEXTEDIT);
+	registerEnum(i, CREATURE_EVENT_HEALTHCHANGE);
+	registerEnum(i, CREATURE_EVENT_MANACHANGE);
+	registerEnum(i, CREATURE_EVENT_EXTENDED_OPCODE);
+
 	i.registerClass("CreatureEvent", "", luaCreateCreatureEvent);
 	i.registerMethod("CreatureEvent", "type", luaCreatureEventType);
 	i.registerMethod("CreatureEvent", "register", luaCreatureEventRegister);

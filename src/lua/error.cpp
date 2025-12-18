@@ -1,6 +1,19 @@
 #include "error.h"
 
+#include "api.h"
+#include "env.h"
+
 #include <iostream>
+
+namespace {
+
+std::string getStackTrace(lua_State* L, std::string_view error_desc)
+{
+	luaL_traceback(L, L, error_desc.data(), 1);
+	return tfs::lua::popString(L);
+}
+
+} // namespace
 
 namespace tfs::lua {
 

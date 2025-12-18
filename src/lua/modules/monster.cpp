@@ -463,6 +463,14 @@ int luaMonsterRemoveIcon(lua_State* L)
 
 void tfs::lua::registerMonster(LuaScriptInterface& i)
 {
+	registerEnum(i, MONSTER_ICON_VULNERABLE);
+	registerEnum(i, MONSTER_ICON_WEAKENED);
+	registerEnum(i, MONSTER_ICON_MELEE);
+	registerEnum(i, MONSTER_ICON_INFLUENCED);
+	registerEnum(i, MONSTER_ICON_FIENDISH);
+	registerEnum(i, MONSTER_ICON_FIRST);
+	registerEnum(i, MONSTER_ICON_LAST);
+
 	i.registerClass("Monster", "Creature", luaMonsterCreate);
 	i.registerMetaMethod("Monster", "__eq", tfs::lua::luaUserdataCompare);
 

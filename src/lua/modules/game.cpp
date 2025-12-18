@@ -630,6 +630,20 @@ int luaGameReload(lua_State* L)
 
 void tfs::lua::registerGame(LuaScriptInterface& i)
 {
+	registerEnum(i, ITEM_STACK_SIZE);
+
+	registerEnum(i, GAME_STATE_STARTUP);
+	registerEnum(i, GAME_STATE_INIT);
+	registerEnum(i, GAME_STATE_NORMAL);
+	registerEnum(i, GAME_STATE_CLOSED);
+	registerEnum(i, GAME_STATE_SHUTDOWN);
+	registerEnum(i, GAME_STATE_CLOSING);
+	registerEnum(i, GAME_STATE_MAINTAIN);
+
+	registerEnum(i, WORLD_TYPE_NO_PVP);
+	registerEnum(i, WORLD_TYPE_PVP);
+	registerEnum(i, WORLD_TYPE_PVP_ENFORCED);
+
 	i.registerTable("Game");
 
 	i.registerMethod("Game", "getSpectators", luaGameGetSpectators);

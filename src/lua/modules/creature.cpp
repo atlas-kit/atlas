@@ -1117,6 +1117,44 @@ int luaCreatureSetStorageValue(lua_State* L)
 
 void tfs::lua::registerCreature(LuaScriptInterface& i)
 {
+	registerEnum(i, CONST_SLOT_HEAD);
+	registerEnum(i, CONST_SLOT_NECKLACE);
+	registerEnum(i, CONST_SLOT_BACKPACK);
+	registerEnum(i, CONST_SLOT_ARMOR);
+	registerEnum(i, CONST_SLOT_RIGHT);
+	registerEnum(i, CONST_SLOT_LEFT);
+	registerEnum(i, CONST_SLOT_LEGS);
+	registerEnum(i, CONST_SLOT_FEET);
+	registerEnum(i, CONST_SLOT_RING);
+	registerEnum(i, CONST_SLOT_AMMO);
+
+	registerEnum(i, CREATURE_ID_MIN);
+	registerEnum(i, CREATURE_ID_MAX);
+
+	registerEnum(i, CREATURE_ICON_CROSS_WHITE);
+	registerEnum(i, CREATURE_ICON_CROSS_WHITE_RED);
+	registerEnum(i, CREATURE_ICON_ORB_RED);
+	registerEnum(i, CREATURE_ICON_ORB_GREEN);
+	registerEnum(i, CREATURE_ICON_ORB_RED_GREEN);
+	registerEnum(i, CREATURE_ICON_GEM_GREEN);
+	registerEnum(i, CREATURE_ICON_GEM_YELLOW);
+	registerEnum(i, CREATURE_ICON_GEM_BLUE);
+	registerEnum(i, CREATURE_ICON_GEM_PURPLE);
+	registerEnum(i, CREATURE_ICON_GEM_RED);
+	registerEnum(i, CREATURE_ICON_PIGEON);
+	registerEnum(i, CREATURE_ICON_ENERGY);
+	registerEnum(i, CREATURE_ICON_POISON);
+	registerEnum(i, CREATURE_ICON_WATER);
+	registerEnum(i, CREATURE_ICON_FIRE);
+	registerEnum(i, CREATURE_ICON_ICE);
+	registerEnum(i, CREATURE_ICON_ARROW_UP);
+	registerEnum(i, CREATURE_ICON_ARROW_DOWN);
+	registerEnum(i, CREATURE_ICON_WARNING);
+	registerEnum(i, CREATURE_ICON_QUESTION);
+	registerEnum(i, CREATURE_ICON_CROSS_RED);
+	registerEnum(i, CREATURE_ICON_FIRST);
+	registerEnum(i, CREATURE_ICON_LAST);
+
 	i.registerClass("Creature", "", luaCreatureCreate);
 	i.registerMetaMethod("Creature", "__eq", tfs::lua::luaUserdataCompare);
 

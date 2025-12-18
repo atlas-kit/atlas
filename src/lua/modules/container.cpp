@@ -278,6 +278,18 @@ int luaContainerGetItems(lua_State* L)
 
 void tfs::lua::registerContainer(LuaScriptInterface& i)
 {
+	i.registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
+
+	// Use with container:addItem, container:addItemEx and possibly other functions.
+	registerEnum(i, FLAG_NOLIMIT);
+	registerEnum(i, FLAG_IGNOREBLOCKITEM);
+	registerEnum(i, FLAG_IGNOREBLOCKCREATURE);
+	registerEnum(i, FLAG_CHILDISOWNER);
+	registerEnum(i, FLAG_PATHFINDING);
+	registerEnum(i, FLAG_IGNOREFIELDDAMAGE);
+	registerEnum(i, FLAG_IGNORENOTMOVEABLE);
+	registerEnum(i, FLAG_IGNOREAUTOSTACK);
+
 	i.registerClass("Container", "Item", luaContainerCreate);
 	i.registerMetaMethod("Container", "__eq", tfs::lua::luaUserdataCompare);
 

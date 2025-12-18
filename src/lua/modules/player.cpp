@@ -2344,6 +2344,16 @@ int luaPlayerSendEnterMarket(lua_State* L)
 
 void tfs::lua::registerPlayer(LuaScriptInterface& i)
 {
+	registerEnum(i, FIGHTMODE_ATTACK);
+	registerEnum(i, FIGHTMODE_BALANCED);
+	registerEnum(i, FIGHTMODE_DEFENSE);
+
+	registerEnum(i, RESOURCE_BANK_BALANCE);
+	registerEnum(i, RESOURCE_GOLD_EQUIPPED);
+	registerEnum(i, RESOURCE_PREY_WILDCARDS);
+	registerEnum(i, RESOURCE_DAILYREWARD_STREAK);
+	registerEnum(i, RESOURCE_DAILYREWARD_JOKERS);
+
 	i.registerClass("Player", "Creature", luaPlayerCreate);
 	i.registerMetaMethod("Player", "__eq", tfs::lua::luaUserdataCompare);
 

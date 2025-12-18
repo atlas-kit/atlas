@@ -1158,6 +1158,8 @@ int luaMonsterTypeBestiaryInfo(lua_State* L)
 
 void tfs::lua::registerMonsterType(LuaScriptInterface& i)
 {
+	registerEnum(i, MAX_LOOTCHANCE);
+
 	i.registerClass("MonsterType", "", luaMonsterTypeCreate);
 	i.registerMetaMethod("MonsterType", "__eq", tfs::lua::luaUserdataCompare);
 
