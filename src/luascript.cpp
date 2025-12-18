@@ -1279,7 +1279,6 @@ int LuaScriptInterface::luaTablePack(lua_State* L)
 	return 1;                /* return table */
 }
 
-
 #define registerEnum(L, value) \
 	{ \
 		std::string enumName = #value; \
