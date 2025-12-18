@@ -242,7 +242,6 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 		if (foundPlayer->client) {
 			foundPlayer->disconnect();
-			foundPlayer->isConnecting = true;
 
 			eventConnect = g_scheduler.addEvent(
 			    createSchedulerTask(1000, [=, thisPtr = getThis(), playerID = foundPlayer->getID()]() {
@@ -278,7 +277,6 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 	g_chat->removeUserFromAllChannels(player);
 	player->clearModalWindows();
 	player->setOperatingSystem(operatingSystem);
-	player->isConnecting = false;
 
 	player->client = getThis();
 	player->onCreatureAppear(player, false, CONST_ME_NONE);
