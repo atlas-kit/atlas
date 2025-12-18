@@ -89,7 +89,6 @@ mysqlSock = ""
 -- intervals regardless of other actions such as item (potion) use. This setting
 -- may cause high CPU usage with many players and potentially affect performance!
 -- checkDuplicateStorageKeys checks the values stored in the variables for duplicates.
--- logLevel: trace, debug, info, warning, error, critical, off.
 allowChangeOutfit = true
 freePremium = false
 maxMessageBuffer = 4
@@ -104,7 +103,6 @@ minimumLevelToSendPrivate = 1
 premiumToSendPrivate = false
 cleanProtectionZones = false
 checkDuplicateStorageKeys = false
-logLevel = "info"
 
 -- VIP and Depot limits
 -- NOTE: you can set custom limits per group in data/XML/groups.xml
