@@ -61,7 +61,7 @@ jobs:
           LSAN_OPTIONS: exitcode=0
         with:
           configurePreset: vcpkg
-          configurePresetAdditionalArgs: "['-DASAN=ON']"
+          configurePresetAdditionalArgs: "['-DASAN=ON', '-DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg']"
           buildPreset: vcpkg
           buildPresetAdditionalArgs: "['--config', 'Debug']"
           testPreset: vcpkg

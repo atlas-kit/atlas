@@ -62,6 +62,7 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: vcpkg
+          configurePresetAdditionalArgs: "['-DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg']"
           buildPreset: vcpkg
 
       - name: Upload build logs

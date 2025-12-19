@@ -11,8 +11,9 @@ if (DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
     set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "The vcpkg triplet")
 endif()
 
-set(BOOST_REQUIRED_VERSION 1.71.0)
 set(VCPKG_MANIFEST_NO_DEFAULT_FEATURES ON)
+
+set(BOOST_REQUIRED_VERSION 1.71.0)
 
 option(ENABLE_HTTP "Enable HTTP support" ON)
 if (ENABLE_HTTP)
@@ -21,15 +22,16 @@ if (ENABLE_HTTP)
     add_compile_definitions(HTTP)
 endif()
 
-if (BUILD_TESTING)
-    list(APPEND VCPKG_MANIFEST_FEATURES "unit-tests")
-endif()
-
 option(USE_LIBMYSQL "Use libmysql instead of libmariadb (vcpkg only)" OFF)
 if (USE_LIBMYSQL)
     list(APPEND VCPKG_MANIFEST_FEATURES "libmysql")
 else()
     list(APPEND VCPKG_MANIFEST_FEATURES "libmariadb")
+endif()
+
+option(BUILD_TESTING "Build the testing tree" OFF)
+if (BUILD_TESTING)
+    list(APPEND VCPKG_MANIFEST_FEATURES "unit-tests")
 endif()
 
 option(ENABLE_ASAN "Enable address sanitizer" OFF)
@@ -45,7 +47,10 @@ if (ENABLE_ASAN)
 endif ()
 
 project(tfs CXX)
-include(CTest)
+
+if (BUILD_TESTING)
+    include(CTest)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -69,9 +74,14 @@ endif ()
 
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
 
-# Find packages.
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Lua REQUIRED)
 find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
+find_package(PugiXML CONFIG REQUIRED)
 find_package(simdutf CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
 # Look for vcpkg-provided packages first
@@ -93,10 +103,6 @@ if (NOT MYSQL_CLIENT_LIBS)
     find_package(MySQL REQUIRED)
 endif ()
 
-find_package(Lua REQUIRED)
-find_package(PugiXML CONFIG REQUIRED)
-find_package(Threads REQUIRED)
-
 if (APPLE)
     find_package(Iconv REQUIRED)
 endif()
@@ -112,17 +118,13 @@ find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${BOOST_REQUIRE
 
 include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Option to disable unity builds
 option(ENABLE_UNITY_BUILD "Enable unity build" ON)
 
 add_subdirectory(src)
 add_executable(tfs ${tfs_MAIN})
 target_link_libraries(tfs tfslib)
+target_precompile_headers(tfs PUBLIC src/otpch.h)
 
-### INTERPROCEDURAL_OPTIMIZATION ###
 include(CheckIPOSupported)
 check_ipo_supported(RESULT result OUTPUT error)
 if (result)
@@ -130,6 +132,3 @@ if (result)
 else ()
     message(STATUS "IPO is not supported: ${error}")
 endif ()
-### END INTERPROCEDURAL_OPTIMIZATION ###
-
-target_precompile_headers(tfs PUBLIC src/otpch.h)
