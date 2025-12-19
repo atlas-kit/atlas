@@ -442,6 +442,7 @@ public:
 	const ItemType& getItemIdByClientId(uint16_t spriteId) const;
 
 	uint16_t getItemIdByName(const std::string& name);
+	std::vector<uint16_t> getBedItemIds() const;
 
 	uint32_t majorVersion = 0;
 	uint32_t minorVersion = 0;
