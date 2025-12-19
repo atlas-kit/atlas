@@ -454,8 +454,6 @@ public:
 
 	void startDecay(const std::shared_ptr<Item>& item);
 
-	void sendOfflineTrainingDialog(const std::shared_ptr<Player>& player);
-
 	auto getPlayers() const { return players | std::views::values; }
 	auto getNpcs() const { return npcs | std::views::values; }
 	auto getMonsters() const { return monsters | std::views::values; }
@@ -533,8 +531,6 @@ private:
 	std::map<uint32_t, std::shared_ptr<BedItem>> bedSleepersMap;
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
-
-	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
 
 	GameState_t gameState = GAME_STATE_NORMAL;
 	WorldType_t worldType = WORLD_TYPE_PVP;
