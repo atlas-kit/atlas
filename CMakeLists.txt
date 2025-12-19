@@ -14,8 +14,8 @@ endif()
 set(BOOST_REQUIRED_VERSION 1.71.0)
 set(VCPKG_MANIFEST_NO_DEFAULT_FEATURES ON)
 
-option(HTTP "Enable HTTP support" ON)
-if (HTTP)
+option(ENABLE_HTTP "Enable HTTP support" ON)
+if (ENABLE_HTTP)
     list(APPEND VCPKG_MANIFEST_FEATURES "http")
     set(BOOST_REQUIRED_VERSION 1.75.0)
     add_compile_definitions(HTTP)
@@ -32,8 +32,8 @@ else()
     list(APPEND VCPKG_MANIFEST_FEATURES "libmariadb")
 endif()
 
-option(ASAN "Enable address sanitizer" OFF)
-if (ASAN)
+option(ENABLE_ASAN "Enable address sanitizer" OFF)
+if (ENABLE_ASAN)
     if (MSVC)
         message(WARNING "ASAN is experimental on Windows/MSVC")
         add_compile_options(/fsanitize=address)
@@ -102,7 +102,7 @@ if (APPLE)
 endif()
 
 set(BOOST_REQUIRED_COMPONENTS system iostreams)
-if (HTTP)
+if (ENABLE_HTTP)
     list(APPEND BOOST_REQUIRED_COMPONENTS json)
 endif ()
 if (BUILD_TESTING)
@@ -131,20 +131,5 @@ else ()
     message(STATUS "IPO is not supported: ${error}")
 endif ()
 ### END INTERPROCEDURAL_OPTIMIZATION ###
-
-### Git Version ###
-# Define the two required variables before including
-# the source code for watching a git repository.
-option(SKIP_GIT "Skip checking for git updates" OFF)
-if(NOT SKIP_GIT)
-	set(PRE_CONFIGURE_FILE "cmake/gitmetadata.h.in")
-	set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gitmetadata.h")
-	include(git_watcher)
-	if(Git_FOUND)
-		add_dependencies(tfs check_git)
-		target_include_directories(tfs PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-	endif()
-endif()
-### END  Git Version ###
 
 target_precompile_headers(tfs PUBLIC src/otpch.h)
