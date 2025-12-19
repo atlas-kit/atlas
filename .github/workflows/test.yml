@@ -60,7 +60,9 @@ jobs:
           ASAN_OPTIONS: exitcode=0
           LSAN_OPTIONS: exitcode=0
         with:
-          workflowPreset: ci
-          configurePresetAdditionalArgs: "['-DASAN=ON', '-DBUILD_TESTING=ON']"
+          configurePreset: vcpkg
+          configurePresetAdditionalArgs: "['-DASAN=ON']"
+          buildPreset: vcpkg
           buildPresetAdditionalArgs: "['--config', 'Debug']"
+          testPreset: vcpkg
           testPresetAdditionalArgs: "['--build-config', 'Debug']"

@@ -21,7 +21,6 @@ if (HTTP)
     add_compile_definitions(HTTP)
 endif()
 
-option(BUILD_TESTING "Build unit tests" OFF)
 if (BUILD_TESTING)
     list(APPEND VCPKG_MANIFEST_FEATURES "unit-tests")
 endif()
@@ -46,6 +45,7 @@ if (ASAN)
 endif ()
 
 project(tfs CXX)
+include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -114,11 +114,6 @@ include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_D
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if (BUILD_TESTING)
-    message(STATUS "Building unit tests")
-    enable_testing()
-endif()
 
 # Option to disable unity builds
 option(ENABLE_UNITY_BUILD "Enable unity build" ON)

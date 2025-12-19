@@ -8,17 +8,24 @@
   },
   "configurePresets": [
     {
-      "name": "default",
-      "description": "Generate Ninja project files",
+      "name": "base",
+      "hidden": true,
       "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build"
     },
     {
-      "name": "vcpkg",
+      "name": "default",
+      "description": "Generate Ninja project files",
       "inherits": [
-        "default"
-      ],
+        "base"
+      ]
+    },
+    {
+      "name": "vcpkg",
       "description": "Configure with vcpkg toolchain and generate Ninja project files",
+      "inherits": [
+        "base"
+      ],
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     }
   ],
@@ -34,37 +41,25 @@
   ],
   "testPresets": [
     {
-      "name": "default",
-      "configurePreset": "default",
+      "name": "base",
+      "hidden": true,
       "output": {
         "outputOnFailure": true
       }
     },
     {
-      "name": "vcpkg",
-      "configurePreset": "vcpkg",
-      "output": {
-        "outputOnFailure": true
-      }
-    }
-  ],
-  "workflowPresets": [
+      "name": "default",
+      "inherits": [
+        "base"
+      ],
+      "configurePreset": "default"
+    },
     {
-      "name": "ci",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "vcpkg"
-        },
-        {
-          "type": "build",
-          "name": "vcpkg"
-        },
-        {
-          "type": "test",
-          "name": "vcpkg"
-        }
-      ]
+      "name": "vcpkg",
+      "inherits": [
+        "base"
+      ],
+      "configurePreset": "vcpkg"
     }
   ]
 }
