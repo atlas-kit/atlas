@@ -73,7 +73,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     add_compile_options(-Wimplicit-fallthrough -Wmove)
 endif ()
 
-add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/bigobj /utf-8>")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
