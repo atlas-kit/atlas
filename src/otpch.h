@@ -14,6 +14,7 @@
 #include <bitset>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
+#include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/lockfree/stack.hpp>
@@ -41,6 +42,7 @@
 #include <random>
 #include <ranges>
 #include <set>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -53,6 +55,12 @@
 #include <vector>
 
 #if __has_include(<mariadb/mysql.h>)
+#include <mariadb/mysql.h>
+#else
+#include <mysql/mysql.h>
+#endif
+
+#if __has_include("mariadb/mysql.h")
 #include <mariadb/mysql.h>
 #else
 #include <mysql/mysql.h>

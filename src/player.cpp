@@ -22,19 +22,21 @@
 #include "tools.h"
 #include "weapons.h"
 
-extern Game g_game;
 extern Chat* g_chat;
-extern Vocations g_vocations;
-extern MoveEvents* g_moveEvents;
-extern Weapons* g_weapons;
 extern CreatureEvents* g_creatureEvents;
+extern Dispatcher g_dispatcher;
+extern Game g_game;
+extern MoveEvents* g_moveEvents;
+extern Scheduler g_scheduler;
+extern Vocations g_vocations;
+extern Weapons* g_weapons;
 
 MuteCountMap Player::muteCountMap;
 
 uint32_t Player::playerAutoID = 0x10000000;
 uint32_t Player::playerIDLimit = 0x20000000;
 
-Player::Player(ProtocolGame_ptr p) : Creature{}, lastPing{OTSYS_TIME()}, lastPong{lastPing}, client{std::move(p)} {}
+Player::Player(ProtocolGame_ptr p) : Creature{}, client{std::move(p)} {}
 
 void Player::setID()
 {
@@ -788,49 +790,6 @@ void Player::sendStats()
 	}
 }
 
-void Player::sendPing()
-{
-	int64_t timeNow = OTSYS_TIME();
-
-	bool hasLostConnection = false;
-	if ((timeNow - lastPing) >= 5000) {
-		lastPing = timeNow;
-		if (client) {
-			client->sendPing();
-		} else {
-			hasLostConnection = true;
-		}
-	}
-
-	int64_t noPongTime = timeNow - lastPong;
-	if (const auto& attackedCreature = getAttackedCreature()) {
-		if ((hasLostConnection || noPongTime >= 7000) && attackedCreature->getPlayer()) {
-			removeAttackedCreature();
-		}
-	}
-
-	int32_t noPongKickTime = vocation->getNoPongKickTime();
-	if (pzLocked && noPongKickTime < 60000) {
-		noPongKickTime = 60000;
-	}
-
-	if (noPongTime >= noPongKickTime) {
-		if (isConnecting || getTile()->hasFlag(TILESTATE_NOLOGOUT)) {
-			return;
-		}
-
-		if (!g_creatureEvents->playerLogout(getPlayer())) {
-			return;
-		}
-
-		if (client) {
-			client->logout(true, true);
-		} else {
-			g_game.removeCreature(getPlayer(), true);
-		}
-	}
-}
-
 std::shared_ptr<Item> Player::getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen)
 {
 	windowTextId = this->windowTextId;
@@ -850,21 +809,21 @@ uint32_t Player::setWriteItem(const std::shared_ptr<Item>& item, uint16_t maxWri
 	return ++windowTextId;
 }
 
-House* Player::getEditHouse(uint32_t& windowTextId, uint32_t& listId)
+std::shared_ptr<House> Player::getEditHouse(uint32_t& windowTextId, uint32_t& listId)
 {
 	windowTextId = this->windowTextId;
 	listId = this->editListId;
-	return editHouse;
+	return editHouse.lock();
 }
 
-void Player::setEditHouse(House* house, uint32_t listId /*= 0*/)
+void Player::setEditHouse(const std::shared_ptr<House>& house, uint32_t listId /*= 0*/)
 {
 	windowTextId++;
 	editHouse = house;
 	editListId = listId;
 }
 
-void Player::sendHouseWindow(House* house, uint32_t listId) const
+void Player::sendHouseWindow(const std::shared_ptr<House>& house, uint32_t listId) const
 {
 	if (!client) {
 		return;
@@ -1492,8 +1451,6 @@ uint32_t Player::getNextActionTime() const { return std::max<int64_t>(SCHEDULER_
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-
-	sendPing();
 
 	MessageBufferTicks += interval;
 	if (MessageBufferTicks >= 1500) {

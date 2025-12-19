@@ -337,8 +337,6 @@ public:
 	void playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	void playerOpenPrivateChannel(uint32_t playerId, std::string receiver);
 	void playerCloseNpcChannel(uint32_t playerId);
-	void playerReceivePing(uint32_t playerId);
-	void playerReceivePingBack(uint32_t playerId);
 	void playerAutoWalk(uint32_t playerId, const std::vector<Direction>& listDir);
 	void playerStopAutoWalk(uint32_t playerId);
 	void playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
@@ -494,6 +492,12 @@ public:
 	void removeTileToClean(const std::shared_ptr<Tile>& tile) { tilesToClean.erase(tile); }
 	void clearTilesToClean() { tilesToClean.clear(); }
 
+	std::shared_ptr<House> addHouse(uint32_t id);
+	std::shared_ptr<House> getHouseById(uint32_t id);
+	std::shared_ptr<House> getHouseByPlayerId(uint32_t playerId);
+	const auto& getHouses() const { return houses; }
+	void payHouses(RentPeriod_t rentPeriod) const;
+
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
 	void playerWhisper(const std::shared_ptr<Player>& player, const std::string& text);
@@ -517,6 +521,8 @@ private:
 	size_t lastBucket = 0;
 
 	WildcardTreeNode wildcardTree{false};
+
+	boost::container::flat_map<uint32_t, std::shared_ptr<House>> houses;
 
 	std::map<uint32_t, std::weak_ptr<Npc>> npcs;
 	std::map<uint32_t, std::weak_ptr<Monster>> monsters;

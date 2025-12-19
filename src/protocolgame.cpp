@@ -18,8 +18,11 @@
 #include "podium.h"
 #include "scheduler.h"
 
-extern CreatureEvents* g_creatureEvents;
 extern Chat* g_chat;
+extern CreatureEvents* g_creatureEvents;
+extern Dispatcher g_dispatcher;
+extern Game g_game;
+extern Scheduler g_scheduler;
 
 namespace {
 
@@ -239,7 +242,6 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 		if (foundPlayer->client) {
 			foundPlayer->disconnect();
-			foundPlayer->isConnecting = true;
 
 			eventConnect = g_scheduler.addEvent(
 			    createSchedulerTask(1000, [=, thisPtr = getThis(), playerID = foundPlayer->getID()]() {
@@ -275,7 +277,6 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 	g_chat->removeUserFromAllChannels(player);
 	player->clearModalWindows();
 	player->setOperatingSystem(operatingSystem);
-	player->isConnecting = false;
 
 	player->client = getThis();
 	player->onCreatureAppear(player, false, CONST_ME_NONE);
@@ -523,12 +524,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 	switch (recvbyte) {
 		case 0x14:
 			g_dispatcher.addTask([thisPtr = getThis()]() { thisPtr->logout(true, false); });
-			break;
-		case 0x1D:
-			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerReceivePingBack(playerID); });
-			break;
-		case 0x1E:
-			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerReceivePing(playerID); });
 			break;
 		// case 0x2A: break; // bestiary tracker
 		// case 0x2C: break; // team finder (leader)
@@ -2518,20 +2513,6 @@ void ProtocolGame::sendSkills()
 {
 	NetworkMessage msg;
 	AddPlayerSkills(msg);
-	writeToOutputBuffer(msg);
-}
-
-void ProtocolGame::sendPing()
-{
-	NetworkMessage msg;
-	msg.addByte(0x1D);
-	writeToOutputBuffer(msg);
-}
-
-void ProtocolGame::sendPingBack()
-{
-	NetworkMessage msg;
-	msg.addByte(0x1E);
 	writeToOutputBuffer(msg);
 }
 

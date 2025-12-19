@@ -3,8 +3,6 @@
 
 #include "otpch.h"
 
-#include "otserv.h"
-
 #include "configmanager.h"
 #include "databasemanager.h"
 #include "databasetasks.h"
@@ -26,14 +24,13 @@
 #include "gitmetadata.h"
 #endif
 
-DatabaseTasks g_databaseTasks;
-Dispatcher g_dispatcher;
-Scheduler g_scheduler;
-
-Game g_game;
-Monsters g_monsters;
-Vocations g_vocations;
+extern DatabaseTasks g_databaseTasks;
+extern Dispatcher g_dispatcher;
+extern Game g_game;
+extern Monsters g_monsters;
+extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
+extern Vocations g_vocations;
 
 std::mutex g_loaderLock;
 std::condition_variable g_loaderSignal;
@@ -43,6 +40,38 @@ std::unique_lock<std::mutex> g_loaderUniqueLock(g_loaderLock);
 #define BOLDRED "\033[1m\033[31m"
 
 namespace {
+
+void printServerVersion()
+{
+#if defined(GIT_RETRIEVED_STATE) && GIT_RETRIEVED_STATE
+	std::cout << STATUS_SERVER_NAME << " - Version " << GIT_DESCRIBE << std::endl;
+	std::cout << "Git SHA1 " << GIT_SHORT_SHA1 << " dated " << GIT_COMMIT_DATE_ISO8601 << std::endl;
+#if GIT_IS_DIRTY
+	std::cout << "*** DIRTY - NOT OFFICIAL RELEASE ***" << std::endl;
+#endif
+#else
+	std::cout << STATUS_SERVER_NAME << " - Version " << STATUS_SERVER_VERSION << std::endl;
+#endif
+	std::cout << std::endl;
+
+	std::cout << "Compiled with " << BOOST_COMPILER << std::endl;
+	std::cout << "Compiled on " << __DATE__ << ' ' << __TIME__ << " for platform ";
+#if defined(__amd64__) || defined(_M_X64)
+	std::cout << "x64" << std::endl;
+#elif defined(__i386__) || defined(_M_IX86) || defined(_X86_)
+	std::cout << "x86" << std::endl;
+#elif defined(__arm__)
+	std::cout << "ARM" << std::endl;
+#else
+	std::cout << "unknown" << std::endl;
+#endif
+	std::cout << "Linked with " << LUA_RELEASE << " for Lua support" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "A server developed by " << STATUS_SERVER_DEVELOPERS << std::endl;
+	std::cout << "Visit our forum for updates, support, and resources: https://otland.net/." << std::endl;
+	std::cout << std::endl;
+}
 
 void startupErrorMessage(const std::string& errorStr)
 {
@@ -244,7 +273,7 @@ void mainLoader(ServiceManager* services)
 		rentPeriod = RENTPERIOD_NEVER;
 	}
 
-	g_game.map.houses.payHouses(rentPeriod);
+	g_game.payHouses(rentPeriod);
 
 	tfs::iomarket::checkExpiredOffers();
 	tfs::iomarket::updateStatistics();
@@ -271,10 +300,57 @@ void mainLoader(ServiceManager* services)
 	exit(-1);
 }
 
+bool argumentsHandler(const std::vector<std::string_view>& args)
+{
+	for (const auto& arg : args) {
+		if (arg == "--help") {
+			std::println("Usage:");
+			std::println("  --config=<path>      Alternate configuration file path.");
+			std::println("  --ip=<address>       IP address of the server.");
+			std::println("  --http-port=<port>   Port for http to listen on.");
+			std::println("  --game-port=<port>   Port for game server to listen on.");
+			std::println("  --log-level=<level>  Logging level (trace, debug, info, warn, error, critical).");
+			return false;
+		} else if (arg == "--version") {
+			printServerVersion();
+			return false;
+		}
+
+		auto tmp = explodeString(arg, "=");
+
+		if (tmp[0] == "--config")
+			ConfigManager::setString(ConfigManager::CONFIG_FILE, tmp[1]);
+		else if (tmp[0] == "--ip")
+			ConfigManager::setString(ConfigManager::IP, tmp[1]);
+		else if (tmp[0] == "--http-port")
+			ConfigManager::setNumber(ConfigManager::HTTP_PORT, std::stoi(tmp[1].data()));
+		else if (tmp[0] == "--game-port")
+			ConfigManager::setNumber(ConfigManager::GAME_PORT, std::stoi(tmp[1].data()));
+		else if (tmp[0] == "--log-level") {
+			auto level = spdlog::level::from_str(std::string{tmp[1]});
+			if (level == spdlog::level::off && tmp[1] != "off") {
+				std::println("Invalid log level: {:s}", tmp[1]);
+				return false;
+			}
+			spdlog::set_level(level);
+		}
+	}
+
+	return true;
+}
+
 } // namespace
 
-void startServer()
+int main(int argc, const char** argv)
 {
+	std::vector<std::string_view> args(argv, argv + argc);
+	if (!argumentsHandler(args)) {
+		return 1;
+	}
+
+	spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+	[[maybe_unused]] auto spdlog_exit = tfs::scope_exit([] { spdlog::shutdown(); });
+
 	// Setup bad allocation handler
 	std::set_new_handler(badAllocationHandler);
 
@@ -300,36 +376,4 @@ void startServer()
 	g_scheduler.join();
 	g_databaseTasks.join();
 	g_dispatcher.join();
-}
-
-void printServerVersion()
-{
-#if defined(GIT_RETRIEVED_STATE) && GIT_RETRIEVED_STATE
-	std::cout << STATUS_SERVER_NAME << " - Version " << GIT_DESCRIBE << std::endl;
-	std::cout << "Git SHA1 " << GIT_SHORT_SHA1 << " dated " << GIT_COMMIT_DATE_ISO8601 << std::endl;
-#if GIT_IS_DIRTY
-	std::cout << "*** DIRTY - NOT OFFICIAL RELEASE ***" << std::endl;
-#endif
-#else
-	std::cout << STATUS_SERVER_NAME << " - Version " << STATUS_SERVER_VERSION << std::endl;
-#endif
-	std::cout << std::endl;
-
-	std::cout << "Compiled with " << BOOST_COMPILER << std::endl;
-	std::cout << "Compiled on " << __DATE__ << ' ' << __TIME__ << " for platform ";
-#if defined(__amd64__) || defined(_M_X64)
-	std::cout << "x64" << std::endl;
-#elif defined(__i386__) || defined(_M_IX86) || defined(_X86_)
-	std::cout << "x86" << std::endl;
-#elif defined(__arm__)
-	std::cout << "ARM" << std::endl;
-#else
-	std::cout << "unknown" << std::endl;
-#endif
-	std::cout << "Linked with " << LUA_RELEASE << " for Lua support" << std::endl;
-	std::cout << std::endl;
-
-	std::cout << "A server developed by " << STATUS_SERVER_DEVELOPERS << std::endl;
-	std::cout << "Visit our forum for updates, support, and resources: https://otland.net/." << std::endl;
-	std::cout << std::endl;
 }
