@@ -569,8 +569,6 @@ public:
 			client->sendCreatureSkull(creature);
 		}
 	}
-	void checkSkullTicks(int64_t ticks);
-
 	bool canWear(uint32_t lookType, uint8_t addons) const;
 	bool hasOutfit(uint32_t lookType, uint8_t addons);
 	void addOutfit(uint16_t lookType, uint8_t addons);
@@ -927,7 +925,7 @@ public:
 			client->sendDistanceShoot(from, to, type);
 		}
 	}
-	void sendHouseWindow(House* house, uint32_t listId) const;
+	void sendHouseWindow(const std::shared_ptr<House>& house, uint32_t listId) const;
 	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
 	{
 		if (client) {
@@ -951,13 +949,6 @@ public:
 	{
 		if (client) {
 			client->sendMagicEffect(pos, type);
-		}
-	}
-	void sendPing();
-	void sendPingBack() const
-	{
-		if (client) {
-			client->sendPingBack();
 		}
 	}
 	void sendStats();
@@ -1175,8 +1166,6 @@ public:
 		}
 	}
 
-	void receivePing() { lastPong = OTSYS_TIME(); }
-
 	void onThink(uint32_t interval) override;
 	void onAttacking(uint32_t) override;
 
@@ -1200,8 +1189,8 @@ public:
 	std::shared_ptr<Item> getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen);
 	uint32_t setWriteItem(const std::shared_ptr<Item>& item, uint16_t maxWriteLen = 0);
 
-	House* getEditHouse(uint32_t& windowTextId, uint32_t& listId);
-	void setEditHouse(House* house, uint32_t listId = 0);
+	std::shared_ptr<House> getEditHouse(uint32_t& windowTextId, uint32_t& listId);
+	void setEditHouse(const std::shared_ptr<House>& house, uint32_t listId = 0);
 
 	void learnInstantSpell(const std::string& spellName);
 	void forgetInstantSpell(const std::string& spellName);
@@ -1305,8 +1294,6 @@ private:
 	int64_t skullTicks = 0;
 	int64_t lastWalkthroughAttempt = 0;
 	int64_t lastToggleMount = 0;
-	int64_t lastPing;
-	int64_t lastPong;
 	int64_t nextAction = 0;
 
 	ProtocolGame_ptr client;
@@ -1319,7 +1306,7 @@ private:
 	std::weak_ptr<Item> tradeItem;
 	std::shared_ptr<Item> inventory[CONST_SLOT_LAST + 1] = {};
 	std::weak_ptr<Item> writeItem;
-	House* editHouse = nullptr;
+	std::weak_ptr<House> editHouse;
 	std::weak_ptr<Npc> shopOwner;
 	Party* party = nullptr;
 	std::weak_ptr<Player> tradePartner;
@@ -1386,7 +1373,6 @@ private:
 	bool wasMounted_ = false;
 	bool ghostMode = false;
 	bool pzLocked = false;
-	bool isConnecting = false;
 	bool addAttackSkillPoint = false;
 	bool inventoryAbilities[CONST_SLOT_LAST + 1] = {};
 	bool randomizeMount = false;

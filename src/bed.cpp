@@ -11,6 +11,7 @@
 #include "scheduler.h"
 
 extern Game g_game;
+extern Scheduler g_scheduler;
 
 BedItem::BedItem(uint16_t id) : Item(id) { internalRemoveSleeper(); }
 
@@ -69,7 +70,20 @@ std::shared_ptr<BedItem> BedItem::getNextBedItem() const
 
 bool BedItem::canUse(const std::shared_ptr<Player>& player)
 {
-	if (!player || !house || !player->isPremium() || player->getZone() != ZONE_PROTECTION) {
+	if (!player) {
+		return false;
+	}
+
+	if (player->getZone() != ZONE_PROTECTION) {
+		return false;
+	}
+
+	if (!player->isPremium()) {
+		return false;
+	}
+
+	const auto& house = getHouse();
+	if (!house) {
 		return false;
 	}
 
@@ -94,24 +108,30 @@ bool BedItem::canUse(const std::shared_ptr<Player>& player)
 
 bool BedItem::trySleep(const std::shared_ptr<Player>& player)
 {
-	if (!house || player->isRemoved()) {
+	if (player->isRemoved()) {
 		return false;
 	}
 
-	if (sleeperGUID != 0) {
-		if (Item::items[id].transformToFree != 0 && house->getOwner() == player->getGUID()) {
-			wakeUp(nullptr);
-		}
-
-		g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+	const auto& house = getHouse();
+	if (!house) {
 		return false;
 	}
-	return true;
+
+	if (sleeperGUID == 0) {
+		return true;
+	}
+
+	if (Item::items[id].transformToFree != 0 && house->getOwner() == player->getGUID()) {
+		wakeUp(nullptr);
+	}
+
+	g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+	return false;
 }
 
 bool BedItem::sleep(const std::shared_ptr<Player>& player)
 {
-	if (!house) {
+	if (house.expired()) {
 		return false;
 	}
 
@@ -152,7 +172,7 @@ bool BedItem::sleep(const std::shared_ptr<Player>& player)
 
 void BedItem::wakeUp(const std::shared_ptr<Player>& player)
 {
-	if (!house) {
+	if (house.expired()) {
 		return;
 	}
 
