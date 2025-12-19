@@ -8,6 +8,7 @@
 #include "container.h"
 #include "podium.h"
 
+#include <iostream>
 #include <simdutf.h>
 
 std::string NetworkMessage::getString(uint16_t stringLen /* = 0*/)
@@ -34,6 +35,16 @@ Position NetworkMessage::getPosition()
 	pos.y = get<uint16_t>();
 	pos.z = getByte();
 	return pos;
+}
+
+bool NetworkMessage::getBool()
+{
+	const uint8_t value = getByte();
+	if (value > 1) {
+		std::cout << "[Warning - NetworkMessage::getBool] Invalid boolean value received: " << value
+		          << std::endl;
+	}
+	return value != 0;
 }
 
 void NetworkMessage::addString(std::string_view value)
@@ -189,3 +200,5 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 }
 
 void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Item::items[itemId].clientId); }
+
+void NetworkMessage::addBool(bool value) { addByte(value ? 1 : 0); }
