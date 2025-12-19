@@ -141,17 +141,17 @@ int luaLootAddChildLoot(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerLoot(LuaScriptInterface& i)
+void tfs::lua::registerLoot(LuaScriptInterface& lsi)
 {
-	i.registerClass("Loot", "", luaCreateLoot);
-	i.registerMetaMethod("Loot", "__gc", luaDeleteLoot);
-	i.registerMethod("Loot", "delete", luaDeleteLoot);
+	lsi.registerClass("Loot", "", luaCreateLoot);
+	lsi.registerMetaMethod("Loot", "__gc", luaDeleteLoot);
+	lsi.registerMethod("Loot", "delete", luaDeleteLoot);
 
-	i.registerMethod("Loot", "setId", luaLootSetId);
-	i.registerMethod("Loot", "setMaxCount", luaLootSetMaxCount);
-	i.registerMethod("Loot", "setSubType", luaLootSetSubType);
-	i.registerMethod("Loot", "setChance", luaLootSetChance);
-	i.registerMethod("Loot", "setActionId", luaLootSetActionId);
-	i.registerMethod("Loot", "setDescription", luaLootSetDescription);
-	i.registerMethod("Loot", "addChildLoot", luaLootAddChildLoot);
+	lsi.registerMethod("Loot", "setId", luaLootSetId);
+	lsi.registerMethod("Loot", "setMaxCount", luaLootSetMaxCount);
+	lsi.registerMethod("Loot", "setSubType", luaLootSetSubType);
+	lsi.registerMethod("Loot", "setChance", luaLootSetChance);
+	lsi.registerMethod("Loot", "setActionId", luaLootSetActionId);
+	lsi.registerMethod("Loot", "setDescription", luaLootSetDescription);
+	lsi.registerMethod("Loot", "addChildLoot", luaLootAddChildLoot);
 }

@@ -99,15 +99,15 @@ int luaPodiumSetDirection(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerPodium(LuaScriptInterface& i)
+void tfs::lua::registerPodium(LuaScriptInterface& lsi)
 {
-	i.registerClass("Podium", "Item", luaPodiumCreate);
-	i.registerMetaMethod("Podium", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Podium", "Item", luaPodiumCreate);
+	lsi.registerMetaMethod("Podium", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Podium", "getOutfit", luaPodiumGetOutfit);
-	i.registerMethod("Podium", "setOutfit", luaPodiumSetOutfit);
-	i.registerMethod("Podium", "hasFlag", luaPodiumHasFlag);
-	i.registerMethod("Podium", "setFlag", luaPodiumSetFlag);
-	i.registerMethod("Podium", "getDirection", luaPodiumGetDirection);
-	i.registerMethod("Podium", "setDirection", luaPodiumSetDirection);
+	lsi.registerMethod("Podium", "getOutfit", luaPodiumGetOutfit);
+	lsi.registerMethod("Podium", "setOutfit", luaPodiumSetOutfit);
+	lsi.registerMethod("Podium", "hasFlag", luaPodiumHasFlag);
+	lsi.registerMethod("Podium", "setFlag", luaPodiumSetFlag);
+	lsi.registerMethod("Podium", "getDirection", luaPodiumGetDirection);
+	lsi.registerMethod("Podium", "setDirection", luaPodiumSetDirection);
 }

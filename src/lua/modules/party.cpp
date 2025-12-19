@@ -259,31 +259,31 @@ int luaPartySetSharedExperience(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerParty(LuaScriptInterface& i)
+void tfs::lua::registerParty(LuaScriptInterface& lsi)
 {
-	i.registerClass("Party", "", luaPartyCreate);
-	i.registerMetaMethod("Party", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Party", "", luaPartyCreate);
+	lsi.registerMetaMethod("Party", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Party", "disband", luaPartyDisband);
+	lsi.registerMethod("Party", "disband", luaPartyDisband);
 
-	i.registerMethod("Party", "getLeader", luaPartyGetLeader);
-	i.registerMethod("Party", "setLeader", luaPartySetLeader);
+	lsi.registerMethod("Party", "getLeader", luaPartyGetLeader);
+	lsi.registerMethod("Party", "setLeader", luaPartySetLeader);
 
-	i.registerMethod("Party", "getMembers", luaPartyGetMembers);
-	i.registerMethod("Party", "getMemberCount", luaPartyGetMemberCount);
+	lsi.registerMethod("Party", "getMembers", luaPartyGetMembers);
+	lsi.registerMethod("Party", "getMemberCount", luaPartyGetMemberCount);
 
-	i.registerMethod("Party", "getInvitees", luaPartyGetInvitees);
-	i.registerMethod("Party", "getInviteeCount", luaPartyGetInviteeCount);
+	lsi.registerMethod("Party", "getInvitees", luaPartyGetInvitees);
+	lsi.registerMethod("Party", "getInviteeCount", luaPartyGetInviteeCount);
 
-	i.registerMethod("Party", "addInvite", luaPartyAddInvite);
-	i.registerMethod("Party", "removeInvite", luaPartyRemoveInvite);
+	lsi.registerMethod("Party", "addInvite", luaPartyAddInvite);
+	lsi.registerMethod("Party", "removeInvite", luaPartyRemoveInvite);
 
-	i.registerMethod("Party", "addMember", luaPartyAddMember);
-	i.registerMethod("Party", "removeMember", luaPartyRemoveMember);
+	lsi.registerMethod("Party", "addMember", luaPartyAddMember);
+	lsi.registerMethod("Party", "removeMember", luaPartyRemoveMember);
 
-	i.registerMethod("Party", "isSharedExperienceActive", luaPartyIsSharedExperienceActive);
-	i.registerMethod("Party", "isSharedExperienceEnabled", luaPartyIsSharedExperienceEnabled);
-	i.registerMethod("Party", "isMemberSharingExp", luaPartyIsMemberSharingExp);
-	i.registerMethod("Party", "shareExperience", luaPartyShareExperience);
-	i.registerMethod("Party", "setSharedExperience", luaPartySetSharedExperience);
+	lsi.registerMethod("Party", "isSharedExperienceActive", luaPartyIsSharedExperienceActive);
+	lsi.registerMethod("Party", "isSharedExperienceEnabled", luaPartyIsSharedExperienceEnabled);
+	lsi.registerMethod("Party", "isMemberSharingExp", luaPartyIsMemberSharingExp);
+	lsi.registerMethod("Party", "shareExperience", luaPartyShareExperience);
+	lsi.registerMethod("Party", "setSharedExperience", luaPartySetSharedExperience);
 }

@@ -787,7 +787,7 @@ int luaItemGetBoostPercent(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerItem(LuaScriptInterface& i)
+void tfs::lua::registerItem(LuaScriptInterface& lsi)
 {
 	registerEnum(i, CONST_PROP_BLOCKSOLID);
 	registerEnum(i, CONST_PROP_HASHEIGHT);
@@ -806,63 +806,63 @@ void tfs::lua::registerItem(LuaScriptInterface& i)
 	registerEnum(i, DECAYING_TRUE);
 	registerEnum(i, DECAYING_PENDING);
 
-	i.registerClass("Item", "", luaItemCreate);
-	i.registerMetaMethod("Item", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Item", "", luaItemCreate);
+	lsi.registerMetaMethod("Item", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Item", "isItem", luaItemIsItem);
+	lsi.registerMethod("Item", "isItem", luaItemIsItem);
 
-	i.registerMethod("Item", "hasParent", luaItemHasParent);
-	i.registerMethod("Item", "getParent", luaItemGetParent);
-	i.registerMethod("Item", "getTopParent", luaItemGetTopParent);
+	lsi.registerMethod("Item", "hasParent", luaItemHasParent);
+	lsi.registerMethod("Item", "getParent", luaItemGetParent);
+	lsi.registerMethod("Item", "getTopParent", luaItemGetTopParent);
 
-	i.registerMethod("Item", "getId", luaItemGetId);
+	lsi.registerMethod("Item", "getId", luaItemGetId);
 
-	i.registerMethod("Item", "clone", luaItemClone);
-	i.registerMethod("Item", "split", luaItemSplit);
-	i.registerMethod("Item", "remove", luaItemRemove);
+	lsi.registerMethod("Item", "clone", luaItemClone);
+	lsi.registerMethod("Item", "split", luaItemSplit);
+	lsi.registerMethod("Item", "remove", luaItemRemove);
 
-	i.registerMethod("Item", "getUniqueId", luaItemGetUniqueId);
-	i.registerMethod("Item", "getActionId", luaItemGetActionId);
-	i.registerMethod("Item", "setActionId", luaItemSetActionId);
+	lsi.registerMethod("Item", "getUniqueId", luaItemGetUniqueId);
+	lsi.registerMethod("Item", "getActionId", luaItemGetActionId);
+	lsi.registerMethod("Item", "setActionId", luaItemSetActionId);
 
-	i.registerMethod("Item", "getCount", luaItemGetCount);
-	i.registerMethod("Item", "getCharges", luaItemGetCharges);
-	i.registerMethod("Item", "getFluidType", luaItemGetFluidType);
-	i.registerMethod("Item", "getWeight", luaItemGetWeight);
-	i.registerMethod("Item", "getWorth", luaItemGetWorth);
+	lsi.registerMethod("Item", "getCount", luaItemGetCount);
+	lsi.registerMethod("Item", "getCharges", luaItemGetCharges);
+	lsi.registerMethod("Item", "getFluidType", luaItemGetFluidType);
+	lsi.registerMethod("Item", "getWeight", luaItemGetWeight);
+	lsi.registerMethod("Item", "getWorth", luaItemGetWorth);
 
-	i.registerMethod("Item", "getSubType", luaItemGetSubType);
+	lsi.registerMethod("Item", "getSubType", luaItemGetSubType);
 
-	i.registerMethod("Item", "getName", luaItemGetName);
-	i.registerMethod("Item", "getPluralName", luaItemGetPluralName);
-	i.registerMethod("Item", "getArticle", luaItemGetArticle);
+	lsi.registerMethod("Item", "getName", luaItemGetName);
+	lsi.registerMethod("Item", "getPluralName", luaItemGetPluralName);
+	lsi.registerMethod("Item", "getArticle", luaItemGetArticle);
 
-	i.registerMethod("Item", "getPosition", luaItemGetPosition);
-	i.registerMethod("Item", "getTile", luaItemGetTile);
+	lsi.registerMethod("Item", "getPosition", luaItemGetPosition);
+	lsi.registerMethod("Item", "getTile", luaItemGetTile);
 
-	i.registerMethod("Item", "hasAttribute", luaItemHasAttribute);
-	i.registerMethod("Item", "getAttribute", luaItemGetAttribute);
-	i.registerMethod("Item", "setAttribute", luaItemSetAttribute);
-	i.registerMethod("Item", "removeAttribute", luaItemRemoveAttribute);
-	i.registerMethod("Item", "getCustomAttribute", luaItemGetCustomAttribute);
-	i.registerMethod("Item", "setCustomAttribute", luaItemSetCustomAttribute);
-	i.registerMethod("Item", "removeCustomAttribute", luaItemRemoveCustomAttribute);
+	lsi.registerMethod("Item", "hasAttribute", luaItemHasAttribute);
+	lsi.registerMethod("Item", "getAttribute", luaItemGetAttribute);
+	lsi.registerMethod("Item", "setAttribute", luaItemSetAttribute);
+	lsi.registerMethod("Item", "removeAttribute", luaItemRemoveAttribute);
+	lsi.registerMethod("Item", "getCustomAttribute", luaItemGetCustomAttribute);
+	lsi.registerMethod("Item", "setCustomAttribute", luaItemSetCustomAttribute);
+	lsi.registerMethod("Item", "removeCustomAttribute", luaItemRemoveCustomAttribute);
 
-	i.registerMethod("Item", "moveTo", luaItemMoveTo);
-	i.registerMethod("Item", "transform", luaItemTransform);
-	i.registerMethod("Item", "decay", luaItemDecay);
+	lsi.registerMethod("Item", "moveTo", luaItemMoveTo);
+	lsi.registerMethod("Item", "transform", luaItemTransform);
+	lsi.registerMethod("Item", "decay", luaItemDecay);
 
-	i.registerMethod("Item", "getSpecialDescription", luaItemGetSpecialDescription);
+	lsi.registerMethod("Item", "getSpecialDescription", luaItemGetSpecialDescription);
 
-	i.registerMethod("Item", "hasProperty", luaItemHasProperty);
-	i.registerMethod("Item", "isLoadedFromMap", luaItemIsLoadedFromMap);
+	lsi.registerMethod("Item", "hasProperty", luaItemHasProperty);
+	lsi.registerMethod("Item", "isLoadedFromMap", luaItemIsLoadedFromMap);
 
-	i.registerMethod("Item", "setStoreItem", luaItemSetStoreItem);
-	i.registerMethod("Item", "isStoreItem", luaItemIsStoreItem);
+	lsi.registerMethod("Item", "setStoreItem", luaItemSetStoreItem);
+	lsi.registerMethod("Item", "isStoreItem", luaItemIsStoreItem);
 
-	i.registerMethod("Item", "setReflect", luaItemSetReflect);
-	i.registerMethod("Item", "getReflect", luaItemGetReflect);
+	lsi.registerMethod("Item", "setReflect", luaItemSetReflect);
+	lsi.registerMethod("Item", "getReflect", luaItemGetReflect);
 
-	i.registerMethod("Item", "setBoostPercent", luaItemSetBoostPercent);
-	i.registerMethod("Item", "getBoostPercent", luaItemGetBoostPercent);
+	lsi.registerMethod("Item", "setBoostPercent", luaItemSetBoostPercent);
+	lsi.registerMethod("Item", "getBoostPercent", luaItemGetBoostPercent);
 }

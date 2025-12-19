@@ -103,7 +103,7 @@ int luaCreatureEventOnCallback(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerCreatureEvent(LuaScriptInterface& i)
+void tfs::lua::registerCreatureEvent(LuaScriptInterface& lsi)
 {
 	registerEnum(i, CREATURE_EVENT_NONE);
 	registerEnum(i, CREATURE_EVENT_LOGIN);
@@ -120,20 +120,20 @@ void tfs::lua::registerCreatureEvent(LuaScriptInterface& i)
 	registerEnum(i, CREATURE_EVENT_MANACHANGE);
 	registerEnum(i, CREATURE_EVENT_EXTENDED_OPCODE);
 
-	i.registerClass("CreatureEvent", "", luaCreateCreatureEvent);
-	i.registerMethod("CreatureEvent", "type", luaCreatureEventType);
-	i.registerMethod("CreatureEvent", "register", luaCreatureEventRegister);
-	i.registerMethod("CreatureEvent", "onLogin", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onLogout", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onReconnect", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onThink", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onPrepareDeath", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onDeath", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onKill", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onAdvance", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onModalWindow", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onTextEdit", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onHealthChange", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onManaChange", luaCreatureEventOnCallback);
-	i.registerMethod("CreatureEvent", "onExtendedOpcode", luaCreatureEventOnCallback);
+	lsi.registerClass("CreatureEvent", "", luaCreateCreatureEvent);
+	lsi.registerMethod("CreatureEvent", "type", luaCreatureEventType);
+	lsi.registerMethod("CreatureEvent", "register", luaCreatureEventRegister);
+	lsi.registerMethod("CreatureEvent", "onLogin", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onLogout", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onReconnect", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onThink", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onPrepareDeath", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onDeath", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onKill", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onAdvance", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onModalWindow", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onTextEdit", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onHealthChange", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onManaChange", luaCreatureEventOnCallback);
+	lsi.registerMethod("CreatureEvent", "onExtendedOpcode", luaCreatureEventOnCallback);
 }

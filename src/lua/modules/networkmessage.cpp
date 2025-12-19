@@ -298,32 +298,32 @@ int luaNetworkMessageSendToPlayer(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerNetworkMessage(LuaScriptInterface& i)
+void tfs::lua::registerNetworkMessage(LuaScriptInterface& lsi)
 {
-	i.registerClass("NetworkMessage", "", luaNetworkMessageCreate);
-	i.registerMetaMethod("NetworkMessage", "__eq", tfs::lua::luaUserdataCompare);
-	i.registerMetaMethod("NetworkMessage", "__gc", luaNetworkMessageDelete);
-	i.registerMethod("NetworkMessage", "delete", luaNetworkMessageDelete);
+	lsi.registerClass("NetworkMessage", "", luaNetworkMessageCreate);
+	lsi.registerMetaMethod("NetworkMessage", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("NetworkMessage", "__gc", luaNetworkMessageDelete);
+	lsi.registerMethod("NetworkMessage", "delete", luaNetworkMessageDelete);
 
-	i.registerMethod("NetworkMessage", "getByte", luaNetworkMessageGetByte);
-	i.registerMethod("NetworkMessage", "getU16", luaNetworkMessageGetU16);
-	i.registerMethod("NetworkMessage", "getU32", luaNetworkMessageGetU32);
-	i.registerMethod("NetworkMessage", "getU64", luaNetworkMessageGetU64);
-	i.registerMethod("NetworkMessage", "getString", luaNetworkMessageGetString);
-	i.registerMethod("NetworkMessage", "getPosition", luaNetworkMessageGetPosition);
+	lsi.registerMethod("NetworkMessage", "getByte", luaNetworkMessageGetByte);
+	lsi.registerMethod("NetworkMessage", "getU16", luaNetworkMessageGetU16);
+	lsi.registerMethod("NetworkMessage", "getU32", luaNetworkMessageGetU32);
+	lsi.registerMethod("NetworkMessage", "getU64", luaNetworkMessageGetU64);
+	lsi.registerMethod("NetworkMessage", "getString", luaNetworkMessageGetString);
+	lsi.registerMethod("NetworkMessage", "getPosition", luaNetworkMessageGetPosition);
 
-	i.registerMethod("NetworkMessage", "addByte", luaNetworkMessageAddByte);
-	i.registerMethod("NetworkMessage", "addU16", luaNetworkMessageAddU16);
-	i.registerMethod("NetworkMessage", "addU32", luaNetworkMessageAddU32);
-	i.registerMethod("NetworkMessage", "addU64", luaNetworkMessageAddU64);
-	i.registerMethod("NetworkMessage", "addString", luaNetworkMessageAddString);
-	i.registerMethod("NetworkMessage", "addPosition", luaNetworkMessageAddPosition);
-	i.registerMethod("NetworkMessage", "addDouble", luaNetworkMessageAddDouble);
-	i.registerMethod("NetworkMessage", "addItem", luaNetworkMessageAddItem);
-	i.registerMethod("NetworkMessage", "addItemId", luaNetworkMessageAddItemId);
+	lsi.registerMethod("NetworkMessage", "addByte", luaNetworkMessageAddByte);
+	lsi.registerMethod("NetworkMessage", "addU16", luaNetworkMessageAddU16);
+	lsi.registerMethod("NetworkMessage", "addU32", luaNetworkMessageAddU32);
+	lsi.registerMethod("NetworkMessage", "addU64", luaNetworkMessageAddU64);
+	lsi.registerMethod("NetworkMessage", "addString", luaNetworkMessageAddString);
+	lsi.registerMethod("NetworkMessage", "addPosition", luaNetworkMessageAddPosition);
+	lsi.registerMethod("NetworkMessage", "addDouble", luaNetworkMessageAddDouble);
+	lsi.registerMethod("NetworkMessage", "addItem", luaNetworkMessageAddItem);
+	lsi.registerMethod("NetworkMessage", "addItemId", luaNetworkMessageAddItemId);
 
-	i.registerMethod("NetworkMessage", "reset", luaNetworkMessageReset);
-	i.registerMethod("NetworkMessage", "len", luaNetworkMessageLength);
-	i.registerMethod("NetworkMessage", "skipBytes", luaNetworkMessageSkipBytes);
-	i.registerMethod("NetworkMessage", "sendToPlayer", luaNetworkMessageSendToPlayer);
+	lsi.registerMethod("NetworkMessage", "reset", luaNetworkMessageReset);
+	lsi.registerMethod("NetworkMessage", "len", luaNetworkMessageLength);
+	lsi.registerMethod("NetworkMessage", "skipBytes", luaNetworkMessageSkipBytes);
+	lsi.registerMethod("NetworkMessage", "sendToPlayer", luaNetworkMessageSendToPlayer);
 }

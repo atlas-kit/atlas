@@ -628,7 +628,7 @@ int luaGameReload(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerGame(LuaScriptInterface& i)
+void tfs::lua::registerGame(LuaScriptInterface& lsi)
 {
 	registerEnum(i, ITEM_STACK_SIZE);
 
@@ -644,52 +644,52 @@ void tfs::lua::registerGame(LuaScriptInterface& i)
 	registerEnum(i, WORLD_TYPE_PVP);
 	registerEnum(i, WORLD_TYPE_PVP_ENFORCED);
 
-	i.registerTable("Game");
+	lsi.registerTable("Game");
 
-	i.registerMethod("Game", "getSpectators", luaGameGetSpectators);
-	i.registerMethod("Game", "getPlayers", luaGameGetPlayers);
-	i.registerMethod("Game", "getNpcs", luaGameGetNpcs);
-	i.registerMethod("Game", "getMonsters", luaGameGetMonsters);
-	i.registerMethod("Game", "loadMap", luaGameLoadMap);
+	lsi.registerMethod("Game", "getSpectators", luaGameGetSpectators);
+	lsi.registerMethod("Game", "getPlayers", luaGameGetPlayers);
+	lsi.registerMethod("Game", "getNpcs", luaGameGetNpcs);
+	lsi.registerMethod("Game", "getMonsters", luaGameGetMonsters);
+	lsi.registerMethod("Game", "loadMap", luaGameLoadMap);
 
-	i.registerMethod("Game", "getExperienceStage", luaGameGetExperienceStage);
-	i.registerMethod("Game", "getExperienceForLevel", luaGameGetExperienceForLevel);
-	i.registerMethod("Game", "getMonsterCount", luaGameGetMonsterCount);
-	i.registerMethod("Game", "getPlayerCount", luaGameGetPlayerCount);
-	i.registerMethod("Game", "getNpcCount", luaGameGetNpcCount);
-	i.registerMethod("Game", "getMonsterTypes", luaGameGetMonsterTypes);
-	i.registerMethod("Game", "getBestiary", luaGameGetBestiary);
-	i.registerMethod("Game", "getCurrencyItems", luaGameGetCurrencyItems);
-	i.registerMethod("Game", "getItemTypeByClientId", luaGameGetItemTypeByClientId);
-	i.registerMethod("Game", "getMountIdByLookType", luaGameGetMountIdByLookType);
+	lsi.registerMethod("Game", "getExperienceStage", luaGameGetExperienceStage);
+	lsi.registerMethod("Game", "getExperienceForLevel", luaGameGetExperienceForLevel);
+	lsi.registerMethod("Game", "getMonsterCount", luaGameGetMonsterCount);
+	lsi.registerMethod("Game", "getPlayerCount", luaGameGetPlayerCount);
+	lsi.registerMethod("Game", "getNpcCount", luaGameGetNpcCount);
+	lsi.registerMethod("Game", "getMonsterTypes", luaGameGetMonsterTypes);
+	lsi.registerMethod("Game", "getBestiary", luaGameGetBestiary);
+	lsi.registerMethod("Game", "getCurrencyItems", luaGameGetCurrencyItems);
+	lsi.registerMethod("Game", "getItemTypeByClientId", luaGameGetItemTypeByClientId);
+	lsi.registerMethod("Game", "getMountIdByLookType", luaGameGetMountIdByLookType);
 
-	i.registerMethod("Game", "getTowns", luaGameGetTowns);
-	i.registerMethod("Game", "getHouses", luaGameGetHouses);
-	i.registerMethod("Game", "getOutfits", luaGameGetOutfits);
-	i.registerMethod("Game", "getMounts", luaGameGetMounts);
-	i.registerMethod("Game", "getVocations", luaGameGetVocations);
-	i.registerMethod("Game", "getRuneSpells", luaGameGetRuneSpells);
-	i.registerMethod("Game", "getInstantSpells", luaGameGetInstantSpells);
+	lsi.registerMethod("Game", "getTowns", luaGameGetTowns);
+	lsi.registerMethod("Game", "getHouses", luaGameGetHouses);
+	lsi.registerMethod("Game", "getOutfits", luaGameGetOutfits);
+	lsi.registerMethod("Game", "getMounts", luaGameGetMounts);
+	lsi.registerMethod("Game", "getVocations", luaGameGetVocations);
+	lsi.registerMethod("Game", "getRuneSpells", luaGameGetRuneSpells);
+	lsi.registerMethod("Game", "getInstantSpells", luaGameGetInstantSpells);
 
-	i.registerMethod("Game", "getGameState", luaGameGetGameState);
-	i.registerMethod("Game", "setGameState", luaGameSetGameState);
+	lsi.registerMethod("Game", "getGameState", luaGameGetGameState);
+	lsi.registerMethod("Game", "setGameState", luaGameSetGameState);
 
-	i.registerMethod("Game", "getWorldType", luaGameGetWorldType);
-	i.registerMethod("Game", "setWorldType", luaGameSetWorldType);
+	lsi.registerMethod("Game", "getWorldType", luaGameGetWorldType);
+	lsi.registerMethod("Game", "setWorldType", luaGameSetWorldType);
 
-	i.registerMethod("Game", "getItemAttributeByName", luaGameGetItemAttributeByName);
-	i.registerMethod("Game", "getReturnMessage", luaGameGetReturnMessage);
+	lsi.registerMethod("Game", "getItemAttributeByName", luaGameGetItemAttributeByName);
+	lsi.registerMethod("Game", "getReturnMessage", luaGameGetReturnMessage);
 
-	i.registerMethod("Game", "createItem", luaGameCreateItem);
-	i.registerMethod("Game", "createContainer", luaGameCreateContainer);
-	i.registerMethod("Game", "createMonster", luaGameCreateMonster);
-	i.registerMethod("Game", "createNpc", luaGameCreateNpc);
-	i.registerMethod("Game", "createTile", luaGameCreateTile);
-	i.registerMethod("Game", "createMonsterType", luaGameCreateMonsterType);
+	lsi.registerMethod("Game", "createItem", luaGameCreateItem);
+	lsi.registerMethod("Game", "createContainer", luaGameCreateContainer);
+	lsi.registerMethod("Game", "createMonster", luaGameCreateMonster);
+	lsi.registerMethod("Game", "createNpc", luaGameCreateNpc);
+	lsi.registerMethod("Game", "createTile", luaGameCreateTile);
+	lsi.registerMethod("Game", "createMonsterType", luaGameCreateMonsterType);
 
-	i.registerMethod("Game", "startEvent", luaGameStartEvent);
+	lsi.registerMethod("Game", "startEvent", luaGameStartEvent);
 
-	i.registerMethod("Game", "getClientVersion", luaGameGetClientVersion);
+	lsi.registerMethod("Game", "getClientVersion", luaGameGetClientVersion);
 
-	i.registerMethod("Game", "reload", luaGameReload);
+	lsi.registerMethod("Game", "reload", luaGameReload);
 }

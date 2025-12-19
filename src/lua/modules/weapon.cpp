@@ -628,44 +628,44 @@ int luaWeaponExtraElement(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerWeapon(LuaScriptInterface& i)
+void tfs::lua::registerWeapon(LuaScriptInterface& lsi)
 {
-	i.registerClass("Weapon", "", luaCreateWeapon);
-	i.registerMethod("Weapon", "action", luaWeaponAction);
-	i.registerMethod("Weapon", "register", luaWeaponRegister);
-	i.registerMethod("Weapon", "id", luaWeaponId);
-	i.registerMethod("Weapon", "level", luaWeaponLevel);
-	i.registerMethod("Weapon", "magicLevel", luaWeaponMagicLevel);
-	i.registerMethod("Weapon", "mana", luaWeaponMana);
-	i.registerMethod("Weapon", "manaPercent", luaWeaponManaPercent);
-	i.registerMethod("Weapon", "health", luaWeaponHealth);
-	i.registerMethod("Weapon", "healthPercent", luaWeaponHealthPercent);
-	i.registerMethod("Weapon", "soul", luaWeaponSoul);
-	i.registerMethod("Weapon", "breakChance", luaWeaponBreakChance);
-	i.registerMethod("Weapon", "premium", luaWeaponPremium);
-	i.registerMethod("Weapon", "wieldUnproperly", luaWeaponUnproperly);
-	i.registerMethod("Weapon", "vocation", luaWeaponVocation);
-	i.registerMethod("Weapon", "onUseWeapon", luaWeaponOnUseWeapon);
-	i.registerMethod("Weapon", "element", luaWeaponElement);
-	i.registerMethod("Weapon", "attack", luaWeaponAttack);
-	i.registerMethod("Weapon", "defense", luaWeaponDefense);
-	i.registerMethod("Weapon", "range", luaWeaponRange);
-	i.registerMethod("Weapon", "charges", luaWeaponCharges);
-	i.registerMethod("Weapon", "duration", luaWeaponDuration);
-	i.registerMethod("Weapon", "decayTo", luaWeaponDecayTo);
-	i.registerMethod("Weapon", "transformEquipTo", luaWeaponTransformEquipTo);
-	i.registerMethod("Weapon", "transformDeEquipTo", luaWeaponTransformDeEquipTo);
-	i.registerMethod("Weapon", "slotType", luaWeaponSlotType);
-	i.registerMethod("Weapon", "hitChance", luaWeaponHitChance);
-	i.registerMethod("Weapon", "extraElement", luaWeaponExtraElement);
+	lsi.registerClass("Weapon", "", luaCreateWeapon);
+	lsi.registerMethod("Weapon", "action", luaWeaponAction);
+	lsi.registerMethod("Weapon", "register", luaWeaponRegister);
+	lsi.registerMethod("Weapon", "id", luaWeaponId);
+	lsi.registerMethod("Weapon", "level", luaWeaponLevel);
+	lsi.registerMethod("Weapon", "magicLevel", luaWeaponMagicLevel);
+	lsi.registerMethod("Weapon", "mana", luaWeaponMana);
+	lsi.registerMethod("Weapon", "manaPercent", luaWeaponManaPercent);
+	lsi.registerMethod("Weapon", "health", luaWeaponHealth);
+	lsi.registerMethod("Weapon", "healthPercent", luaWeaponHealthPercent);
+	lsi.registerMethod("Weapon", "soul", luaWeaponSoul);
+	lsi.registerMethod("Weapon", "breakChance", luaWeaponBreakChance);
+	lsi.registerMethod("Weapon", "premium", luaWeaponPremium);
+	lsi.registerMethod("Weapon", "wieldUnproperly", luaWeaponUnproperly);
+	lsi.registerMethod("Weapon", "vocation", luaWeaponVocation);
+	lsi.registerMethod("Weapon", "onUseWeapon", luaWeaponOnUseWeapon);
+	lsi.registerMethod("Weapon", "element", luaWeaponElement);
+	lsi.registerMethod("Weapon", "attack", luaWeaponAttack);
+	lsi.registerMethod("Weapon", "defense", luaWeaponDefense);
+	lsi.registerMethod("Weapon", "range", luaWeaponRange);
+	lsi.registerMethod("Weapon", "charges", luaWeaponCharges);
+	lsi.registerMethod("Weapon", "duration", luaWeaponDuration);
+	lsi.registerMethod("Weapon", "decayTo", luaWeaponDecayTo);
+	lsi.registerMethod("Weapon", "transformEquipTo", luaWeaponTransformEquipTo);
+	lsi.registerMethod("Weapon", "transformDeEquipTo", luaWeaponTransformDeEquipTo);
+	lsi.registerMethod("Weapon", "slotType", luaWeaponSlotType);
+	lsi.registerMethod("Weapon", "hitChance", luaWeaponHitChance);
+	lsi.registerMethod("Weapon", "extraElement", luaWeaponExtraElement);
 
 	// exclusively for distance weapons
-	i.registerMethod("Weapon", "ammoType", luaWeaponAmmoType);
-	i.registerMethod("Weapon", "maxHitChance", luaWeaponMaxHitChance);
+	lsi.registerMethod("Weapon", "ammoType", luaWeaponAmmoType);
+	lsi.registerMethod("Weapon", "maxHitChance", luaWeaponMaxHitChance);
 
 	// exclusively for wands
-	i.registerMethod("Weapon", "damage", luaWeaponWandDamage);
+	lsi.registerMethod("Weapon", "damage", luaWeaponWandDamage);
 
 	// exclusively for wands & distance weapons
-	i.registerMethod("Weapon", "shootType", luaWeaponShootType);
+	lsi.registerMethod("Weapon", "shootType", luaWeaponShootType);
 }

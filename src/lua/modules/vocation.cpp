@@ -308,38 +308,38 @@ int luaVocationGetNoPongKickTime(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerVocation(LuaScriptInterface& i)
+void tfs::lua::registerVocation(LuaScriptInterface& lsi)
 {
-	i.registerClass("Vocation", "", luaVocationCreate);
-	i.registerMetaMethod("Vocation", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Vocation", "", luaVocationCreate);
+	lsi.registerMetaMethod("Vocation", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Vocation", "getId", luaVocationGetId);
-	i.registerMethod("Vocation", "getClientId", luaVocationGetClientId);
-	i.registerMethod("Vocation", "getName", luaVocationGetName);
-	i.registerMethod("Vocation", "getDescription", luaVocationGetDescription);
+	lsi.registerMethod("Vocation", "getId", luaVocationGetId);
+	lsi.registerMethod("Vocation", "getClientId", luaVocationGetClientId);
+	lsi.registerMethod("Vocation", "getName", luaVocationGetName);
+	lsi.registerMethod("Vocation", "getDescription", luaVocationGetDescription);
 
-	i.registerMethod("Vocation", "getRequiredSkillTries", luaVocationGetRequiredSkillTries);
-	i.registerMethod("Vocation", "getRequiredManaSpent", luaVocationGetRequiredManaSpent);
+	lsi.registerMethod("Vocation", "getRequiredSkillTries", luaVocationGetRequiredSkillTries);
+	lsi.registerMethod("Vocation", "getRequiredManaSpent", luaVocationGetRequiredManaSpent);
 
-	i.registerMethod("Vocation", "getCapacityGain", luaVocationGetCapacityGain);
+	lsi.registerMethod("Vocation", "getCapacityGain", luaVocationGetCapacityGain);
 
-	i.registerMethod("Vocation", "getHealthGain", luaVocationGetHealthGain);
-	i.registerMethod("Vocation", "getHealthGainTicks", luaVocationGetHealthGainTicks);
-	i.registerMethod("Vocation", "getHealthGainAmount", luaVocationGetHealthGainAmount);
+	lsi.registerMethod("Vocation", "getHealthGain", luaVocationGetHealthGain);
+	lsi.registerMethod("Vocation", "getHealthGainTicks", luaVocationGetHealthGainTicks);
+	lsi.registerMethod("Vocation", "getHealthGainAmount", luaVocationGetHealthGainAmount);
 
-	i.registerMethod("Vocation", "getManaGain", luaVocationGetManaGain);
-	i.registerMethod("Vocation", "getManaGainTicks", luaVocationGetManaGainTicks);
-	i.registerMethod("Vocation", "getManaGainAmount", luaVocationGetManaGainAmount);
+	lsi.registerMethod("Vocation", "getManaGain", luaVocationGetManaGain);
+	lsi.registerMethod("Vocation", "getManaGainTicks", luaVocationGetManaGainTicks);
+	lsi.registerMethod("Vocation", "getManaGainAmount", luaVocationGetManaGainAmount);
 
-	i.registerMethod("Vocation", "getMaxSoul", luaVocationGetMaxSoul);
-	i.registerMethod("Vocation", "getSoulGainTicks", luaVocationGetSoulGainTicks);
+	lsi.registerMethod("Vocation", "getMaxSoul", luaVocationGetMaxSoul);
+	lsi.registerMethod("Vocation", "getSoulGainTicks", luaVocationGetSoulGainTicks);
 
-	i.registerMethod("Vocation", "getAttackSpeed", luaVocationGetAttackSpeed);
-	i.registerMethod("Vocation", "getBaseSpeed", luaVocationGetBaseSpeed);
+	lsi.registerMethod("Vocation", "getAttackSpeed", luaVocationGetAttackSpeed);
+	lsi.registerMethod("Vocation", "getBaseSpeed", luaVocationGetBaseSpeed);
 
-	i.registerMethod("Vocation", "getDemotion", luaVocationGetDemotion);
-	i.registerMethod("Vocation", "getPromotion", luaVocationGetPromotion);
+	lsi.registerMethod("Vocation", "getDemotion", luaVocationGetDemotion);
+	lsi.registerMethod("Vocation", "getPromotion", luaVocationGetPromotion);
 
-	i.registerMethod("Vocation", "allowsPvp", luaVocationAllowsPvp);
-	i.registerMethod("Vocation", "getNoPongKickTime", luaVocationGetNoPongKickTime);
+	lsi.registerMethod("Vocation", "allowsPvp", luaVocationAllowsPvp);
+	lsi.registerMethod("Vocation", "getNoPongKickTime", luaVocationGetNoPongKickTime);
 }

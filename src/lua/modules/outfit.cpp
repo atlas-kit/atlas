@@ -28,8 +28,8 @@ int luaOutfitCompare(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerOutfit(LuaScriptInterface& i)
+void tfs::lua::registerOutfit(LuaScriptInterface& lsi)
 {
-	i.registerClass("Outfit", "", luaOutfitCreate);
-	i.registerMetaMethod("Outfit", "__eq", luaOutfitCompare);
+	lsi.registerClass("Outfit", "", luaOutfitCreate);
+	lsi.registerMetaMethod("Outfit", "__eq", luaOutfitCompare);
 }

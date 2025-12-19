@@ -150,20 +150,20 @@ int luaXmlNodeNextSibling(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerXml(LuaScriptInterface& i)
+void tfs::lua::registerXml(LuaScriptInterface& lsi)
 {
-	i.registerClass("XMLDocument", "", luaCreateXmlDocument);
-	i.registerMetaMethod("XMLDocument", "__gc", luaDeleteXmlDocument);
-	i.registerMethod("XMLDocument", "delete", luaDeleteXmlDocument);
+	lsi.registerClass("XMLDocument", "", luaCreateXmlDocument);
+	lsi.registerMetaMethod("XMLDocument", "__gc", luaDeleteXmlDocument);
+	lsi.registerMethod("XMLDocument", "delete", luaDeleteXmlDocument);
 
-	i.registerMethod("XMLDocument", "child", luaXmlDocumentChild);
+	lsi.registerMethod("XMLDocument", "child", luaXmlDocumentChild);
 
-	i.registerClass("XMLNode", "");
-	i.registerMetaMethod("XMLNode", "__gc", luaDeleteXmlNode);
-	i.registerMethod("XMLNode", "delete", luaDeleteXmlNode);
+	lsi.registerClass("XMLNode", "");
+	lsi.registerMetaMethod("XMLNode", "__gc", luaDeleteXmlNode);
+	lsi.registerMethod("XMLNode", "delete", luaDeleteXmlNode);
 
-	i.registerMethod("XMLNode", "attribute", luaXmlNodeAttribute);
-	i.registerMethod("XMLNode", "name", luaXmlNodeName);
-	i.registerMethod("XMLNode", "firstChild", luaXmlNodeFirstChild);
-	i.registerMethod("XMLNode", "nextSibling", luaXmlNodeNextSibling);
+	lsi.registerMethod("XMLNode", "attribute", luaXmlNodeAttribute);
+	lsi.registerMethod("XMLNode", "name", luaXmlNodeName);
+	lsi.registerMethod("XMLNode", "firstChild", luaXmlNodeFirstChild);
+	lsi.registerMethod("XMLNode", "nextSibling", luaXmlNodeNextSibling);
 }

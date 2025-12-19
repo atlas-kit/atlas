@@ -276,9 +276,9 @@ int luaContainerGetItems(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerContainer(LuaScriptInterface& i)
+void tfs::lua::registerContainer(LuaScriptInterface& lsi)
 {
-	i.registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
+	lsi.registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
 
 	// Use with container:addItem, container:addItemEx and possibly other functions.
 	registerEnum(i, FLAG_NOLIMIT);
@@ -290,19 +290,19 @@ void tfs::lua::registerContainer(LuaScriptInterface& i)
 	registerEnum(i, FLAG_IGNORENOTMOVEABLE);
 	registerEnum(i, FLAG_IGNOREAUTOSTACK);
 
-	i.registerClass("Container", "Item", luaContainerCreate);
-	i.registerMetaMethod("Container", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Container", "Item", luaContainerCreate);
+	lsi.registerMetaMethod("Container", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Container", "getSize", luaContainerGetSize);
-	i.registerMethod("Container", "getCapacity", luaContainerGetCapacity);
-	i.registerMethod("Container", "getEmptySlots", luaContainerGetEmptySlots);
-	i.registerMethod("Container", "getItems", luaContainerGetItems);
-	i.registerMethod("Container", "getItemHoldingCount", luaContainerGetItemHoldingCount);
-	i.registerMethod("Container", "getItemCountById", luaContainerGetItemCountById);
+	lsi.registerMethod("Container", "getSize", luaContainerGetSize);
+	lsi.registerMethod("Container", "getCapacity", luaContainerGetCapacity);
+	lsi.registerMethod("Container", "getEmptySlots", luaContainerGetEmptySlots);
+	lsi.registerMethod("Container", "getItems", luaContainerGetItems);
+	lsi.registerMethod("Container", "getItemHoldingCount", luaContainerGetItemHoldingCount);
+	lsi.registerMethod("Container", "getItemCountById", luaContainerGetItemCountById);
 
-	i.registerMethod("Container", "getItem", luaContainerGetItem);
-	i.registerMethod("Container", "hasItem", luaContainerHasItem);
-	i.registerMethod("Container", "addItem", luaContainerAddItem);
-	i.registerMethod("Container", "addItemEx", luaContainerAddItemEx);
-	i.registerMethod("Container", "getCorpseOwner", luaContainerGetCorpseOwner);
+	lsi.registerMethod("Container", "getItem", luaContainerGetItem);
+	lsi.registerMethod("Container", "hasItem", luaContainerHasItem);
+	lsi.registerMethod("Container", "addItem", luaContainerAddItem);
+	lsi.registerMethod("Container", "addItemEx", luaContainerAddItemEx);
+	lsi.registerMethod("Container", "getCorpseOwner", luaContainerGetCorpseOwner);
 }

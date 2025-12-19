@@ -6,12 +6,12 @@
 #define registerEnumIn(i, tableName, value) \
 	{ \
 		std::string enumName = #value; \
-		i.registerVariable(tableName, enumName.substr(enumName.find_last_of(':') + 1), value); \
+		lsi.registerVariable(tableName, enumName.substr(enumName.find_last_of(':') + 1), value); \
 	}
 
-void tfs::lua::registerConfigManager(LuaScriptInterface& i)
+void tfs::lua::registerConfigManager(LuaScriptInterface& lsi)
 {
-	i.registerTable("configKeys");
+	lsi.registerTable("configKeys");
 
 	registerEnumIn(i, "configKeys", ConfigManager::ALLOW_CHANGEOUTFIT);
 	registerEnumIn(i, "configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT);

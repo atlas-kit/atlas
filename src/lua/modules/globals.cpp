@@ -41,7 +41,7 @@ int luaRawGetMetatable(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerGlobals(LuaScriptInterface& i)
+void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 {
 	// Enums
 	registerEnum(i, ACCOUNT_TYPE_NORMAL);
@@ -814,8 +814,8 @@ void tfs::lua::registerGlobals(LuaScriptInterface& i)
 	registerEnum(i, MONSTERS_EVENT_MOVE);
 	registerEnum(i, MONSTERS_EVENT_SAY);
 
-	i.registerGlobalBoolean("VIRTUAL_PARENT", true);
+	lsi.registerGlobalBoolean("VIRTUAL_PARENT", true);
 
-	i.registerGlobalMethod("isType", luaIsType);
-	i.registerGlobalMethod("rawgetmetatable", luaRawGetMetatable);
+	lsi.registerGlobalMethod("isType", luaIsType);
+	lsi.registerGlobalMethod("rawgetmetatable", luaRawGetMetatable);
 }

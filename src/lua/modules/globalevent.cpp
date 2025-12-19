@@ -168,17 +168,17 @@ int luaGlobalEventInterval(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerGlobalEvent(LuaScriptInterface& i)
+void tfs::lua::registerGlobalEvent(LuaScriptInterface& lsi)
 {
-	i.registerClass("GlobalEvent", "", luaCreateGlobalEvent);
-	i.registerMethod("GlobalEvent", "type", luaGlobalEventType);
-	i.registerMethod("GlobalEvent", "register", luaGlobalEventRegister);
-	i.registerMethod("GlobalEvent", "time", luaGlobalEventTime);
-	i.registerMethod("GlobalEvent", "interval", luaGlobalEventInterval);
-	i.registerMethod("GlobalEvent", "onThink", luaGlobalEventOnCallback);
-	i.registerMethod("GlobalEvent", "onTime", luaGlobalEventOnCallback);
-	i.registerMethod("GlobalEvent", "onStartup", luaGlobalEventOnCallback);
-	i.registerMethod("GlobalEvent", "onShutdown", luaGlobalEventOnCallback);
-	i.registerMethod("GlobalEvent", "onRecord", luaGlobalEventOnCallback);
-	i.registerMethod("GlobalEvent", "onSave", luaGlobalEventOnCallback);
+	lsi.registerClass("GlobalEvent", "", luaCreateGlobalEvent);
+	lsi.registerMethod("GlobalEvent", "type", luaGlobalEventType);
+	lsi.registerMethod("GlobalEvent", "register", luaGlobalEventRegister);
+	lsi.registerMethod("GlobalEvent", "time", luaGlobalEventTime);
+	lsi.registerMethod("GlobalEvent", "interval", luaGlobalEventInterval);
+	lsi.registerMethod("GlobalEvent", "onThink", luaGlobalEventOnCallback);
+	lsi.registerMethod("GlobalEvent", "onTime", luaGlobalEventOnCallback);
+	lsi.registerMethod("GlobalEvent", "onStartup", luaGlobalEventOnCallback);
+	lsi.registerMethod("GlobalEvent", "onShutdown", luaGlobalEventOnCallback);
+	lsi.registerMethod("GlobalEvent", "onRecord", luaGlobalEventOnCallback);
+	lsi.registerMethod("GlobalEvent", "onSave", luaGlobalEventOnCallback);
 }

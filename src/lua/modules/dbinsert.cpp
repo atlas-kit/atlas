@@ -53,11 +53,11 @@ int luaDBInsertDelete(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerDBInsert(LuaScriptInterface& i)
+void tfs::lua::registerDBInsert(LuaScriptInterface& lsi)
 {
-	i.registerClass("DBInsert", "", luaDBInsertCreate);
-	i.registerMetaMethod("DBInsert", "__gc", luaDBInsertDelete);
+	lsi.registerClass("DBInsert", "", luaDBInsertCreate);
+	lsi.registerMetaMethod("DBInsert", "__gc", luaDBInsertDelete);
 
-	i.registerMethod("DBInsert", "addRow", luaDBInsertAddRow);
-	i.registerMethod("DBInsert", "execute", luaDBInsertExecute);
+	lsi.registerMethod("DBInsert", "addRow", luaDBInsertAddRow);
+	lsi.registerMethod("DBInsert", "execute", luaDBInsertExecute);
 }

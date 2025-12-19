@@ -158,15 +158,15 @@ int luaActionCheckFloor(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerAction(LuaScriptInterface& i)
+void tfs::lua::registerAction(LuaScriptInterface& lsi)
 {
-	i.registerClass("Action", "", luaCreateAction);
-	i.registerMethod("Action", "onUse", luaActionOnUse);
-	i.registerMethod("Action", "register", luaActionRegister);
-	i.registerMethod("Action", "id", luaActionItemId);
-	i.registerMethod("Action", "aid", luaActionActionId);
-	i.registerMethod("Action", "uid", luaActionUniqueId);
-	i.registerMethod("Action", "allowFarUse", luaActionAllowFarUse);
-	i.registerMethod("Action", "blockWalls", luaActionBlockWalls);
-	i.registerMethod("Action", "checkFloor", luaActionCheckFloor);
+	lsi.registerClass("Action", "", luaCreateAction);
+	lsi.registerMethod("Action", "onUse", luaActionOnUse);
+	lsi.registerMethod("Action", "register", luaActionRegister);
+	lsi.registerMethod("Action", "id", luaActionItemId);
+	lsi.registerMethod("Action", "aid", luaActionActionId);
+	lsi.registerMethod("Action", "uid", luaActionUniqueId);
+	lsi.registerMethod("Action", "allowFarUse", luaActionAllowFarUse);
+	lsi.registerMethod("Action", "blockWalls", luaActionBlockWalls);
+	lsi.registerMethod("Action", "checkFloor", luaActionCheckFloor);
 }

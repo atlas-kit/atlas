@@ -461,7 +461,7 @@ int luaMonsterRemoveIcon(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerMonster(LuaScriptInterface& i)
+void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 {
 	registerEnum(i, MONSTER_ICON_VULNERABLE);
 	registerEnum(i, MONSTER_ICON_WEAKENED);
@@ -471,44 +471,44 @@ void tfs::lua::registerMonster(LuaScriptInterface& i)
 	registerEnum(i, MONSTER_ICON_FIRST);
 	registerEnum(i, MONSTER_ICON_LAST);
 
-	i.registerClass("Monster", "Creature", luaMonsterCreate);
-	i.registerMetaMethod("Monster", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Monster", "Creature", luaMonsterCreate);
+	lsi.registerMetaMethod("Monster", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Monster", "isMonster", luaMonsterIsMonster);
+	lsi.registerMethod("Monster", "isMonster", luaMonsterIsMonster);
 
-	i.registerMethod("Monster", "getId", luaMonsterGetId);
-	i.registerMethod("Monster", "getType", luaMonsterGetType);
+	lsi.registerMethod("Monster", "getId", luaMonsterGetId);
+	lsi.registerMethod("Monster", "getType", luaMonsterGetType);
 
-	i.registerMethod("Monster", "rename", luaMonsterRename);
+	lsi.registerMethod("Monster", "rename", luaMonsterRename);
 
-	i.registerMethod("Monster", "getSpawnPosition", luaMonsterGetSpawnPosition);
-	i.registerMethod("Monster", "isInSpawnRange", luaMonsterIsInSpawnRange);
+	lsi.registerMethod("Monster", "getSpawnPosition", luaMonsterGetSpawnPosition);
+	lsi.registerMethod("Monster", "isInSpawnRange", luaMonsterIsInSpawnRange);
 
-	i.registerMethod("Monster", "isIdle", luaMonsterIsIdle);
-	i.registerMethod("Monster", "setIdle", luaMonsterSetIdle);
+	lsi.registerMethod("Monster", "isIdle", luaMonsterIsIdle);
+	lsi.registerMethod("Monster", "setIdle", luaMonsterSetIdle);
 
-	i.registerMethod("Monster", "isTarget", luaMonsterIsTarget);
-	i.registerMethod("Monster", "isOpponent", luaMonsterIsOpponent);
-	i.registerMethod("Monster", "isFriend", luaMonsterIsFriend);
+	lsi.registerMethod("Monster", "isTarget", luaMonsterIsTarget);
+	lsi.registerMethod("Monster", "isOpponent", luaMonsterIsOpponent);
+	lsi.registerMethod("Monster", "isFriend", luaMonsterIsFriend);
 
-	i.registerMethod("Monster", "addFriend", luaMonsterAddFriend);
-	i.registerMethod("Monster", "removeFriend", luaMonsterRemoveFriend);
-	i.registerMethod("Monster", "getFriendList", luaMonsterGetFriendList);
-	i.registerMethod("Monster", "getFriendCount", luaMonsterGetFriendCount);
+	lsi.registerMethod("Monster", "addFriend", luaMonsterAddFriend);
+	lsi.registerMethod("Monster", "removeFriend", luaMonsterRemoveFriend);
+	lsi.registerMethod("Monster", "getFriendList", luaMonsterGetFriendList);
+	lsi.registerMethod("Monster", "getFriendCount", luaMonsterGetFriendCount);
 
-	i.registerMethod("Monster", "addTarget", luaMonsterAddTarget);
-	i.registerMethod("Monster", "removeTarget", luaMonsterRemoveTarget);
-	i.registerMethod("Monster", "getTargetList", luaMonsterGetTargetList);
-	i.registerMethod("Monster", "getTargetCount", luaMonsterGetTargetCount);
+	lsi.registerMethod("Monster", "addTarget", luaMonsterAddTarget);
+	lsi.registerMethod("Monster", "removeTarget", luaMonsterRemoveTarget);
+	lsi.registerMethod("Monster", "getTargetList", luaMonsterGetTargetList);
+	lsi.registerMethod("Monster", "getTargetCount", luaMonsterGetTargetCount);
 
-	i.registerMethod("Monster", "selectTarget", luaMonsterSelectTarget);
-	i.registerMethod("Monster", "searchTarget", luaMonsterSearchTarget);
+	lsi.registerMethod("Monster", "selectTarget", luaMonsterSelectTarget);
+	lsi.registerMethod("Monster", "searchTarget", luaMonsterSearchTarget);
 
-	i.registerMethod("Monster", "isWalkingToSpawn", luaMonsterIsWalkingToSpawn);
-	i.registerMethod("Monster", "walkToSpawn", luaMonsterWalkToSpawn);
+	lsi.registerMethod("Monster", "isWalkingToSpawn", luaMonsterIsWalkingToSpawn);
+	lsi.registerMethod("Monster", "walkToSpawn", luaMonsterWalkToSpawn);
 
-	i.registerMethod("Monster", "hasSpecialIcon", luaMonsterHasIcon);
-	i.registerMethod("Monster", "setSpecialIcon", luaMonsterSetIcon);
-	i.registerMethod("Monster", "getSpecialIcon", luaMonsterGetIcon);
-	i.registerMethod("Monster", "removeSpecialIcon", luaMonsterRemoveIcon);
+	lsi.registerMethod("Monster", "hasSpecialIcon", luaMonsterHasIcon);
+	lsi.registerMethod("Monster", "setSpecialIcon", luaMonsterSetIcon);
+	lsi.registerMethod("Monster", "getSpecialIcon", luaMonsterGetIcon);
+	lsi.registerMethod("Monster", "removeSpecialIcon", luaMonsterRemoveIcon);
 }

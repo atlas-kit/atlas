@@ -107,16 +107,16 @@ int luaGroupHasFlag(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerGroup(LuaScriptInterface& i)
+void tfs::lua::registerGroup(LuaScriptInterface& lsi)
 {
-	i.registerClass("Group", "", luaGroupCreate);
-	i.registerMetaMethod("Group", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Group", "", luaGroupCreate);
+	lsi.registerMetaMethod("Group", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Group", "getId", luaGroupGetId);
-	i.registerMethod("Group", "getName", luaGroupGetName);
-	i.registerMethod("Group", "getFlags", luaGroupGetFlags);
-	i.registerMethod("Group", "getAccess", luaGroupGetAccess);
-	i.registerMethod("Group", "getMaxDepotItems", luaGroupGetMaxDepotItems);
-	i.registerMethod("Group", "getMaxVipEntries", luaGroupGetMaxVipEntries);
-	i.registerMethod("Group", "hasFlag", luaGroupHasFlag);
+	lsi.registerMethod("Group", "getId", luaGroupGetId);
+	lsi.registerMethod("Group", "getName", luaGroupGetName);
+	lsi.registerMethod("Group", "getFlags", luaGroupGetFlags);
+	lsi.registerMethod("Group", "getAccess", luaGroupGetAccess);
+	lsi.registerMethod("Group", "getMaxDepotItems", luaGroupGetMaxDepotItems);
+	lsi.registerMethod("Group", "getMaxVipEntries", luaGroupGetMaxVipEntries);
+	lsi.registerMethod("Group", "hasFlag", luaGroupHasFlag);
 }

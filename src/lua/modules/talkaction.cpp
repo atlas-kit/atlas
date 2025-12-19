@@ -97,12 +97,12 @@ int luaTalkactionAccountType(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerTalkAction(LuaScriptInterface& i)
+void tfs::lua::registerTalkAction(LuaScriptInterface& lsi)
 {
-	i.registerClass("TalkAction", "", luaCreateTalkaction);
-	i.registerMethod("TalkAction", "onSay", luaTalkactionOnSay);
-	i.registerMethod("TalkAction", "register", luaTalkactionRegister);
-	i.registerMethod("TalkAction", "separator", luaTalkactionSeparator);
-	i.registerMethod("TalkAction", "access", luaTalkactionAccess);
-	i.registerMethod("TalkAction", "accountType", luaTalkactionAccountType);
+	lsi.registerClass("TalkAction", "", luaCreateTalkaction);
+	lsi.registerMethod("TalkAction", "onSay", luaTalkactionOnSay);
+	lsi.registerMethod("TalkAction", "register", luaTalkactionRegister);
+	lsi.registerMethod("TalkAction", "separator", luaTalkactionSeparator);
+	lsi.registerMethod("TalkAction", "access", luaTalkactionAccess);
+	lsi.registerMethod("TalkAction", "accountType", luaTalkactionAccountType);
 }

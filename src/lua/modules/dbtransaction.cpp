@@ -49,13 +49,13 @@ int luaDBTransactionDelete(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerDBTransaction(LuaScriptInterface& i)
+void tfs::lua::registerDBTransaction(LuaScriptInterface& lsi)
 {
-	i.registerClass("DBTransaction", "", luaDBTransactionCreate);
-	i.registerMetaMethod("DBTransaction", "__eq", tfs::lua::luaUserdataCompare);
-	i.registerMetaMethod("DBTransaction", "__gc", luaDBTransactionDelete);
+	lsi.registerClass("DBTransaction", "", luaDBTransactionCreate);
+	lsi.registerMetaMethod("DBTransaction", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("DBTransaction", "__gc", luaDBTransactionDelete);
 
-	i.registerMethod("DBTransaction", "begin", luaDBTransactionBegin);
-	i.registerMethod("DBTransaction", "commit", luaDBTransactionCommit);
-	i.registerMethod("DBTransaction", "rollback", luaDBTransactionDelete);
+	lsi.registerMethod("DBTransaction", "begin", luaDBTransactionBegin);
+	lsi.registerMethod("DBTransaction", "commit", luaDBTransactionCommit);
+	lsi.registerMethod("DBTransaction", "rollback", luaDBTransactionDelete);
 }

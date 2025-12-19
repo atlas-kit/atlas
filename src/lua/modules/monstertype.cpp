@@ -1156,88 +1156,88 @@ int luaMonsterTypeBestiaryInfo(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerMonsterType(LuaScriptInterface& i)
+void tfs::lua::registerMonsterType(LuaScriptInterface& lsi)
 {
 	registerEnum(i, MAX_LOOTCHANCE);
 
-	i.registerClass("MonsterType", "", luaMonsterTypeCreate);
-	i.registerMetaMethod("MonsterType", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("MonsterType", "", luaMonsterTypeCreate);
+	lsi.registerMetaMethod("MonsterType", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("MonsterType", "isAttackable", luaMonsterTypeIsAttackable);
-	i.registerMethod("MonsterType", "isChallengeable", luaMonsterTypeIsChallengeable);
-	i.registerMethod("MonsterType", "isConvinceable", luaMonsterTypeIsConvinceable);
-	i.registerMethod("MonsterType", "isSummonable", luaMonsterTypeIsSummonable);
-	i.registerMethod("MonsterType", "isIgnoringSpawnBlock", luaMonsterTypeIsIgnoringSpawnBlock);
-	i.registerMethod("MonsterType", "isIllusionable", luaMonsterTypeIsIllusionable);
-	i.registerMethod("MonsterType", "isHostile", luaMonsterTypeIsHostile);
-	i.registerMethod("MonsterType", "isPushable", luaMonsterTypeIsPushable);
-	i.registerMethod("MonsterType", "isHealthHidden", luaMonsterTypeIsHealthHidden);
-	i.registerMethod("MonsterType", "isBoss", luaMonsterTypeIsBoss);
+	lsi.registerMethod("MonsterType", "isAttackable", luaMonsterTypeIsAttackable);
+	lsi.registerMethod("MonsterType", "isChallengeable", luaMonsterTypeIsChallengeable);
+	lsi.registerMethod("MonsterType", "isConvinceable", luaMonsterTypeIsConvinceable);
+	lsi.registerMethod("MonsterType", "isSummonable", luaMonsterTypeIsSummonable);
+	lsi.registerMethod("MonsterType", "isIgnoringSpawnBlock", luaMonsterTypeIsIgnoringSpawnBlock);
+	lsi.registerMethod("MonsterType", "isIllusionable", luaMonsterTypeIsIllusionable);
+	lsi.registerMethod("MonsterType", "isHostile", luaMonsterTypeIsHostile);
+	lsi.registerMethod("MonsterType", "isPushable", luaMonsterTypeIsPushable);
+	lsi.registerMethod("MonsterType", "isHealthHidden", luaMonsterTypeIsHealthHidden);
+	lsi.registerMethod("MonsterType", "isBoss", luaMonsterTypeIsBoss);
 
-	i.registerMethod("MonsterType", "canPushItems", luaMonsterTypeCanPushItems);
-	i.registerMethod("MonsterType", "canPushCreatures", luaMonsterTypeCanPushCreatures);
+	lsi.registerMethod("MonsterType", "canPushItems", luaMonsterTypeCanPushItems);
+	lsi.registerMethod("MonsterType", "canPushCreatures", luaMonsterTypeCanPushCreatures);
 
-	i.registerMethod("MonsterType", "canWalkOnEnergy", luaMonsterTypeCanWalkOnEnergy);
-	i.registerMethod("MonsterType", "canWalkOnFire", luaMonsterTypeCanWalkOnFire);
-	i.registerMethod("MonsterType", "canWalkOnPoison", luaMonsterTypeCanWalkOnPoison);
+	lsi.registerMethod("MonsterType", "canWalkOnEnergy", luaMonsterTypeCanWalkOnEnergy);
+	lsi.registerMethod("MonsterType", "canWalkOnFire", luaMonsterTypeCanWalkOnFire);
+	lsi.registerMethod("MonsterType", "canWalkOnPoison", luaMonsterTypeCanWalkOnPoison);
 
-	i.registerMethod("MonsterType", "name", luaMonsterTypeName);
-	i.registerMethod("MonsterType", "nameDescription", luaMonsterTypeNameDescription);
+	lsi.registerMethod("MonsterType", "name", luaMonsterTypeName);
+	lsi.registerMethod("MonsterType", "nameDescription", luaMonsterTypeNameDescription);
 
-	i.registerMethod("MonsterType", "health", luaMonsterTypeHealth);
-	i.registerMethod("MonsterType", "maxHealth", luaMonsterTypeMaxHealth);
-	i.registerMethod("MonsterType", "runHealth", luaMonsterTypeRunHealth);
-	i.registerMethod("MonsterType", "experience", luaMonsterTypeExperience);
-	i.registerMethod("MonsterType", "skull", luaMonsterTypeSkull);
+	lsi.registerMethod("MonsterType", "health", luaMonsterTypeHealth);
+	lsi.registerMethod("MonsterType", "maxHealth", luaMonsterTypeMaxHealth);
+	lsi.registerMethod("MonsterType", "runHealth", luaMonsterTypeRunHealth);
+	lsi.registerMethod("MonsterType", "experience", luaMonsterTypeExperience);
+	lsi.registerMethod("MonsterType", "skull", luaMonsterTypeSkull);
 
-	i.registerMethod("MonsterType", "combatImmunities", luaMonsterTypeCombatImmunities);
-	i.registerMethod("MonsterType", "conditionImmunities", luaMonsterTypeConditionImmunities);
+	lsi.registerMethod("MonsterType", "combatImmunities", luaMonsterTypeCombatImmunities);
+	lsi.registerMethod("MonsterType", "conditionImmunities", luaMonsterTypeConditionImmunities);
 
-	i.registerMethod("MonsterType", "getAttackList", luaMonsterTypeGetAttackList);
-	i.registerMethod("MonsterType", "addAttack", luaMonsterTypeAddAttack);
+	lsi.registerMethod("MonsterType", "getAttackList", luaMonsterTypeGetAttackList);
+	lsi.registerMethod("MonsterType", "addAttack", luaMonsterTypeAddAttack);
 
-	i.registerMethod("MonsterType", "getDefenseList", luaMonsterTypeGetDefenseList);
-	i.registerMethod("MonsterType", "addDefense", luaMonsterTypeAddDefense);
+	lsi.registerMethod("MonsterType", "getDefenseList", luaMonsterTypeGetDefenseList);
+	lsi.registerMethod("MonsterType", "addDefense", luaMonsterTypeAddDefense);
 
-	i.registerMethod("MonsterType", "getElementList", luaMonsterTypeGetElementList);
-	i.registerMethod("MonsterType", "addElement", luaMonsterTypeAddElement);
+	lsi.registerMethod("MonsterType", "getElementList", luaMonsterTypeGetElementList);
+	lsi.registerMethod("MonsterType", "addElement", luaMonsterTypeAddElement);
 
-	i.registerMethod("MonsterType", "getVoices", luaMonsterTypeGetVoices);
-	i.registerMethod("MonsterType", "addVoice", luaMonsterTypeAddVoice);
+	lsi.registerMethod("MonsterType", "getVoices", luaMonsterTypeGetVoices);
+	lsi.registerMethod("MonsterType", "addVoice", luaMonsterTypeAddVoice);
 
-	i.registerMethod("MonsterType", "getLoot", luaMonsterTypeGetLoot);
-	i.registerMethod("MonsterType", "addLoot", luaMonsterTypeAddLoot);
+	lsi.registerMethod("MonsterType", "getLoot", luaMonsterTypeGetLoot);
+	lsi.registerMethod("MonsterType", "addLoot", luaMonsterTypeAddLoot);
 
-	i.registerMethod("MonsterType", "getCreatureEvents", luaMonsterTypeGetCreatureEvents);
-	i.registerMethod("MonsterType", "registerEvent", luaMonsterTypeRegisterEvent);
+	lsi.registerMethod("MonsterType", "getCreatureEvents", luaMonsterTypeGetCreatureEvents);
+	lsi.registerMethod("MonsterType", "registerEvent", luaMonsterTypeRegisterEvent);
 
-	i.registerMethod("MonsterType", "eventType", luaMonsterTypeEventType);
-	i.registerMethod("MonsterType", "onThink", luaMonsterTypeEventOnCallback);
-	i.registerMethod("MonsterType", "onAppear", luaMonsterTypeEventOnCallback);
-	i.registerMethod("MonsterType", "onDisappear", luaMonsterTypeEventOnCallback);
-	i.registerMethod("MonsterType", "onMove", luaMonsterTypeEventOnCallback);
-	i.registerMethod("MonsterType", "onSay", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "eventType", luaMonsterTypeEventType);
+	lsi.registerMethod("MonsterType", "onThink", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onAppear", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onDisappear", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onMove", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onSay", luaMonsterTypeEventOnCallback);
 
-	i.registerMethod("MonsterType", "getSummonList", luaMonsterTypeGetSummonList);
-	i.registerMethod("MonsterType", "addSummon", luaMonsterTypeAddSummon);
+	lsi.registerMethod("MonsterType", "getSummonList", luaMonsterTypeGetSummonList);
+	lsi.registerMethod("MonsterType", "addSummon", luaMonsterTypeAddSummon);
 
-	i.registerMethod("MonsterType", "maxSummons", luaMonsterTypeMaxSummons);
+	lsi.registerMethod("MonsterType", "maxSummons", luaMonsterTypeMaxSummons);
 
-	i.registerMethod("MonsterType", "armor", luaMonsterTypeArmor);
-	i.registerMethod("MonsterType", "defense", luaMonsterTypeDefense);
-	i.registerMethod("MonsterType", "outfit", luaMonsterTypeOutfit);
-	i.registerMethod("MonsterType", "race", luaMonsterTypeRace);
-	i.registerMethod("MonsterType", "corpseId", luaMonsterTypeCorpseId);
-	i.registerMethod("MonsterType", "manaCost", luaMonsterTypeManaCost);
-	i.registerMethod("MonsterType", "baseSpeed", luaMonsterTypeBaseSpeed);
-	i.registerMethod("MonsterType", "light", luaMonsterTypeLight);
+	lsi.registerMethod("MonsterType", "armor", luaMonsterTypeArmor);
+	lsi.registerMethod("MonsterType", "defense", luaMonsterTypeDefense);
+	lsi.registerMethod("MonsterType", "outfit", luaMonsterTypeOutfit);
+	lsi.registerMethod("MonsterType", "race", luaMonsterTypeRace);
+	lsi.registerMethod("MonsterType", "corpseId", luaMonsterTypeCorpseId);
+	lsi.registerMethod("MonsterType", "manaCost", luaMonsterTypeManaCost);
+	lsi.registerMethod("MonsterType", "baseSpeed", luaMonsterTypeBaseSpeed);
+	lsi.registerMethod("MonsterType", "light", luaMonsterTypeLight);
 
-	i.registerMethod("MonsterType", "staticAttackChance", luaMonsterTypeStaticAttackChance);
-	i.registerMethod("MonsterType", "targetDistance", luaMonsterTypeTargetDistance);
-	i.registerMethod("MonsterType", "yellChance", luaMonsterTypeYellChance);
-	i.registerMethod("MonsterType", "yellSpeedTicks", luaMonsterTypeYellSpeedTicks);
-	i.registerMethod("MonsterType", "changeTargetChance", luaMonsterTypeChangeTargetChance);
-	i.registerMethod("MonsterType", "changeTargetSpeed", luaMonsterTypeChangeTargetSpeed);
+	lsi.registerMethod("MonsterType", "staticAttackChance", luaMonsterTypeStaticAttackChance);
+	lsi.registerMethod("MonsterType", "targetDistance", luaMonsterTypeTargetDistance);
+	lsi.registerMethod("MonsterType", "yellChance", luaMonsterTypeYellChance);
+	lsi.registerMethod("MonsterType", "yellSpeedTicks", luaMonsterTypeYellSpeedTicks);
+	lsi.registerMethod("MonsterType", "changeTargetChance", luaMonsterTypeChangeTargetChance);
+	lsi.registerMethod("MonsterType", "changeTargetSpeed", luaMonsterTypeChangeTargetSpeed);
 
-	i.registerMethod("MonsterType", "bestiaryInfo", luaMonsterTypeBestiaryInfo);
+	lsi.registerMethod("MonsterType", "bestiaryInfo", luaMonsterTypeBestiaryInfo);
 }

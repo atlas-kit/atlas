@@ -122,17 +122,17 @@ int luaNpcGetSpectators(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerNpc(LuaScriptInterface& i)
+void tfs::lua::registerNpc(LuaScriptInterface& lsi)
 {
-	i.registerClass("Npc", "Creature", luaNpcCreate);
-	i.registerMetaMethod("Npc", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Npc", "Creature", luaNpcCreate);
+	lsi.registerMetaMethod("Npc", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Npc", "isNpc", luaNpcIsNpc);
+	lsi.registerMethod("Npc", "isNpc", luaNpcIsNpc);
 
-	i.registerMethod("Npc", "setMasterPos", luaNpcSetMasterPos);
+	lsi.registerMethod("Npc", "setMasterPos", luaNpcSetMasterPos);
 
-	i.registerMethod("Npc", "getSpeechBubble", luaNpcGetSpeechBubble);
-	i.registerMethod("Npc", "setSpeechBubble", luaNpcSetSpeechBubble);
+	lsi.registerMethod("Npc", "getSpeechBubble", luaNpcGetSpeechBubble);
+	lsi.registerMethod("Npc", "setSpeechBubble", luaNpcSetSpeechBubble);
 
-	i.registerMethod("Npc", "getSpectators", luaNpcGetSpectators);
+	lsi.registerMethod("Npc", "getSpectators", luaNpcGetSpectators);
 }

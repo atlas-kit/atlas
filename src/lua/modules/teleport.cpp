@@ -45,11 +45,11 @@ int luaTeleportSetDestination(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerTeleport(LuaScriptInterface& i)
+void tfs::lua::registerTeleport(LuaScriptInterface& lsi)
 {
-	i.registerClass("Teleport", "Item", luaTeleportCreate);
-	i.registerMetaMethod("Teleport", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Teleport", "Item", luaTeleportCreate);
+	lsi.registerMetaMethod("Teleport", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Teleport", "getDestination", luaTeleportGetDestination);
-	i.registerMethod("Teleport", "setDestination", luaTeleportSetDestination);
+	lsi.registerMethod("Teleport", "getDestination", luaTeleportGetDestination);
+	lsi.registerMethod("Teleport", "setDestination", luaTeleportSetDestination);
 }

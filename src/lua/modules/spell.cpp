@@ -891,49 +891,49 @@ int luaSpellCheckFloor(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerSpell(LuaScriptInterface& i)
+void tfs::lua::registerSpell(LuaScriptInterface& lsi)
 {
-	i.registerClass("Spell", "", luaSpellCreate);
-	i.registerMetaMethod("Spell", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Spell", "", luaSpellCreate);
+	lsi.registerMetaMethod("Spell", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Spell", "onCastSpell", luaSpellOnCastSpell);
-	i.registerMethod("Spell", "register", luaSpellRegister);
-	i.registerMethod("Spell", "name", luaSpellName);
-	i.registerMethod("Spell", "id", luaSpellId);
-	i.registerMethod("Spell", "group", luaSpellGroup);
-	i.registerMethod("Spell", "cooldown", luaSpellCooldown);
-	i.registerMethod("Spell", "groupCooldown", luaSpellGroupCooldown);
-	i.registerMethod("Spell", "level", luaSpellLevel);
-	i.registerMethod("Spell", "magicLevel", luaSpellMagicLevel);
-	i.registerMethod("Spell", "mana", luaSpellMana);
-	i.registerMethod("Spell", "manaPercent", luaSpellManaPercent);
-	i.registerMethod("Spell", "soul", luaSpellSoul);
-	i.registerMethod("Spell", "range", luaSpellRange);
-	i.registerMethod("Spell", "isPremium", luaSpellPremium);
-	i.registerMethod("Spell", "isEnabled", luaSpellEnabled);
-	i.registerMethod("Spell", "needTarget", luaSpellNeedTarget);
-	i.registerMethod("Spell", "needWeapon", luaSpellNeedWeapon);
-	i.registerMethod("Spell", "needLearn", luaSpellNeedLearn);
-	i.registerMethod("Spell", "isSelfTarget", luaSpellSelfTarget);
-	i.registerMethod("Spell", "isBlocking", luaSpellBlocking);
-	i.registerMethod("Spell", "isAggressive", luaSpellAggressive);
-	i.registerMethod("Spell", "isPzLock", luaSpellPzLock);
-	i.registerMethod("Spell", "vocation", luaSpellVocation);
+	lsi.registerMethod("Spell", "onCastSpell", luaSpellOnCastSpell);
+	lsi.registerMethod("Spell", "register", luaSpellRegister);
+	lsi.registerMethod("Spell", "name", luaSpellName);
+	lsi.registerMethod("Spell", "id", luaSpellId);
+	lsi.registerMethod("Spell", "group", luaSpellGroup);
+	lsi.registerMethod("Spell", "cooldown", luaSpellCooldown);
+	lsi.registerMethod("Spell", "groupCooldown", luaSpellGroupCooldown);
+	lsi.registerMethod("Spell", "level", luaSpellLevel);
+	lsi.registerMethod("Spell", "magicLevel", luaSpellMagicLevel);
+	lsi.registerMethod("Spell", "mana", luaSpellMana);
+	lsi.registerMethod("Spell", "manaPercent", luaSpellManaPercent);
+	lsi.registerMethod("Spell", "soul", luaSpellSoul);
+	lsi.registerMethod("Spell", "range", luaSpellRange);
+	lsi.registerMethod("Spell", "isPremium", luaSpellPremium);
+	lsi.registerMethod("Spell", "isEnabled", luaSpellEnabled);
+	lsi.registerMethod("Spell", "needTarget", luaSpellNeedTarget);
+	lsi.registerMethod("Spell", "needWeapon", luaSpellNeedWeapon);
+	lsi.registerMethod("Spell", "needLearn", luaSpellNeedLearn);
+	lsi.registerMethod("Spell", "isSelfTarget", luaSpellSelfTarget);
+	lsi.registerMethod("Spell", "isBlocking", luaSpellBlocking);
+	lsi.registerMethod("Spell", "isAggressive", luaSpellAggressive);
+	lsi.registerMethod("Spell", "isPzLock", luaSpellPzLock);
+	lsi.registerMethod("Spell", "vocation", luaSpellVocation);
 
 	// only for InstantSpell
-	i.registerMethod("Spell", "words", luaSpellWords);
-	i.registerMethod("Spell", "needDirection", luaSpellNeedDirection);
-	i.registerMethod("Spell", "hasParams", luaSpellHasParams);
-	i.registerMethod("Spell", "hasPlayerNameParam", luaSpellHasPlayerNameParam);
-	i.registerMethod("Spell", "needCasterTargetOrDirection", luaSpellNeedCasterTargetOrDirection);
-	i.registerMethod("Spell", "isBlockingWalls", luaSpellIsBlockingWalls);
+	lsi.registerMethod("Spell", "words", luaSpellWords);
+	lsi.registerMethod("Spell", "needDirection", luaSpellNeedDirection);
+	lsi.registerMethod("Spell", "hasParams", luaSpellHasParams);
+	lsi.registerMethod("Spell", "hasPlayerNameParam", luaSpellHasPlayerNameParam);
+	lsi.registerMethod("Spell", "needCasterTargetOrDirection", luaSpellNeedCasterTargetOrDirection);
+	lsi.registerMethod("Spell", "isBlockingWalls", luaSpellIsBlockingWalls);
 
 	// only for RuneSpells
-	i.registerMethod("Spell", "runeLevel", luaSpellRuneLevel);
-	i.registerMethod("Spell", "runeMagicLevel", luaSpellRuneMagicLevel);
-	i.registerMethod("Spell", "runeId", luaSpellRuneId);
-	i.registerMethod("Spell", "charges", luaSpellCharges);
-	i.registerMethod("Spell", "allowFarUse", luaSpellAllowFarUse);
-	i.registerMethod("Spell", "blockWalls", luaSpellBlockWalls);
-	i.registerMethod("Spell", "checkFloor", luaSpellCheckFloor);
+	lsi.registerMethod("Spell", "runeLevel", luaSpellRuneLevel);
+	lsi.registerMethod("Spell", "runeMagicLevel", luaSpellRuneMagicLevel);
+	lsi.registerMethod("Spell", "runeId", luaSpellRuneId);
+	lsi.registerMethod("Spell", "charges", luaSpellCharges);
+	lsi.registerMethod("Spell", "allowFarUse", luaSpellAllowFarUse);
+	lsi.registerMethod("Spell", "blockWalls", luaSpellBlockWalls);
+	lsi.registerMethod("Spell", "checkFloor", luaSpellCheckFloor);
 }

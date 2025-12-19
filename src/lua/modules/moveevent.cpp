@@ -321,25 +321,25 @@ int luaMoveEventPosition(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerMoveEvent(LuaScriptInterface& i)
+void tfs::lua::registerMoveEvent(LuaScriptInterface& lsi)
 {
-	i.registerClass("MoveEvent", "", luaCreateMoveEvent);
-	i.registerMethod("MoveEvent", "type", luaMoveEventType);
-	i.registerMethod("MoveEvent", "register", luaMoveEventRegister);
-	i.registerMethod("MoveEvent", "level", luaMoveEventLevel);
-	i.registerMethod("MoveEvent", "magicLevel", luaMoveEventMagLevel);
-	i.registerMethod("MoveEvent", "slot", luaMoveEventSlot);
-	i.registerMethod("MoveEvent", "id", luaMoveEventItemId);
-	i.registerMethod("MoveEvent", "aid", luaMoveEventActionId);
-	i.registerMethod("MoveEvent", "uid", luaMoveEventUniqueId);
-	i.registerMethod("MoveEvent", "position", luaMoveEventPosition);
-	i.registerMethod("MoveEvent", "premium", luaMoveEventPremium);
-	i.registerMethod("MoveEvent", "vocation", luaMoveEventVocation);
-	i.registerMethod("MoveEvent", "tileItem", luaMoveEventTileItem);
-	i.registerMethod("MoveEvent", "onEquip", luaMoveEventOnCallback);
-	i.registerMethod("MoveEvent", "onDeEquip", luaMoveEventOnCallback);
-	i.registerMethod("MoveEvent", "onStepIn", luaMoveEventOnCallback);
-	i.registerMethod("MoveEvent", "onStepOut", luaMoveEventOnCallback);
-	i.registerMethod("MoveEvent", "onAddItem", luaMoveEventOnCallback);
-	i.registerMethod("MoveEvent", "onRemoveItem", luaMoveEventOnCallback);
+	lsi.registerClass("MoveEvent", "", luaCreateMoveEvent);
+	lsi.registerMethod("MoveEvent", "type", luaMoveEventType);
+	lsi.registerMethod("MoveEvent", "register", luaMoveEventRegister);
+	lsi.registerMethod("MoveEvent", "level", luaMoveEventLevel);
+	lsi.registerMethod("MoveEvent", "magicLevel", luaMoveEventMagLevel);
+	lsi.registerMethod("MoveEvent", "slot", luaMoveEventSlot);
+	lsi.registerMethod("MoveEvent", "id", luaMoveEventItemId);
+	lsi.registerMethod("MoveEvent", "aid", luaMoveEventActionId);
+	lsi.registerMethod("MoveEvent", "uid", luaMoveEventUniqueId);
+	lsi.registerMethod("MoveEvent", "position", luaMoveEventPosition);
+	lsi.registerMethod("MoveEvent", "premium", luaMoveEventPremium);
+	lsi.registerMethod("MoveEvent", "vocation", luaMoveEventVocation);
+	lsi.registerMethod("MoveEvent", "tileItem", luaMoveEventTileItem);
+	lsi.registerMethod("MoveEvent", "onEquip", luaMoveEventOnCallback);
+	lsi.registerMethod("MoveEvent", "onDeEquip", luaMoveEventOnCallback);
+	lsi.registerMethod("MoveEvent", "onStepIn", luaMoveEventOnCallback);
+	lsi.registerMethod("MoveEvent", "onStepOut", luaMoveEventOnCallback);
+	lsi.registerMethod("MoveEvent", "onAddItem", luaMoveEventOnCallback);
+	lsi.registerMethod("MoveEvent", "onRemoveItem", luaMoveEventOnCallback);
 }

@@ -91,7 +91,7 @@ int luaPositionSendDistanceEffect(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerPosition(LuaScriptInterface& i)
+void tfs::lua::registerPosition(LuaScriptInterface& lsi)
 {
 	registerEnum(i, DIRECTION_NORTH);
 	registerEnum(i, DIRECTION_EAST);
@@ -102,10 +102,10 @@ void tfs::lua::registerPosition(LuaScriptInterface& i)
 	registerEnum(i, DIRECTION_NORTHWEST);
 	registerEnum(i, DIRECTION_NORTHEAST);
 
-	i.registerClass("Position", "", luaPositionCreate);
+	lsi.registerClass("Position", "", luaPositionCreate);
 
-	i.registerMethod("Position", "isSightClear", luaPositionIsSightClear);
+	lsi.registerMethod("Position", "isSightClear", luaPositionIsSightClear);
 
-	i.registerMethod("Position", "sendMagicEffect", luaPositionSendMagicEffect);
-	i.registerMethod("Position", "sendDistanceEffect", luaPositionSendDistanceEffect);
+	lsi.registerMethod("Position", "sendMagicEffect", luaPositionSendMagicEffect);
+	lsi.registerMethod("Position", "sendDistanceEffect", luaPositionSendDistanceEffect);
 }

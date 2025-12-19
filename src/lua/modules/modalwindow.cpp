@@ -243,34 +243,34 @@ int luaModalWindowSendToPlayer(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerModalWindow(LuaScriptInterface& i)
+void tfs::lua::registerModalWindow(LuaScriptInterface& lsi)
 {
-	i.registerClass("ModalWindow", "", luaModalWindowCreate);
-	i.registerMetaMethod("ModalWindow", "__eq", tfs::lua::luaUserdataCompare);
-	i.registerMetaMethod("ModalWindow", "__gc", luaModalWindowDelete);
-	i.registerMethod("ModalWindow", "delete", luaModalWindowDelete);
+	lsi.registerClass("ModalWindow", "", luaModalWindowCreate);
+	lsi.registerMetaMethod("ModalWindow", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("ModalWindow", "__gc", luaModalWindowDelete);
+	lsi.registerMethod("ModalWindow", "delete", luaModalWindowDelete);
 
-	i.registerMethod("ModalWindow", "getId", luaModalWindowGetId);
-	i.registerMethod("ModalWindow", "getTitle", luaModalWindowGetTitle);
-	i.registerMethod("ModalWindow", "getMessage", luaModalWindowGetMessage);
+	lsi.registerMethod("ModalWindow", "getId", luaModalWindowGetId);
+	lsi.registerMethod("ModalWindow", "getTitle", luaModalWindowGetTitle);
+	lsi.registerMethod("ModalWindow", "getMessage", luaModalWindowGetMessage);
 
-	i.registerMethod("ModalWindow", "setTitle", luaModalWindowSetTitle);
-	i.registerMethod("ModalWindow", "setMessage", luaModalWindowSetMessage);
+	lsi.registerMethod("ModalWindow", "setTitle", luaModalWindowSetTitle);
+	lsi.registerMethod("ModalWindow", "setMessage", luaModalWindowSetMessage);
 
-	i.registerMethod("ModalWindow", "getButtonCount", luaModalWindowGetButtonCount);
-	i.registerMethod("ModalWindow", "getChoiceCount", luaModalWindowGetChoiceCount);
+	lsi.registerMethod("ModalWindow", "getButtonCount", luaModalWindowGetButtonCount);
+	lsi.registerMethod("ModalWindow", "getChoiceCount", luaModalWindowGetChoiceCount);
 
-	i.registerMethod("ModalWindow", "addButton", luaModalWindowAddButton);
-	i.registerMethod("ModalWindow", "addChoice", luaModalWindowAddChoice);
+	lsi.registerMethod("ModalWindow", "addButton", luaModalWindowAddButton);
+	lsi.registerMethod("ModalWindow", "addChoice", luaModalWindowAddChoice);
 
-	i.registerMethod("ModalWindow", "getDefaultEnterButton", luaModalWindowGetDefaultEnterButton);
-	i.registerMethod("ModalWindow", "setDefaultEnterButton", luaModalWindowSetDefaultEnterButton);
+	lsi.registerMethod("ModalWindow", "getDefaultEnterButton", luaModalWindowGetDefaultEnterButton);
+	lsi.registerMethod("ModalWindow", "setDefaultEnterButton", luaModalWindowSetDefaultEnterButton);
 
-	i.registerMethod("ModalWindow", "getDefaultEscapeButton", luaModalWindowGetDefaultEscapeButton);
-	i.registerMethod("ModalWindow", "setDefaultEscapeButton", luaModalWindowSetDefaultEscapeButton);
+	lsi.registerMethod("ModalWindow", "getDefaultEscapeButton", luaModalWindowGetDefaultEscapeButton);
+	lsi.registerMethod("ModalWindow", "setDefaultEscapeButton", luaModalWindowSetDefaultEscapeButton);
 
-	i.registerMethod("ModalWindow", "hasPriority", luaModalWindowHasPriority);
-	i.registerMethod("ModalWindow", "setPriority", luaModalWindowSetPriority);
+	lsi.registerMethod("ModalWindow", "hasPriority", luaModalWindowHasPriority);
+	lsi.registerMethod("ModalWindow", "setPriority", luaModalWindowSetPriority);
 
-	i.registerMethod("ModalWindow", "sendToPlayer", luaModalWindowSendToPlayer);
+	lsi.registerMethod("ModalWindow", "sendToPlayer", luaModalWindowSendToPlayer);
 }

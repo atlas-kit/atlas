@@ -269,23 +269,23 @@ int luaCombatExecute(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerCombat(LuaScriptInterface& i)
+void tfs::lua::registerCombat(LuaScriptInterface& lsi)
 {
-	i.registerClass("Combat", "", luaCombatCreate);
-	i.registerMetaMethod("Combat", "__eq", tfs::lua::luaUserdataCompare);
-	i.registerMetaMethod("Combat", "__gc", luaCombatDelete);
-	i.registerMethod("Combat", "delete", luaCombatDelete);
+	lsi.registerClass("Combat", "", luaCombatCreate);
+	lsi.registerMetaMethod("Combat", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("Combat", "__gc", luaCombatDelete);
+	lsi.registerMethod("Combat", "delete", luaCombatDelete);
 
-	i.registerMethod("Combat", "setParameter", luaCombatSetParameter);
-	i.registerMethod("Combat", "getParameter", luaCombatGetParameter);
+	lsi.registerMethod("Combat", "setParameter", luaCombatSetParameter);
+	lsi.registerMethod("Combat", "getParameter", luaCombatGetParameter);
 
-	i.registerMethod("Combat", "setFormula", luaCombatSetFormula);
+	lsi.registerMethod("Combat", "setFormula", luaCombatSetFormula);
 
-	i.registerMethod("Combat", "setArea", luaCombatSetArea);
-	i.registerMethod("Combat", "addCondition", luaCombatAddCondition);
-	i.registerMethod("Combat", "clearConditions", luaCombatClearConditions);
-	i.registerMethod("Combat", "setCallback", luaCombatSetCallback);
-	i.registerMethod("Combat", "setOrigin", luaCombatSetOrigin);
+	lsi.registerMethod("Combat", "setArea", luaCombatSetArea);
+	lsi.registerMethod("Combat", "addCondition", luaCombatAddCondition);
+	lsi.registerMethod("Combat", "clearConditions", luaCombatClearConditions);
+	lsi.registerMethod("Combat", "setCallback", luaCombatSetCallback);
+	lsi.registerMethod("Combat", "setOrigin", luaCombatSetOrigin);
 
-	i.registerMethod("Combat", "execute", luaCombatExecute);
+	lsi.registerMethod("Combat", "execute", luaCombatExecute);
 }

@@ -2342,7 +2342,7 @@ int luaPlayerSendEnterMarket(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerPlayer(LuaScriptInterface& i)
+void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 {
 	registerEnum(i, FIGHTMODE_ATTACK);
 	registerEnum(i, FIGHTMODE_BALANCED);
@@ -2354,202 +2354,202 @@ void tfs::lua::registerPlayer(LuaScriptInterface& i)
 	registerEnum(i, RESOURCE_DAILYREWARD_STREAK);
 	registerEnum(i, RESOURCE_DAILYREWARD_JOKERS);
 
-	i.registerClass("Player", "Creature", luaPlayerCreate);
-	i.registerMetaMethod("Player", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Player", "Creature", luaPlayerCreate);
+	lsi.registerMetaMethod("Player", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Player", "isPlayer", luaPlayerIsPlayer);
+	lsi.registerMethod("Player", "isPlayer", luaPlayerIsPlayer);
 
-	i.registerMethod("Player", "getGuid", luaPlayerGetGuid);
-	i.registerMethod("Player", "getIp", luaPlayerGetIp);
-	i.registerMethod("Player", "getAccountId", luaPlayerGetAccountId);
-	i.registerMethod("Player", "getLastLoginSaved", luaPlayerGetLastLoginSaved);
-	i.registerMethod("Player", "getLastLogout", luaPlayerGetLastLogout);
+	lsi.registerMethod("Player", "getGuid", luaPlayerGetGuid);
+	lsi.registerMethod("Player", "getIp", luaPlayerGetIp);
+	lsi.registerMethod("Player", "getAccountId", luaPlayerGetAccountId);
+	lsi.registerMethod("Player", "getLastLoginSaved", luaPlayerGetLastLoginSaved);
+	lsi.registerMethod("Player", "getLastLogout", luaPlayerGetLastLogout);
 
-	i.registerMethod("Player", "getAccountType", luaPlayerGetAccountType);
-	i.registerMethod("Player", "setAccountType", luaPlayerSetAccountType);
+	lsi.registerMethod("Player", "getAccountType", luaPlayerGetAccountType);
+	lsi.registerMethod("Player", "setAccountType", luaPlayerSetAccountType);
 
-	i.registerMethod("Player", "getCapacity", luaPlayerGetCapacity);
-	i.registerMethod("Player", "setCapacity", luaPlayerSetCapacity);
+	lsi.registerMethod("Player", "getCapacity", luaPlayerGetCapacity);
+	lsi.registerMethod("Player", "setCapacity", luaPlayerSetCapacity);
 
-	i.registerMethod("Player", "getFreeCapacity", luaPlayerGetFreeCapacity);
+	lsi.registerMethod("Player", "getFreeCapacity", luaPlayerGetFreeCapacity);
 
-	i.registerMethod("Player", "getDepotChest", luaPlayerGetDepotChest);
-	i.registerMethod("Player", "getInbox", luaPlayerGetInbox);
+	lsi.registerMethod("Player", "getDepotChest", luaPlayerGetDepotChest);
+	lsi.registerMethod("Player", "getInbox", luaPlayerGetInbox);
 
-	i.registerMethod("Player", "getSkullTime", luaPlayerGetSkullTime);
-	i.registerMethod("Player", "setSkullTime", luaPlayerSetSkullTime);
-	i.registerMethod("Player", "getDeathPenalty", luaPlayerGetDeathPenalty);
+	lsi.registerMethod("Player", "getSkullTime", luaPlayerGetSkullTime);
+	lsi.registerMethod("Player", "setSkullTime", luaPlayerSetSkullTime);
+	lsi.registerMethod("Player", "getDeathPenalty", luaPlayerGetDeathPenalty);
 
-	i.registerMethod("Player", "getExperience", luaPlayerGetExperience);
-	i.registerMethod("Player", "addExperience", luaPlayerAddExperience);
-	i.registerMethod("Player", "removeExperience", luaPlayerRemoveExperience);
-	i.registerMethod("Player", "getLevel", luaPlayerGetLevel);
-	i.registerMethod("Player", "getLevelPercent", luaPlayerGetLevelPercent);
+	lsi.registerMethod("Player", "getExperience", luaPlayerGetExperience);
+	lsi.registerMethod("Player", "addExperience", luaPlayerAddExperience);
+	lsi.registerMethod("Player", "removeExperience", luaPlayerRemoveExperience);
+	lsi.registerMethod("Player", "getLevel", luaPlayerGetLevel);
+	lsi.registerMethod("Player", "getLevelPercent", luaPlayerGetLevelPercent);
 
-	i.registerMethod("Player", "getMagicLevel", luaPlayerGetMagicLevel);
-	i.registerMethod("Player", "getMagicLevelPercent", luaPlayerGetMagicLevelPercent);
-	i.registerMethod("Player", "getBaseMagicLevel", luaPlayerGetBaseMagicLevel);
-	i.registerMethod("Player", "getMana", luaPlayerGetMana);
-	i.registerMethod("Player", "addMana", luaPlayerAddMana);
-	i.registerMethod("Player", "getMaxMana", luaPlayerGetMaxMana);
-	i.registerMethod("Player", "setMaxMana", luaPlayerSetMaxMana);
-	i.registerMethod("Player", "setManaShieldBar", luaPlayerSetManaShieldBar);
-	i.registerMethod("Player", "getManaSpent", luaPlayerGetManaSpent);
-	i.registerMethod("Player", "addManaSpent", luaPlayerAddManaSpent);
-	i.registerMethod("Player", "removeManaSpent", luaPlayerRemoveManaSpent);
+	lsi.registerMethod("Player", "getMagicLevel", luaPlayerGetMagicLevel);
+	lsi.registerMethod("Player", "getMagicLevelPercent", luaPlayerGetMagicLevelPercent);
+	lsi.registerMethod("Player", "getBaseMagicLevel", luaPlayerGetBaseMagicLevel);
+	lsi.registerMethod("Player", "getMana", luaPlayerGetMana);
+	lsi.registerMethod("Player", "addMana", luaPlayerAddMana);
+	lsi.registerMethod("Player", "getMaxMana", luaPlayerGetMaxMana);
+	lsi.registerMethod("Player", "setMaxMana", luaPlayerSetMaxMana);
+	lsi.registerMethod("Player", "setManaShieldBar", luaPlayerSetManaShieldBar);
+	lsi.registerMethod("Player", "getManaSpent", luaPlayerGetManaSpent);
+	lsi.registerMethod("Player", "addManaSpent", luaPlayerAddManaSpent);
+	lsi.registerMethod("Player", "removeManaSpent", luaPlayerRemoveManaSpent);
 
-	i.registerMethod("Player", "getBaseMaxHealth", luaPlayerGetBaseMaxHealth);
-	i.registerMethod("Player", "getBaseMaxMana", luaPlayerGetBaseMaxMana);
+	lsi.registerMethod("Player", "getBaseMaxHealth", luaPlayerGetBaseMaxHealth);
+	lsi.registerMethod("Player", "getBaseMaxMana", luaPlayerGetBaseMaxMana);
 
-	i.registerMethod("Player", "getSkillLevel", luaPlayerGetSkillLevel);
-	i.registerMethod("Player", "getEffectiveSkillLevel", luaPlayerGetEffectiveSkillLevel);
-	i.registerMethod("Player", "getSkillPercent", luaPlayerGetSkillPercent);
-	i.registerMethod("Player", "getSkillTries", luaPlayerGetSkillTries);
-	i.registerMethod("Player", "addSkillTries", luaPlayerAddSkillTries);
-	i.registerMethod("Player", "removeSkillTries", luaPlayerRemoveSkillTries);
-	i.registerMethod("Player", "getSpecialSkill", luaPlayerGetSpecialSkill);
-	i.registerMethod("Player", "addSpecialSkill", luaPlayerAddSpecialSkill);
+	lsi.registerMethod("Player", "getSkillLevel", luaPlayerGetSkillLevel);
+	lsi.registerMethod("Player", "getEffectiveSkillLevel", luaPlayerGetEffectiveSkillLevel);
+	lsi.registerMethod("Player", "getSkillPercent", luaPlayerGetSkillPercent);
+	lsi.registerMethod("Player", "getSkillTries", luaPlayerGetSkillTries);
+	lsi.registerMethod("Player", "addSkillTries", luaPlayerAddSkillTries);
+	lsi.registerMethod("Player", "removeSkillTries", luaPlayerRemoveSkillTries);
+	lsi.registerMethod("Player", "getSpecialSkill", luaPlayerGetSpecialSkill);
+	lsi.registerMethod("Player", "addSpecialSkill", luaPlayerAddSpecialSkill);
 
-	i.registerMethod("Player", "addOfflineTrainingTime", luaPlayerAddOfflineTrainingTime);
-	i.registerMethod("Player", "getOfflineTrainingTime", luaPlayerGetOfflineTrainingTime);
-	i.registerMethod("Player", "removeOfflineTrainingTime", luaPlayerRemoveOfflineTrainingTime);
+	lsi.registerMethod("Player", "addOfflineTrainingTime", luaPlayerAddOfflineTrainingTime);
+	lsi.registerMethod("Player", "getOfflineTrainingTime", luaPlayerGetOfflineTrainingTime);
+	lsi.registerMethod("Player", "removeOfflineTrainingTime", luaPlayerRemoveOfflineTrainingTime);
 
-	i.registerMethod("Player", "addOfflineTrainingTries", luaPlayerAddOfflineTrainingTries);
+	lsi.registerMethod("Player", "addOfflineTrainingTries", luaPlayerAddOfflineTrainingTries);
 
-	i.registerMethod("Player", "getOfflineTrainingSkill", luaPlayerGetOfflineTrainingSkill);
-	i.registerMethod("Player", "setOfflineTrainingSkill", luaPlayerSetOfflineTrainingSkill);
+	lsi.registerMethod("Player", "getOfflineTrainingSkill", luaPlayerGetOfflineTrainingSkill);
+	lsi.registerMethod("Player", "setOfflineTrainingSkill", luaPlayerSetOfflineTrainingSkill);
 
-	i.registerMethod("Player", "getItemCount", luaPlayerGetItemCount);
-	i.registerMethod("Player", "getItemById", luaPlayerGetItemById);
+	lsi.registerMethod("Player", "getItemCount", luaPlayerGetItemCount);
+	lsi.registerMethod("Player", "getItemById", luaPlayerGetItemById);
 
-	i.registerMethod("Player", "getVocation", luaPlayerGetVocation);
-	i.registerMethod("Player", "setVocation", luaPlayerSetVocation);
+	lsi.registerMethod("Player", "getVocation", luaPlayerGetVocation);
+	lsi.registerMethod("Player", "setVocation", luaPlayerSetVocation);
 
-	i.registerMethod("Player", "getSex", luaPlayerGetSex);
-	i.registerMethod("Player", "setSex", luaPlayerSetSex);
+	lsi.registerMethod("Player", "getSex", luaPlayerGetSex);
+	lsi.registerMethod("Player", "setSex", luaPlayerSetSex);
 
-	i.registerMethod("Player", "getTown", luaPlayerGetTown);
-	i.registerMethod("Player", "setTown", luaPlayerSetTown);
+	lsi.registerMethod("Player", "getTown", luaPlayerGetTown);
+	lsi.registerMethod("Player", "setTown", luaPlayerSetTown);
 
-	i.registerMethod("Player", "getGuild", luaPlayerGetGuild);
-	i.registerMethod("Player", "setGuild", luaPlayerSetGuild);
+	lsi.registerMethod("Player", "getGuild", luaPlayerGetGuild);
+	lsi.registerMethod("Player", "setGuild", luaPlayerSetGuild);
 
-	i.registerMethod("Player", "getGuildLevel", luaPlayerGetGuildLevel);
-	i.registerMethod("Player", "setGuildLevel", luaPlayerSetGuildLevel);
+	lsi.registerMethod("Player", "getGuildLevel", luaPlayerGetGuildLevel);
+	lsi.registerMethod("Player", "setGuildLevel", luaPlayerSetGuildLevel);
 
-	i.registerMethod("Player", "getGuildNick", luaPlayerGetGuildNick);
-	i.registerMethod("Player", "setGuildNick", luaPlayerSetGuildNick);
+	lsi.registerMethod("Player", "getGuildNick", luaPlayerGetGuildNick);
+	lsi.registerMethod("Player", "setGuildNick", luaPlayerSetGuildNick);
 
-	i.registerMethod("Player", "getGroup", luaPlayerGetGroup);
-	i.registerMethod("Player", "setGroup", luaPlayerSetGroup);
+	lsi.registerMethod("Player", "getGroup", luaPlayerGetGroup);
+	lsi.registerMethod("Player", "setGroup", luaPlayerSetGroup);
 
-	i.registerMethod("Player", "getStamina", luaPlayerGetStamina);
-	i.registerMethod("Player", "setStamina", luaPlayerSetStamina);
+	lsi.registerMethod("Player", "getStamina", luaPlayerGetStamina);
+	lsi.registerMethod("Player", "setStamina", luaPlayerSetStamina);
 
-	i.registerMethod("Player", "getSoul", luaPlayerGetSoul);
-	i.registerMethod("Player", "addSoul", luaPlayerAddSoul);
-	i.registerMethod("Player", "getMaxSoul", luaPlayerGetMaxSoul);
+	lsi.registerMethod("Player", "getSoul", luaPlayerGetSoul);
+	lsi.registerMethod("Player", "addSoul", luaPlayerAddSoul);
+	lsi.registerMethod("Player", "getMaxSoul", luaPlayerGetMaxSoul);
 
-	i.registerMethod("Player", "getBankBalance", luaPlayerGetBankBalance);
-	i.registerMethod("Player", "setBankBalance", luaPlayerSetBankBalance);
+	lsi.registerMethod("Player", "getBankBalance", luaPlayerGetBankBalance);
+	lsi.registerMethod("Player", "setBankBalance", luaPlayerSetBankBalance);
 
-	i.registerMethod("Player", "addItem", luaPlayerAddItem);
-	i.registerMethod("Player", "addItemEx", luaPlayerAddItemEx);
-	i.registerMethod("Player", "removeItem", luaPlayerRemoveItem);
-	i.registerMethod("Player", "sendSupplyUsed", luaPlayerSendSupplyUsed);
+	lsi.registerMethod("Player", "addItem", luaPlayerAddItem);
+	lsi.registerMethod("Player", "addItemEx", luaPlayerAddItemEx);
+	lsi.registerMethod("Player", "removeItem", luaPlayerRemoveItem);
+	lsi.registerMethod("Player", "sendSupplyUsed", luaPlayerSendSupplyUsed);
 
-	i.registerMethod("Player", "getMoney", luaPlayerGetMoney);
-	i.registerMethod("Player", "addMoney", luaPlayerAddMoney);
-	i.registerMethod("Player", "removeMoney", luaPlayerRemoveMoney);
+	lsi.registerMethod("Player", "getMoney", luaPlayerGetMoney);
+	lsi.registerMethod("Player", "addMoney", luaPlayerAddMoney);
+	lsi.registerMethod("Player", "removeMoney", luaPlayerRemoveMoney);
 
-	i.registerMethod("Player", "showTextDialog", luaPlayerShowTextDialog);
+	lsi.registerMethod("Player", "showTextDialog", luaPlayerShowTextDialog);
 
-	i.registerMethod("Player", "sendTextMessage", luaPlayerSendTextMessage);
-	i.registerMethod("Player", "sendChannelMessage", luaPlayerSendChannelMessage);
-	i.registerMethod("Player", "sendPrivateMessage", luaPlayerSendPrivateMessage);
-	i.registerMethod("Player", "channelSay", luaPlayerChannelSay);
-	i.registerMethod("Player", "openChannel", luaPlayerOpenChannel);
-	i.registerMethod("Player", "leaveChannel", luaPlayerLeaveChannel);
+	lsi.registerMethod("Player", "sendTextMessage", luaPlayerSendTextMessage);
+	lsi.registerMethod("Player", "sendChannelMessage", luaPlayerSendChannelMessage);
+	lsi.registerMethod("Player", "sendPrivateMessage", luaPlayerSendPrivateMessage);
+	lsi.registerMethod("Player", "channelSay", luaPlayerChannelSay);
+	lsi.registerMethod("Player", "openChannel", luaPlayerOpenChannel);
+	lsi.registerMethod("Player", "leaveChannel", luaPlayerLeaveChannel);
 
-	i.registerMethod("Player", "getSlotItem", luaPlayerGetSlotItem);
+	lsi.registerMethod("Player", "getSlotItem", luaPlayerGetSlotItem);
 
-	i.registerMethod("Player", "getParty", luaPlayerGetParty);
+	lsi.registerMethod("Player", "getParty", luaPlayerGetParty);
 
-	i.registerMethod("Player", "addOutfit", luaPlayerAddOutfit);
-	i.registerMethod("Player", "addOutfitAddon", luaPlayerAddOutfitAddon);
-	i.registerMethod("Player", "removeOutfit", luaPlayerRemoveOutfit);
-	i.registerMethod("Player", "removeOutfitAddon", luaPlayerRemoveOutfitAddon);
-	i.registerMethod("Player", "hasOutfit", luaPlayerHasOutfit);
-	i.registerMethod("Player", "canWearOutfit", luaPlayerCanWearOutfit);
-	i.registerMethod("Player", "sendOutfitWindow", luaPlayerSendOutfitWindow);
+	lsi.registerMethod("Player", "addOutfit", luaPlayerAddOutfit);
+	lsi.registerMethod("Player", "addOutfitAddon", luaPlayerAddOutfitAddon);
+	lsi.registerMethod("Player", "removeOutfit", luaPlayerRemoveOutfit);
+	lsi.registerMethod("Player", "removeOutfitAddon", luaPlayerRemoveOutfitAddon);
+	lsi.registerMethod("Player", "hasOutfit", luaPlayerHasOutfit);
+	lsi.registerMethod("Player", "canWearOutfit", luaPlayerCanWearOutfit);
+	lsi.registerMethod("Player", "sendOutfitWindow", luaPlayerSendOutfitWindow);
 
-	i.registerMethod("Player", "sendEditPodium", luaPlayerSendEditPodium);
+	lsi.registerMethod("Player", "sendEditPodium", luaPlayerSendEditPodium);
 
-	i.registerMethod("Player", "addMount", luaPlayerAddMount);
-	i.registerMethod("Player", "removeMount", luaPlayerRemoveMount);
-	i.registerMethod("Player", "hasMount", luaPlayerHasMount);
-	i.registerMethod("Player", "toggleMount", luaPlayerToggleMount);
+	lsi.registerMethod("Player", "addMount", luaPlayerAddMount);
+	lsi.registerMethod("Player", "removeMount", luaPlayerRemoveMount);
+	lsi.registerMethod("Player", "hasMount", luaPlayerHasMount);
+	lsi.registerMethod("Player", "toggleMount", luaPlayerToggleMount);
 
-	i.registerMethod("Player", "getPremiumEndsAt", luaPlayerGetPremiumEndsAt);
-	i.registerMethod("Player", "setPremiumEndsAt", luaPlayerSetPremiumEndsAt);
+	lsi.registerMethod("Player", "getPremiumEndsAt", luaPlayerGetPremiumEndsAt);
+	lsi.registerMethod("Player", "setPremiumEndsAt", luaPlayerSetPremiumEndsAt);
 
-	i.registerMethod("Player", "hasBlessing", luaPlayerHasBlessing);
-	i.registerMethod("Player", "addBlessing", luaPlayerAddBlessing);
-	i.registerMethod("Player", "removeBlessing", luaPlayerRemoveBlessing);
+	lsi.registerMethod("Player", "hasBlessing", luaPlayerHasBlessing);
+	lsi.registerMethod("Player", "addBlessing", luaPlayerAddBlessing);
+	lsi.registerMethod("Player", "removeBlessing", luaPlayerRemoveBlessing);
 
-	i.registerMethod("Player", "canLearnSpell", luaPlayerCanLearnSpell);
-	i.registerMethod("Player", "learnSpell", luaPlayerLearnSpell);
-	i.registerMethod("Player", "forgetSpell", luaPlayerForgetSpell);
-	i.registerMethod("Player", "hasLearnedSpell", luaPlayerHasLearnedSpell);
+	lsi.registerMethod("Player", "canLearnSpell", luaPlayerCanLearnSpell);
+	lsi.registerMethod("Player", "learnSpell", luaPlayerLearnSpell);
+	lsi.registerMethod("Player", "forgetSpell", luaPlayerForgetSpell);
+	lsi.registerMethod("Player", "hasLearnedSpell", luaPlayerHasLearnedSpell);
 
-	i.registerMethod("Player", "sendTutorial", luaPlayerSendTutorial);
-	i.registerMethod("Player", "addMapMark", luaPlayerAddMapMark);
+	lsi.registerMethod("Player", "sendTutorial", luaPlayerSendTutorial);
+	lsi.registerMethod("Player", "addMapMark", luaPlayerAddMapMark);
 
-	i.registerMethod("Player", "save", luaPlayerSave);
-	i.registerMethod("Player", "popupFYI", luaPlayerPopupFYI);
+	lsi.registerMethod("Player", "save", luaPlayerSave);
+	lsi.registerMethod("Player", "popupFYI", luaPlayerPopupFYI);
 
-	i.registerMethod("Player", "isPzLocked", luaPlayerIsPzLocked);
+	lsi.registerMethod("Player", "isPzLocked", luaPlayerIsPzLocked);
 
-	i.registerMethod("Player", "getClient", luaPlayerGetClient);
+	lsi.registerMethod("Player", "getClient", luaPlayerGetClient);
 
-	i.registerMethod("Player", "getHouse", luaPlayerGetHouse);
-	i.registerMethod("Player", "sendHouseWindow", luaPlayerSendHouseWindow);
-	i.registerMethod("Player", "setEditHouse", luaPlayerSetEditHouse);
+	lsi.registerMethod("Player", "getHouse", luaPlayerGetHouse);
+	lsi.registerMethod("Player", "sendHouseWindow", luaPlayerSendHouseWindow);
+	lsi.registerMethod("Player", "setEditHouse", luaPlayerSetEditHouse);
 
-	i.registerMethod("Player", "setGhostMode", luaPlayerSetGhostMode);
+	lsi.registerMethod("Player", "setGhostMode", luaPlayerSetGhostMode);
 
-	i.registerMethod("Player", "getContainerId", luaPlayerGetContainerId);
-	i.registerMethod("Player", "getContainerById", luaPlayerGetContainerById);
-	i.registerMethod("Player", "getContainerIndex", luaPlayerGetContainerIndex);
+	lsi.registerMethod("Player", "getContainerId", luaPlayerGetContainerId);
+	lsi.registerMethod("Player", "getContainerById", luaPlayerGetContainerById);
+	lsi.registerMethod("Player", "getContainerIndex", luaPlayerGetContainerIndex);
 
-	i.registerMethod("Player", "getRuneSpells", luaPlayerGetRuneSpells);
-	i.registerMethod("Player", "getInstantSpells", luaPlayerGetInstantSpells);
-	i.registerMethod("Player", "canCast", luaPlayerCanCast);
+	lsi.registerMethod("Player", "getRuneSpells", luaPlayerGetRuneSpells);
+	lsi.registerMethod("Player", "getInstantSpells", luaPlayerGetInstantSpells);
+	lsi.registerMethod("Player", "canCast", luaPlayerCanCast);
 
-	i.registerMethod("Player", "hasChaseMode", luaPlayerHasChaseMode);
-	i.registerMethod("Player", "hasSecureMode", luaPlayerHasSecureMode);
-	i.registerMethod("Player", "getFightMode", luaPlayerGetFightMode);
+	lsi.registerMethod("Player", "hasChaseMode", luaPlayerHasChaseMode);
+	lsi.registerMethod("Player", "hasSecureMode", luaPlayerHasSecureMode);
+	lsi.registerMethod("Player", "getFightMode", luaPlayerGetFightMode);
 
-	i.registerMethod("Player", "getStoreInbox", luaPlayerGetStoreInbox);
+	lsi.registerMethod("Player", "getStoreInbox", luaPlayerGetStoreInbox);
 
-	i.registerMethod("Player", "isNearDepotBox", luaPlayerIsNearDepotBox);
+	lsi.registerMethod("Player", "isNearDepotBox", luaPlayerIsNearDepotBox);
 
-	i.registerMethod("Player", "getIdleTime", luaPlayerGetIdleTime);
-	i.registerMethod("Player", "setIdleTime", luaPlayerSetIdleTime);
-	i.registerMethod("Player", "resetIdleTime", luaPlayerResetIdleTime);
+	lsi.registerMethod("Player", "getIdleTime", luaPlayerGetIdleTime);
+	lsi.registerMethod("Player", "setIdleTime", luaPlayerSetIdleTime);
+	lsi.registerMethod("Player", "resetIdleTime", luaPlayerResetIdleTime);
 
-	i.registerMethod("Player", "sendCreatureSquare", luaPlayerSendCreatureSquare);
+	lsi.registerMethod("Player", "sendCreatureSquare", luaPlayerSendCreatureSquare);
 
-	i.registerMethod("Player", "getClientExpDisplay", luaPlayerGetClientExpDisplay);
-	i.registerMethod("Player", "setClientExpDisplay", luaPlayerSetClientExpDisplay);
+	lsi.registerMethod("Player", "getClientExpDisplay", luaPlayerGetClientExpDisplay);
+	lsi.registerMethod("Player", "setClientExpDisplay", luaPlayerSetClientExpDisplay);
 
-	i.registerMethod("Player", "getClientStaminaBonusDisplay", luaPlayerGetClientStaminaBonusDisplay);
-	i.registerMethod("Player", "setClientStaminaBonusDisplay", luaPlayerSetClientStaminaBonusDisplay);
+	lsi.registerMethod("Player", "getClientStaminaBonusDisplay", luaPlayerGetClientStaminaBonusDisplay);
+	lsi.registerMethod("Player", "setClientStaminaBonusDisplay", luaPlayerSetClientStaminaBonusDisplay);
 
-	i.registerMethod("Player", "getClientLowLevelBonusDisplay", luaPlayerGetClientLowLevelBonusDisplay);
-	i.registerMethod("Player", "setClientLowLevelBonusDisplay", luaPlayerSetClientLowLevelBonusDisplay);
+	lsi.registerMethod("Player", "getClientLowLevelBonusDisplay", luaPlayerGetClientLowLevelBonusDisplay);
+	lsi.registerMethod("Player", "setClientLowLevelBonusDisplay", luaPlayerSetClientLowLevelBonusDisplay);
 
-	i.registerMethod("Player", "sendResourceBalance", luaPlayerSendResourceBalance);
+	lsi.registerMethod("Player", "sendResourceBalance", luaPlayerSendResourceBalance);
 
-	i.registerMethod("Player", "sendEnterMarket", luaPlayerSendEnterMarket);
+	lsi.registerMethod("Player", "sendEnterMarket", luaPlayerSendEnterMarket);
 }

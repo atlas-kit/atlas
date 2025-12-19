@@ -457,49 +457,49 @@ int luaHouseSave(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerHouse(LuaScriptInterface& i)
+void tfs::lua::registerHouse(LuaScriptInterface& lsi)
 {
 	registerEnum(i, GUEST_LIST);
 	registerEnum(i, SUBOWNER_LIST);
 
-	i.registerClass("House", "", luaHouseCreate);
-	i.registerMetaMethod("House", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("House", "", luaHouseCreate);
+	lsi.registerMetaMethod("House", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("House", "getId", luaHouseGetId);
-	i.registerMethod("House", "getName", luaHouseGetName);
-	i.registerMethod("House", "getTown", luaHouseGetTown);
-	i.registerMethod("House", "getExitPosition", luaHouseGetExitPosition);
+	lsi.registerMethod("House", "getId", luaHouseGetId);
+	lsi.registerMethod("House", "getName", luaHouseGetName);
+	lsi.registerMethod("House", "getTown", luaHouseGetTown);
+	lsi.registerMethod("House", "getExitPosition", luaHouseGetExitPosition);
 
-	i.registerMethod("House", "getRent", luaHouseGetRent);
-	i.registerMethod("House", "setRent", luaHouseSetRent);
+	lsi.registerMethod("House", "getRent", luaHouseGetRent);
+	lsi.registerMethod("House", "setRent", luaHouseSetRent);
 
-	i.registerMethod("House", "getPaidUntil", luaHouseGetPaidUntil);
-	i.registerMethod("House", "setPaidUntil", luaHouseSetPaidUntil);
+	lsi.registerMethod("House", "getPaidUntil", luaHouseGetPaidUntil);
+	lsi.registerMethod("House", "setPaidUntil", luaHouseSetPaidUntil);
 
-	i.registerMethod("House", "getPayRentWarnings", luaHouseGetPayRentWarnings);
-	i.registerMethod("House", "setPayRentWarnings", luaHouseSetPayRentWarnings);
+	lsi.registerMethod("House", "getPayRentWarnings", luaHouseGetPayRentWarnings);
+	lsi.registerMethod("House", "setPayRentWarnings", luaHouseSetPayRentWarnings);
 
-	i.registerMethod("House", "getOwnerName", luaHouseGetOwnerName);
-	i.registerMethod("House", "getOwnerGuid", luaHouseGetOwnerGuid);
-	i.registerMethod("House", "setOwnerGuid", luaHouseSetOwnerGuid);
-	i.registerMethod("House", "startTrade", luaHouseStartTrade);
+	lsi.registerMethod("House", "getOwnerName", luaHouseGetOwnerName);
+	lsi.registerMethod("House", "getOwnerGuid", luaHouseGetOwnerGuid);
+	lsi.registerMethod("House", "setOwnerGuid", luaHouseSetOwnerGuid);
+	lsi.registerMethod("House", "startTrade", luaHouseStartTrade);
 
-	i.registerMethod("House", "getBeds", luaHouseGetBeds);
-	i.registerMethod("House", "getBedCount", luaHouseGetBedCount);
+	lsi.registerMethod("House", "getBeds", luaHouseGetBeds);
+	lsi.registerMethod("House", "getBedCount", luaHouseGetBedCount);
 
-	i.registerMethod("House", "getDoors", luaHouseGetDoors);
-	i.registerMethod("House", "getDoorCount", luaHouseGetDoorCount);
-	i.registerMethod("House", "getDoorIdByPosition", luaHouseGetDoorIdByPosition);
+	lsi.registerMethod("House", "getDoors", luaHouseGetDoors);
+	lsi.registerMethod("House", "getDoorCount", luaHouseGetDoorCount);
+	lsi.registerMethod("House", "getDoorIdByPosition", luaHouseGetDoorIdByPosition);
 
-	i.registerMethod("House", "getTiles", luaHouseGetTiles);
-	i.registerMethod("House", "getItems", luaHouseGetItems);
-	i.registerMethod("House", "getTileCount", luaHouseGetTileCount);
+	lsi.registerMethod("House", "getTiles", luaHouseGetTiles);
+	lsi.registerMethod("House", "getItems", luaHouseGetItems);
+	lsi.registerMethod("House", "getTileCount", luaHouseGetTileCount);
 
-	i.registerMethod("House", "canEditAccessList", luaHouseCanEditAccessList);
-	i.registerMethod("House", "getAccessList", luaHouseGetAccessList);
-	i.registerMethod("House", "setAccessList", luaHouseSetAccessList);
+	lsi.registerMethod("House", "canEditAccessList", luaHouseCanEditAccessList);
+	lsi.registerMethod("House", "getAccessList", luaHouseGetAccessList);
+	lsi.registerMethod("House", "setAccessList", luaHouseSetAccessList);
 
-	i.registerMethod("House", "kickPlayer", luaHouseKickPlayer);
+	lsi.registerMethod("House", "kickPlayer", luaHouseKickPlayer);
 
-	i.registerMethod("House", "save", luaHouseSave);
+	lsi.registerMethod("House", "save", luaHouseSave);
 }

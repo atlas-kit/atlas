@@ -145,19 +145,19 @@ int luaGuildSetMotd(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerGuild(LuaScriptInterface& i)
+void tfs::lua::registerGuild(LuaScriptInterface& lsi)
 {
-	i.registerClass("Guild", "", luaGuildCreate);
-	i.registerMetaMethod("Guild", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Guild", "", luaGuildCreate);
+	lsi.registerMetaMethod("Guild", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Guild", "getId", luaGuildGetId);
-	i.registerMethod("Guild", "getName", luaGuildGetName);
-	i.registerMethod("Guild", "getMembersOnline", luaGuildGetMembersOnline);
+	lsi.registerMethod("Guild", "getId", luaGuildGetId);
+	lsi.registerMethod("Guild", "getName", luaGuildGetName);
+	lsi.registerMethod("Guild", "getMembersOnline", luaGuildGetMembersOnline);
 
-	i.registerMethod("Guild", "addRank", luaGuildAddRank);
-	i.registerMethod("Guild", "getRankById", luaGuildGetRankById);
-	i.registerMethod("Guild", "getRankByLevel", luaGuildGetRankByLevel);
+	lsi.registerMethod("Guild", "addRank", luaGuildAddRank);
+	lsi.registerMethod("Guild", "getRankById", luaGuildGetRankById);
+	lsi.registerMethod("Guild", "getRankByLevel", luaGuildGetRankByLevel);
 
-	i.registerMethod("Guild", "getMotd", luaGuildGetMotd);
-	i.registerMethod("Guild", "setMotd", luaGuildSetMotd);
+	lsi.registerMethod("Guild", "getMotd", luaGuildGetMotd);
+	lsi.registerMethod("Guild", "setMotd", luaGuildSetMotd);
 }

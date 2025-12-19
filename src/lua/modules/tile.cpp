@@ -722,7 +722,7 @@ int luaTileGetHouse(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerTile(LuaScriptInterface& i)
+void tfs::lua::registerTile(LuaScriptInterface& lsi)
 {
 	registerEnum(i, TILESTATE_NONE);
 	registerEnum(i, TILESTATE_PROTECTIONZONE);
@@ -757,47 +757,47 @@ void tfs::lua::registerTile(LuaScriptInterface& i)
 	registerEnum(i, ZONE_NOLOGOUT);
 	registerEnum(i, ZONE_NORMAL);
 
-	i.registerClass("Tile", "", luaTileCreate);
-	i.registerMetaMethod("Tile", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Tile", "", luaTileCreate);
+	lsi.registerMetaMethod("Tile", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Tile", "remove", luaTileRemove);
+	lsi.registerMethod("Tile", "remove", luaTileRemove);
 
-	i.registerMethod("Tile", "getPosition", luaTileGetPosition);
-	i.registerMethod("Tile", "getGround", luaTileGetGround);
-	i.registerMethod("Tile", "getThing", luaTileGetThing);
-	i.registerMethod("Tile", "getThingCount", luaTileGetThingCount);
-	i.registerMethod("Tile", "getTopVisibleThing", luaTileGetTopVisibleThing);
+	lsi.registerMethod("Tile", "getPosition", luaTileGetPosition);
+	lsi.registerMethod("Tile", "getGround", luaTileGetGround);
+	lsi.registerMethod("Tile", "getThing", luaTileGetThing);
+	lsi.registerMethod("Tile", "getThingCount", luaTileGetThingCount);
+	lsi.registerMethod("Tile", "getTopVisibleThing", luaTileGetTopVisibleThing);
 
-	i.registerMethod("Tile", "getTopTopItem", luaTileGetTopTopItem);
-	i.registerMethod("Tile", "getTopDownItem", luaTileGetTopDownItem);
-	i.registerMethod("Tile", "getFieldItem", luaTileGetFieldItem);
+	lsi.registerMethod("Tile", "getTopTopItem", luaTileGetTopTopItem);
+	lsi.registerMethod("Tile", "getTopDownItem", luaTileGetTopDownItem);
+	lsi.registerMethod("Tile", "getFieldItem", luaTileGetFieldItem);
 
-	i.registerMethod("Tile", "getItemById", luaTileGetItemById);
-	i.registerMethod("Tile", "getItemByType", luaTileGetItemByType);
-	i.registerMethod("Tile", "getItemByTopOrder", luaTileGetItemByTopOrder);
-	i.registerMethod("Tile", "getItemCountById", luaTileGetItemCountById);
+	lsi.registerMethod("Tile", "getItemById", luaTileGetItemById);
+	lsi.registerMethod("Tile", "getItemByType", luaTileGetItemByType);
+	lsi.registerMethod("Tile", "getItemByTopOrder", luaTileGetItemByTopOrder);
+	lsi.registerMethod("Tile", "getItemCountById", luaTileGetItemCountById);
 
-	i.registerMethod("Tile", "getBottomCreature", luaTileGetBottomCreature);
-	i.registerMethod("Tile", "getTopCreature", luaTileGetTopCreature);
-	i.registerMethod("Tile", "getBottomVisibleCreature", luaTileGetBottomVisibleCreature);
-	i.registerMethod("Tile", "getTopVisibleCreature", luaTileGetTopVisibleCreature);
+	lsi.registerMethod("Tile", "getBottomCreature", luaTileGetBottomCreature);
+	lsi.registerMethod("Tile", "getTopCreature", luaTileGetTopCreature);
+	lsi.registerMethod("Tile", "getBottomVisibleCreature", luaTileGetBottomVisibleCreature);
+	lsi.registerMethod("Tile", "getTopVisibleCreature", luaTileGetTopVisibleCreature);
 
-	i.registerMethod("Tile", "getItems", luaTileGetItems);
-	i.registerMethod("Tile", "getItemCount", luaTileGetItemCount);
-	i.registerMethod("Tile", "getDownItemCount", luaTileGetDownItemCount);
-	i.registerMethod("Tile", "getTopItemCount", luaTileGetTopItemCount);
+	lsi.registerMethod("Tile", "getItems", luaTileGetItems);
+	lsi.registerMethod("Tile", "getItemCount", luaTileGetItemCount);
+	lsi.registerMethod("Tile", "getDownItemCount", luaTileGetDownItemCount);
+	lsi.registerMethod("Tile", "getTopItemCount", luaTileGetTopItemCount);
 
-	i.registerMethod("Tile", "getCreatures", luaTileGetCreatures);
-	i.registerMethod("Tile", "getCreatureCount", luaTileGetCreatureCount);
+	lsi.registerMethod("Tile", "getCreatures", luaTileGetCreatures);
+	lsi.registerMethod("Tile", "getCreatureCount", luaTileGetCreatureCount);
 
-	i.registerMethod("Tile", "getThingIndex", luaTileGetThingIndex);
+	lsi.registerMethod("Tile", "getThingIndex", luaTileGetThingIndex);
 
-	i.registerMethod("Tile", "hasProperty", luaTileHasProperty);
-	i.registerMethod("Tile", "hasFlag", luaTileHasFlag);
+	lsi.registerMethod("Tile", "hasProperty", luaTileHasProperty);
+	lsi.registerMethod("Tile", "hasFlag", luaTileHasFlag);
 
-	i.registerMethod("Tile", "queryAdd", luaTileQueryAdd);
-	i.registerMethod("Tile", "addItem", luaTileAddItem);
-	i.registerMethod("Tile", "addItemEx", luaTileAddItemEx);
+	lsi.registerMethod("Tile", "queryAdd", luaTileQueryAdd);
+	lsi.registerMethod("Tile", "addItem", luaTileAddItem);
+	lsi.registerMethod("Tile", "addItemEx", luaTileAddItemEx);
 
-	i.registerMethod("Tile", "getHouse", luaTileGetHouse);
+	lsi.registerMethod("Tile", "getHouse", luaTileGetHouse);
 }

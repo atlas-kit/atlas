@@ -233,28 +233,28 @@ int luaConditionAddDamage(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerCondition(LuaScriptInterface& i)
+void tfs::lua::registerCondition(LuaScriptInterface& lsi)
 {
-	i.registerClass("Condition", "", luaConditionCreate);
-	i.registerMetaMethod("Condition", "__eq", tfs::lua::luaUserdataCompare);
-	i.registerMetaMethod("Condition", "__gc", luaConditionDelete);
+	lsi.registerClass("Condition", "", luaConditionCreate);
+	lsi.registerMetaMethod("Condition", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("Condition", "__gc", luaConditionDelete);
 
-	i.registerMethod("Condition", "getId", luaConditionGetId);
-	i.registerMethod("Condition", "getSubId", luaConditionGetSubId);
-	i.registerMethod("Condition", "getType", luaConditionGetType);
-	i.registerMethod("Condition", "getIcons", luaConditionGetIcons);
-	i.registerMethod("Condition", "getEndTime", luaConditionGetEndTime);
+	lsi.registerMethod("Condition", "getId", luaConditionGetId);
+	lsi.registerMethod("Condition", "getSubId", luaConditionGetSubId);
+	lsi.registerMethod("Condition", "getType", luaConditionGetType);
+	lsi.registerMethod("Condition", "getIcons", luaConditionGetIcons);
+	lsi.registerMethod("Condition", "getEndTime", luaConditionGetEndTime);
 
-	i.registerMethod("Condition", "clone", luaConditionClone);
+	lsi.registerMethod("Condition", "clone", luaConditionClone);
 
-	i.registerMethod("Condition", "getTicks", luaConditionGetTicks);
-	i.registerMethod("Condition", "setTicks", luaConditionSetTicks);
+	lsi.registerMethod("Condition", "getTicks", luaConditionGetTicks);
+	lsi.registerMethod("Condition", "setTicks", luaConditionSetTicks);
 
-	i.registerMethod("Condition", "setParameter", luaConditionSetParameter);
-	i.registerMethod("Condition", "getParameter", luaConditionGetParameter);
+	lsi.registerMethod("Condition", "setParameter", luaConditionSetParameter);
+	lsi.registerMethod("Condition", "getParameter", luaConditionGetParameter);
 
-	i.registerMethod("Condition", "setFormula", luaConditionSetFormula);
-	i.registerMethod("Condition", "setOutfit", luaConditionSetOutfit);
+	lsi.registerMethod("Condition", "setFormula", luaConditionSetFormula);
+	lsi.registerMethod("Condition", "setOutfit", luaConditionSetOutfit);
 
-	i.registerMethod("Condition", "addDamage", luaConditionAddDamage);
+	lsi.registerMethod("Condition", "addDamage", luaConditionAddDamage);
 }

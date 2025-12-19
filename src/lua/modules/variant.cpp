@@ -64,11 +64,11 @@ int luaVariantGetPosition(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerVariant(LuaScriptInterface& i)
+void tfs::lua::registerVariant(LuaScriptInterface& lsi)
 {
-	i.registerClass("Variant", "", luaVariantCreate);
+	lsi.registerClass("Variant", "", luaVariantCreate);
 
-	i.registerMethod("Variant", "getNumber", luaVariantGetNumber);
-	i.registerMethod("Variant", "getString", luaVariantGetString);
-	i.registerMethod("Variant", "getPosition", luaVariantGetPosition);
+	lsi.registerMethod("Variant", "getNumber", luaVariantGetNumber);
+	lsi.registerMethod("Variant", "getString", luaVariantGetString);
+	lsi.registerMethod("Variant", "getPosition", luaVariantGetPosition);
 }

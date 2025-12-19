@@ -1115,7 +1115,7 @@ int luaCreatureSetStorageValue(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerCreature(LuaScriptInterface& i)
+void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 {
 	registerEnum(i, CONST_SLOT_HEAD);
 	registerEnum(i, CONST_SLOT_NECKLACE);
@@ -1155,94 +1155,94 @@ void tfs::lua::registerCreature(LuaScriptInterface& i)
 	registerEnum(i, CREATURE_ICON_FIRST);
 	registerEnum(i, CREATURE_ICON_LAST);
 
-	i.registerClass("Creature", "", luaCreatureCreate);
-	i.registerMetaMethod("Creature", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("Creature", "", luaCreatureCreate);
+	lsi.registerMetaMethod("Creature", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("Creature", "getEvents", luaCreatureGetEvents);
-	i.registerMethod("Creature", "registerEvent", luaCreatureRegisterEvent);
-	i.registerMethod("Creature", "unregisterEvent", luaCreatureUnregisterEvent);
+	lsi.registerMethod("Creature", "getEvents", luaCreatureGetEvents);
+	lsi.registerMethod("Creature", "registerEvent", luaCreatureRegisterEvent);
+	lsi.registerMethod("Creature", "unregisterEvent", luaCreatureUnregisterEvent);
 
-	i.registerMethod("Creature", "isRemoved", luaCreatureIsRemoved);
-	i.registerMethod("Creature", "isCreature", luaCreatureIsCreature);
-	i.registerMethod("Creature", "isInGhostMode", luaCreatureIsInGhostMode);
-	i.registerMethod("Creature", "isHealthHidden", luaCreatureIsHealthHidden);
-	i.registerMethod("Creature", "isMovementBlocked", luaCreatureIsMovementBlocked);
-	i.registerMethod("Creature", "isImmune", luaCreatureIsImmune);
+	lsi.registerMethod("Creature", "isRemoved", luaCreatureIsRemoved);
+	lsi.registerMethod("Creature", "isCreature", luaCreatureIsCreature);
+	lsi.registerMethod("Creature", "isInGhostMode", luaCreatureIsInGhostMode);
+	lsi.registerMethod("Creature", "isHealthHidden", luaCreatureIsHealthHidden);
+	lsi.registerMethod("Creature", "isMovementBlocked", luaCreatureIsMovementBlocked);
+	lsi.registerMethod("Creature", "isImmune", luaCreatureIsImmune);
 
-	i.registerMethod("Creature", "canSee", luaCreatureCanSee);
-	i.registerMethod("Creature", "canSeeCreature", luaCreatureCanSeeCreature);
-	i.registerMethod("Creature", "canSeeGhostMode", luaCreatureCanSeeGhostMode);
-	i.registerMethod("Creature", "canSeeInvisibility", luaCreatureCanSeeInvisibility);
+	lsi.registerMethod("Creature", "canSee", luaCreatureCanSee);
+	lsi.registerMethod("Creature", "canSeeCreature", luaCreatureCanSeeCreature);
+	lsi.registerMethod("Creature", "canSeeGhostMode", luaCreatureCanSeeGhostMode);
+	lsi.registerMethod("Creature", "canSeeInvisibility", luaCreatureCanSeeInvisibility);
 
-	i.registerMethod("Creature", "hasParent", luaCreatureHasParent);
-	i.registerMethod("Creature", "getParent", luaCreatureGetParent);
+	lsi.registerMethod("Creature", "hasParent", luaCreatureHasParent);
+	lsi.registerMethod("Creature", "getParent", luaCreatureGetParent);
 
-	i.registerMethod("Creature", "getId", luaCreatureGetId);
-	i.registerMethod("Creature", "getName", luaCreatureGetName);
+	lsi.registerMethod("Creature", "getId", luaCreatureGetId);
+	lsi.registerMethod("Creature", "getName", luaCreatureGetName);
 
-	i.registerMethod("Creature", "getTarget", luaCreatureGetTarget);
-	i.registerMethod("Creature", "setTarget", luaCreatureSetTarget);
+	lsi.registerMethod("Creature", "getTarget", luaCreatureGetTarget);
+	lsi.registerMethod("Creature", "setTarget", luaCreatureSetTarget);
 
-	i.registerMethod("Creature", "getFollowCreature", luaCreatureGetFollowCreature);
-	i.registerMethod("Creature", "setFollowCreature", luaCreatureSetFollowCreature);
+	lsi.registerMethod("Creature", "getFollowCreature", luaCreatureGetFollowCreature);
+	lsi.registerMethod("Creature", "setFollowCreature", luaCreatureSetFollowCreature);
 
-	i.registerMethod("Creature", "getMaster", luaCreatureGetMaster);
-	i.registerMethod("Creature", "setMaster", luaCreatureSetMaster);
+	lsi.registerMethod("Creature", "getMaster", luaCreatureGetMaster);
+	lsi.registerMethod("Creature", "setMaster", luaCreatureSetMaster);
 
-	i.registerMethod("Creature", "getLight", luaCreatureGetLight);
-	i.registerMethod("Creature", "setLight", luaCreatureSetLight);
+	lsi.registerMethod("Creature", "getLight", luaCreatureGetLight);
+	lsi.registerMethod("Creature", "setLight", luaCreatureSetLight);
 
-	i.registerMethod("Creature", "getSpeed", luaCreatureGetSpeed);
-	i.registerMethod("Creature", "getBaseSpeed", luaCreatureGetBaseSpeed);
-	i.registerMethod("Creature", "changeSpeed", luaCreatureChangeSpeed);
+	lsi.registerMethod("Creature", "getSpeed", luaCreatureGetSpeed);
+	lsi.registerMethod("Creature", "getBaseSpeed", luaCreatureGetBaseSpeed);
+	lsi.registerMethod("Creature", "changeSpeed", luaCreatureChangeSpeed);
 
-	i.registerMethod("Creature", "setDropLoot", luaCreatureSetDropLoot);
-	i.registerMethod("Creature", "setSkillLoss", luaCreatureSetSkillLoss);
+	lsi.registerMethod("Creature", "setDropLoot", luaCreatureSetDropLoot);
+	lsi.registerMethod("Creature", "setSkillLoss", luaCreatureSetSkillLoss);
 
-	i.registerMethod("Creature", "getPosition", luaCreatureGetPosition);
-	i.registerMethod("Creature", "getTile", luaCreatureGetTile);
-	i.registerMethod("Creature", "getDirection", luaCreatureGetDirection);
-	i.registerMethod("Creature", "setDirection", luaCreatureSetDirection);
+	lsi.registerMethod("Creature", "getPosition", luaCreatureGetPosition);
+	lsi.registerMethod("Creature", "getTile", luaCreatureGetTile);
+	lsi.registerMethod("Creature", "getDirection", luaCreatureGetDirection);
+	lsi.registerMethod("Creature", "setDirection", luaCreatureSetDirection);
 
-	i.registerMethod("Creature", "getHealth", luaCreatureGetHealth);
-	i.registerMethod("Creature", "setHealth", luaCreatureSetHealth);
-	i.registerMethod("Creature", "addHealth", luaCreatureAddHealth);
-	i.registerMethod("Creature", "getMaxHealth", luaCreatureGetMaxHealth);
-	i.registerMethod("Creature", "setMaxHealth", luaCreatureSetMaxHealth);
-	i.registerMethod("Creature", "setHiddenHealth", luaCreatureSetHiddenHealth);
-	i.registerMethod("Creature", "setMovementBlocked", luaCreatureSetMovementBlocked);
+	lsi.registerMethod("Creature", "getHealth", luaCreatureGetHealth);
+	lsi.registerMethod("Creature", "setHealth", luaCreatureSetHealth);
+	lsi.registerMethod("Creature", "addHealth", luaCreatureAddHealth);
+	lsi.registerMethod("Creature", "getMaxHealth", luaCreatureGetMaxHealth);
+	lsi.registerMethod("Creature", "setMaxHealth", luaCreatureSetMaxHealth);
+	lsi.registerMethod("Creature", "setHiddenHealth", luaCreatureSetHiddenHealth);
+	lsi.registerMethod("Creature", "setMovementBlocked", luaCreatureSetMovementBlocked);
 
-	i.registerMethod("Creature", "getSkull", luaCreatureGetSkull);
-	i.registerMethod("Creature", "setSkull", luaCreatureSetSkull);
+	lsi.registerMethod("Creature", "getSkull", luaCreatureGetSkull);
+	lsi.registerMethod("Creature", "setSkull", luaCreatureSetSkull);
 
-	i.registerMethod("Creature", "getOutfit", luaCreatureGetOutfit);
-	i.registerMethod("Creature", "setOutfit", luaCreatureSetOutfit);
+	lsi.registerMethod("Creature", "getOutfit", luaCreatureGetOutfit);
+	lsi.registerMethod("Creature", "setOutfit", luaCreatureSetOutfit);
 
-	i.registerMethod("Creature", "getCondition", luaCreatureGetCondition);
-	i.registerMethod("Creature", "addCondition", luaCreatureAddCondition);
-	i.registerMethod("Creature", "removeCondition", luaCreatureRemoveCondition);
-	i.registerMethod("Creature", "hasCondition", luaCreatureHasCondition);
+	lsi.registerMethod("Creature", "getCondition", luaCreatureGetCondition);
+	lsi.registerMethod("Creature", "addCondition", luaCreatureAddCondition);
+	lsi.registerMethod("Creature", "removeCondition", luaCreatureRemoveCondition);
+	lsi.registerMethod("Creature", "hasCondition", luaCreatureHasCondition);
 
-	i.registerMethod("Creature", "remove", luaCreatureRemove);
-	i.registerMethod("Creature", "teleportTo", luaCreatureTeleportTo);
-	i.registerMethod("Creature", "say", luaCreatureSay);
+	lsi.registerMethod("Creature", "remove", luaCreatureRemove);
+	lsi.registerMethod("Creature", "teleportTo", luaCreatureTeleportTo);
+	lsi.registerMethod("Creature", "say", luaCreatureSay);
 
-	i.registerMethod("Creature", "getDamageMap", luaCreatureGetDamageMap);
+	lsi.registerMethod("Creature", "getDamageMap", luaCreatureGetDamageMap);
 
-	i.registerMethod("Creature", "getSummons", luaCreatureGetSummons);
+	lsi.registerMethod("Creature", "getSummons", luaCreatureGetSummons);
 
-	i.registerMethod("Creature", "getDescription", luaCreatureGetDescription);
+	lsi.registerMethod("Creature", "getDescription", luaCreatureGetDescription);
 
-	i.registerMethod("Creature", "getPathTo", luaCreatureGetPathTo);
-	i.registerMethod("Creature", "move", luaCreatureMove);
+	lsi.registerMethod("Creature", "getPathTo", luaCreatureGetPathTo);
+	lsi.registerMethod("Creature", "move", luaCreatureMove);
 
-	i.registerMethod("Creature", "getZone", luaCreatureGetZone);
+	lsi.registerMethod("Creature", "getZone", luaCreatureGetZone);
 
-	i.registerMethod("Creature", "hasIcon", luaCreatureHasIcon);
-	i.registerMethod("Creature", "setIcon", luaCreatureSetIcon);
-	i.registerMethod("Creature", "getIcon", luaCreatureGetIcon);
-	i.registerMethod("Creature", "removeIcon", luaCreatureRemoveIcon);
+	lsi.registerMethod("Creature", "hasIcon", luaCreatureHasIcon);
+	lsi.registerMethod("Creature", "setIcon", luaCreatureSetIcon);
+	lsi.registerMethod("Creature", "getIcon", luaCreatureGetIcon);
+	lsi.registerMethod("Creature", "removeIcon", luaCreatureRemoveIcon);
 
-	i.registerMethod("Creature", "getStorageValue", luaCreatureGetStorageValue);
-	i.registerMethod("Creature", "setStorageValue", luaCreatureSetStorageValue);
+	lsi.registerMethod("Creature", "getStorageValue", luaCreatureGetStorageValue);
+	lsi.registerMethod("Creature", "setStorageValue", luaCreatureSetStorageValue);
 }

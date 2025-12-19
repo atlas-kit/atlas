@@ -339,33 +339,33 @@ int luaMonsterSpellSetOutfit(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerMonsterSpell(LuaScriptInterface& i)
+void tfs::lua::registerMonsterSpell(LuaScriptInterface& lsi)
 {
-	i.registerClass("MonsterSpell", "", luaCreateMonsterSpell);
-	i.registerMetaMethod("MonsterSpell", "__gc", luaDeleteMonsterSpell);
-	i.registerMethod("MonsterSpell", "delete", luaDeleteMonsterSpell);
+	lsi.registerClass("MonsterSpell", "", luaCreateMonsterSpell);
+	lsi.registerMetaMethod("MonsterSpell", "__gc", luaDeleteMonsterSpell);
+	lsi.registerMethod("MonsterSpell", "delete", luaDeleteMonsterSpell);
 
-	i.registerMethod("MonsterSpell", "setType", luaMonsterSpellSetType);
-	i.registerMethod("MonsterSpell", "setScriptName", luaMonsterSpellSetScriptName);
-	i.registerMethod("MonsterSpell", "setChance", luaMonsterSpellSetChance);
-	i.registerMethod("MonsterSpell", "setInterval", luaMonsterSpellSetInterval);
-	i.registerMethod("MonsterSpell", "setRange", luaMonsterSpellSetRange);
-	i.registerMethod("MonsterSpell", "setCombatValue", luaMonsterSpellSetCombatValue);
-	i.registerMethod("MonsterSpell", "setCombatType", luaMonsterSpellSetCombatType);
-	i.registerMethod("MonsterSpell", "setAttackValue", luaMonsterSpellSetAttackValue);
-	i.registerMethod("MonsterSpell", "setNeedTarget", luaMonsterSpellSetNeedTarget);
-	i.registerMethod("MonsterSpell", "setNeedDirection", luaMonsterSpellSetNeedDirection);
-	i.registerMethod("MonsterSpell", "setCombatLength", luaMonsterSpellSetCombatLength);
-	i.registerMethod("MonsterSpell", "setCombatSpread", luaMonsterSpellSetCombatSpread);
-	i.registerMethod("MonsterSpell", "setCombatRadius", luaMonsterSpellSetCombatRadius);
-	i.registerMethod("MonsterSpell", "setCombatRing", luaMonsterSpellSetCombatRing);
-	i.registerMethod("MonsterSpell", "setConditionType", luaMonsterSpellSetConditionType);
-	i.registerMethod("MonsterSpell", "setConditionDamage", luaMonsterSpellSetConditionDamage);
-	i.registerMethod("MonsterSpell", "setConditionSpeedChange", luaMonsterSpellSetConditionSpeedChange);
-	i.registerMethod("MonsterSpell", "setConditionDuration", luaMonsterSpellSetConditionDuration);
-	i.registerMethod("MonsterSpell", "setConditionDrunkenness", luaMonsterSpellSetConditionDrunkenness);
-	i.registerMethod("MonsterSpell", "setConditionTickInterval", luaMonsterSpellSetConditionTickInterval);
-	i.registerMethod("MonsterSpell", "setCombatShootEffect", luaMonsterSpellSetCombatShootEffect);
-	i.registerMethod("MonsterSpell", "setCombatEffect", luaMonsterSpellSetCombatEffect);
-	i.registerMethod("MonsterSpell", "setOutfit", luaMonsterSpellSetOutfit);
+	lsi.registerMethod("MonsterSpell", "setType", luaMonsterSpellSetType);
+	lsi.registerMethod("MonsterSpell", "setScriptName", luaMonsterSpellSetScriptName);
+	lsi.registerMethod("MonsterSpell", "setChance", luaMonsterSpellSetChance);
+	lsi.registerMethod("MonsterSpell", "setInterval", luaMonsterSpellSetInterval);
+	lsi.registerMethod("MonsterSpell", "setRange", luaMonsterSpellSetRange);
+	lsi.registerMethod("MonsterSpell", "setCombatValue", luaMonsterSpellSetCombatValue);
+	lsi.registerMethod("MonsterSpell", "setCombatType", luaMonsterSpellSetCombatType);
+	lsi.registerMethod("MonsterSpell", "setAttackValue", luaMonsterSpellSetAttackValue);
+	lsi.registerMethod("MonsterSpell", "setNeedTarget", luaMonsterSpellSetNeedTarget);
+	lsi.registerMethod("MonsterSpell", "setNeedDirection", luaMonsterSpellSetNeedDirection);
+	lsi.registerMethod("MonsterSpell", "setCombatLength", luaMonsterSpellSetCombatLength);
+	lsi.registerMethod("MonsterSpell", "setCombatSpread", luaMonsterSpellSetCombatSpread);
+	lsi.registerMethod("MonsterSpell", "setCombatRadius", luaMonsterSpellSetCombatRadius);
+	lsi.registerMethod("MonsterSpell", "setCombatRing", luaMonsterSpellSetCombatRing);
+	lsi.registerMethod("MonsterSpell", "setConditionType", luaMonsterSpellSetConditionType);
+	lsi.registerMethod("MonsterSpell", "setConditionDamage", luaMonsterSpellSetConditionDamage);
+	lsi.registerMethod("MonsterSpell", "setConditionSpeedChange", luaMonsterSpellSetConditionSpeedChange);
+	lsi.registerMethod("MonsterSpell", "setConditionDuration", luaMonsterSpellSetConditionDuration);
+	lsi.registerMethod("MonsterSpell", "setConditionDrunkenness", luaMonsterSpellSetConditionDrunkenness);
+	lsi.registerMethod("MonsterSpell", "setConditionTickInterval", luaMonsterSpellSetConditionTickInterval);
+	lsi.registerMethod("MonsterSpell", "setCombatShootEffect", luaMonsterSpellSetCombatShootEffect);
+	lsi.registerMethod("MonsterSpell", "setCombatEffect", luaMonsterSpellSetCombatEffect);
+	lsi.registerMethod("MonsterSpell", "setOutfit", luaMonsterSpellSetOutfit);
 }

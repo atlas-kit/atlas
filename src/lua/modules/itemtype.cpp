@@ -948,7 +948,7 @@ int luaItemTypeIsStoreItem(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerItemType(LuaScriptInterface& i)
+void tfs::lua::registerItemType(LuaScriptInterface& lsi)
 {
 	registerEnum(i, ITEM_TYPE_DEPOT);
 	registerEnum(i, ITEM_TYPE_MAILBOX);
@@ -992,83 +992,83 @@ void tfs::lua::registerItemType(LuaScriptInterface& i)
 	registerEnum(i, SLOTP_DEPOT);
 	registerEnum(i, SLOTP_TWO_HAND);
 
-	i.registerClass("ItemType", "", luaItemTypeCreate);
-	i.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerClass("ItemType", "", luaItemTypeCreate);
+	lsi.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);
 
-	i.registerMethod("ItemType", "isCorpse", luaItemTypeIsCorpse);
-	i.registerMethod("ItemType", "isDoor", luaItemTypeIsDoor);
-	i.registerMethod("ItemType", "isContainer", luaItemTypeIsContainer);
-	i.registerMethod("ItemType", "isFluidContainer", luaItemTypeIsFluidContainer);
-	i.registerMethod("ItemType", "isMovable", luaItemTypeIsMovable);
-	i.registerMethod("ItemType", "isRune", luaItemTypeIsRune);
-	i.registerMethod("ItemType", "isStackable", luaItemTypeIsStackable);
-	i.registerMethod("ItemType", "isReadable", luaItemTypeIsReadable);
-	i.registerMethod("ItemType", "isWritable", luaItemTypeIsWritable);
-	i.registerMethod("ItemType", "isBlocking", luaItemTypeIsBlocking);
-	i.registerMethod("ItemType", "isGroundTile", luaItemTypeIsGroundTile);
-	i.registerMethod("ItemType", "isMagicField", luaItemTypeIsMagicField);
-	i.registerMethod("ItemType", "isUseable", luaItemTypeIsUseable);
-	i.registerMethod("ItemType", "isPickupable", luaItemTypeIsPickupable);
-	i.registerMethod("ItemType", "isRotatable", luaItemTypeIsRotatable);
+	lsi.registerMethod("ItemType", "isCorpse", luaItemTypeIsCorpse);
+	lsi.registerMethod("ItemType", "isDoor", luaItemTypeIsDoor);
+	lsi.registerMethod("ItemType", "isContainer", luaItemTypeIsContainer);
+	lsi.registerMethod("ItemType", "isFluidContainer", luaItemTypeIsFluidContainer);
+	lsi.registerMethod("ItemType", "isMovable", luaItemTypeIsMovable);
+	lsi.registerMethod("ItemType", "isRune", luaItemTypeIsRune);
+	lsi.registerMethod("ItemType", "isStackable", luaItemTypeIsStackable);
+	lsi.registerMethod("ItemType", "isReadable", luaItemTypeIsReadable);
+	lsi.registerMethod("ItemType", "isWritable", luaItemTypeIsWritable);
+	lsi.registerMethod("ItemType", "isBlocking", luaItemTypeIsBlocking);
+	lsi.registerMethod("ItemType", "isGroundTile", luaItemTypeIsGroundTile);
+	lsi.registerMethod("ItemType", "isMagicField", luaItemTypeIsMagicField);
+	lsi.registerMethod("ItemType", "isUseable", luaItemTypeIsUseable);
+	lsi.registerMethod("ItemType", "isPickupable", luaItemTypeIsPickupable);
+	lsi.registerMethod("ItemType", "isRotatable", luaItemTypeIsRotatable);
 
-	i.registerMethod("ItemType", "getType", luaItemTypeGetType);
-	i.registerMethod("ItemType", "getGroup", luaItemTypeGetGroup);
-	i.registerMethod("ItemType", "getId", luaItemTypeGetId);
-	i.registerMethod("ItemType", "getClientId", luaItemTypeGetClientId);
-	i.registerMethod("ItemType", "getName", luaItemTypeGetName);
-	i.registerMethod("ItemType", "getPluralName", luaItemTypeGetPluralName);
-	i.registerMethod("ItemType", "getRotateTo", luaItemTypeGetRotateTo);
-	i.registerMethod("ItemType", "getArticle", luaItemTypeGetArticle);
-	i.registerMethod("ItemType", "getDescription", luaItemTypeGetDescription);
-	i.registerMethod("ItemType", "getSlotPosition", luaItemTypeGetSlotPosition);
+	lsi.registerMethod("ItemType", "getType", luaItemTypeGetType);
+	lsi.registerMethod("ItemType", "getGroup", luaItemTypeGetGroup);
+	lsi.registerMethod("ItemType", "getId", luaItemTypeGetId);
+	lsi.registerMethod("ItemType", "getClientId", luaItemTypeGetClientId);
+	lsi.registerMethod("ItemType", "getName", luaItemTypeGetName);
+	lsi.registerMethod("ItemType", "getPluralName", luaItemTypeGetPluralName);
+	lsi.registerMethod("ItemType", "getRotateTo", luaItemTypeGetRotateTo);
+	lsi.registerMethod("ItemType", "getArticle", luaItemTypeGetArticle);
+	lsi.registerMethod("ItemType", "getDescription", luaItemTypeGetDescription);
+	lsi.registerMethod("ItemType", "getSlotPosition", luaItemTypeGetSlotPosition);
 
-	i.registerMethod("ItemType", "getCharges", luaItemTypeGetCharges);
-	i.registerMethod("ItemType", "getFluidSource", luaItemTypeGetFluidSource);
-	i.registerMethod("ItemType", "getCapacity", luaItemTypeGetCapacity);
-	i.registerMethod("ItemType", "getWeight", luaItemTypeGetWeight);
-	i.registerMethod("ItemType", "getWorth", luaItemTypeGetWorth);
+	lsi.registerMethod("ItemType", "getCharges", luaItemTypeGetCharges);
+	lsi.registerMethod("ItemType", "getFluidSource", luaItemTypeGetFluidSource);
+	lsi.registerMethod("ItemType", "getCapacity", luaItemTypeGetCapacity);
+	lsi.registerMethod("ItemType", "getWeight", luaItemTypeGetWeight);
+	lsi.registerMethod("ItemType", "getWorth", luaItemTypeGetWorth);
 
-	i.registerMethod("ItemType", "getHitChance", luaItemTypeGetHitChance);
-	i.registerMethod("ItemType", "getShootRange", luaItemTypeGetShootRange);
+	lsi.registerMethod("ItemType", "getHitChance", luaItemTypeGetHitChance);
+	lsi.registerMethod("ItemType", "getShootRange", luaItemTypeGetShootRange);
 
-	i.registerMethod("ItemType", "getAttack", luaItemTypeGetAttack);
-	i.registerMethod("ItemType", "getAttackSpeed", luaItemTypeGetAttackSpeed);
-	i.registerMethod("ItemType", "getDefense", luaItemTypeGetDefense);
-	i.registerMethod("ItemType", "getExtraDefense", luaItemTypeGetExtraDefense);
-	i.registerMethod("ItemType", "getArmor", luaItemTypeGetArmor);
-	i.registerMethod("ItemType", "getWeaponType", luaItemTypeGetWeaponType);
+	lsi.registerMethod("ItemType", "getAttack", luaItemTypeGetAttack);
+	lsi.registerMethod("ItemType", "getAttackSpeed", luaItemTypeGetAttackSpeed);
+	lsi.registerMethod("ItemType", "getDefense", luaItemTypeGetDefense);
+	lsi.registerMethod("ItemType", "getExtraDefense", luaItemTypeGetExtraDefense);
+	lsi.registerMethod("ItemType", "getArmor", luaItemTypeGetArmor);
+	lsi.registerMethod("ItemType", "getWeaponType", luaItemTypeGetWeaponType);
 
-	i.registerMethod("ItemType", "getElementType", luaItemTypeGetElementType);
-	i.registerMethod("ItemType", "getElementDamage", luaItemTypeGetElementDamage);
+	lsi.registerMethod("ItemType", "getElementType", luaItemTypeGetElementType);
+	lsi.registerMethod("ItemType", "getElementDamage", luaItemTypeGetElementDamage);
 
-	i.registerMethod("ItemType", "getTransformEquipId", luaItemTypeGetTransformEquipId);
-	i.registerMethod("ItemType", "getTransformDeEquipId", luaItemTypeGetTransformDeEquipId);
-	i.registerMethod("ItemType", "getDestroyId", luaItemTypeGetDestroyId);
-	i.registerMethod("ItemType", "getDecayId", luaItemTypeGetDecayId);
-	i.registerMethod("ItemType", "getRequiredLevel", luaItemTypeGetRequiredLevel);
-	i.registerMethod("ItemType", "getAmmoType", luaItemTypeGetAmmoType);
-	i.registerMethod("ItemType", "getCorpseType", luaItemTypeGetCorpseType);
-	i.registerMethod("ItemType", "getClassification", luaItemTypeGetClassification);
+	lsi.registerMethod("ItemType", "getTransformEquipId", luaItemTypeGetTransformEquipId);
+	lsi.registerMethod("ItemType", "getTransformDeEquipId", luaItemTypeGetTransformDeEquipId);
+	lsi.registerMethod("ItemType", "getDestroyId", luaItemTypeGetDestroyId);
+	lsi.registerMethod("ItemType", "getDecayId", luaItemTypeGetDecayId);
+	lsi.registerMethod("ItemType", "getRequiredLevel", luaItemTypeGetRequiredLevel);
+	lsi.registerMethod("ItemType", "getAmmoType", luaItemTypeGetAmmoType);
+	lsi.registerMethod("ItemType", "getCorpseType", luaItemTypeGetCorpseType);
+	lsi.registerMethod("ItemType", "getClassification", luaItemTypeGetClassification);
 
-	i.registerMethod("ItemType", "getAbilities", luaItemTypeGetAbilities);
+	lsi.registerMethod("ItemType", "getAbilities", luaItemTypeGetAbilities);
 
-	i.registerMethod("ItemType", "hasShowAttributes", luaItemTypeHasShowAttributes);
-	i.registerMethod("ItemType", "hasShowCount", luaItemTypeHasShowCount);
-	i.registerMethod("ItemType", "hasShowCharges", luaItemTypeHasShowCharges);
-	i.registerMethod("ItemType", "hasShowDuration", luaItemTypeHasShowDuration);
-	i.registerMethod("ItemType", "hasAllowDistRead", luaItemTypeHasAllowDistRead);
-	i.registerMethod("ItemType", "getWieldInfo", luaItemTypeGetWieldInfo);
-	i.registerMethod("ItemType", "getDurationMin", luaItemTypeGetDurationMin);
-	i.registerMethod("ItemType", "getDurationMax", luaItemTypeGetDurationMax);
-	i.registerMethod("ItemType", "getLevelDoor", luaItemTypeGetLevelDoor);
-	i.registerMethod("ItemType", "getRuneSpellName", luaItemTypeGetRuneSpellName);
-	i.registerMethod("ItemType", "getVocationString", luaItemTypeGetVocationString);
-	i.registerMethod("ItemType", "getMinReqLevel", luaItemTypeGetMinReqLevel);
-	i.registerMethod("ItemType", "getMinReqMagicLevel", luaItemTypeGetMinReqMagicLevel);
-	i.registerMethod("ItemType", "getMarketBuyStatistics", luaItemTypeGetMarketBuyStatistics);
-	i.registerMethod("ItemType", "getMarketSellStatistics", luaItemTypeGetMarketSellStatistics);
+	lsi.registerMethod("ItemType", "hasShowAttributes", luaItemTypeHasShowAttributes);
+	lsi.registerMethod("ItemType", "hasShowCount", luaItemTypeHasShowCount);
+	lsi.registerMethod("ItemType", "hasShowCharges", luaItemTypeHasShowCharges);
+	lsi.registerMethod("ItemType", "hasShowDuration", luaItemTypeHasShowDuration);
+	lsi.registerMethod("ItemType", "hasAllowDistRead", luaItemTypeHasAllowDistRead);
+	lsi.registerMethod("ItemType", "getWieldInfo", luaItemTypeGetWieldInfo);
+	lsi.registerMethod("ItemType", "getDurationMin", luaItemTypeGetDurationMin);
+	lsi.registerMethod("ItemType", "getDurationMax", luaItemTypeGetDurationMax);
+	lsi.registerMethod("ItemType", "getLevelDoor", luaItemTypeGetLevelDoor);
+	lsi.registerMethod("ItemType", "getRuneSpellName", luaItemTypeGetRuneSpellName);
+	lsi.registerMethod("ItemType", "getVocationString", luaItemTypeGetVocationString);
+	lsi.registerMethod("ItemType", "getMinReqLevel", luaItemTypeGetMinReqLevel);
+	lsi.registerMethod("ItemType", "getMinReqMagicLevel", luaItemTypeGetMinReqMagicLevel);
+	lsi.registerMethod("ItemType", "getMarketBuyStatistics", luaItemTypeGetMarketBuyStatistics);
+	lsi.registerMethod("ItemType", "getMarketSellStatistics", luaItemTypeGetMarketSellStatistics);
 
-	i.registerMethod("ItemType", "hasSubType", luaItemTypeHasSubType);
+	lsi.registerMethod("ItemType", "hasSubType", luaItemTypeHasSubType);
 
-	i.registerMethod("ItemType", "isStoreItem", luaItemTypeIsStoreItem);
+	lsi.registerMethod("ItemType", "isStoreItem", luaItemTypeIsStoreItem);
 }
