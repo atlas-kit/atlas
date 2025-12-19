@@ -12,12 +12,15 @@ function talk.onSay(player, words, param)
         return false
     end
 
-    local position = Position(tonumber(split[1]), tonumber(split[2]), tonumber(split[3]))
-    if not position then
+    local x = tonumber(split[1])
+    local y = tonumber(split[2])
+    local z = tonumber(split[3])
+    if not x or not y or not z then
         player:sendCancelMessage("Invalid position values.")
         return false
     end
 
+    local position = Position(x, y, z)
     player:teleportTo(position)
     player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You have been teleported to position: " .. position.x .. ", " .. position.y .. ", " .. position.z)
     return false
