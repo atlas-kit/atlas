@@ -65,6 +65,7 @@ configManager = {}
 ---@field getMonsterTypes fun(): table
 ---@field getBestiary fun(): table
 ---@field getCurrencyItems fun(): table
+---@field getBedItemIds fun(): table
 ---@field getItemTypeByClientId fun(clientId: number): ItemType
 ---@field getMountIdByLookType fun(lookType: number): number
 ---@field getTowns fun(): table
@@ -221,6 +222,9 @@ ModalWindow = {}
 ---@field moveTo fun(self: Item, destination: Position|Thing)
 ---@field transform fun(self: Item, newItem: number|string, count?: number)
 ---@field decay fun(self: Item)
+---@field canUseBed fun(self: Item, player: Player): number
+---@field trySleep fun(self: Item, player: Player): boolean
+---@field sleep fun(self: Item, player: Player): boolean
 ---@field getSpecialDescription fun(self: Item): string
 ---@field hasProperty fun(self: Item, property: number): boolean
 ---@field isLoadedFromMap fun(self: Item): boolean
@@ -416,6 +420,8 @@ Creature = {}
 ---@field channelSay fun(self: Player, channelId: number, message: string)
 ---@field openChannel fun(self: Player, channelId: number)
 ---@field getSlotItem fun(self: Player, slot: number): Item
+---@field getBedItem fun(self: Player): Item
+---@field setBedItem fun(self: Player, item: Item|nil): boolean
 ---@field getParty fun(self: Player): Party
 ---@field addOutfit fun(self: Player, outfitId: number)
 ---@field addOutfitAddon fun(self: Player, outfitId: number, addonId: number)
