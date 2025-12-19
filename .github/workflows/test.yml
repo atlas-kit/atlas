@@ -35,6 +35,7 @@ jobs:
     env:
       CXX: g++-14
       VCPKG_BUILD_TYPE: release
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
 
     steps:
       - uses: actions/checkout@v6
@@ -61,7 +62,7 @@ jobs:
           LSAN_OPTIONS: exitcode=0
         with:
           configurePreset: vcpkg
-          configurePresetAdditionalArgs: "['-DASAN=ON', '-DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg']"
+          configurePresetAdditionalArgs: "['-DASAN=ON']"
           buildPreset: vcpkg
           buildPresetAdditionalArgs: "['--config', 'Debug']"
           testPreset: vcpkg

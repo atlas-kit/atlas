@@ -36,6 +36,7 @@ jobs:
 
     env:
       VCPKG_BUILD_TYPE: release
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
 
     steps:
       - uses: actions/checkout@v6
@@ -62,7 +63,6 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: vcpkg
-          configurePresetAdditionalArgs: "['-DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg']"
           buildPreset: vcpkg
 
       - name: Upload build logs
