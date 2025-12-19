@@ -1960,3 +1960,17 @@ uint16_t Items::getItemIdByName(const std::string& name)
 
 	return result->second;
 }
+
+std::vector<uint16_t> Items::getBedItemIds() const
+{
+	std::vector<uint16_t> bedIds;
+	bedIds.reserve(items.size());
+
+	for (size_t id = 0; id < items.size(); ++id) {
+		if (items[id].isBed()) {
+			bedIds.push_back(static_cast<uint16_t>(id));
+		}
+	}
+
+	return bedIds;
+}
