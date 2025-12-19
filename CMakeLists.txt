@@ -123,11 +123,6 @@ include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_D
 option(ENABLE_UNITY_BUILD "Enable unity build" ON)
 set(CMAKE_UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
-add_subdirectory(src)
-add_executable(tfs ${tfs_MAIN})
-target_link_libraries(tfs tfslib)
-target_precompile_headers(tfs PUBLIC src/otpch.h)
-
 include(CheckIPOSupported)
 check_ipo_supported(
     RESULT CMAKE_INTERPROCEDURAL_OPTIMIZATION
@@ -137,3 +132,5 @@ check_ipo_supported(
 if (NOT CMAKE_INTERPROCEDURAL_OPTIMIZATION)
     message(STATUS "IPO is not supported: ${INTERPROCEDURAL_OPTIMIZATION_ERROR}")
 endif ()
+
+add_subdirectory(src)

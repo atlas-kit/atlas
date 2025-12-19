@@ -186,6 +186,7 @@ add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR}
 
 add_executable(tfs ${tfs_MAIN})
 target_link_libraries(tfs PRIVATE tfslib)
+target_precompile_headers(tfs PUBLIC otpch.h)
 
 if (BUILD_TESTING)
     add_subdirectory(tests)
