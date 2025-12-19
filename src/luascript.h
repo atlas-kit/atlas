@@ -260,6 +260,7 @@ private:
 	static int luaGameGetMonsterTypes(lua_State* L);
 	static int luaGameGetBestiary(lua_State* L);
 	static int luaGameGetCurrencyItems(lua_State* L);
+	static int luaGameGetBedItemIds(lua_State* L);
 	static int luaGameGetItemTypeByClientId(lua_State* L);
 	static int luaGameGetMountIdByLookType(lua_State* L);
 
@@ -451,6 +452,9 @@ private:
 	static int luaItemMoveTo(lua_State* L);
 	static int luaItemTransform(lua_State* L);
 	static int luaItemDecay(lua_State* L);
+	static int luaItemCanUseBed(lua_State* L);
+	static int luaItemTrySleep(lua_State* L);
+	static int luaItemSleep(lua_State* L);
 
 	static int luaItemGetSpecialDescription(lua_State* L);
 
@@ -708,6 +712,8 @@ private:
 	static int luaPlayerLeaveChannel(lua_State* L);
 
 	static int luaPlayerGetSlotItem(lua_State* L);
+	static int luaPlayerGetBedItem(lua_State* L);
+	static int luaPlayerSetBedItem(lua_State* L);
 
 	static int luaPlayerGetParty(lua_State* L);
 
