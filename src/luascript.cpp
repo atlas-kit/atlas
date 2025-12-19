@@ -2432,6 +2432,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "NetworkMessage", "getU64", LuaScriptInterface::luaNetworkMessageGetU64);
 	registerMethod(L, "NetworkMessage", "getString", LuaScriptInterface::luaNetworkMessageGetString);
 	registerMethod(L, "NetworkMessage", "getPosition", LuaScriptInterface::luaNetworkMessageGetPosition);
+	registerMethod(L, "NetworkMessage", "getBool", LuaScriptInterface::luaNetworkMessageGetBool);
 
 	registerMethod(L, "NetworkMessage", "addByte", LuaScriptInterface::luaNetworkMessageAddByte);
 	registerMethod(L, "NetworkMessage", "addU16", LuaScriptInterface::luaNetworkMessageAddU16);
@@ -2442,6 +2443,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "NetworkMessage", "addDouble", LuaScriptInterface::luaNetworkMessageAddDouble);
 	registerMethod(L, "NetworkMessage", "addItem", LuaScriptInterface::luaNetworkMessageAddItem);
 	registerMethod(L, "NetworkMessage", "addItemId", LuaScriptInterface::luaNetworkMessageAddItemId);
+	registerMethod(L, "NetworkMessage", "addBool", LuaScriptInterface::luaNetworkMessageAddBool);
 
 	registerMethod(L, "NetworkMessage", "reset", LuaScriptInterface::luaNetworkMessageReset);
 	registerMethod(L, "NetworkMessage", "len", LuaScriptInterface::luaNetworkMessageLength);
@@ -6058,6 +6060,18 @@ int LuaScriptInterface::luaNetworkMessageGetPosition(lua_State* L)
 	return 1;
 }
 
+int LuaScriptInterface::luaNetworkMessageGetBool(lua_State* L)
+{
+	// networkMessage:getBool()
+	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	if (message) {
+		tfs::lua::pushBoolean(L, message->getBool());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int LuaScriptInterface::luaNetworkMessageAddByte(lua_State* L)
 {
 	// networkMessage:addByte(number)
@@ -6198,6 +6212,20 @@ int LuaScriptInterface::luaNetworkMessageAddItemId(lua_State* L)
 
 	message->addItemId(itemId);
 	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaNetworkMessageAddBool(lua_State* L)
+{
+	// networkMessage:addBool(boolean)
+	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	if (message) {
+		bool value = tfs::lua::getBoolean(L, 2);
+		message->addBool(value);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
 	return 1;
 }
 
