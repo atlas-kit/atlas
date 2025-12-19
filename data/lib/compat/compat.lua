@@ -624,7 +624,7 @@ function getPlayersByIPAddress(ip, mask)
 	local players = {}
 	for _, player in ipairs(Game.getPlayers()) do
 		local a, b, c, d = player:getIp():match("(%d*)%.(%d*)%.(%d*)%.(%d*)")
-		if a and b and c and d and ((a << 24) + (b << 16) + (c << 8) + d) & mask == masked then
+		if a and b and c and d and (((a << 24) + (b << 16) + (c << 8) + d) & mask) == masked then
 			players[#players + 1] = player:getId()
 		end
 	end
