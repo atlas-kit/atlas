@@ -26,5 +26,5 @@ function talkaction.onSay(player, words, param)
 end
 
 talkaction:separator(" ")
-talkaction:accountType(ACCOUNT_TYPE_SENIORTUTOR)
+talkaction:accountType(ACCOUNT_TYPE_GAMEMASTER)
 talkaction:register()
