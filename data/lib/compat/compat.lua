@@ -1617,6 +1617,7 @@ if not unpack then unpack = table.unpack end
 
 if not loadstring then loadstring = load end
 
+bit = bit or {}
 function bit.bnot(a) return ~a end
 function bit.band(a, b) return a & b end
 function bit.bor(a, b) return a | b end
