@@ -185,26 +185,6 @@ ReturnValue Actions::internalUseItem(const std::shared_ptr<Player>& player, cons
 		}
 	}
 
-	if (const auto& bed = item->getBed()) {
-		if (!bed->canUse(player)) {
-			if (!bed->getHouse()) {
-				return RETURNVALUE_YOUCANNOTUSETHISBED;
-			}
-
-			if (!player->isPremium()) {
-				return RETURNVALUE_YOUNEEDPREMIUMACCOUNT;
-			}
-			return RETURNVALUE_CANNOTUSETHISOBJECT;
-		}
-
-		if (bed->trySleep(player)) {
-			player->setBedItem(bed);
-			g_game.sendOfflineTrainingDialog(player);
-		}
-
-		return RETURNVALUE_NOERROR;
-	}
-
 	if (auto container = item->getContainer()) {
 		uint32_t corpseOwner = container->getCorpseOwner();
 		if (corpseOwner != 0 && !player->canOpenCorpse(corpseOwner)) {
