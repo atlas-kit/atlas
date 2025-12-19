@@ -2321,6 +2321,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "Game", "getMonsterTypes", LuaScriptInterface::luaGameGetMonsterTypes);
 	registerMethod(L, "Game", "getBestiary", LuaScriptInterface::luaGameGetBestiary);
 	registerMethod(L, "Game", "getCurrencyItems", LuaScriptInterface::luaGameGetCurrencyItems);
+	registerMethod(L, "Game", "getBedItemIds", LuaScriptInterface::luaGameGetBedItemIds);
 	registerMethod(L, "Game", "getItemTypeByClientId", LuaScriptInterface::luaGameGetItemTypeByClientId);
 	registerMethod(L, "Game", "getMountIdByLookType", LuaScriptInterface::luaGameGetMountIdByLookType);
 
@@ -2520,6 +2521,9 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "Item", "moveTo", LuaScriptInterface::luaItemMoveTo);
 	registerMethod(L, "Item", "transform", LuaScriptInterface::luaItemTransform);
 	registerMethod(L, "Item", "decay", LuaScriptInterface::luaItemDecay);
+	registerMethod(L, "Item", "canUseBed", LuaScriptInterface::luaItemCanUseBed);
+	registerMethod(L, "Item", "trySleep", LuaScriptInterface::luaItemTrySleep);
+	registerMethod(L, "Item", "sleep", LuaScriptInterface::luaItemSleep);
 
 	registerMethod(L, "Item", "getSpecialDescription", LuaScriptInterface::luaItemGetSpecialDescription);
 
@@ -2781,6 +2785,8 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "Player", "leaveChannel", LuaScriptInterface::luaPlayerLeaveChannel);
 
 	registerMethod(L, "Player", "getSlotItem", LuaScriptInterface::luaPlayerGetSlotItem);
+	registerMethod(L, "Player", "getBedItem", LuaScriptInterface::luaPlayerGetBedItem);
+	registerMethod(L, "Player", "setBedItem", LuaScriptInterface::luaPlayerSetBedItem);
 
 	registerMethod(L, "Player", "getParty", LuaScriptInterface::luaPlayerGetParty);
 
@@ -4586,6 +4592,20 @@ int LuaScriptInterface::luaGameGetCurrencyItems(lua_State* L)
 		tfs::lua::pushUserdata(L, &itemType);
 		tfs::lua::setMetatable(L, -1, "ItemType");
 		lua_rawseti(L, -2, size--);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGameGetBedItemIds(lua_State* L)
+{
+	// Game.getBedItemIds()
+	const auto bedIds = Item::items.getBedItemIds();
+	lua_createtable(L, bedIds.size(), 0);
+
+	int index = 0;
+	for (const auto id : bedIds) {
+		lua_pushnumber(L, id);
+		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
 }
@@ -7077,6 +7097,77 @@ int LuaScriptInterface::luaItemDecay(lua_State* L)
 	} else {
 		lua_pushnil(L);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaItemCanUseBed(lua_State* L)
+{
+	// item:canUseBed(player)
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 1);
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
+	if (!item || !player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto& bed = item->getBed();
+	if (!bed) {
+		tfs::lua::pushNumber(L, RETURNVALUE_NOTPOSSIBLE);
+		return 1;
+	}
+
+	ReturnValue ret = RETURNVALUE_NOERROR;
+	if (!bed->canUse(player)) {
+		if (!bed->getHouse()) {
+			ret = RETURNVALUE_YOUCANNOTUSETHISBED;
+		} else if (!player->isPremium()) {
+			ret = RETURNVALUE_YOUNEEDPREMIUMACCOUNT;
+		} else {
+			ret = RETURNVALUE_CANNOTUSETHISOBJECT;
+		}
+	}
+
+	tfs::lua::pushNumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaItemTrySleep(lua_State* L)
+{
+	// item:trySleep(player)
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 1);
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
+	if (!item || !player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto& bed = item->getBed();
+	if (!bed) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, bed->trySleep(player));
+	return 1;
+}
+
+int LuaScriptInterface::luaItemSleep(lua_State* L)
+{
+	// item:sleep(player)
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 1);
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
+	if (!item || !player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto& bed = item->getBed();
+	if (!bed) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, bed->sleep(player));
 	return 1;
 }
 
@@ -10131,6 +10222,58 @@ int LuaScriptInterface::luaPlayerGetSlotItem(lua_State* L)
 	} else {
 		lua_pushnil(L);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerGetBedItem(lua_State* L)
+{
+	// player:getBedItem()
+	const auto& player = tfs::lua::getSharedPtr<const Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto& bed = player->getBedItem();
+	if (!bed) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushSharedPtr(L, bed);
+	tfs::lua::setItemMetatable(L, -1, bed);
+	return 1;
+}
+
+int LuaScriptInterface::luaPlayerSetBedItem(lua_State* L)
+{
+	// player:setBedItem(item)
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	if (lua_isnil(L, 2)) {
+		player->setBedItem(nullptr);
+		tfs::lua::pushBoolean(L, true);
+		return 1;
+	}
+
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 2);
+	if (!item) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const auto& bed = item->getBed();
+	if (!bed) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	player->setBedItem(bed);
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
