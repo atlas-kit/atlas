@@ -188,9 +188,6 @@
     <ClCompile Include="..\src\items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\luascript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\mailbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -404,6 +401,9 @@
     <ClCompile Include="..\src\lua\modules\configmanager.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lua\script.cpp">
+      <Filter>Source Files\lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\http\http.h">
@@ -553,9 +553,6 @@
     <ClInclude Include="..\src\lockfree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\luascript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\mailbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -692,6 +689,9 @@
       <Filter>Header Files\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\register.h">
+      <Filter>Header Files\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\script.h">
       <Filter>Header Files\lua</Filter>
     </ClInclude>
   </ItemGroup>

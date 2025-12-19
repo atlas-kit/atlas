@@ -167,28 +167,12 @@ private:
 	static int luaResultNext(lua_State* L);
 	static int luaResultFree(lua_State* L);
 
-	// _G
-	static int luaIsType(lua_State* L);
-	static int luaRawGetMetatable(lua_State* L);
-
 	// os
 	static int luaSystemTime(lua_State* L);
 
 	// table
 	static int luaTableCreate(lua_State* L);
 	static int luaTablePack(lua_State* L);
-
-	// DB Insert
-	static int luaDBInsertCreate(lua_State* L);
-	static int luaDBInsertAddRow(lua_State* L);
-	static int luaDBInsertExecute(lua_State* L);
-	static int luaDBInsertDelete(lua_State* L);
-
-	// DB Transaction
-	static int luaDBTransactionCreate(lua_State* L);
-	static int luaDBTransactionDelete(lua_State* L);
-	static int luaDBTransactionBegin(lua_State* L);
-	static int luaDBTransactionCommit(lua_State* L);
 
 	//
 	std::string lastLuaError;
