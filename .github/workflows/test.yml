@@ -62,7 +62,7 @@ jobs:
           LSAN_OPTIONS: exitcode=0
         with:
           configurePreset: vcpkg
-          configurePresetAdditionalArgs: "['-DASAN=ON']"
+          configurePresetAdditionalArgs: "['-DBUILD_TESTING=ON', '-DENABLE_ASAN=ON']"
           buildPreset: vcpkg
           buildPresetAdditionalArgs: "['--config', 'Debug']"
           testPreset: vcpkg
