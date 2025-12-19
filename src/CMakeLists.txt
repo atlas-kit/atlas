@@ -1,5 +1,4 @@
 set(tfs_SRC
-	${CMAKE_CURRENT_LIST_DIR}/otpch.cpp
 	${CMAKE_CURRENT_LIST_DIR}/actions.cpp
 	${CMAKE_CURRENT_LIST_DIR}/ban.cpp
 	${CMAKE_CURRENT_LIST_DIR}/base64.cpp
@@ -180,7 +179,7 @@ if (APPLE)
 	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
 endif()
 
-if (HTTP)
+if (ENABLE_HTTP)
 	add_subdirectory(http)
 	target_link_libraries(tfslib PRIVATE http)
 endif ()
