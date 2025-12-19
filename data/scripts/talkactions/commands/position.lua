@@ -1,6 +1,6 @@
-local talk = TalkAction("/pos")
+local talkaction = TalkAction("/pos")
 
-function talk.onSay(player, words, param)
+function talkaction.onSay(player, words, param)
     if param == "" then
         player:sendCancelMessage("Command requires parameters. Usage: /pos x,y,z")
         return false
@@ -26,7 +26,7 @@ function talk.onSay(player, words, param)
     return false
 end
 
-talk:separator(" ")
-talk:access(true)
-talk:accountType(ACCOUNT_TYPE_GOD)
-talk:register()
+talkaction:separator(" ")
+talkaction:access(true)
+talkaction:accountType(ACCOUNT_TYPE_GOD)
+talkaction:register()
