@@ -11,8 +11,6 @@
 #include "player.h"
 #include "lua/env.h"
 
-using namespace tfs::lua;
-
 namespace {
 
 LuaScriptInterface scriptInterface{"Event Interface"};

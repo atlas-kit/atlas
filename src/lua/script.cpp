@@ -893,8 +893,6 @@ int LuaScriptInterface::luaIsScriptsInterface(lua_State* L)
 
 void LuaScriptInterface::registerFunctions()
 {
-	using namespace tfs::lua;
-
 	// isValidUID(uid)
 	lua_register(L, "isValidUID", LuaScriptInterface::luaIsValidUID);
 
