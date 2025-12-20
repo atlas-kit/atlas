@@ -14,6 +14,7 @@
 #include "spells.h"
 #include "tasks.h"
 
+extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Monsters g_monsters;
 

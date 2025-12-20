@@ -14,6 +14,7 @@
 
 extern Chat* g_chat;
 extern Game g_game;
+extern Scheduler g_scheduler;
 
 bool PrivateChatChannel::isInvited(uint32_t guid) const
 {
