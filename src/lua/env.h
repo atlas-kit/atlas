@@ -1,8 +1,6 @@
 #pragma once
 
-#include <lua.hpp>
-#include <memory>
-#include <unordered_map>
+#include "../database.h"
 
 class Container;
 class DBResult;

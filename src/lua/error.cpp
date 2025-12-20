@@ -1,9 +1,10 @@
+#include "../otpch.h"
+
 #include "error.h"
 
 #include "api.h"
 #include "env.h"
-
-#include <iostream>
+#include "script.h"
 
 namespace {
 

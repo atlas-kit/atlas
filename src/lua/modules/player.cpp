@@ -1,9 +1,101 @@
+#include "../../otpch.h"
+
+#include "../../player.h"
+
+#include "../../depotchest.h"
+#include "../../game.h"
+#include "../../inbox.h"
+#include "../../iologindata.h"
+#include "../../spells.h"
+#include "../../storeinbox.h"
+#include "../../vocation.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 
+extern Chat* g_chat;
+extern Game g_game;
+extern Spells* g_spells;
+extern Vocations g_vocations;
+
 namespace {
+
+int luaDoPlayerAddItem(lua_State* L)
+{
+	// doPlayerAddItem(cid, itemid, <optional: default: 1> count/subtype, <optional: default: 1> canDropOnMap)
+	// doPlayerAddItem(cid, itemid, <optional: default: 1> count, <optional: default: 1> canDropOnMap, <optional:
+	// default: 1>subtype)
+	const auto& player = tfs::lua::getPlayer(L, 1);
+	if (!player) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	uint16_t itemId = tfs::lua::getNumber<uint16_t>(L, 2);
+	int32_t count = tfs::lua::getNumber<int32_t>(L, 3, 1);
+	bool canDropOnMap = tfs::lua::getBoolean(L, 4, true);
+	uint16_t subType = tfs::lua::getNumber<uint16_t>(L, 5, 1);
+
+	const ItemType& it = Item::items[itemId];
+	int32_t itemCount;
+
+	auto parameters = lua_gettop(L);
+	if (parameters > 4) {
+		// subtype already supplied, count then is the amount
+		itemCount = std::max<int32_t>(1, count);
+	} else if (it.hasSubType()) {
+		if (it.stackable) {
+			itemCount = static_cast<int32_t>(std::ceil(static_cast<float>(count) / ITEM_STACK_SIZE));
+		} else {
+			itemCount = 1;
+		}
+		subType = count;
+	} else {
+		itemCount = std::max<int32_t>(1, count);
+	}
+
+	while (itemCount > 0) {
+		uint16_t stackCount = subType;
+		if (it.stackable && stackCount > ITEM_STACK_SIZE) {
+			stackCount = ITEM_STACK_SIZE;
+		}
+
+		const auto& newItem = Item::CreateItem(itemId, stackCount);
+		if (!newItem) {
+			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
+			tfs::lua::pushBoolean(L, false);
+			return 1;
+		}
+
+		if (it.stackable) {
+			subType -= stackCount;
+		}
+
+		ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
+		if (ret != RETURNVALUE_NOERROR) {
+			tfs::lua::pushBoolean(L, false);
+			return 1;
+		}
+
+		if (--itemCount == 0) {
+			if (newItem->hasParent()) {
+				uint32_t uid = tfs::lua::getScriptEnv()->addThing(newItem);
+				tfs::lua::pushNumber(L, uid);
+				return 1;
+			} else {
+				// stackable item stacked with existing object, newItem will be released
+				tfs::lua::pushBoolean(L, false);
+				return 1;
+			}
+		}
+	}
+
+	tfs::lua::pushBoolean(L, false);
+	return 1;
+}
 
 int luaPlayerCreate(lua_State* L)
 {
@@ -1873,9 +1965,9 @@ int luaPlayerGetHouse(lua_State* L)
 		return 1;
 	}
 
-	House* house = g_game.map.houses.getHouseByPlayerId(player->getGUID());
+	const auto& house = g_game.getHouseByPlayerId(player->getGUID());
 	if (house) {
-		tfs::lua::pushUserdata(L, house);
+		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {
 		lua_pushnil(L);
@@ -1892,7 +1984,7 @@ int luaPlayerSendHouseWindow(lua_State* L)
 		return 1;
 	}
 
-	House* house = tfs::lua::getUserdata<House>(L, 2);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 2);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -1913,7 +2005,7 @@ int luaPlayerSetEditHouse(lua_State* L)
 		return 1;
 	}
 
-	House* house = tfs::lua::getUserdata<House>(L, 2);
+	const auto& house = tfs::lua::getSharedPtr<House>(L, 2);
 	if (!house) {
 		lua_pushnil(L);
 		return 1;
@@ -2344,15 +2436,20 @@ int luaPlayerSendEnterMarket(lua_State* L)
 
 void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 {
-	registerEnum(i, FIGHTMODE_ATTACK);
-	registerEnum(i, FIGHTMODE_BALANCED);
-	registerEnum(i, FIGHTMODE_DEFENSE);
+	registerEnum(lsi, FIGHTMODE_ATTACK);
+	registerEnum(lsi, FIGHTMODE_BALANCED);
+	registerEnum(lsi, FIGHTMODE_DEFENSE);
 
-	registerEnum(i, RESOURCE_BANK_BALANCE);
-	registerEnum(i, RESOURCE_GOLD_EQUIPPED);
-	registerEnum(i, RESOURCE_PREY_WILDCARDS);
-	registerEnum(i, RESOURCE_DAILYREWARD_STREAK);
-	registerEnum(i, RESOURCE_DAILYREWARD_JOKERS);
+	registerEnum(lsi, RESOURCE_BANK_BALANCE);
+	registerEnum(lsi, RESOURCE_GOLD_EQUIPPED);
+	registerEnum(lsi, RESOURCE_PREY_WILDCARDS);
+	registerEnum(lsi, RESOURCE_DAILYREWARD_STREAK);
+	registerEnum(lsi, RESOURCE_DAILYREWARD_JOKERS);
+
+	// doPlayerAddItem(uid, itemid, <optional: default: 1> count/subtype)
+	// doPlayerAddItem(cid, itemid, <optional: default: 1> count, <optional: default: 1> canDropOnMap, <optional:
+	// default: 1>subtype) Returns uid of the created item
+	lsi.registerGlobalMethod("doPlayerAddItem", luaDoPlayerAddItem);
 
 	lsi.registerClass("Player", "Creature", luaPlayerCreate);
 	lsi.registerMetaMethod("Player", "__eq", tfs::lua::luaUserdataCompare);

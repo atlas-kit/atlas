@@ -1,7 +1,15 @@
+#include "../../otpch.h"
+
+#include "../../actions.h"
+#include "../../script.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Actions* g_actions;
+extern Scripts* g_scripts;
 
 namespace {
 

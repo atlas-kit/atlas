@@ -1,7 +1,16 @@
+#include "../../otpch.h"
+
+#include "../../talkaction.h"
+
+#include "../../script.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Scripts* g_scripts;
+extern TalkActions* g_talkActions;
 
 namespace {
 

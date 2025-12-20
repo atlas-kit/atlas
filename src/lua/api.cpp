@@ -1,3 +1,5 @@
+#include "../otpch.h"
+
 #include "api.h"
 
 #include "../game.h"
@@ -7,9 +9,7 @@
 #include "../npc.h"
 #include "../podium.h"
 #include "../spells.h"
-#include "../town.h"
 #include "../teleport.h"
-#include "api.h"
 #include "env.h"
 #include "meta.h"
 

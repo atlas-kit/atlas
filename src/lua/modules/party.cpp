@@ -1,11 +1,19 @@
+#include "../../otpch.h"
+
+#include "../../party.h"
+
+#include "../../game.h"
+#include "../../player.h"
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 
+extern Game g_game;
+
 namespace {
 
-	int32_t luaPartyCreate(lua_State* L)
+int32_t luaPartyCreate(lua_State* L)
 {
 	// Party(userdata)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);

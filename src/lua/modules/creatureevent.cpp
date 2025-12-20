@@ -1,8 +1,16 @@
+#include "../../otpch.h"
+
+#include "../../creatureevent.h"
+
+#include "../../script.h"
 #include "../api.h"
 #include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern CreatureEvents* g_creatureEvents;
+extern Scripts* g_scripts;
 
 namespace {
 
@@ -105,20 +113,20 @@ int luaCreatureEventOnCallback(lua_State* L)
 
 void tfs::lua::registerCreatureEvent(LuaScriptInterface& lsi)
 {
-	registerEnum(i, CREATURE_EVENT_NONE);
-	registerEnum(i, CREATURE_EVENT_LOGIN);
-	registerEnum(i, CREATURE_EVENT_LOGOUT);
-	registerEnum(i, CREATURE_EVENT_RECONNECT);
-	registerEnum(i, CREATURE_EVENT_THINK);
-	registerEnum(i, CREATURE_EVENT_PREPAREDEATH);
-	registerEnum(i, CREATURE_EVENT_DEATH);
-	registerEnum(i, CREATURE_EVENT_KILL);
-	registerEnum(i, CREATURE_EVENT_ADVANCE);
-	registerEnum(i, CREATURE_EVENT_MODALWINDOW);
-	registerEnum(i, CREATURE_EVENT_TEXTEDIT);
-	registerEnum(i, CREATURE_EVENT_HEALTHCHANGE);
-	registerEnum(i, CREATURE_EVENT_MANACHANGE);
-	registerEnum(i, CREATURE_EVENT_EXTENDED_OPCODE);
+	registerEnum(lsi, CREATURE_EVENT_NONE);
+	registerEnum(lsi, CREATURE_EVENT_LOGIN);
+	registerEnum(lsi, CREATURE_EVENT_LOGOUT);
+	registerEnum(lsi, CREATURE_EVENT_RECONNECT);
+	registerEnum(lsi, CREATURE_EVENT_THINK);
+	registerEnum(lsi, CREATURE_EVENT_PREPAREDEATH);
+	registerEnum(lsi, CREATURE_EVENT_DEATH);
+	registerEnum(lsi, CREATURE_EVENT_KILL);
+	registerEnum(lsi, CREATURE_EVENT_ADVANCE);
+	registerEnum(lsi, CREATURE_EVENT_MODALWINDOW);
+	registerEnum(lsi, CREATURE_EVENT_TEXTEDIT);
+	registerEnum(lsi, CREATURE_EVENT_HEALTHCHANGE);
+	registerEnum(lsi, CREATURE_EVENT_MANACHANGE);
+	registerEnum(lsi, CREATURE_EVENT_EXTENDED_OPCODE);
 
 	lsi.registerClass("CreatureEvent", "", luaCreateCreatureEvent);
 	lsi.registerMethod("CreatureEvent", "type", luaCreatureEventType);

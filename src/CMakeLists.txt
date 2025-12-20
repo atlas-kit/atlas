@@ -33,7 +33,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.cpp
 	${CMAKE_CURRENT_LIST_DIR}/item.cpp
 	${CMAKE_CURRENT_LIST_DIR}/items.cpp
-	${CMAKE_CURRENT_LIST_DIR}/luascript.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/map.cpp
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.cpp
@@ -114,7 +113,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/itemloader.h
 	${CMAKE_CURRENT_LIST_DIR}/items.h
 	${CMAKE_CURRENT_LIST_DIR}/lockfree.h
-	${CMAKE_CURRENT_LIST_DIR}/luascript.h
 	${CMAKE_CURRENT_LIST_DIR}/luavariant.h
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.h
 	${CMAKE_CURRENT_LIST_DIR}/map.h

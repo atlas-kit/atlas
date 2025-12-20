@@ -1,7 +1,17 @@
+#include "../../otpch.h"
+
+#include "../../globalevent.h"
+
+#include "../../script.h"
+#include "../../tools.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern GlobalEvents* g_globalEvents;
+extern Scripts* g_scripts;
 
 namespace {
 

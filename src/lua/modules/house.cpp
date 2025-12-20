@@ -1,15 +1,27 @@
+#include "../../otpch.h"
+
+#include "../../house.h"
+
+#include "../../bed.h"
+#include "../../game.h"
+#include "../../housetile.h"
+#include "../../iologindata.h"
+#include "../../iomapserialize.h"
+#include "../../player.h"
+#include "../../town.h"
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
-#include "../../house.h"
+
+extern Game g_game;
 
 namespace {
 
 int luaHouseCreate(lua_State* L)
 {
 	// House(id)
-	House* house = g_game.getHouse(tfs::lua::getNumber<uint32_t>(L, 2));
+	const auto& house = g_game.getHouseById(tfs::lua::getNumber<uint32_t>(L, 2));
 	if (house) {
 		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
@@ -212,7 +224,7 @@ int luaHouseStartTrade(lua_State* L)
 		return 1;
 	}
 
-	if (g_game.map.houses.getHouseByPlayerId(tradePartner->getGUID())) {
+	if (g_game.getHouseByPlayerId(tradePartner->getGUID())) {
 		tfs::lua::pushNumber(L, RETURNVALUE_TRADEPLAYERALREADYOWNSAHOUSE);
 		return 1;
 	}
@@ -459,8 +471,8 @@ int luaHouseSave(lua_State* L)
 
 void tfs::lua::registerHouse(LuaScriptInterface& lsi)
 {
-	registerEnum(i, GUEST_LIST);
-	registerEnum(i, SUBOWNER_LIST);
+	registerEnum(lsi, GUEST_LIST);
+	registerEnum(lsi, SUBOWNER_LIST);
 
 	lsi.registerClass("House", "", luaHouseCreate);
 	lsi.registerMetaMethod("House", "__eq", tfs::lua::luaUserdataCompare);

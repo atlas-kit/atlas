@@ -580,11 +580,11 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(L, "doSellItem", NpcScriptInterface::luaDoSellItem);
 
 	// metatable
-	tfs::lua::registerMethod(L, "Npc", "getParameter", NpcScriptInterface::luaNpcGetParameter);
-	tfs::lua::registerMethod(L, "Npc", "setFocus", NpcScriptInterface::luaNpcSetFocus);
+	registerMethod("Npc", "getParameter", NpcScriptInterface::luaNpcGetParameter);
+	registerMethod("Npc", "setFocus", NpcScriptInterface::luaNpcSetFocus);
 
-	tfs::lua::registerMethod(L, "Npc", "openShopWindow", NpcScriptInterface::luaNpcOpenShopWindow);
-	tfs::lua::registerMethod(L, "Npc", "closeShopWindow", NpcScriptInterface::luaNpcCloseShopWindow);
+	registerMethod("Npc", "openShopWindow", NpcScriptInterface::luaNpcOpenShopWindow);
+	registerMethod("Npc", "closeShopWindow", NpcScriptInterface::luaNpcCloseShopWindow);
 }
 
 int NpcScriptInterface::luaActionSay(lua_State* L)

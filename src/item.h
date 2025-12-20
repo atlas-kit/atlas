@@ -6,7 +6,7 @@
 
 #include "items.h"
 #include "lua/api.h"
-#include "luascript.h"
+#include "lua/script.h"
 #include "thing.h"
 
 class BedItem;

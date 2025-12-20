@@ -1,5 +1,7 @@
+#include "../../otpch.h"
+
+#include "../../thing.h"
 #include "../api.h"
-#include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 

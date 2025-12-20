@@ -1,7 +1,15 @@
+#include "../../otpch.h"
+
+#include "../../spells.h"
+#include "../../vocation.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Spells* g_spells;
+extern Vocations g_vocations;
 
 namespace {
 

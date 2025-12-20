@@ -1,4 +1,10 @@
+#include "../../otpch.h"
+
+#include "../../iomarket.h"
+#include "../../item.h"
+#include "../../items.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
@@ -950,47 +956,47 @@ int luaItemTypeIsStoreItem(lua_State* L)
 
 void tfs::lua::registerItemType(LuaScriptInterface& lsi)
 {
-	registerEnum(i, ITEM_TYPE_DEPOT);
-	registerEnum(i, ITEM_TYPE_MAILBOX);
-	registerEnum(i, ITEM_TYPE_TRASHHOLDER);
-	registerEnum(i, ITEM_TYPE_CONTAINER);
-	registerEnum(i, ITEM_TYPE_DOOR);
-	registerEnum(i, ITEM_TYPE_MAGICFIELD);
-	registerEnum(i, ITEM_TYPE_TELEPORT);
-	registerEnum(i, ITEM_TYPE_BED);
-	registerEnum(i, ITEM_TYPE_KEY);
-	registerEnum(i, ITEM_TYPE_RUNE);
-	registerEnum(i, ITEM_TYPE_PODIUM);
+	registerEnum(lsi, ITEM_TYPE_DEPOT);
+	registerEnum(lsi, ITEM_TYPE_MAILBOX);
+	registerEnum(lsi, ITEM_TYPE_TRASHHOLDER);
+	registerEnum(lsi, ITEM_TYPE_CONTAINER);
+	registerEnum(lsi, ITEM_TYPE_DOOR);
+	registerEnum(lsi, ITEM_TYPE_MAGICFIELD);
+	registerEnum(lsi, ITEM_TYPE_TELEPORT);
+	registerEnum(lsi, ITEM_TYPE_BED);
+	registerEnum(lsi, ITEM_TYPE_KEY);
+	registerEnum(lsi, ITEM_TYPE_RUNE);
+	registerEnum(lsi, ITEM_TYPE_PODIUM);
 
-	registerEnum(i, ITEM_GROUP_GROUND);
-	registerEnum(i, ITEM_GROUP_CONTAINER);
-	registerEnum(i, ITEM_GROUP_WEAPON);
-	registerEnum(i, ITEM_GROUP_AMMUNITION);
-	registerEnum(i, ITEM_GROUP_ARMOR);
-	registerEnum(i, ITEM_GROUP_CHARGES);
-	registerEnum(i, ITEM_GROUP_TELEPORT);
-	registerEnum(i, ITEM_GROUP_MAGICFIELD);
-	registerEnum(i, ITEM_GROUP_WRITEABLE);
-	registerEnum(i, ITEM_GROUP_KEY);
-	registerEnum(i, ITEM_GROUP_SPLASH);
-	registerEnum(i, ITEM_GROUP_FLUID);
-	registerEnum(i, ITEM_GROUP_DOOR);
-	registerEnum(i, ITEM_GROUP_DEPRECATED);
-	registerEnum(i, ITEM_GROUP_PODIUM);
+	registerEnum(lsi, ITEM_GROUP_GROUND);
+	registerEnum(lsi, ITEM_GROUP_CONTAINER);
+	registerEnum(lsi, ITEM_GROUP_WEAPON);
+	registerEnum(lsi, ITEM_GROUP_AMMUNITION);
+	registerEnum(lsi, ITEM_GROUP_ARMOR);
+	registerEnum(lsi, ITEM_GROUP_CHARGES);
+	registerEnum(lsi, ITEM_GROUP_TELEPORT);
+	registerEnum(lsi, ITEM_GROUP_MAGICFIELD);
+	registerEnum(lsi, ITEM_GROUP_WRITEABLE);
+	registerEnum(lsi, ITEM_GROUP_KEY);
+	registerEnum(lsi, ITEM_GROUP_SPLASH);
+	registerEnum(lsi, ITEM_GROUP_FLUID);
+	registerEnum(lsi, ITEM_GROUP_DOOR);
+	registerEnum(lsi, ITEM_GROUP_DEPRECATED);
+	registerEnum(lsi, ITEM_GROUP_PODIUM);
 
-	registerEnum(i, SLOTP_WHEREEVER);
-	registerEnum(i, SLOTP_HEAD);
-	registerEnum(i, SLOTP_NECKLACE);
-	registerEnum(i, SLOTP_BACKPACK);
-	registerEnum(i, SLOTP_ARMOR);
-	registerEnum(i, SLOTP_RIGHT);
-	registerEnum(i, SLOTP_LEFT);
-	registerEnum(i, SLOTP_LEGS);
-	registerEnum(i, SLOTP_FEET);
-	registerEnum(i, SLOTP_RING);
-	registerEnum(i, SLOTP_AMMO);
-	registerEnum(i, SLOTP_DEPOT);
-	registerEnum(i, SLOTP_TWO_HAND);
+	registerEnum(lsi, SLOTP_WHEREEVER);
+	registerEnum(lsi, SLOTP_HEAD);
+	registerEnum(lsi, SLOTP_NECKLACE);
+	registerEnum(lsi, SLOTP_BACKPACK);
+	registerEnum(lsi, SLOTP_ARMOR);
+	registerEnum(lsi, SLOTP_RIGHT);
+	registerEnum(lsi, SLOTP_LEFT);
+	registerEnum(lsi, SLOTP_LEGS);
+	registerEnum(lsi, SLOTP_FEET);
+	registerEnum(lsi, SLOTP_RING);
+	registerEnum(lsi, SLOTP_AMMO);
+	registerEnum(lsi, SLOTP_DEPOT);
+	registerEnum(lsi, SLOTP_TWO_HAND);
 
 	lsi.registerClass("ItemType", "", luaItemTypeCreate);
 	lsi.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);

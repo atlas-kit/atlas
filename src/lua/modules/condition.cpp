@@ -1,3 +1,7 @@
+#include "../../otpch.h"
+
+#include "../../condition.h"
+
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"

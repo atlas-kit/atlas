@@ -1,7 +1,16 @@
+#include "../../otpch.h"
+
+#include "../../monster.h"
+
+#include "../../events.h"
+#include "../../game.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -59,7 +68,7 @@ int luaMonsterGetType(lua_State* L)
 {
 	// monster:getType()
 	if (const auto& monster = tfs::lua::getSharedPtr<const Monster>(L, 1)) {
-		tfs::lua::pushUserdata(L, monster->mType);
+		tfs::lua::pushUserdata(L, monster->getMonsterType());
 		tfs::lua::setMetatable(L, -1, "MonsterType");
 	} else {
 		lua_pushnil(L);
@@ -463,13 +472,13 @@ int luaMonsterRemoveIcon(lua_State* L)
 
 void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 {
-	registerEnum(i, MONSTER_ICON_VULNERABLE);
-	registerEnum(i, MONSTER_ICON_WEAKENED);
-	registerEnum(i, MONSTER_ICON_MELEE);
-	registerEnum(i, MONSTER_ICON_INFLUENCED);
-	registerEnum(i, MONSTER_ICON_FIENDISH);
-	registerEnum(i, MONSTER_ICON_FIRST);
-	registerEnum(i, MONSTER_ICON_LAST);
+	registerEnum(lsi, MONSTER_ICON_VULNERABLE);
+	registerEnum(lsi, MONSTER_ICON_WEAKENED);
+	registerEnum(lsi, MONSTER_ICON_MELEE);
+	registerEnum(lsi, MONSTER_ICON_INFLUENCED);
+	registerEnum(lsi, MONSTER_ICON_FIENDISH);
+	registerEnum(lsi, MONSTER_ICON_FIRST);
+	registerEnum(lsi, MONSTER_ICON_LAST);
 
 	lsi.registerClass("Monster", "Creature", luaMonsterCreate);
 	lsi.registerMetaMethod("Monster", "__eq", tfs::lua::luaUserdataCompare);

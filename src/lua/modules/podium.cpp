@@ -1,11 +1,19 @@
+#include "../../otpch.h"
+
+#include "../../podium.h"
+
+#include "../../game.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 
+extern Game g_game;
+
 namespace {
 
-	int luaPodiumCreate(lua_State* L)
+int luaPodiumCreate(lua_State* L)
 {
 	// Podium(uid)
 	uint32_t id = tfs::lua::getNumber<uint32_t>(L, 2);

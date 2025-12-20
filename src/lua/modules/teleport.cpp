@@ -1,4 +1,9 @@
+#include "../../otpch.h"
+
+#include "../../teleport.h"
+
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"

@@ -1,7 +1,15 @@
+#include "../../otpch.h"
+
+#include "../../script.h"
+#include "../../weapons.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Scripts* g_scripts;
+extern Weapons* g_weapons;
 
 namespace {
 

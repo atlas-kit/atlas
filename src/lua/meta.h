@@ -1,11 +1,7 @@
 #pragma once
 
-#include <lua.hpp>
-#include <memory>
-#include <string>
-
-class Item;
 class Creature;
+class Item;
 
 namespace tfs::lua {
 

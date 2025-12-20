@@ -1,7 +1,17 @@
+#include "../../otpch.h"
+
+#include "../../creature.h"
+
+#include "../../condition.h"
+#include "../../events.h"
+#include "../../game.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -1117,43 +1127,43 @@ int luaCreatureSetStorageValue(lua_State* L)
 
 void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 {
-	registerEnum(i, CONST_SLOT_HEAD);
-	registerEnum(i, CONST_SLOT_NECKLACE);
-	registerEnum(i, CONST_SLOT_BACKPACK);
-	registerEnum(i, CONST_SLOT_ARMOR);
-	registerEnum(i, CONST_SLOT_RIGHT);
-	registerEnum(i, CONST_SLOT_LEFT);
-	registerEnum(i, CONST_SLOT_LEGS);
-	registerEnum(i, CONST_SLOT_FEET);
-	registerEnum(i, CONST_SLOT_RING);
-	registerEnum(i, CONST_SLOT_AMMO);
+	registerEnum(lsi, CONST_SLOT_HEAD);
+	registerEnum(lsi, CONST_SLOT_NECKLACE);
+	registerEnum(lsi, CONST_SLOT_BACKPACK);
+	registerEnum(lsi, CONST_SLOT_ARMOR);
+	registerEnum(lsi, CONST_SLOT_RIGHT);
+	registerEnum(lsi, CONST_SLOT_LEFT);
+	registerEnum(lsi, CONST_SLOT_LEGS);
+	registerEnum(lsi, CONST_SLOT_FEET);
+	registerEnum(lsi, CONST_SLOT_RING);
+	registerEnum(lsi, CONST_SLOT_AMMO);
 
-	registerEnum(i, CREATURE_ID_MIN);
-	registerEnum(i, CREATURE_ID_MAX);
+	registerEnum(lsi, CREATURE_ID_MIN);
+	registerEnum(lsi, CREATURE_ID_MAX);
 
-	registerEnum(i, CREATURE_ICON_CROSS_WHITE);
-	registerEnum(i, CREATURE_ICON_CROSS_WHITE_RED);
-	registerEnum(i, CREATURE_ICON_ORB_RED);
-	registerEnum(i, CREATURE_ICON_ORB_GREEN);
-	registerEnum(i, CREATURE_ICON_ORB_RED_GREEN);
-	registerEnum(i, CREATURE_ICON_GEM_GREEN);
-	registerEnum(i, CREATURE_ICON_GEM_YELLOW);
-	registerEnum(i, CREATURE_ICON_GEM_BLUE);
-	registerEnum(i, CREATURE_ICON_GEM_PURPLE);
-	registerEnum(i, CREATURE_ICON_GEM_RED);
-	registerEnum(i, CREATURE_ICON_PIGEON);
-	registerEnum(i, CREATURE_ICON_ENERGY);
-	registerEnum(i, CREATURE_ICON_POISON);
-	registerEnum(i, CREATURE_ICON_WATER);
-	registerEnum(i, CREATURE_ICON_FIRE);
-	registerEnum(i, CREATURE_ICON_ICE);
-	registerEnum(i, CREATURE_ICON_ARROW_UP);
-	registerEnum(i, CREATURE_ICON_ARROW_DOWN);
-	registerEnum(i, CREATURE_ICON_WARNING);
-	registerEnum(i, CREATURE_ICON_QUESTION);
-	registerEnum(i, CREATURE_ICON_CROSS_RED);
-	registerEnum(i, CREATURE_ICON_FIRST);
-	registerEnum(i, CREATURE_ICON_LAST);
+	registerEnum(lsi, CREATURE_ICON_CROSS_WHITE);
+	registerEnum(lsi, CREATURE_ICON_CROSS_WHITE_RED);
+	registerEnum(lsi, CREATURE_ICON_ORB_RED);
+	registerEnum(lsi, CREATURE_ICON_ORB_GREEN);
+	registerEnum(lsi, CREATURE_ICON_ORB_RED_GREEN);
+	registerEnum(lsi, CREATURE_ICON_GEM_GREEN);
+	registerEnum(lsi, CREATURE_ICON_GEM_YELLOW);
+	registerEnum(lsi, CREATURE_ICON_GEM_BLUE);
+	registerEnum(lsi, CREATURE_ICON_GEM_PURPLE);
+	registerEnum(lsi, CREATURE_ICON_GEM_RED);
+	registerEnum(lsi, CREATURE_ICON_PIGEON);
+	registerEnum(lsi, CREATURE_ICON_ENERGY);
+	registerEnum(lsi, CREATURE_ICON_POISON);
+	registerEnum(lsi, CREATURE_ICON_WATER);
+	registerEnum(lsi, CREATURE_ICON_FIRE);
+	registerEnum(lsi, CREATURE_ICON_ICE);
+	registerEnum(lsi, CREATURE_ICON_ARROW_UP);
+	registerEnum(lsi, CREATURE_ICON_ARROW_DOWN);
+	registerEnum(lsi, CREATURE_ICON_WARNING);
+	registerEnum(lsi, CREATURE_ICON_QUESTION);
+	registerEnum(lsi, CREATURE_ICON_CROSS_RED);
+	registerEnum(lsi, CREATURE_ICON_FIRST);
+	registerEnum(lsi, CREATURE_ICON_LAST);
 
 	lsi.registerClass("Creature", "", luaCreatureCreate);
 	lsi.registerMetaMethod("Creature", "__eq", tfs::lua::luaUserdataCompare);

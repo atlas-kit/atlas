@@ -1,11 +1,9 @@
+#include "../otpch.h"
+
 #include "meta.h"
 
 #include "../creature.h"
 #include "../item.h"
-
-#include <set>
-#include <string>
-#include <vector>
 
 namespace tfs::lua {
 

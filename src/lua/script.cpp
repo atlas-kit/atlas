@@ -6,33 +6,20 @@
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
-#include "../databasemanager.h"
-#include "../databasetasks.h"
 #include "../events.h"
 #include "../game.h"
 #include "../globalevent.h"
-#include "../housetile.h"
-#include "../iologindata.h"
-#include "../iomapserialize.h"
-#include "../iomarket.h"
 #include "../item.h"
-#include "../matrixarea.h"
 #include "../movement.h"
-#include "../outfit.h"
-#include "../party.h"
 #include "../player.h"
-#include "../podium.h"
 #include "../protocolstatus.h"
 #include "../scheduler.h"
 #include "../spells.h"
-#include "../teleport.h"
 #include "../weapons.h"
 #include "api.h"
 #include "env.h"
 #include "error.h"
-#include "meta.h"
 #include "script.h"
-#include "variant.h"
 
 #include <string>
 
@@ -45,16 +32,12 @@ extern Spells* g_spells;
 extern Actions* g_actions;
 extern TalkActions* g_talkActions;
 extern CreatureEvents* g_creatureEvents;
-extern MoveEvents* g_moveEvents;
-extern GlobalEvents* g_globalEvents;
 extern Scripts* g_scripts;
 extern Weapons* g_weapons;
 
 LuaEnvironment g_luaEnvironment;
 
 namespace {
-
-constexpr int32_t EVENT_ID_LOADING = 1;
 
 bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 {
@@ -309,7 +292,7 @@ void LuaScriptInterface::callVoidFunction(int params)
 }
 
 void LuaScriptInterface::registerClass(std::string_view className, std::string_view baseClass,
-                                       lua_CFunction newFunction = nullptr)
+                                       lua_CFunction newFunction)
 {
 	// className = {}
 	lua_newtable(L);
@@ -443,84 +426,6 @@ void LuaScriptInterface::registerGlobalBoolean(std::string_view name, bool value
 	// _G[name] = value
 	tfs::lua::pushBoolean(L, value);
 	lua_setglobal(L, name.data());
-}
-
-#undef registerEnum
-#undef registerEnumIn
-
-int LuaScriptInterface::luaDoPlayerAddItem(lua_State* L)
-{
-	// doPlayerAddItem(cid, itemid, <optional: default: 1> count/subtype, <optional: default: 1> canDropOnMap)
-	// doPlayerAddItem(cid, itemid, <optional: default: 1> count, <optional: default: 1> canDropOnMap, <optional:
-	// default: 1>subtype)
-	const auto& player = tfs::lua::getPlayer(L, 1);
-	if (!player) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	uint16_t itemId = tfs::lua::getNumber<uint16_t>(L, 2);
-	int32_t count = tfs::lua::getNumber<int32_t>(L, 3, 1);
-	bool canDropOnMap = tfs::lua::getBoolean(L, 4, true);
-	uint16_t subType = tfs::lua::getNumber<uint16_t>(L, 5, 1);
-
-	const ItemType& it = Item::items[itemId];
-	int32_t itemCount;
-
-	auto parameters = lua_gettop(L);
-	if (parameters > 4) {
-		// subtype already supplied, count then is the amount
-		itemCount = std::max<int32_t>(1, count);
-	} else if (it.hasSubType()) {
-		if (it.stackable) {
-			itemCount = static_cast<int32_t>(std::ceil(static_cast<float>(count) / ITEM_STACK_SIZE));
-		} else {
-			itemCount = 1;
-		}
-		subType = count;
-	} else {
-		itemCount = std::max<int32_t>(1, count);
-	}
-
-	while (itemCount > 0) {
-		uint16_t stackCount = subType;
-		if (it.stackable && stackCount > ITEM_STACK_SIZE) {
-			stackCount = ITEM_STACK_SIZE;
-		}
-
-		const auto& newItem = Item::CreateItem(itemId, stackCount);
-		if (!newItem) {
-			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_ITEM_NOT_FOUND));
-			tfs::lua::pushBoolean(L, false);
-			return 1;
-		}
-
-		if (it.stackable) {
-			subType -= stackCount;
-		}
-
-		ReturnValue ret = g_game.internalPlayerAddItem(player, newItem, canDropOnMap);
-		if (ret != RETURNVALUE_NOERROR) {
-			tfs::lua::pushBoolean(L, false);
-			return 1;
-		}
-
-		if (--itemCount == 0) {
-			if (newItem->hasParent()) {
-				uint32_t uid = tfs::lua::getScriptEnv()->addThing(newItem);
-				tfs::lua::pushNumber(L, uid);
-				return 1;
-			} else {
-				// stackable item stacked with existing object, newItem will be released
-				tfs::lua::pushBoolean(L, false);
-				return 1;
-			}
-		}
-	}
-
-	tfs::lua::pushBoolean(L, false);
-	return 1;
 }
 
 int LuaScriptInterface::luaDebugPrint(lua_State* L)
@@ -986,310 +891,9 @@ int LuaScriptInterface::luaIsScriptsInterface(lua_State* L)
 	return 1;
 }
 
-const luaL_Reg LuaScriptInterface::luaBitReg[] = {
-    //{"tobit", LuaScriptInterface::luaBitToBit},
-    {"bnot", LuaScriptInterface::luaBitNot},
-    {"band", LuaScriptInterface::luaBitAnd},
-    {"bor", LuaScriptInterface::luaBitOr},
-    {"bxor", LuaScriptInterface::luaBitXor},
-    {"lshift", LuaScriptInterface::luaBitLeftShift},
-    {"rshift", LuaScriptInterface::luaBitRightShift},
-    //{"arshift", LuaScriptInterface::luaBitArithmeticalRightShift},
-    //{"rol", LuaScriptInterface::luaBitRotateLeft},
-    //{"ror", LuaScriptInterface::luaBitRotateRight},
-    //{"bswap", LuaScriptInterface::luaBitSwapEndian},
-    //{"tohex", LuaScriptInterface::luaBitToHex},
-    {nullptr, nullptr}};
-
-int LuaScriptInterface::luaBitNot(lua_State* L)
-{
-	tfs::lua::pushNumber(L, ~tfs::lua::getNumber<uint32_t>(L, -1));
-	return 1;
-}
-
-#define MULTIOP(name, op) \
-	int LuaScriptInterface::luaBit##name(lua_State* L) \
-	{ \
-		int n = lua_gettop(L); \
-		uint32_t w = tfs::lua::getNumber<uint32_t>(L, -1); \
-		for (int i = 1; i < n; ++i) w op tfs::lua::getNumber<uint32_t>(L, i); \
-		tfs::lua::pushNumber(L, w); \
-		return 1; \
-	}
-
-MULTIOP(And, &=)
-MULTIOP(Or, |=)
-MULTIOP(Xor, ^=)
-
-#define SHIFTOP(name, op) \
-	int LuaScriptInterface::luaBit##name(lua_State* L) \
-	{ \
-		uint32_t n1 = tfs::lua::getNumber<uint32_t>(L, 1), n2 = tfs::lua::getNumber<uint32_t>(L, 2); \
-		tfs::lua::pushNumber(L, (n1 op n2)); \
-		return 1; \
-	}
-
-SHIFTOP(LeftShift, <<)
-SHIFTOP(RightShift, >>)
-
-const luaL_Reg LuaScriptInterface::luaConfigManagerTable[] = {
-    {"getString", LuaScriptInterface::luaConfigManagerGetString},
-    {"getNumber", LuaScriptInterface::luaConfigManagerGetNumber},
-    {"getBoolean", LuaScriptInterface::luaConfigManagerGetBoolean},
-    {nullptr, nullptr}};
-
-int LuaScriptInterface::luaConfigManagerGetString(lua_State* L)
-{
-	tfs::lua::pushString(L, ConfigManager::getString(tfs::lua::getNumber<ConfigManager::string_config_t>(L, -1)));
-	return 1;
-}
-
-int LuaScriptInterface::luaConfigManagerGetNumber(lua_State* L)
-{
-	tfs::lua::pushNumber(L, ConfigManager::getNumber(tfs::lua::getNumber<ConfigManager::integer_config_t>(L, -1)));
-	return 1;
-}
-
-int LuaScriptInterface::luaConfigManagerGetBoolean(lua_State* L)
-{
-	tfs::lua::pushBoolean(L, ConfigManager::getBoolean(tfs::lua::getNumber<ConfigManager::boolean_config_t>(L, -1)));
-	return 1;
-}
-
-const luaL_Reg LuaScriptInterface::luaDatabaseTable[] = {
-    {"query", LuaScriptInterface::luaDatabaseExecute},
-    {"asyncQuery", LuaScriptInterface::luaDatabaseAsyncExecute},
-    {"storeQuery", LuaScriptInterface::luaDatabaseStoreQuery},
-    {"asyncStoreQuery", LuaScriptInterface::luaDatabaseAsyncStoreQuery},
-    {"escapeString", LuaScriptInterface::luaDatabaseEscapeString},
-    {"escapeBlob", LuaScriptInterface::luaDatabaseEscapeBlob},
-    {"lastInsertId", LuaScriptInterface::luaDatabaseLastInsertId},
-    {"tableExists", LuaScriptInterface::luaDatabaseTableExists},
-    {nullptr, nullptr}};
-
-int LuaScriptInterface::luaDatabaseExecute(lua_State* L)
-{
-	// db.query(query)
-	tfs::lua::pushBoolean(L, Database::getInstance().executeQuery(tfs::lua::getString(L, -1)));
-	return 1;
-}
-
-int LuaScriptInterface::luaDatabaseAsyncExecute(lua_State* L)
-{
-	// db.asyncQuery(query, callback)
-	std::function<void(const std::shared_ptr<DBResult>&, bool)> callback;
-	if (lua_gettop(L) > 1) {
-		int32_t ref = luaL_ref(L, LUA_REGISTRYINDEX);
-		auto scriptId = tfs::lua::getScriptEnv()->getScriptId();
-		callback = [ref, scriptId](const std::shared_ptr<DBResult>&, bool success) {
-			lua_State* L = g_luaEnvironment.getLuaState();
-			if (!L) {
-				return;
-			}
-
-			if (!tfs::lua::reserveScriptEnv()) {
-				luaL_unref(L, LUA_REGISTRYINDEX, ref);
-				return;
-			}
-
-			lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-			tfs::lua::pushBoolean(L, success);
-			auto env = tfs::lua::getScriptEnv();
-			env->setScriptId(scriptId, &g_luaEnvironment);
-			g_luaEnvironment.callFunction(1);
-
-			luaL_unref(L, LUA_REGISTRYINDEX, ref);
-		};
-	}
-	g_databaseTasks.addTask(tfs::lua::getString(L, -1), callback);
-	return 0;
-}
-
-int LuaScriptInterface::luaDatabaseStoreQuery(lua_State* L)
-{
-	// db.storeQuery(query)
-	if (const auto& result = Database::getInstance().storeQuery(tfs::lua::getString(L, -1))) {
-		tfs::lua::pushNumber(L, tfs::lua::addResult(result));
-	} else {
-		tfs::lua::pushBoolean(L, false);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaDatabaseAsyncStoreQuery(lua_State* L)
-{
-	// db.asyncStoreQuery(query, callback)
-	std::function<void(const std::shared_ptr<DBResult>&, bool)> callback;
-	if (lua_gettop(L) > 1) {
-		int32_t ref = luaL_ref(L, LUA_REGISTRYINDEX);
-		auto scriptId = tfs::lua::getScriptEnv()->getScriptId();
-		callback = [ref, scriptId](const std::shared_ptr<DBResult>& result, bool) {
-			lua_State* L = g_luaEnvironment.getLuaState();
-			if (!L) {
-				return;
-			}
-
-			if (!tfs::lua::reserveScriptEnv()) {
-				luaL_unref(L, LUA_REGISTRYINDEX, ref);
-				return;
-			}
-
-			lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-			if (result) {
-				tfs::lua::pushNumber(L, tfs::lua::addResult(result));
-			} else {
-				tfs::lua::pushBoolean(L, false);
-			}
-			auto env = tfs::lua::getScriptEnv();
-			env->setScriptId(scriptId, &g_luaEnvironment);
-			g_luaEnvironment.callFunction(1);
-
-			luaL_unref(L, LUA_REGISTRYINDEX, ref);
-		};
-	}
-	g_databaseTasks.addTask(tfs::lua::getString(L, -1), callback, true);
-	return 0;
-}
-
-int LuaScriptInterface::luaDatabaseEscapeString(lua_State* L)
-{
-	// db.escapeString(s)
-	tfs::lua::pushString(L, Database::getInstance().escapeString(tfs::lua::getString(L, -1)));
-	return 1;
-}
-
-int LuaScriptInterface::luaDatabaseEscapeBlob(lua_State* L)
-{
-	// db.escapeBlob(s, length)
-	uint32_t length = tfs::lua::getNumber<uint32_t>(L, 2);
-	tfs::lua::pushString(L, Database::getInstance().escapeBlob(tfs::lua::getString(L, 1).data(), length));
-	return 1;
-}
-
-int LuaScriptInterface::luaDatabaseLastInsertId(lua_State* L)
-{
-	// db.lastInsertId()
-	tfs::lua::pushNumber(L, Database::getInstance().getLastInsertId());
-	return 1;
-}
-
-int LuaScriptInterface::luaDatabaseTableExists(lua_State* L)
-{
-	// db.tableExists(tableName)
-	tfs::lua::pushBoolean(L, DatabaseManager::tableExists(tfs::lua::getString(L, -1)));
-	return 1;
-}
-
-const luaL_Reg LuaScriptInterface::luaResultTable[] = {
-    {"getNumber", LuaScriptInterface::luaResultGetNumber}, {"getString", LuaScriptInterface::luaResultGetString},
-    {"getStream", LuaScriptInterface::luaResultGetStream}, {"next", LuaScriptInterface::luaResultNext},
-    {"free", LuaScriptInterface::luaResultFree},           {nullptr, nullptr}};
-
-int LuaScriptInterface::luaResultGetNumber(lua_State* L)
-{
-	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
-	if (!result) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const std::string& s = tfs::lua::getString(L, 2);
-	tfs::lua::pushNumber(L, result->getNumber<int64_t>(s));
-	return 1;
-}
-
-int LuaScriptInterface::luaResultGetString(lua_State* L)
-{
-	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
-	if (!result) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const std::string& s = tfs::lua::getString(L, 2);
-	tfs::lua::pushString(L, result->getString(s));
-	return 1;
-}
-
-int LuaScriptInterface::luaResultGetStream(lua_State* L)
-{
-	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, 1));
-	if (!result) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	auto stream = result->getString(tfs::lua::getString(L, 2));
-	lua_pushlstring(L, stream.data(), stream.size());
-	tfs::lua::pushNumber(L, stream.size());
-	return 2;
-}
-
-int LuaScriptInterface::luaResultNext(lua_State* L)
-{
-	const auto& result = tfs::lua::getResultByID(tfs::lua::getNumber<uint32_t>(L, -1));
-	if (!result) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	tfs::lua::pushBoolean(L, result->next());
-	return 1;
-}
-
-int LuaScriptInterface::luaResultFree(lua_State* L)
-{
-	tfs::lua::pushBoolean(L, tfs::lua::removeResult(tfs::lua::getNumber<uint32_t>(L, -1)));
-	return 1;
-}
-
-// os
-int LuaScriptInterface::luaSystemTime(lua_State* L)
-{
-	// os.mtime()
-	tfs::lua::pushNumber(L, OTSYS_TIME());
-	return 1;
-}
-
-// table
-int LuaScriptInterface::luaTableCreate(lua_State* L)
-{
-	// table.create(arrayLength, keyLength)
-	lua_createtable(L, tfs::lua::getNumber<int32_t>(L, 1), tfs::lua::getNumber<int32_t>(L, 2));
-	return 1;
-}
-
-int LuaScriptInterface::luaTablePack(lua_State* L)
-{
-	// table.pack(...)
-	int n = lua_gettop(L);         /* number of elements to pack */
-	lua_createtable(L, n, 1);      /* create result table */
-	lua_insert(L, 1);              /* put it at index 1 */
-	for (int i = n; i >= 1; i--) { /* assign elements */
-		lua_rawseti(L, 1, i);
-	}
-	if (luaL_callmeta(L, -1, "__index") != 0) {
-		lua_replace(L, -2);
-	}
-	tfs::lua::pushNumber(L, n);
-	lua_setfield(L, 1, "n"); /* t.n = number of elements */
-	return 1;                /* return table */
-}
-
-#define registerEnum(L, value) \
-	{ \
-		std::string enumName = #value; \
-		registerGlobalVariable(L, enumName.substr(enumName.find_last_of(':') + 1), value); \
-	}
-
 void LuaScriptInterface::registerFunctions()
 {
 	using namespace tfs::lua;
-
-	// doPlayerAddItem(uid, itemid, <optional: default: 1> count/subtype)
-	// doPlayerAddItem(cid, itemid, <optional: default: 1> count, <optional: default: 1> canDropOnMap, <optional:
-	// default: 1>subtype) Returns uid of the created item
-	lua_register(L, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
 
 	// isValidUID(uid)
 	lua_register(L, "isValidUID", LuaScriptInterface::luaIsValidUID);
@@ -1356,23 +960,6 @@ void LuaScriptInterface::registerFunctions()
 	// isScriptsInterface()
 	lua_register(L, "isScriptsInterface", LuaScriptInterface::luaIsScriptsInterface);
 
-	// bit operations for Lua, based on bitlib project release 24
-	// bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
-	luaL_register(L, "bit", LuaScriptInterface::luaBitReg);
-	lua_pop(L, 1);
-
-	// configManager table
-	luaL_register(L, "configManager", LuaScriptInterface::luaConfigManagerTable);
-	lua_pop(L, 1);
-
-	// db table
-	luaL_register(L, "db", LuaScriptInterface::luaDatabaseTable);
-	lua_pop(L, 1);
-
-	// result table
-	luaL_register(L, "result", LuaScriptInterface::luaResultTable);
-	lua_pop(L, 1);
-
 	/* New functions */
 	// registerClass(className, baseClass, newFunction)
 	// registerTable(tableName)
@@ -1383,13 +970,6 @@ void LuaScriptInterface::registerFunctions()
 	// registerGlobalVariable(name, value)
 	// registerEnum(value)
 	// registerEnumIn(tableName, value)
-
-	// os
-	registerMethod(L, "os", "mtime", LuaScriptInterface::luaSystemTime);
-
-	// table
-	registerMethod(L, "table", "create", LuaScriptInterface::luaTableCreate);
-	registerMethod(L, "table", "pack", LuaScriptInterface::luaTablePack);
 }
 
 LuaEnvironment::LuaEnvironment() : LuaScriptInterface("Main Interface") {}

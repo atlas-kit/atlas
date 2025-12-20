@@ -7,7 +7,9 @@
 
 #include "configmanager.h"
 #include "database.h"
-#include "luascript.h"
+#include "lua/script.h"
+#include "lua/api.h"
+#include "lua/register.h"
 
 bool DatabaseManager::optimizeTables()
 {
@@ -71,28 +73,20 @@ int32_t DatabaseManager::getDatabaseVersion()
 
 void DatabaseManager::updateDatabase()
 {
-	lua_State* L = luaL_newstate();
-	if (!L) {
+	LuaScriptInterface lsi{"Database Interface"};
+	if (!lsi.initState()) {
 		return;
 	}
 
-	luaL_openlibs(L);
+	luaL_openlibs(lsi.getLuaState());
 
-	// bit operations for Lua, based on bitlib project release 24
-	// bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
-	luaL_register(L, "bit", LuaScriptInterface::luaBitReg);
-
-	// db table
-	luaL_register(L, "db", LuaScriptInterface::luaDatabaseTable);
-
-	// result table
-	luaL_register(L, "result", LuaScriptInterface::luaResultTable);
+	tfs::lua::registerDatabase(lsi);
 
 	int32_t version = getDatabaseVersion();
 	do {
-		if (luaL_dofile(L, std::format("data/migrations/{:d}.lua", version).c_str()) != 0) {
+		if (luaL_dofile(lsi.getLuaState(), std::format("data/migrations/{:d}.lua", version).c_str()) != 0) {
 			std::cout << "[Error - DatabaseManager::updateDatabase - Version: " << version << "] "
-			          << lua_tostring(L, -1) << std::endl;
+			          << lua_tostring(lsi.getLuaState(), -1) << std::endl;
 			break;
 		}
 
@@ -100,15 +94,15 @@ void DatabaseManager::updateDatabase()
 			break;
 		}
 
-		lua_getglobal(L, "onUpdateDatabase");
-		if (lua_pcall(L, 0, 1, 0) != 0) {
+		lua_getglobal(lsi.getLuaState(), "onUpdateDatabase");
+		if (lua_pcall(lsi.getLuaState(), 0, 1, 0) != 0) {
 			tfs::lua::resetScriptEnv();
 			std::cout << "[Error - DatabaseManager::updateDatabase - Version: " << version << "] "
-			          << lua_tostring(L, -1) << std::endl;
+			          << lua_tostring(lsi.getLuaState(), -1) << std::endl;
 			break;
 		}
 
-		if (!tfs::lua::getBoolean(L, -1, false)) {
+		if (!tfs::lua::getBoolean(lsi.getLuaState(), -1, false)) {
 			tfs::lua::resetScriptEnv();
 			break;
 		}
@@ -119,7 +113,8 @@ void DatabaseManager::updateDatabase()
 
 		tfs::lua::resetScriptEnv();
 	} while (true);
-	lua_close(L);
+
+	lua_close(lsi.getLuaState());
 }
 
 bool DatabaseManager::getDatabaseConfig(const std::string& config, int32_t& value)

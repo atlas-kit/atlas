@@ -1,7 +1,14 @@
+#include "../../otpch.h"
+
+#include "../../guild.h"
+
+#include "../../game.h"
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 

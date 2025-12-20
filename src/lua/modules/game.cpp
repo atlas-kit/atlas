@@ -1,7 +1,28 @@
+#include "../../otpch.h"
+
+#include "../../game.h"
+
+#include "../../configmanager.h"
+#include "../../events.h"
+#include "../../globalevent.h"
+#include "../../monster.h"
+#include "../../npc.h"
+#include "../../script.h"
+#include "../../spells.h"
+#include "../../tasks.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
+extern GlobalEvents* g_globalEvents;
+extern LuaEnvironment g_luaEnvironment;
+extern Spells* g_spells;
+extern Monsters g_monsters;
+extern Scripts* g_scripts;
+extern Dispatcher g_dispather;
 
 namespace {
 
@@ -630,19 +651,19 @@ int luaGameReload(lua_State* L)
 
 void tfs::lua::registerGame(LuaScriptInterface& lsi)
 {
-	registerEnum(i, ITEM_STACK_SIZE);
+	registerEnum(lsi, ITEM_STACK_SIZE);
 
-	registerEnum(i, GAME_STATE_STARTUP);
-	registerEnum(i, GAME_STATE_INIT);
-	registerEnum(i, GAME_STATE_NORMAL);
-	registerEnum(i, GAME_STATE_CLOSED);
-	registerEnum(i, GAME_STATE_SHUTDOWN);
-	registerEnum(i, GAME_STATE_CLOSING);
-	registerEnum(i, GAME_STATE_MAINTAIN);
+	registerEnum(lsi, GAME_STATE_STARTUP);
+	registerEnum(lsi, GAME_STATE_INIT);
+	registerEnum(lsi, GAME_STATE_NORMAL);
+	registerEnum(lsi, GAME_STATE_CLOSED);
+	registerEnum(lsi, GAME_STATE_SHUTDOWN);
+	registerEnum(lsi, GAME_STATE_CLOSING);
+	registerEnum(lsi, GAME_STATE_MAINTAIN);
 
-	registerEnum(i, WORLD_TYPE_NO_PVP);
-	registerEnum(i, WORLD_TYPE_PVP);
-	registerEnum(i, WORLD_TYPE_PVP_ENFORCED);
+	registerEnum(lsi, WORLD_TYPE_NO_PVP);
+	registerEnum(lsi, WORLD_TYPE_PVP);
+	registerEnum(lsi, WORLD_TYPE_PVP_ENFORCED);
 
 	lsi.registerTable("Game");
 

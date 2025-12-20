@@ -1,7 +1,11 @@
+#include "../../otpch.h"
+
+#include "../../game.h"
 #include "../api.h"
-#include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -93,14 +97,14 @@ int luaPositionSendDistanceEffect(lua_State* L)
 
 void tfs::lua::registerPosition(LuaScriptInterface& lsi)
 {
-	registerEnum(i, DIRECTION_NORTH);
-	registerEnum(i, DIRECTION_EAST);
-	registerEnum(i, DIRECTION_SOUTH);
-	registerEnum(i, DIRECTION_WEST);
-	registerEnum(i, DIRECTION_SOUTHWEST);
-	registerEnum(i, DIRECTION_SOUTHEAST);
-	registerEnum(i, DIRECTION_NORTHWEST);
-	registerEnum(i, DIRECTION_NORTHEAST);
+	registerEnum(lsi, DIRECTION_NORTH);
+	registerEnum(lsi, DIRECTION_EAST);
+	registerEnum(lsi, DIRECTION_SOUTH);
+	registerEnum(lsi, DIRECTION_WEST);
+	registerEnum(lsi, DIRECTION_SOUTHWEST);
+	registerEnum(lsi, DIRECTION_SOUTHEAST);
+	registerEnum(lsi, DIRECTION_NORTHWEST);
+	registerEnum(lsi, DIRECTION_NORTHEAST);
 
 	lsi.registerClass("Position", "", luaPositionCreate);
 

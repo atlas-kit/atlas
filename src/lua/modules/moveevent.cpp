@@ -1,7 +1,15 @@
+#include "../../otpch.h"
+
+#include "../../movement.h"
+#include "../../script.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern MoveEvents* g_moveEvents;
+extern Scripts* g_scripts;
 
 namespace {
 

@@ -1,7 +1,15 @@
+#include "../../otpch.h"
+
+#include "../../container.h"
+
+#include "../../game.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -280,15 +288,14 @@ void tfs::lua::registerContainer(LuaScriptInterface& lsi)
 {
 	lsi.registerGlobalVariable("INDEX_WHEREEVER", INDEX_WHEREEVER);
 
-	// Use with container:addItem, container:addItemEx and possibly other functions.
-	registerEnum(i, FLAG_NOLIMIT);
-	registerEnum(i, FLAG_IGNOREBLOCKITEM);
-	registerEnum(i, FLAG_IGNOREBLOCKCREATURE);
-	registerEnum(i, FLAG_CHILDISOWNER);
-	registerEnum(i, FLAG_PATHFINDING);
-	registerEnum(i, FLAG_IGNOREFIELDDAMAGE);
-	registerEnum(i, FLAG_IGNORENOTMOVEABLE);
-	registerEnum(i, FLAG_IGNOREAUTOSTACK);
+	registerEnum(lsi, FLAG_NOLIMIT);
+	registerEnum(lsi, FLAG_IGNOREBLOCKITEM);
+	registerEnum(lsi, FLAG_IGNOREBLOCKCREATURE);
+	registerEnum(lsi, FLAG_CHILDISOWNER);
+	registerEnum(lsi, FLAG_PATHFINDING);
+	registerEnum(lsi, FLAG_IGNOREFIELDDAMAGE);
+	registerEnum(lsi, FLAG_IGNORENOTMOVEABLE);
+	registerEnum(lsi, FLAG_IGNOREAUTOSTACK);
 
 	lsi.registerClass("Container", "Item", luaContainerCreate);
 	lsi.registerMetaMethod("Container", "__eq", tfs::lua::luaUserdataCompare);

@@ -1,7 +1,16 @@
+#include "../../otpch.h"
+
+#include "../../item.h"
+
+#include "../../game.h"
+#include "../../tools.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -550,7 +559,7 @@ int luaItemMoveTo(lua_State* L)
 
 	std::shared_ptr<Thing> toThing = nullptr;
 	if (lua_isuserdata(L, 2)) {
-		const auto const type = tfs::lua::getUserdataType(L, 2);
+		const auto type = tfs::lua::getUserdataType(L, 2);
 		switch (type) {
 			case tfs::lua::LuaData_Container:
 				toThing = tfs::lua::getSharedPtr<Container>(L, 2);
@@ -789,22 +798,22 @@ int luaItemGetBoostPercent(lua_State* L)
 
 void tfs::lua::registerItem(LuaScriptInterface& lsi)
 {
-	registerEnum(i, CONST_PROP_BLOCKSOLID);
-	registerEnum(i, CONST_PROP_HASHEIGHT);
-	registerEnum(i, CONST_PROP_BLOCKPROJECTILE);
-	registerEnum(i, CONST_PROP_BLOCKPATH);
-	registerEnum(i, CONST_PROP_ISVERTICAL);
-	registerEnum(i, CONST_PROP_ISHORIZONTAL);
-	registerEnum(i, CONST_PROP_MOVEABLE);
-	registerEnum(i, CONST_PROP_IMMOVABLEBLOCKSOLID);
-	registerEnum(i, CONST_PROP_IMMOVABLEBLOCKPATH);
-	registerEnum(i, CONST_PROP_IMMOVABLENOFIELDBLOCKPATH);
-	registerEnum(i, CONST_PROP_NOFIELDBLOCKPATH);
-	registerEnum(i, CONST_PROP_SUPPORTHANGABLE);
+	registerEnum(lsi, CONST_PROP_BLOCKSOLID);
+	registerEnum(lsi, CONST_PROP_HASHEIGHT);
+	registerEnum(lsi, CONST_PROP_BLOCKPROJECTILE);
+	registerEnum(lsi, CONST_PROP_BLOCKPATH);
+	registerEnum(lsi, CONST_PROP_ISVERTICAL);
+	registerEnum(lsi, CONST_PROP_ISHORIZONTAL);
+	registerEnum(lsi, CONST_PROP_MOVEABLE);
+	registerEnum(lsi, CONST_PROP_IMMOVABLEBLOCKSOLID);
+	registerEnum(lsi, CONST_PROP_IMMOVABLEBLOCKPATH);
+	registerEnum(lsi, CONST_PROP_IMMOVABLENOFIELDBLOCKPATH);
+	registerEnum(lsi, CONST_PROP_NOFIELDBLOCKPATH);
+	registerEnum(lsi, CONST_PROP_SUPPORTHANGABLE);
 
-	registerEnum(i, DECAYING_FALSE);
-	registerEnum(i, DECAYING_TRUE);
-	registerEnum(i, DECAYING_PENDING);
+	registerEnum(lsi, DECAYING_FALSE);
+	registerEnum(lsi, DECAYING_TRUE);
+	registerEnum(lsi, DECAYING_PENDING);
 
 	lsi.registerClass("Item", "", luaItemCreate);
 	lsi.registerMetaMethod("Item", "__eq", tfs::lua::luaUserdataCompare);

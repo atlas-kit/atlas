@@ -1,24 +1,19 @@
+#include "../otpch.h"
+
 #include "env.h"
 
-#include "../creature.h"
-#include "../database.h"
 #include "../game.h"
 #include "../item.h"
-#include "../thing.h"
-#include "error.h"
 
-#include <cassert>
-#include <iostream>
-#include <map>
-#include <ranges>
+extern Game g_game;
 
 namespace tfs::lua {
 
 static std::array<ScriptEnvironment, 16> scriptEnv = {};
 static int32_t scriptEnvIndex = -1;
 
-uint32_t lastResultId = 0;
-std::map<uint32_t, std::shared_ptr<DBResult>> tempResults = {};
+static uint32_t lastResultId = 0;
+static std::map<uint32_t, std::shared_ptr<DBResult>> tempResults = {};
 
 uint32_t addResult(std::shared_ptr<DBResult> result)
 {

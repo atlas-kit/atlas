@@ -1,3 +1,9 @@
+#include "../../otpch.h"
+
+#include "../../networkmessage.h"
+
+#include "../../item.h"
+#include "../../player.h"
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"

@@ -1,7 +1,17 @@
+#include "../../otpch.h"
+
+#include "../../tile.h"
+
+#include "../../combat.h"
+#include "../../game.h"
+#include "../../housetile.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
 
 namespace {
 
@@ -724,38 +734,38 @@ int luaTileGetHouse(lua_State* L)
 
 void tfs::lua::registerTile(LuaScriptInterface& lsi)
 {
-	registerEnum(i, TILESTATE_NONE);
-	registerEnum(i, TILESTATE_PROTECTIONZONE);
-	registerEnum(i, TILESTATE_NOPVPZONE);
-	registerEnum(i, TILESTATE_NOLOGOUT);
-	registerEnum(i, TILESTATE_PVPZONE);
-	registerEnum(i, TILESTATE_FLOORCHANGE);
-	registerEnum(i, TILESTATE_FLOORCHANGE_DOWN);
-	registerEnum(i, TILESTATE_FLOORCHANGE_NORTH);
-	registerEnum(i, TILESTATE_FLOORCHANGE_SOUTH);
-	registerEnum(i, TILESTATE_FLOORCHANGE_EAST);
-	registerEnum(i, TILESTATE_FLOORCHANGE_WEST);
-	registerEnum(i, TILESTATE_TELEPORT);
-	registerEnum(i, TILESTATE_MAGICFIELD);
-	registerEnum(i, TILESTATE_MAILBOX);
-	registerEnum(i, TILESTATE_TRASHHOLDER);
-	registerEnum(i, TILESTATE_BED);
-	registerEnum(i, TILESTATE_DEPOT);
-	registerEnum(i, TILESTATE_BLOCKSOLID);
-	registerEnum(i, TILESTATE_BLOCKPATH);
-	registerEnum(i, TILESTATE_IMMOVABLEBLOCKSOLID);
-	registerEnum(i, TILESTATE_IMMOVABLEBLOCKPATH);
-	registerEnum(i, TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
-	registerEnum(i, TILESTATE_NOFIELDBLOCKPATH);
-	registerEnum(i, TILESTATE_FLOORCHANGE_SOUTH_ALT);
-	registerEnum(i, TILESTATE_FLOORCHANGE_EAST_ALT);
-	registerEnum(i, TILESTATE_SUPPORTS_HANGABLE);
+	registerEnum(lsi, TILESTATE_NONE);
+	registerEnum(lsi, TILESTATE_PROTECTIONZONE);
+	registerEnum(lsi, TILESTATE_NOPVPZONE);
+	registerEnum(lsi, TILESTATE_NOLOGOUT);
+	registerEnum(lsi, TILESTATE_PVPZONE);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_DOWN);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_NORTH);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_SOUTH);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_EAST);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_WEST);
+	registerEnum(lsi, TILESTATE_TELEPORT);
+	registerEnum(lsi, TILESTATE_MAGICFIELD);
+	registerEnum(lsi, TILESTATE_MAILBOX);
+	registerEnum(lsi, TILESTATE_TRASHHOLDER);
+	registerEnum(lsi, TILESTATE_BED);
+	registerEnum(lsi, TILESTATE_DEPOT);
+	registerEnum(lsi, TILESTATE_BLOCKSOLID);
+	registerEnum(lsi, TILESTATE_BLOCKPATH);
+	registerEnum(lsi, TILESTATE_IMMOVABLEBLOCKSOLID);
+	registerEnum(lsi, TILESTATE_IMMOVABLEBLOCKPATH);
+	registerEnum(lsi, TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+	registerEnum(lsi, TILESTATE_NOFIELDBLOCKPATH);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_SOUTH_ALT);
+	registerEnum(lsi, TILESTATE_FLOORCHANGE_EAST_ALT);
+	registerEnum(lsi, TILESTATE_SUPPORTS_HANGABLE);
 
-	registerEnum(i, ZONE_PROTECTION);
-	registerEnum(i, ZONE_NOPVP);
-	registerEnum(i, ZONE_PVP);
-	registerEnum(i, ZONE_NOLOGOUT);
-	registerEnum(i, ZONE_NORMAL);
+	registerEnum(lsi, ZONE_PROTECTION);
+	registerEnum(lsi, ZONE_NOPVP);
+	registerEnum(lsi, ZONE_PVP);
+	registerEnum(lsi, ZONE_NOLOGOUT);
+	registerEnum(lsi, ZONE_NORMAL);
 
 	lsi.registerClass("Tile", "", luaTileCreate);
 	lsi.registerMetaMethod("Tile", "__eq", tfs::lua::luaUserdataCompare);

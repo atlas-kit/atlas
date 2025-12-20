@@ -1,9 +1,352 @@
+#include "../../otpch.h"
+
+#include "../../monsters.h"
+
+#include "../../item.h"
+#include "../../script.h"
+#include "../../spells.h"
+#include "../../tools.h"
 #include "../api.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 
+extern Monsters g_monsters;
+extern Scripts* g_scripts;
+
 namespace {
+
+int luaCreateMonsterSpell(lua_State* L)
+{
+	// MonsterSpell() will create a new Monster Spell
+	tfs::lua::pushUserdata(L, new MonsterSpell);
+	tfs::lua::setMetatable(L, -1, "MonsterSpell");
+	return 1;
+}
+
+int luaDeleteMonsterSpell(lua_State* L)
+{
+	// monsterSpell:delete() monsterSpell:__gc()
+	MonsterSpell** monsterSpellPtr = tfs::lua::getRawUserdata<MonsterSpell>(L, 1);
+	if (monsterSpellPtr && *monsterSpellPtr) {
+		delete *monsterSpellPtr;
+		*monsterSpellPtr = nullptr;
+	}
+	return 0;
+}
+
+int luaMonsterSpellSetType(lua_State* L)
+{
+	// monsterSpell:setType(type)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->name = tfs::lua::getString(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetScriptName(lua_State* L)
+{
+	// monsterSpell:setScriptName(name)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->scriptName = tfs::lua::getString(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetChance(lua_State* L)
+{
+	// monsterSpell:setChance(chance)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->chance = tfs::lua::getNumber<uint8_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetInterval(lua_State* L)
+{
+	// monsterSpell:setInterval(interval)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->interval = tfs::lua::getNumber<uint16_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetRange(lua_State* L)
+{
+	// monsterSpell:setRange(range)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->range = tfs::lua::getNumber<uint8_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatValue(lua_State* L)
+{
+	// monsterSpell:setCombatValue(min, max)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->minCombatValue = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->maxCombatValue = tfs::lua::getNumber<int32_t>(L, 3);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatType(lua_State* L)
+{
+	// monsterSpell:setCombatType(combatType_t)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->combatType = tfs::lua::getNumber<CombatType_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetAttackValue(lua_State* L)
+{
+	// monsterSpell:setAttackValue(attack, skill)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->attack = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->skill = tfs::lua::getNumber<int32_t>(L, 3);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetNeedTarget(lua_State* L)
+{
+	// monsterSpell:setNeedTarget(bool)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->needTarget = tfs::lua::getBoolean(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetNeedDirection(lua_State* L)
+{
+	// monsterSpell:setNeedDirection(bool)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->needDirection = tfs::lua::getBoolean(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatLength(lua_State* L)
+{
+	// monsterSpell:setCombatLength(length)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->length = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatSpread(lua_State* L)
+{
+	// monsterSpell:setCombatSpread(spread)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->spread = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatRadius(lua_State* L)
+{
+	// monsterSpell:setCombatRadius(radius)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->radius = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatRing(lua_State* L)
+{
+	// monsterSpell:setCombatRing(ring)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->ring = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionType(lua_State* L)
+{
+	// monsterSpell:setConditionType(type)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->conditionType = tfs::lua::getNumber<ConditionType_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionDamage(lua_State* L)
+{
+	// monsterSpell:setConditionDamage(min, max, start)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->conditionMinDamage = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->conditionMaxDamage = tfs::lua::getNumber<int32_t>(L, 3);
+		spell->conditionStartDamage = tfs::lua::getNumber<int32_t>(L, 4);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionSpeedChange(lua_State* L)
+{
+	// monsterSpell:setConditionSpeedChange(minSpeed[, maxSpeed])
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->minSpeedChange = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->maxSpeedChange = tfs::lua::getNumber<int32_t>(L, 3, 0);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionDuration(lua_State* L)
+{
+	// monsterSpell:setConditionDuration(duration)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->duration = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionDrunkenness(lua_State* L)
+{
+	// monsterSpell:setConditionDrunkenness(drunkenness)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->drunkenness = tfs::lua::getNumber<uint8_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetConditionTickInterval(lua_State* L)
+{
+	// monsterSpell:setConditionTickInterval(interval)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->tickInterval = tfs::lua::getNumber<int32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatShootEffect(lua_State* L)
+{
+	// monsterSpell:setCombatShootEffect(effect)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->shoot = tfs::lua::getNumber<ShootType_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetCombatEffect(lua_State* L)
+{
+	// monsterSpell:setCombatEffect(effect)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		spell->effect = tfs::lua::getNumber<MagicEffectClasses>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaMonsterSpellSetOutfit(lua_State* L)
+{
+	// monsterSpell:setOutfit(outfit)
+	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
+	if (spell) {
+		if (lua_istable(L, 2)) {
+			spell->outfit = tfs::lua::getOutfit(L, 2);
+		} else if (tfs::lua::isNumber(L, 2)) {
+			spell->outfit.lookTypeEx = tfs::lua::getNumber<uint16_t>(L, 2);
+		} else if (lua_isstring(L, 2)) {
+			MonsterType* mType = g_monsters.getMonsterType(tfs::lua::getString(L, 2));
+			if (mType) {
+				spell->outfit = mType->info.outfit;
+			}
+		}
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
 
 int luaMonsterTypeCreate(lua_State* L)
 {
@@ -1154,11 +1497,173 @@ int luaMonsterTypeBestiaryInfo(lua_State* L)
 	return 1;
 }
 
+int luaCreateLoot(lua_State* L)
+{
+	// Loot() will create a new loot item
+	tfs::lua::pushUserdata(L, new Loot);
+	tfs::lua::setMetatable(L, -1, "Loot");
+	return 1;
+}
+
+int luaDeleteLoot(lua_State* L)
+{
+	// loot:delete() loot:__gc()
+	Loot** lootPtr = tfs::lua::getRawUserdata<Loot>(L, 1);
+	if (lootPtr && *lootPtr) {
+		delete *lootPtr;
+		*lootPtr = nullptr;
+	}
+	return 0;
+}
+
+int luaLootSetId(lua_State* L)
+{
+	// loot:setId(id or name)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		if (tfs::lua::isNumber(L, 2)) {
+			loot->lootBlock.id = tfs::lua::getNumber<uint16_t>(L, 2);
+		} else {
+			auto name = tfs::lua::getString(L, 2);
+			const auto&& [it, end] = Item::items.nameToItems.equal_range(boost::algorithm::to_lower_copy(name));
+
+			if (it == Item::items.nameToItems.cend()) {
+				std::cout << "[Warning - Loot:setId] Unknown loot item \"" << name << "\".\n";
+				tfs::lua::pushBoolean(L, false);
+				return 1;
+			}
+
+			if (std::next(it) != end) {
+				std::cout << "[Warning - Loot:setId] Non-unique loot item \"" << name << "\".\n";
+				tfs::lua::pushBoolean(L, false);
+				return 1;
+			}
+
+			loot->lootBlock.id = it->second;
+		}
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootSetSubType(lua_State* L)
+{
+	// loot:setSubType(type)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		loot->lootBlock.subType = tfs::lua::getNumber<uint16_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootSetChance(lua_State* L)
+{
+	// loot:setChance(chance)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		loot->lootBlock.chance = tfs::lua::getNumber<uint32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootSetMaxCount(lua_State* L)
+{
+	// loot:setMaxCount(max)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		loot->lootBlock.countmax = tfs::lua::getNumber<uint32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootSetActionId(lua_State* L)
+{
+	// loot:setActionId(actionid)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		loot->lootBlock.actionId = tfs::lua::getNumber<uint32_t>(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootSetDescription(lua_State* L)
+{
+	// loot:setDescription(desc)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		loot->lootBlock.text = tfs::lua::getString(L, 2);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaLootAddChildLoot(lua_State* L)
+{
+	// loot:addChildLoot(loot)
+	Loot* loot = tfs::lua::getUserdata<Loot>(L, 1);
+	if (loot) {
+		Loot* childLoot = tfs::lua::getUserdata<Loot>(L, 2);
+		if (childLoot) {
+			loot->lootBlock.childLoot.push_back(childLoot->lootBlock);
+			tfs::lua::pushBoolean(L, true);
+		} else {
+			tfs::lua::pushBoolean(L, false);
+		}
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
-void tfs::lua::registerMonsterType(LuaScriptInterface& lsi)
+void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 {
-	registerEnum(i, MAX_LOOTCHANCE);
+	registerEnum(lsi, MAX_LOOTCHANCE);
+
+	lsi.registerClass("MonsterSpell", "", luaCreateMonsterSpell);
+	lsi.registerMetaMethod("MonsterSpell", "__gc", luaDeleteMonsterSpell);
+	lsi.registerMethod("MonsterSpell", "delete", luaDeleteMonsterSpell);
+
+	lsi.registerMethod("MonsterSpell", "setType", luaMonsterSpellSetType);
+	lsi.registerMethod("MonsterSpell", "setScriptName", luaMonsterSpellSetScriptName);
+	lsi.registerMethod("MonsterSpell", "setChance", luaMonsterSpellSetChance);
+	lsi.registerMethod("MonsterSpell", "setInterval", luaMonsterSpellSetInterval);
+	lsi.registerMethod("MonsterSpell", "setRange", luaMonsterSpellSetRange);
+	lsi.registerMethod("MonsterSpell", "setCombatValue", luaMonsterSpellSetCombatValue);
+	lsi.registerMethod("MonsterSpell", "setCombatType", luaMonsterSpellSetCombatType);
+	lsi.registerMethod("MonsterSpell", "setAttackValue", luaMonsterSpellSetAttackValue);
+	lsi.registerMethod("MonsterSpell", "setNeedTarget", luaMonsterSpellSetNeedTarget);
+	lsi.registerMethod("MonsterSpell", "setNeedDirection", luaMonsterSpellSetNeedDirection);
+	lsi.registerMethod("MonsterSpell", "setCombatLength", luaMonsterSpellSetCombatLength);
+	lsi.registerMethod("MonsterSpell", "setCombatSpread", luaMonsterSpellSetCombatSpread);
+	lsi.registerMethod("MonsterSpell", "setCombatRadius", luaMonsterSpellSetCombatRadius);
+	lsi.registerMethod("MonsterSpell", "setCombatRing", luaMonsterSpellSetCombatRing);
+	lsi.registerMethod("MonsterSpell", "setConditionType", luaMonsterSpellSetConditionType);
+	lsi.registerMethod("MonsterSpell", "setConditionDamage", luaMonsterSpellSetConditionDamage);
+	lsi.registerMethod("MonsterSpell", "setConditionSpeedChange", luaMonsterSpellSetConditionSpeedChange);
+	lsi.registerMethod("MonsterSpell", "setConditionDuration", luaMonsterSpellSetConditionDuration);
+	lsi.registerMethod("MonsterSpell", "setConditionDrunkenness", luaMonsterSpellSetConditionDrunkenness);
+	lsi.registerMethod("MonsterSpell", "setConditionTickInterval", luaMonsterSpellSetConditionTickInterval);
+	lsi.registerMethod("MonsterSpell", "setCombatShootEffect", luaMonsterSpellSetCombatShootEffect);
+	lsi.registerMethod("MonsterSpell", "setCombatEffect", luaMonsterSpellSetCombatEffect);
+	lsi.registerMethod("MonsterSpell", "setOutfit", luaMonsterSpellSetOutfit);
 
 	lsi.registerClass("MonsterType", "", luaMonsterTypeCreate);
 	lsi.registerMetaMethod("MonsterType", "__eq", tfs::lua::luaUserdataCompare);
@@ -1240,4 +1745,16 @@ void tfs::lua::registerMonsterType(LuaScriptInterface& lsi)
 	lsi.registerMethod("MonsterType", "changeTargetSpeed", luaMonsterTypeChangeTargetSpeed);
 
 	lsi.registerMethod("MonsterType", "bestiaryInfo", luaMonsterTypeBestiaryInfo);
+
+	lsi.registerClass("Loot", "", luaCreateLoot);
+	lsi.registerMetaMethod("Loot", "__gc", luaDeleteLoot);
+	lsi.registerMethod("Loot", "delete", luaDeleteLoot);
+
+	lsi.registerMethod("Loot", "setId", luaLootSetId);
+	lsi.registerMethod("Loot", "setMaxCount", luaLootSetMaxCount);
+	lsi.registerMethod("Loot", "setSubType", luaLootSetSubType);
+	lsi.registerMethod("Loot", "setChance", luaLootSetChance);
+	lsi.registerMethod("Loot", "setActionId", luaLootSetActionId);
+	lsi.registerMethod("Loot", "setDescription", luaLootSetDescription);
+	lsi.registerMethod("Loot", "addChildLoot", luaLootAddChildLoot);
 }

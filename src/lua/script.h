@@ -28,6 +28,7 @@ struct Outfit;
 
 using Combat_ptr = std::shared_ptr<Combat>;
 
+inline constexpr int32_t EVENT_ID_LOADING = 1;
 inline constexpr int32_t EVENT_ID_USER = 1000;
 
 struct LuaTimerEventDesc
@@ -80,11 +81,6 @@ public:
 	void registerMetaMethod(std::string_view className, std::string_view methodName, lua_CFunction func);
 	void registerMethod(std::string_view globalName, std::string_view methodName, lua_CFunction func);
 	void registerVariable(std::string_view tableName, std::string_view name, lua_Number value);
-
-	static const luaL_Reg luaBitReg[7];
-	static const luaL_Reg luaConfigManagerTable[4];
-	static const luaL_Reg luaDatabaseTable[9];
-	static const luaL_Reg luaResultTable[6];
 
 protected:
 	virtual bool closeState();
@@ -140,39 +136,6 @@ private:
 	static int luaSendGuildChannelMessage(lua_State* L);
 
 	static int luaIsScriptsInterface(lua_State* L);
-
-	static int luaBitNot(lua_State* L);
-	static int luaBitAnd(lua_State* L);
-	static int luaBitOr(lua_State* L);
-	static int luaBitXor(lua_State* L);
-	static int luaBitLeftShift(lua_State* L);
-	static int luaBitRightShift(lua_State* L);
-
-	static int luaConfigManagerGetString(lua_State* L);
-	static int luaConfigManagerGetNumber(lua_State* L);
-	static int luaConfigManagerGetBoolean(lua_State* L);
-
-	static int luaDatabaseExecute(lua_State* L);
-	static int luaDatabaseAsyncExecute(lua_State* L);
-	static int luaDatabaseStoreQuery(lua_State* L);
-	static int luaDatabaseAsyncStoreQuery(lua_State* L);
-	static int luaDatabaseEscapeString(lua_State* L);
-	static int luaDatabaseEscapeBlob(lua_State* L);
-	static int luaDatabaseLastInsertId(lua_State* L);
-	static int luaDatabaseTableExists(lua_State* L);
-
-	static int luaResultGetNumber(lua_State* L);
-	static int luaResultGetString(lua_State* L);
-	static int luaResultGetStream(lua_State* L);
-	static int luaResultNext(lua_State* L);
-	static int luaResultFree(lua_State* L);
-
-	// os
-	static int luaSystemTime(lua_State* L);
-
-	// table
-	static int luaTableCreate(lua_State* L);
-	static int luaTablePack(lua_State* L);
 
 	//
 	std::string lastLuaError;

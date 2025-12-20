@@ -1,8 +1,5 @@
 #pragma once
 
-#include <lua.hpp>
-#include <string>
-
 namespace tfs::lua {
 
 enum ErrorCode_t

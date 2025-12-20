@@ -317,15 +317,6 @@
     <ClCompile Include="..\src\lua\modules\party.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lua\modules\monsterspell.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\loot.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\monstertype.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lua\modules\outfit.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
@@ -392,17 +383,23 @@
     <ClCompile Include="..\src\lua\modules\game.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lua\modules\dbtransaction.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\dbinsert.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lua\modules\configmanager.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\script.cpp">
       <Filter>Source Files\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules\monsters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules\stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules\database.cpp">
+      <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -693,6 +690,9 @@
     </ClInclude>
     <ClInclude Include="..\src\lua\script.h">
       <Filter>Header Files\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\modules.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

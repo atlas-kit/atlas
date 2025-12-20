@@ -1,7 +1,19 @@
+#include "../../otpch.h"
+
+#include "../../combat.h"
+
+#include "../../creature.h"
+#include "../../game.h"
+#include "../../matrixarea.h"
+#include "../../player.h"
 #include "../api.h"
+#include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
+
+extern Game g_game;
+extern LuaEnvironment g_luaEnvironment;
 
 namespace {
 
