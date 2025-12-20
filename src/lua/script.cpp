@@ -31,6 +31,7 @@ extern Vocations g_vocations;
 extern Spells* g_spells;
 extern Actions* g_actions;
 extern TalkActions* g_talkActions;
+extern Scheduler g_scheduler;
 extern CreatureEvents* g_creatureEvents;
 extern Scripts* g_scripts;
 extern Weapons* g_weapons;

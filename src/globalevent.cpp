@@ -5,6 +5,8 @@
 
 #include "globalevent.h"
 
+#include "lua/api.h"
+#include "lua/env.h"
 #include "pugicast.h"
 #include "scheduler.h"
 #include "tools.h"

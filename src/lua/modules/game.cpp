@@ -22,7 +22,8 @@ extern LuaEnvironment g_luaEnvironment;
 extern Spells* g_spells;
 extern Monsters g_monsters;
 extern Scripts* g_scripts;
-extern Dispatcher g_dispather;
+extern Dispatcher g_dispatcher;
+extern Vocations g_vocations;
 
 namespace {
 
