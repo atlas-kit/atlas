@@ -1,14 +1,15 @@
 FROM debian:forky-slim AS build
 RUN apt-get update -q && apt-get install -yq \
   build-essential \
+  cmake \
   libboost-iostreams1.88-dev \
   libboost-json1.88-dev \
   libboost-system1.88-dev \
-  cmake \
   liblua5.4-dev \
   libmariadb-dev \
   libpugixml-dev \
   libsimdutf-dev \
+  libspdlog-dev \
   libssl-dev \
   ninja-build
 
@@ -25,7 +26,8 @@ RUN apt-get update -q && apt-get install -yq \
   liblua5.4-0 \
   libmariadb3 \
   libpugixml1v5 \
-  libsimdutf27 \
+  libsimdutf29 \
+  libspdlog1.15 \
   libssl3t64 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
