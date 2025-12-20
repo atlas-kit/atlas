@@ -374,7 +374,6 @@ private:
 	static int luaNetworkMessageGetU64(lua_State* L);
 	static int luaNetworkMessageGetString(lua_State* L);
 	static int luaNetworkMessageGetPosition(lua_State* L);
-	static int luaNetworkMessageGetBool(lua_State* L);
 
 	static int luaNetworkMessageAddByte(lua_State* L);
 	static int luaNetworkMessageAddU16(lua_State* L);
@@ -390,7 +389,6 @@ private:
 	static int luaNetworkMessageLength(lua_State* L);
 	static int luaNetworkMessageSkipBytes(lua_State* L);
 	static int luaNetworkMessageSendToPlayer(lua_State* L);
-	static int luaNetworkMessageAddBool(lua_State* L);
 
 	// ModalWindow
 	static int luaModalWindowCreate(lua_State* L);
