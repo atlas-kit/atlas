@@ -182,7 +182,7 @@ if (ENABLE_HTTP)
 endif ()
 
 add_subdirectory(lua)
-target_link_libraries(tfslib PRIVATE $<TARGET_OBJECTS:lua>)
+target_link_libraries(tfslib PRIVATE $<TARGET_OBJECTS:tfs_lua>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 

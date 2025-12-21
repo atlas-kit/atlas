@@ -19,6 +19,8 @@ set(lua_HDR
 	)
 
 add_subdirectory(modules)
-add_library(lua OBJECT ${lua_SRC} ${lua_HDR})
-set_target_properties(lua PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
-target_sources(lua PRIVATE $<TARGET_OBJECTS:luamodules>)
+
+add_library(tfs_lua OBJECT ${lua_SRC} ${lua_HDR})
+set_target_properties(tfs_lua PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
+
+target_sources(tfs_lua PRIVATE $<TARGET_OBJECTS:luamodules>)
