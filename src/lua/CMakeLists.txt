@@ -18,8 +18,7 @@ set(lua_HDR
 	${CMAKE_CURRENT_LIST_DIR}/variant.h
 	)
 
+add_subdirectory(modules)
 add_library(lua OBJECT ${lua_SRC} ${lua_HDR})
 set_target_properties(lua PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
-
-add_subdirectory(luamodules)
-target_link_libraries(tfslib PRIVATE luamodules)
+target_sources(lua PRIVATE $<TARGET_OBJECTS:luamodules>)
