@@ -90,11 +90,11 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 
 	json::array characters;
 	uint32_t lastLogin = 0;
-	if (const auto& result = db.storeQuery(std::format(
+	if (const auto& playersResult = db.storeQuery(std::format(
 	        "SELECT `id`, `name`, `level`, `vocation`, `lastlogin`, `sex`, `looktype`, `lookhead`, `lookbody`, `looklegs`, `lookfeet`, `lookaddons` FROM `players` WHERE `account_id` = {:d}",
 	        accountId))) {
 		do {
-			auto vocation = g_vocations.getVocation(result->getNumber<uint32_t>("vocation"));
+			auto vocation = g_vocations.getVocation(playersResult->getNumber<uint32_t>("vocation"));
 			assert(vocation);
 
 			characters.push_back({
