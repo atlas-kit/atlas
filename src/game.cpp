@@ -4864,9 +4864,9 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party) {
-		party = new Party(player);
+		party = Party::create(player);
 	} else if (party->getLeader() != player) {
 		return;
 	}
@@ -4874,7 +4874,6 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!tfs::events::party::onInvite(party, invitedPlayer)) {
 		if (party->empty()) {
 			player->setParty(nullptr);
-			delete party;
 		}
 		return;
 	}
@@ -4894,7 +4893,7 @@ void Game::playerJoinParty(uint32_t playerId, uint32_t leaderId)
 		return;
 	}
 
-	Party* party = leader->getParty();
+	auto party = leader->getParty();
 	if (!party || party->getLeader() != leader) {
 		return;
 	}
@@ -4914,7 +4913,7 @@ void Game::playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4933,7 +4932,7 @@ void Game::playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4952,7 +4951,7 @@ void Game::playerLeaveParty(uint32_t playerId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party || player->hasCondition(CONDITION_INFIGHT)) {
 		return;
 	}
@@ -4967,7 +4966,7 @@ void Game::playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpAc
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party || (player->hasCondition(CONDITION_INFIGHT) && player->getZone() != ZONE_PROTECTION)) {
 		return;
 	}
