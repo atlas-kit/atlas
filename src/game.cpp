@@ -4866,7 +4866,9 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 
 	Party* party = player->getParty();
 	if (!party) {
-		party = new Party(player);
+		party = new Party();
+		party->setLeader(player);
+		addParty(party);
 	} else if (party->getLeader() != player) {
 		return;
 	}
@@ -4874,6 +4876,7 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!tfs::events::party::onInvite(party, invitedPlayer)) {
 		if (party->empty()) {
 			player->setParty(nullptr);
+			g_game.removeParty(party);
 			delete party;
 		}
 		return;

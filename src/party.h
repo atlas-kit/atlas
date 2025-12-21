@@ -24,9 +24,12 @@ enum SharedExpStatus_t : uint8_t
 class Party
 {
 public:
-	explicit Party(const std::shared_ptr<Player>& leader);
+	constexpr Party() = default;
+	~Party() = default;
 
 	auto getLeader() const { return leader.lock(); }
+	void setLeader(const std::shared_ptr<Player>& leader);
+
 	const auto& getMembers() const { return memberList; }
 	const auto& getInvitees() const { return inviteList; }
 

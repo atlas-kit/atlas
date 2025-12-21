@@ -2324,6 +2324,7 @@ void LuaScriptInterface::registerFunctions()
 	registerMethod(L, "Game", "getItemTypeByClientId", LuaScriptInterface::luaGameGetItemTypeByClientId);
 	registerMethod(L, "Game", "getMountIdByLookType", LuaScriptInterface::luaGameGetMountIdByLookType);
 
+	registerMethod(L, "Game", "getParties", LuaScriptInterface::luaGameGetParties);
 	registerMethod(L, "Game", "getTowns", LuaScriptInterface::luaGameGetTowns);
 	registerMethod(L, "Game", "getHouses", LuaScriptInterface::luaGameGetHouses);
 	registerMethod(L, "Game", "getOutfits", LuaScriptInterface::luaGameGetOutfits);
@@ -4617,6 +4618,21 @@ int LuaScriptInterface::luaGameGetMountIdByLookType(lua_State* L)
 		tfs::lua::pushNumber(L, mount->id);
 	} else {
 		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGameGetParties(lua_State* L)
+{
+	// Game.getParties()
+	const auto& parties = g_game.getParties();
+	lua_createtable(L, parties.size(), 0);
+
+	int index = 0;
+	for (const auto party : parties) {
+		tfs::lua::pushUserdata(L, party);
+		tfs::lua::setMetatable(L, -1, "Party");
+		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
 }
@@ -15695,7 +15711,10 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 
 	Party* party = player->getParty();
 	if (!party) {
-		party = new Party(player);
+		party = new Party();
+		party->setLeader(player);
+		g_game.addParty(party);
+
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
 		tfs::lua::pushUserdata(L, party);
