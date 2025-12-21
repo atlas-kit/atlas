@@ -18,7 +18,7 @@ set(lua_HDR
 	${CMAKE_CURRENT_LIST_DIR}/variant.h
 	)
 
-add_library(lua OBJECT ${lua_SRC})
+add_library(lua OBJECT ${lua_SRC} ${lua_HDR})
 set_target_properties(lua PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 add_subdirectory(luamodules)

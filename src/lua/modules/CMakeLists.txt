@@ -39,5 +39,4 @@ set(luamodules_SRC
 	)
 
 add_library(luamodules OBJECT ${luamodules_SRC})
-target_link_libraries(luamodules)
 set_target_properties(luamodules PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
