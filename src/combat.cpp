@@ -8,6 +8,7 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "matrixarea.h"
