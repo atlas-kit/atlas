@@ -8,7 +8,7 @@
 #include "position.h"
 
 #define luaL_register(L, libname, l) (luaL_newlib(L, l), lua_pushvalue(L, -1), lua_setglobal(L, libname))
-#define lua_equal(L, i1, i2) lua_compare(L, (i1), (i2), LUA_OPEQ)
+
 class AreaCombat;
 class Combat;
 class Container;
