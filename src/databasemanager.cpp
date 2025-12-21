@@ -8,6 +8,7 @@
 #include "configmanager.h"
 #include "database.h"
 #include "lua/api.h"
+#include "lua/modules.h"
 #include "lua/register.h"
 #include "lua/script.h"
 
