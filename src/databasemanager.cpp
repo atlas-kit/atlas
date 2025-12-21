@@ -7,9 +7,9 @@
 
 #include "configmanager.h"
 #include "database.h"
-#include "lua/script.h"
 #include "lua/api.h"
 #include "lua/register.h"
+#include "lua/script.h"
 
 bool DatabaseManager::optimizeTables()
 {

@@ -6,10 +6,10 @@
 #include "events.h"
 
 #include "item.h"
+#include "lua/env.h"
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "player.h"
-#include "lua/env.h"
 
 namespace {
 

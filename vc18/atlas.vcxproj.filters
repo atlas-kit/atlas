@@ -383,12 +383,6 @@
     <ClCompile Include="..\src\lua\script.cpp">
       <Filter>Source Files\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lua\modules\monsters.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\stdlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lua\modules\database.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
@@ -400,6 +394,12 @@
     </ClCompile>
     <ClCompile Include="..\src\lua\modules.cpp">
       <Filter>Source Files\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules\monsters.cpp">
+      <Filter>Source Files\lua\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\modules\stdlib.cpp">
+      <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -692,7 +692,7 @@
       <Filter>Header Files\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\modules.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

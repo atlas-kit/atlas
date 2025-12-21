@@ -10,6 +10,7 @@ class InstantSpell;
 class Player;
 class Spell;
 class Thing;
+
 struct LootBlock;
 struct Mount;
 struct Town;

@@ -33,9 +33,9 @@ int luaConfigManagerGetBoolean(lua_State* L)
 }
 
 static const luaL_Reg luaConfigManagerTable[] = {{"getString", luaConfigManagerGetString},
-                                                  {"getNumber", luaConfigManagerGetNumber},
-                                                  {"getBoolean", luaConfigManagerGetBoolean},
-                                                  {nullptr, nullptr}};
+                                                 {"getNumber", luaConfigManagerGetNumber},
+                                                 {"getBoolean", luaConfigManagerGetBoolean},
+                                                 {nullptr, nullptr}};
 
 } // namespace
 

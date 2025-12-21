@@ -9,8 +9,8 @@
 #include "configmanager.h"
 #include "game.h"
 #include "housetile.h"
-#include "lua/meta.h"
 #include "lua/env.h"
+#include "lua/meta.h"
 #include "spells.h"
 
 extern Game g_game;
