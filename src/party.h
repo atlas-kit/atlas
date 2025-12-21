@@ -25,7 +25,6 @@ class Party
 {
 public:
 	explicit Party(const std::shared_ptr<Player>& leader);
-	~Party() = default;
 
 	auto getLeader() const { return leader.lock(); }
 	const auto& getMembers() const { return memberList; }
