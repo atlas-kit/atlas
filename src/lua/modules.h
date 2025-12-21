@@ -1,6 +1,6 @@
 #pragma once
 
-class LuaScriptInterface;
+#include "script.h"
 
 namespace tfs::lua {
 
