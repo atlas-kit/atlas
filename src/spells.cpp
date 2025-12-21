@@ -9,6 +9,7 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
+#include "lua/env.h"
 #include "lua/meta.h"
 #include "lua/variant.h"
 #include "monsters.h"
