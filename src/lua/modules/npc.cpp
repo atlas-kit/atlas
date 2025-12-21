@@ -132,6 +132,15 @@ int luaNpcGetSpectators(lua_State* L)
 
 void tfs::lua::registerNpc(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, SPEECHBUBBLE_NONE);
+	registerEnum(lsi, SPEECHBUBBLE_NORMAL);
+	registerEnum(lsi, SPEECHBUBBLE_TRADE);
+	registerEnum(lsi, SPEECHBUBBLE_QUEST);
+	registerEnum(lsi, SPEECHBUBBLE_COMPASS);
+	registerEnum(lsi, SPEECHBUBBLE_NORMAL2);
+	registerEnum(lsi, SPEECHBUBBLE_NORMAL3);
+	registerEnum(lsi, SPEECHBUBBLE_HIRELING);
+
 	lsi.registerClass("Npc", "Creature", luaNpcCreate);
 	lsi.registerMetaMethod("Npc", "__eq", tfs::lua::luaUserdataCompare);
 

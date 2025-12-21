@@ -1635,6 +1635,12 @@ int luaLootAddChildLoot(lua_State* L)
 
 void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, MONSTERS_EVENT_THINK);
+	registerEnum(lsi, MONSTERS_EVENT_APPEAR);
+	registerEnum(lsi, MONSTERS_EVENT_DISAPPEAR);
+	registerEnum(lsi, MONSTERS_EVENT_MOVE);
+	registerEnum(lsi, MONSTERS_EVENT_SAY);
+
 	registerEnum(lsi, MAX_LOOTCHANCE);
 
 	lsi.registerClass("MonsterSpell", "", luaCreateMonsterSpell);

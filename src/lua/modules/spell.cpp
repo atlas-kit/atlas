@@ -901,6 +901,9 @@ int luaSpellCheckFloor(lua_State* L)
 
 void tfs::lua::registerSpell(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, SPELL_INSTANT);
+	registerEnum(lsi, SPELL_RUNE);
+
 	lsi.registerClass("Spell", "", luaSpellCreate);
 	lsi.registerMetaMethod("Spell", "__eq", tfs::lua::luaUserdataCompare);
 

@@ -956,6 +956,70 @@ int luaItemTypeIsStoreItem(lua_State* L)
 
 void tfs::lua::registerItemType(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, ITEM_ATTRIBUTE_NONE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_ACTIONID);
+	registerEnum(lsi, ITEM_ATTRIBUTE_UNIQUEID);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DESCRIPTION);
+	registerEnum(lsi, ITEM_ATTRIBUTE_TEXT);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DATE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_WRITER);
+	registerEnum(lsi, ITEM_ATTRIBUTE_NAME);
+	registerEnum(lsi, ITEM_ATTRIBUTE_ARTICLE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_PLURALNAME);
+	registerEnum(lsi, ITEM_ATTRIBUTE_WEIGHT);
+	registerEnum(lsi, ITEM_ATTRIBUTE_ATTACK);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DEFENSE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_EXTRADEFENSE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_ARMOR);
+	registerEnum(lsi, ITEM_ATTRIBUTE_HITCHANCE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_SHOOTRANGE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_OWNER);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DURATION);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DECAYSTATE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_CORPSEOWNER);
+	registerEnum(lsi, ITEM_ATTRIBUTE_CHARGES);
+	registerEnum(lsi, ITEM_ATTRIBUTE_FLUIDTYPE);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DOORID);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DECAYTO);
+	registerEnum(lsi, ITEM_ATTRIBUTE_WRAPID);
+	registerEnum(lsi, ITEM_ATTRIBUTE_STOREITEM);
+	registerEnum(lsi, ITEM_ATTRIBUTE_ATTACK_SPEED);
+	registerEnum(lsi, ITEM_ATTRIBUTE_OPENCONTAINER);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DURATION_MIN);
+	registerEnum(lsi, ITEM_ATTRIBUTE_DURATION_MAX);
+
+	registerEnum(lsi, ITEM_BROWSEFIELD);
+	registerEnum(lsi, ITEM_BAG);
+	registerEnum(lsi, ITEM_SHOPPING_BAG);
+	registerEnum(lsi, ITEM_GOLD_COIN);
+	registerEnum(lsi, ITEM_PLATINUM_COIN);
+	registerEnum(lsi, ITEM_CRYSTAL_COIN);
+	registerEnum(lsi, ITEM_AMULETOFLOSS);
+	registerEnum(lsi, ITEM_PARCEL);
+	registerEnum(lsi, ITEM_LABEL);
+	registerEnum(lsi, ITEM_FIREFIELD_PVP_FULL);
+	registerEnum(lsi, ITEM_FIREFIELD_PVP_MEDIUM);
+	registerEnum(lsi, ITEM_FIREFIELD_PVP_SMALL);
+	registerEnum(lsi, ITEM_FIREFIELD_PERSISTENT_FULL);
+	registerEnum(lsi, ITEM_FIREFIELD_PERSISTENT_MEDIUM);
+	registerEnum(lsi, ITEM_FIREFIELD_PERSISTENT_SMALL);
+	registerEnum(lsi, ITEM_FIREFIELD_NOPVP);
+	registerEnum(lsi, ITEM_FIREFIELD_NOPVP_MEDIUM);
+	registerEnum(lsi, ITEM_POISONFIELD_PVP);
+	registerEnum(lsi, ITEM_POISONFIELD_PERSISTENT);
+	registerEnum(lsi, ITEM_POISONFIELD_NOPVP);
+	registerEnum(lsi, ITEM_ENERGYFIELD_PVP);
+	registerEnum(lsi, ITEM_ENERGYFIELD_PERSISTENT);
+	registerEnum(lsi, ITEM_ENERGYFIELD_NOPVP);
+	registerEnum(lsi, ITEM_MAGICWALL);
+	registerEnum(lsi, ITEM_MAGICWALL_PERSISTENT);
+	registerEnum(lsi, ITEM_MAGICWALL_SAFE);
+	registerEnum(lsi, ITEM_WILDGROWTH);
+	registerEnum(lsi, ITEM_WILDGROWTH_PERSISTENT);
+	registerEnum(lsi, ITEM_WILDGROWTH_SAFE);
+	registerEnum(lsi, ITEM_DECORATION_KIT);
+	registerEnum(lsi, ITEM_MARKET);
+
 	registerEnum(lsi, ITEM_TYPE_DEPOT);
 	registerEnum(lsi, ITEM_TYPE_MAILBOX);
 	registerEnum(lsi, ITEM_TYPE_TRASHHOLDER);
@@ -997,6 +1061,27 @@ void tfs::lua::registerItemType(LuaScriptInterface& lsi)
 	registerEnum(lsi, SLOTP_AMMO);
 	registerEnum(lsi, SLOTP_DEPOT);
 	registerEnum(lsi, SLOTP_TWO_HAND);
+
+	registerEnum(lsi, FLUID_NONE);
+	registerEnum(lsi, FLUID_WATER);
+	registerEnum(lsi, FLUID_BLOOD);
+	registerEnum(lsi, FLUID_BEER);
+	registerEnum(lsi, FLUID_SLIME);
+	registerEnum(lsi, FLUID_LEMONADE);
+	registerEnum(lsi, FLUID_MILK);
+	registerEnum(lsi, FLUID_MANA);
+	registerEnum(lsi, FLUID_LIFE);
+	registerEnum(lsi, FLUID_OIL);
+	registerEnum(lsi, FLUID_URINE);
+	registerEnum(lsi, FLUID_COCONUTMILK);
+	registerEnum(lsi, FLUID_WINE);
+	registerEnum(lsi, FLUID_MUD);
+	registerEnum(lsi, FLUID_FRUITJUICE);
+	registerEnum(lsi, FLUID_LAVA);
+	registerEnum(lsi, FLUID_RUM);
+	registerEnum(lsi, FLUID_SWAMP);
+	registerEnum(lsi, FLUID_TEA);
+	registerEnum(lsi, FLUID_MEAD);
 
 	lsi.registerClass("ItemType", "", luaItemTypeCreate);
 	lsi.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);

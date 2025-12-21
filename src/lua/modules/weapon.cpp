@@ -638,6 +638,25 @@ int luaWeaponExtraElement(lua_State* L)
 
 void tfs::lua::registerWeapon(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, WEAPON_NONE);
+	registerEnum(lsi, WEAPON_SWORD);
+	registerEnum(lsi, WEAPON_CLUB);
+	registerEnum(lsi, WEAPON_AXE);
+	registerEnum(lsi, WEAPON_SHIELD);
+	registerEnum(lsi, WEAPON_DISTANCE);
+	registerEnum(lsi, WEAPON_WAND);
+	registerEnum(lsi, WEAPON_AMMO);
+	registerEnum(lsi, WEAPON_QUIVER);
+
+	registerEnum(lsi, AMMO_NONE);
+	registerEnum(lsi, AMMO_BOLT);
+	registerEnum(lsi, AMMO_ARROW);
+	registerEnum(lsi, AMMO_SPEAR);
+	registerEnum(lsi, AMMO_THROWINGSTAR);
+	registerEnum(lsi, AMMO_THROWINGKNIFE);
+	registerEnum(lsi, AMMO_STONE);
+	registerEnum(lsi, AMMO_SNOWBALL);
+
 	lsi.registerClass("Weapon", "", luaCreateWeapon);
 	lsi.registerMethod("Weapon", "action", luaWeaponAction);
 	lsi.registerMethod("Weapon", "register", luaWeaponRegister);

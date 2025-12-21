@@ -2436,6 +2436,33 @@ int luaPlayerSendEnterMarket(lua_State* L)
 
 void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, VOCATION_NONE);
+
+	registerEnum(lsi, SKILL_FIST);
+	registerEnum(lsi, SKILL_CLUB);
+	registerEnum(lsi, SKILL_SWORD);
+	registerEnum(lsi, SKILL_AXE);
+	registerEnum(lsi, SKILL_DISTANCE);
+	registerEnum(lsi, SKILL_SHIELD);
+	registerEnum(lsi, SKILL_FISHING);
+	registerEnum(lsi, SKILL_MAGLEVEL);
+	registerEnum(lsi, SKILL_LEVEL);
+
+	registerEnum(lsi, SPECIALSKILL_CRITICALHITCHANCE);
+	registerEnum(lsi, SPECIALSKILL_CRITICALHITAMOUNT);
+	registerEnum(lsi, SPECIALSKILL_LIFELEECHCHANCE);
+	registerEnum(lsi, SPECIALSKILL_LIFELEECHAMOUNT);
+	registerEnum(lsi, SPECIALSKILL_MANALEECHCHANCE);
+	registerEnum(lsi, SPECIALSKILL_MANALEECHAMOUNT);
+
+	registerEnum(lsi, STAT_MAXHITPOINTS);
+	registerEnum(lsi, STAT_MAXMANAPOINTS);
+	registerEnum(lsi, STAT_SOULPOINTS);
+	registerEnum(lsi, STAT_MAGICPOINTS);
+
+	registerEnum(lsi, PLAYERSEX_FEMALE);
+	registerEnum(lsi, PLAYERSEX_MALE);
+
 	registerEnum(lsi, FIGHTMODE_ATTACK);
 	registerEnum(lsi, FIGHTMODE_BALANCED);
 	registerEnum(lsi, FIGHTMODE_DEFENSE);

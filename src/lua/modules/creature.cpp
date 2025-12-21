@@ -1127,6 +1127,14 @@ int luaCreatureSetStorageValue(lua_State* L)
 
 void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 {
+	registerEnum(lsi, SKULL_NONE);
+	registerEnum(lsi, SKULL_YELLOW);
+	registerEnum(lsi, SKULL_GREEN);
+	registerEnum(lsi, SKULL_WHITE);
+	registerEnum(lsi, SKULL_RED);
+	registerEnum(lsi, SKULL_BLACK);
+	registerEnum(lsi, SKULL_ORANGE);
+
 	registerEnum(lsi, CONST_SLOT_HEAD);
 	registerEnum(lsi, CONST_SLOT_NECKLACE);
 	registerEnum(lsi, CONST_SLOT_BACKPACK);

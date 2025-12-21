@@ -72,10 +72,4 @@ ScriptEnvironment* getScriptEnv();
 bool reserveScriptEnv();
 void resetScriptEnv();
 
-inline uint32_t lastResultId = 0;
-inline std::map<uint32_t, std::shared_ptr<DBResult>> tempResults = {};
-
-inline std::array<ScriptEnvironment, 16> scriptEnv = {};
-inline int32_t scriptEnvIndex = -1;
-
 } // namespace tfs::lua

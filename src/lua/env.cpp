@@ -9,6 +9,12 @@ extern Game g_game;
 
 namespace tfs::lua {
 
+static uint32_t lastResultId = 0;
+static std::map<uint32_t, std::shared_ptr<DBResult>> tempResults = {};
+
+static std::array<ScriptEnvironment, 16> scriptEnv = {};
+static int32_t scriptEnvIndex = -1;
+
 uint32_t addResult(std::shared_ptr<DBResult> result)
 {
 	tempResults[++lastResultId] = std::move(result);
