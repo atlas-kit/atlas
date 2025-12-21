@@ -113,8 +113,6 @@ void DatabaseManager::updateDatabase()
 
 		tfs::lua::resetScriptEnv();
 	} while (true);
-
-	lua_close(lsi.getLuaState());
 }
 
 bool DatabaseManager::getDatabaseConfig(const std::string& config, int32_t& value)

@@ -10,13 +10,14 @@ void importModules(LuaScriptInterface& lsi)
 	std::cout << "Importing Lua modules..." << std::endl;
 
 	registerStdLib(lsi);
-	// registerGlobals(lsi);
+	registerGlobals(lsi);
 	registerConfigManager(lsi);
 
 	registerAction(lsi);
 	registerCombat(lsi);
 	registerCondition(lsi);
 
+	registerThing(lsi);
 	registerCreature(lsi);
 	registerMonster(lsi); // requires creature
 	registerNpc(lsi);     // requires creature

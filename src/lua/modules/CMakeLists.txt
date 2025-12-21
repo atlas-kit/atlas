@@ -9,6 +9,7 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/database.cpp
     ${CMAKE_CURRENT_LIST_DIR}/game.cpp
     ${CMAKE_CURRENT_LIST_DIR}/globalevent.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/globals.cpp
     ${CMAKE_CURRENT_LIST_DIR}/group.cpp
     ${CMAKE_CURRENT_LIST_DIR}/guild.cpp
     ${CMAKE_CURRENT_LIST_DIR}/house.cpp
@@ -29,6 +30,7 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/stdlib.cpp
     ${CMAKE_CURRENT_LIST_DIR}/talkaction.cpp
     ${CMAKE_CURRENT_LIST_DIR}/teleport.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/thing.cpp
     ${CMAKE_CURRENT_LIST_DIR}/tile.cpp
     ${CMAKE_CURRENT_LIST_DIR}/variant.cpp
     ${CMAKE_CURRENT_LIST_DIR}/vocation.cpp

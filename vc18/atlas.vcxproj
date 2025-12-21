@@ -176,6 +176,7 @@
     <ClCompile Include="..\src\lua\modules\database.cpp" />
     <ClCompile Include="..\src\lua\modules\game.cpp" />
     <ClCompile Include="..\src\lua\modules\globalevent.cpp" />
+    <ClCompile Include="..\src\lua\modules\globals.cpp" />
     <ClCompile Include="..\src\lua\modules\group.cpp" />
     <ClCompile Include="..\src\lua\modules\guild.cpp" />
     <ClCompile Include="..\src\lua\modules\house.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="..\src\lua\modules\stdlib.cpp" />
     <ClCompile Include="..\src\lua\modules\talkaction.cpp" />
     <ClCompile Include="..\src\lua\modules\teleport.cpp" />
+    <ClCompile Include="..\src\lua\modules\thing.cpp" />
     <ClCompile Include="..\src\lua\modules\tile.cpp" />
     <ClCompile Include="..\src\lua\modules\variant.cpp" />
     <ClCompile Include="..\src\lua\modules\vocation.cpp" />

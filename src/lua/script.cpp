@@ -19,6 +19,7 @@
 #include "api.h"
 #include "env.h"
 #include "error.h"
+#include "modules.h"
 #include "script.h"
 
 #include <string>
@@ -596,61 +597,6 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State* L)
 	return 1;
 }
 
-int LuaScriptInterface::luaIsValidUID(lua_State* L)
-{
-	// isValidUID(uid)
-	tfs::lua::pushBoolean(L, tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1)) != nullptr);
-	return 1;
-}
-
-int LuaScriptInterface::luaIsDepot(lua_State* L)
-{
-	// isDepot(uid)
-	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(tfs::lua::getNumber<uint32_t>(L, -1));
-	tfs::lua::pushBoolean(L, container && container->getDepotLocker());
-	return 1;
-}
-
-int LuaScriptInterface::luaIsMoveable(lua_State* L)
-{
-	// isMoveable(uid)
-	// isMovable(uid)
-	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
-	if (const auto& item = thing->asItem()) {
-		tfs::lua::pushBoolean(L, item->isPushable());
-	} else if (const auto& creature = thing->asCreature()) {
-		tfs::lua::pushBoolean(L, creature->isPushable());
-	} else if (const auto& tile = thing->asTile()) {
-		tfs::lua::pushBoolean(L, false);
-	} else {
-		tfs::lua::pushBoolean(L, false);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaGetDepotId(lua_State* L)
-{
-	// getDepotId(uid)
-	uint32_t uid = tfs::lua::getNumber<uint32_t>(L, -1);
-
-	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(uid);
-	if (!container) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CONTAINER_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const auto& depotLocker = container->getDepotLocker();
-	if (!depotLocker) {
-		tfs::lua::reportError(L, "Depot not found");
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	tfs::lua::pushNumber(L, depotLocker->getDepotId());
-	return 1;
-}
-
 int LuaScriptInterface::luaAddEvent(lua_State* L)
 {
 	// addEvent(callback, delay, ...)
@@ -894,21 +840,6 @@ int LuaScriptInterface::luaIsScriptsInterface(lua_State* L)
 
 void LuaScriptInterface::registerFunctions()
 {
-	// isValidUID(uid)
-	lua_register(L, "isValidUID", LuaScriptInterface::luaIsValidUID);
-
-	// isDepot(uid)
-	lua_register(L, "isDepot", LuaScriptInterface::luaIsDepot);
-
-	// isMovable(uid)
-	lua_register(L, "isMovable", LuaScriptInterface::luaIsMoveable);
-
-	// doAddContainerItem(uid, itemid, <optional> count/subtype)
-	// lua_register(L, "doAddContainerItem", LuaScriptInterface::luaDoAddContainerItem);
-
-	// getDepotId(uid)
-	lua_register(L, "getDepotId", LuaScriptInterface::luaGetDepotId);
-
 	// getWorldUpTime()
 	lua_register(L, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
 
@@ -969,6 +900,8 @@ void LuaScriptInterface::registerFunctions()
 	// registerGlobalVariable(name, value)
 	// registerEnum(value)
 	// registerEnumIn(tableName, value)
+
+	tfs::lua::importModules(*this);
 }
 
 LuaEnvironment::LuaEnvironment() : LuaScriptInterface("Main Interface") {}

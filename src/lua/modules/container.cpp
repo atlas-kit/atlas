@@ -13,6 +13,37 @@ extern Game g_game;
 
 namespace {
 
+int luaGetDepotId(lua_State* L)
+{
+	// getDepotId(uid)
+	uint32_t uid = tfs::lua::getNumber<uint32_t>(L, -1);
+
+	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(uid);
+	if (!container) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CONTAINER_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	const auto& depotLocker = container->getDepotLocker();
+	if (!depotLocker) {
+		tfs::lua::reportError(L, "Depot not found");
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	tfs::lua::pushNumber(L, depotLocker->getDepotId());
+	return 1;
+}
+
+int luaIsDepot(lua_State* L)
+{
+	// isDepot(uid)
+	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(tfs::lua::getNumber<uint32_t>(L, -1));
+	tfs::lua::pushBoolean(L, container && container->getDepotLocker());
+	return 1;
+}
+
 int luaContainerCreate(lua_State* L)
 {
 	// Container(uid)
@@ -296,6 +327,10 @@ void tfs::lua::registerContainer(LuaScriptInterface& lsi)
 	registerEnum(lsi, FLAG_IGNOREFIELDDAMAGE);
 	registerEnum(lsi, FLAG_IGNORENOTMOVEABLE);
 	registerEnum(lsi, FLAG_IGNOREAUTOSTACK);
+
+	lua_register(lsi.getLuaState(), "getDepotId", luaGetDepotId);
+
+	lua_register(lsi.getLuaState(), "isDepot", luaIsDepot);
 
 	lsi.registerClass("Container", "Item", luaContainerCreate);
 	lsi.registerMetaMethod("Container", "__eq", tfs::lua::luaUserdataCompare);
