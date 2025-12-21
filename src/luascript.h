@@ -7,8 +7,6 @@
 #include "enums.h"
 #include "position.h"
 
-#define luaL_register(L, libname, l) (luaL_newlib(L, l), lua_pushvalue(L, -1), lua_setglobal(L, libname))
-
 class AreaCombat;
 class Combat;
 class Container;
