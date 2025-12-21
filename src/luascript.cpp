@@ -15711,8 +15711,7 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 
 	Party* party = player->getParty();
 	if (!party) {
-		party = new Party();
-		party->setLeader(player);
+		party = new Party(player);
 		g_game.addParty(party);
 
 		g_game.updatePlayerShield(player);

@@ -4866,8 +4866,7 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 
 	Party* party = player->getParty();
 	if (!party) {
-		party = new Party();
-		party->setLeader(player);
+		party = new Party(player);
 		addParty(party);
 	} else if (party->getLeader() != player) {
 		return;

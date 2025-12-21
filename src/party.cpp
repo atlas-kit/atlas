@@ -11,11 +11,7 @@
 
 extern Game g_game;
 
-void Party::setLeader(const std::shared_ptr<Player>& leader)
-{
-	this->leader = leader;
-	leader->setParty(this);
-}
+Party::Party(const std::shared_ptr<Player>& leader) : leader{leader} { leader->setParty(this); }
 
 void Party::disband()
 {
