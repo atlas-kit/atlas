@@ -3,7 +3,7 @@ function NetworkMessage:getBool()
 	if value > 1 then
 		print("[Warning - NetworkMessage::getBool] Invalid boolean value received: " .. value)
 	end
-    return value ~= 0
+	return value ~= 0
 end
 
 function NetworkMessage:addBool(value)

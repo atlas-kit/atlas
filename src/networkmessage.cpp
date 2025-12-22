@@ -8,7 +8,7 @@
 #include "container.h"
 #include "podium.h"
 
-#include <iostream>
+
 #include <simdutf.h>
 
 std::string NetworkMessage::getString(uint16_t stringLen /* = 0*/)
@@ -41,7 +41,7 @@ bool NetworkMessage::getBool()
 {
 	const uint8_t value = getByte();
 	if (value > 1) {
-		std::cout << "[Warning - NetworkMessage::getBool] Invalid boolean value received: " << value
+		std::cout << "[Warning - NetworkMessage::getBool] Invalid boolean value received: " << static_cast<int>(value)
 		          << std::endl;
 	}
 	return value != 0;
