@@ -294,6 +294,7 @@ void tfs::lua::registerDatabase(LuaScriptInterface& lsi)
 	luaL_newlib(lsi.getLuaState(), luaDatabaseTable);
 	lua_pushvalue(lsi.getLuaState(), -1);
 	lua_setglobal(lsi.getLuaState(), "db");
+	lua_pop(lsi.getLuaState(), 1);
 
 	// result table
 	luaL_newlib(lsi.getLuaState(), luaResultTable);

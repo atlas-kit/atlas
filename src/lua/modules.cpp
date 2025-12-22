@@ -13,12 +13,12 @@ void importModules(LuaScriptInterface& lsi)
 	registerStdLib(lsi);
 	registerGlobals(lsi);
 	registerConfigManager(lsi);
-
+	registerDatabase(lsi);
 	registerAction(lsi);
 	registerCombat(lsi);
 	registerCondition(lsi);
-
 	registerThing(lsi);
+
 	registerCreature(lsi);
 	registerMonster(lsi); // requires creature
 	registerNpc(lsi);     // requires creature
@@ -46,7 +46,6 @@ void importModules(LuaScriptInterface& lsi)
 	registerPosition(lsi);
 	registerSpell(lsi);
 	registerTalkAction(lsi);
-	registerTeleport(lsi);
 	registerTile(lsi);
 	registerVariant(lsi);
 	registerVocation(lsi);
