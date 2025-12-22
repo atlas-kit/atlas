@@ -8,7 +8,6 @@
 #include "container.h"
 #include "podium.h"
 
-
 #include <simdutf.h>
 
 std::string NetworkMessage::getString(uint16_t stringLen /* = 0*/)
