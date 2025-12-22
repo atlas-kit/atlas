@@ -290,10 +290,15 @@ static const luaL_Reg luaResultTable[] = {{"getNumber", luaResultGetNumber}, {"g
 
 void tfs::lua::registerDatabase(LuaScriptInterface& lsi)
 {
-	luaL_register(lsi.getLuaState(), "db", luaDatabaseTable);
-	lua_pop(lsi.getLuaState(), 1);
+	// db table
+	luaL_newlib(lsi.getLuaState(), luaDatabaseTable);
+	lua_pushvalue(lsi.getLuaState(), -1);
+	lua_setglobal(lsi.getLuaState(), "db");
 
-	luaL_register(lsi.getLuaState(), "result", luaResultTable);
+	// result table
+	luaL_newlib(lsi.getLuaState(), luaResultTable);
+	lua_pushvalue(lsi.getLuaState(), -1);
+	lua_setglobal(lsi.getLuaState(), "result");
 	lua_pop(lsi.getLuaState(), 1);
 
 	lsi.registerClass("DBInsert", "", luaDBInsertCreate);

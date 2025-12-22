@@ -19,7 +19,8 @@ namespace {
 int luaIsValidUID(lua_State* L)
 {
 	// isValidUID(uid)
-	tfs::lua::pushBoolean(L, tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1)) != nullptr);
+	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
+	tfs::lua::pushBoolean(L, thing != nullptr);
 	return 1;
 }
 
@@ -28,6 +29,12 @@ int luaIsMoveable(lua_State* L)
 	// isMoveable(uid)
 	// isMovable(uid)
 	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
+	if (!thing) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_THING_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
 	if (const auto& item = thing->asItem()) {
 		tfs::lua::pushBoolean(L, item->isPushable());
 	} else if (const auto& creature = thing->asCreature()) {

@@ -41,7 +41,9 @@ static const luaL_Reg luaConfigManagerTable[] = {{"getString", luaConfigManagerG
 
 void tfs::lua::registerConfigManager(LuaScriptInterface& lsi)
 {
-	luaL_register(lsi.getLuaState(), "configManager", luaConfigManagerTable);
+	luaL_newlib(lsi.getLuaState(), luaConfigManagerTable);
+	lua_pushvalue(lsi.getLuaState(), -1);
+	lua_setglobal(lsi.getLuaState(), "configManager");
 	lua_pop(lsi.getLuaState(), 1);
 
 	lsi.registerTable("configKeys");
