@@ -9,7 +9,7 @@
 #include "../script.h"
 
 extern Scripts* g_scripts;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {
 

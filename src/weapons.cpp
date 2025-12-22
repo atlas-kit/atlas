@@ -15,7 +15,7 @@
 
 extern Game g_game;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 Weapons::Weapons() { scriptInterface.initState(); }
 
@@ -31,14 +31,14 @@ const Weapon* Weapons::getWeapon(const std::shared_ptr<const Item>& item) const
 	if (it == weapons.end()) {
 		return nullptr;
 	}
-	return it->second;
+	return it->second.get();
 }
 
 void Weapons::clear(bool fromLua)
 {
 	for (auto it = weapons.begin(); it != weapons.end();) {
 		if (fromLua == it->second->fromLua) {
-			it = weapons.erase(it);
+			it = weapons.erase(it); // unique_ptr automatically deletes the Weapon
 		} else {
 			++it;
 		}
@@ -61,9 +61,9 @@ void Weapons::loadDefaults()
 			case WEAPON_AXE:
 			case WEAPON_SWORD:
 			case WEAPON_CLUB: {
-				WeaponMelee* weapon = new WeaponMelee(&scriptInterface);
+				auto weapon = std::make_unique<WeaponMelee>(&scriptInterface);
 				weapon->configureWeapon(it);
-				weapons[i] = weapon;
+				weapons[i] = std::move(weapon);
 				break;
 			}
 
@@ -73,9 +73,9 @@ void Weapons::loadDefaults()
 					continue;
 				}
 
-				WeaponDistance* weapon = new WeaponDistance(&scriptInterface);
+				auto weapon = std::make_unique<WeaponDistance>(&scriptInterface);
 				weapon->configureWeapon(it);
-				weapons[i] = weapon;
+				weapons[i] = std::move(weapon);
 				break;
 			}
 
@@ -99,19 +99,19 @@ Event_ptr Weapons::getEvent(const std::string& nodeName)
 
 bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
 {
-	Weapon* weapon = static_cast<Weapon*>(event.release()); // event is guaranteed to be a Weapon
+	Weapon_ptr weapon{static_cast<Weapon*>(event.release())}; // event is guaranteed to be a Weapon
+	uint16_t weaponId = weapon->getID();
 
-	auto result = weapons.emplace(weapon->getID(), weapon);
+	auto result = weapons.emplace(weaponId, std::move(weapon));
 	if (!result.second) {
-		std::cout << "[Warning - Weapons::registerEvent] Duplicate registered item with id: " << weapon->getID()
-		          << std::endl;
+		std::cout << "[Warning - Weapons::registerEvent] Duplicate registered item with id: " << weaponId << std::endl;
 	}
 	return result.second;
 }
 
-bool Weapons::registerLuaEvent(Weapon* weapon)
+bool Weapons::registerLuaEvent(Weapon_ptr weapon)
 {
-	weapons[weapon->getID()] = weapon;
+	weapons[weapon->getID()] = std::move(weapon);
 	return true;
 }
 

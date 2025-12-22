@@ -27,7 +27,7 @@ extern Game g_game;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 MuteCountMap Player::muteCountMap;
 
