@@ -367,10 +367,8 @@ std::shared_ptr<ChatChannel> Chat::createChannel(const std::shared_ptr<const Pla
 				auto [it, inserted] = m_privateChannels.emplace(
 				    std::make_pair(i, std::make_shared<PrivateChatChannel>(i, player->getName() + "'s Channel")));
 				if (inserted) { // second is a bool that indicates that a new channel has been placed in the map
-					const auto& newChannel = it->second;
-					assert(newChannel);
-					newChannel->setOwner(player->getGUID());
-					return newChannel;
+					it->second->setOwner(player->getGUID());
+					return it->second;
 				}
 			}
 			break;
