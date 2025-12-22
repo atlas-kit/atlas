@@ -38,7 +38,7 @@ void Weapons::clear(bool fromLua)
 {
 	for (auto it = weapons.begin(); it != weapons.end();) {
 		if (fromLua == it->second->fromLua) {
-			it = weapons.erase(it); // unique_ptr automatically deletes the Weapon
+			it = weapons.erase(it);
 		} else {
 			++it;
 		}
@@ -99,7 +99,7 @@ Event_ptr Weapons::getEvent(const std::string& nodeName)
 
 bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
 {
-	Weapon_ptr weapon{static_cast<Weapon*>(event.release())}; // event is guaranteed to be a Weapon
+	Weapon_ptr weapon{static_cast<Weapon*>(event.release())};
 	uint16_t weaponId = weapon->getID();
 
 	auto result = weapons.emplace(weaponId, std::move(weapon));

@@ -28,7 +28,7 @@ extern LuaEnvironment g_luaEnvironment;
 
 ScriptingManager::~ScriptingManager()
 {
-	g_weapons.reset(); // unique_ptr handles deletion
+	g_weapons.reset();
 	delete g_spells;
 	delete g_actions;
 	delete g_talkActions;
