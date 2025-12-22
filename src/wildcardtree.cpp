@@ -14,7 +14,7 @@ WildcardTreeNode* WildcardTreeNode::getChild(char ch)
 	if (it == children.end()) {
 		return nullptr;
 	}
-	return &it->second;
+	return it->second.get();
 }
 
 const WildcardTreeNode* WildcardTreeNode::getChild(char ch) const
@@ -23,22 +23,23 @@ const WildcardTreeNode* WildcardTreeNode::getChild(char ch) const
 	if (it == children.end()) {
 		return nullptr;
 	}
-	return &it->second;
+	return it->second.get();
 }
 
-WildcardTreeNode* WildcardTreeNode::addChild(char ch, bool breakpoint)
+WildcardTreeNode& WildcardTreeNode::addChild(char ch, bool breakpoint)
 {
 	WildcardTreeNode* child = getChild(ch);
 	if (child) {
 		if (breakpoint && !child->breakpoint) {
 			child->breakpoint = true;
 		}
+		return *child;
 	} else {
-		auto pair =
-		    children.emplace(std::piecewise_construct, std::forward_as_tuple(ch), std::forward_as_tuple(breakpoint));
-		child = &pair.first->second;
+		auto newChild = std::make_unique<WildcardTreeNode>(breakpoint);
+		auto& childRef = *newChild;
+		children.emplace(ch, std::move(newChild));
+		return childRef;
 	}
-	return child;
 }
 
 void WildcardTreeNode::insert(const std::string& str)
@@ -47,7 +48,7 @@ void WildcardTreeNode::insert(const std::string& str)
 
 	size_t length = str.length() - 1;
 	for (size_t pos = 0; pos < length; ++pos) {
-		cur = cur->addChild(str[pos], false);
+		cur = &cur->addChild(str[pos], false);
 	}
 
 	cur->addChild(str[length], true);
@@ -109,6 +110,6 @@ ReturnValue WildcardTreeNode::findOne(const std::string& query, std::string& res
 
 		auto it = cur->children.begin();
 		result += it->first;
-		cur = &it->second;
+		cur = it->second.get();
 	} while (true);
 }

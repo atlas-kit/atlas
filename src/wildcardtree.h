@@ -6,6 +6,8 @@
 
 #include "enums.h"
 
+#include <memory>
+
 class WildcardTreeNode
 {
 public:
@@ -18,7 +20,7 @@ public:
 
 	WildcardTreeNode* getChild(char ch);
 	const WildcardTreeNode* getChild(char ch) const;
-	WildcardTreeNode* addChild(char ch, bool breakpoint);
+	WildcardTreeNode& addChild(char ch, bool breakpoint);
 
 	void insert(const std::string& str);
 	void remove(const std::string& str);
@@ -26,7 +28,7 @@ public:
 	ReturnValue findOne(const std::string& query, std::string& result) const;
 
 private:
-	std::map<char, WildcardTreeNode> children;
+	std::map<char, std::unique_ptr<WildcardTreeNode>> children;
 	bool breakpoint;
 };
 
