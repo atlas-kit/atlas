@@ -191,12 +191,10 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	PropStream propStream;
 	propStream.init(conditions.data(), conditions.size());
 
-	Condition* condition = Condition::createCondition(propStream);
+	auto condition = Condition::createCondition(propStream);
 	while (condition) {
 		if (condition->unserialize(propStream)) {
-			player->storedConditionList.push_front(condition);
-		} else {
-			delete condition;
+			player->storedConditionList.push_front(std::move(condition));
 		}
 		condition = Condition::createCondition(propStream);
 	}
