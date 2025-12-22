@@ -1193,15 +1193,21 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(L, "isScriptsInterface", LuaScriptInterface::luaIsScriptsInterface);
 
 	// configManager table
-	luaL_register(L, "configManager", LuaScriptInterface::luaConfigManagerTable);
+	luaL_newlib(L, LuaScriptInterface::luaConfigManagerTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "configManager");
 	lua_pop(L, 1);
 
 	// db table
-	luaL_register(L, "db", LuaScriptInterface::luaDatabaseTable);
+	luaL_newlib(L, LuaScriptInterface::luaDatabaseTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "db");
 	lua_pop(L, 1);
 
 	// result table
-	luaL_register(L, "result", LuaScriptInterface::luaResultTable);
+	luaL_newlib(L, LuaScriptInterface::luaResultTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "result");
 	lua_pop(L, 1);
 
 	/* New functions */
@@ -4450,7 +4456,7 @@ int LuaScriptInterface::luaGameGetPlayers(lua_State* L)
 	lua_createtable(L, players.size(), 0);
 
 	int index = 0;
-	for (auto&& player : players) {
+	for (const auto& player : players) {
 		tfs::lua::pushSharedPtr(L, player);
 		tfs::lua::setMetatable(L, -1, "Player");
 		lua_rawseti(L, -2, ++index);
@@ -4465,7 +4471,7 @@ int LuaScriptInterface::luaGameGetNpcs(lua_State* L)
 	lua_createtable(L, npcs.size(), 0);
 
 	int index = 0;
-	for (auto&& npc : npcs) {
+	for (const auto& npc : npcs) {
 		tfs::lua::pushSharedPtr(L, npc);
 		tfs::lua::setMetatable(L, -1, "Npc");
 		lua_rawseti(L, -2, ++index);
@@ -4480,7 +4486,7 @@ int LuaScriptInterface::luaGameGetMonsters(lua_State* L)
 	lua_createtable(L, monsters.size(), 0);
 
 	int index = 0;
-	for (auto&& monster : monsters) {
+	for (const auto& monster : monsters) {
 		tfs::lua::pushSharedPtr(L, monster);
 		tfs::lua::setMetatable(L, -1, "Monster");
 		lua_rawseti(L, -2, ++index);
@@ -8499,7 +8505,7 @@ int LuaScriptInterface::luaCreatureGetSummons(lua_State* L)
 		return 1;
 	}
 
-	const auto summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, summons.size(), 0);
 
 	int index = 0;
@@ -10685,14 +10691,14 @@ int LuaScriptInterface::luaPlayerSetGhostMode(lua_State* L)
 	}
 
 	if (player->isInGhostMode()) {
-		for (auto&& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
+		for (const auto& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
 			if (!onlinePlayer->isAccessPlayer()) {
 				onlinePlayer->notifyStatusChange(player, VIPSTATUS_OFFLINE);
 			}
 		}
 		IOLoginData::updateOnlineStatus(player->getGUID(), false);
 	} else {
-		for (auto&& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
+		for (const auto& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
 			if (!onlinePlayer->isAccessPlayer()) {
 				onlinePlayer->notifyStatusChange(player, VIPSTATUS_ONLINE);
 			}
@@ -15767,7 +15773,7 @@ int LuaScriptInterface::luaPartyGetMembers(lua_State* L)
 		return 1;
 	}
 
-	const auto members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, members.size(), 0);
 
 	int index = 0;
@@ -15801,7 +15807,7 @@ int LuaScriptInterface::luaPartyGetInvitees(lua_State* L)
 		return 1;
 	}
 
-	const auto invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, invitees.size(), 0);
 
 	int index = 0;

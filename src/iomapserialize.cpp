@@ -152,7 +152,7 @@ bool IOMapSerialize::saveHouseItems()
 	PropWriteStream stream;
 	for (auto&& house : g_game.getHouses() | std::views::values | std::views::as_const) {
 		// save house items
-		for (auto&& tile : house->getTiles() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+		for (const auto& tile : house->getTiles() | tfs::views::lock_weak_ptrs) {
 			saveTile(stream, tile);
 
 			if (auto attributes = stream.getStream(); !attributes.empty()) {
@@ -246,12 +246,12 @@ bool IOMapSerialize::loadHouseInfo()
 		}
 	} while (result->next());
 
-	if (const auto& result = db.storeQuery("SELECT `house_id`, `listid`, `list` FROM `house_lists`")) {
+	if (const auto& houseListsRes = db.storeQuery("SELECT `house_id`, `listid`, `list` FROM `house_lists`")) {
 		do {
-			if (const auto& house = g_game.getHouseById(result->getNumber<uint32_t>("house_id"))) {
-				house->setAccessList(result->getNumber<uint32_t>("listid"), result->getString("list"));
+			if (const auto& house = g_game.getHouseById(houseListsRes->getNumber<uint32_t>("house_id"))) {
+				house->setAccessList(houseListsRes->getNumber<uint32_t>("listid"), houseListsRes->getString("list"));
 			}
-		} while (result->next());
+		} while (houseListsRes->next());
 	}
 	return true;
 }
