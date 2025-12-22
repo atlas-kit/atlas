@@ -96,48 +96,6 @@ protected:
 	std::map<int32_t, std::string> cacheFiles;
 
 private:
-	// lua functions
-	static int luaDoPlayerAddItem(lua_State* L);
-
-	// get item info
-	static int luaGetDepotId(lua_State* L);
-
-	// get world info
-	static int luaGetWorldUpTime(lua_State* L);
-
-	// get subtype name
-	static int luaGetSubTypeName(lua_State* L);
-
-	// type validation
-	static int luaIsDepot(lua_State* L);
-	static int luaIsMoveable(lua_State* L);
-	static int luaIsValidUID(lua_State* L);
-
-	//
-	static int luaCreateCombatArea(lua_State* L);
-
-	static int luaDoAreaCombat(lua_State* L);
-	static int luaDoTargetCombat(lua_State* L);
-
-	static int luaDoChallengeCreature(lua_State* L);
-
-	static int luaDebugPrint(lua_State* L);
-	static int luaAddEvent(lua_State* L);
-	static int luaStopEvent(lua_State* L);
-
-	static int luaSaveServer(lua_State* L);
-	static int luaCleanMap(lua_State* L);
-
-	static int luaIsInWar(lua_State* L);
-
-	static int luaGetWaypointPositionByName(lua_State* L);
-
-	static int luaSendChannelMessage(lua_State* L);
-	static int luaSendGuildChannelMessage(lua_State* L);
-
-	static int luaIsScriptsInterface(lua_State* L);
-
-	//
 	std::string lastLuaError;
 	std::string interfaceName;
 	std::string loadingFile;
@@ -167,10 +125,8 @@ public:
 	uint32_t createAreaObject(LuaScriptInterface* interface);
 	void clearAreaObjects(LuaScriptInterface* interface);
 
-private:
 	void executeTimerEvent(uint32_t eventIndex);
-
-	std::unordered_map<uint32_t, LuaTimerEventDesc> timerEvents;
+private:
 	std::unordered_map<uint32_t, Combat_ptr> combatMap;
 	std::unordered_map<uint32_t, AreaCombat*> areaMap;
 
@@ -179,7 +135,6 @@ private:
 
 	LuaScriptInterface* testInterface = nullptr;
 
-	uint32_t lastEventTimerId = 1;
 	uint32_t lastCombatId = 0;
 	uint32_t lastAreaId = 0;
 

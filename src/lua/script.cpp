@@ -41,6 +41,9 @@ LuaEnvironment g_luaEnvironment;
 
 namespace {
 
+std::unordered_map<uint32_t, LuaTimerEventDesc> timerEvents;
+uint32_t lastEventTimerId = 1;
+
 bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 {
 	lua_pushnil(L);
@@ -63,6 +66,414 @@ bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 
 	lua_pop(L, 1);
 	return (rows != 0);
+}
+
+int luaDebugPrint(lua_State* L)
+{
+	// debugPrint(text)
+	tfs::lua::reportError(L, tfs::lua::getString(L, -1));
+	return 0;
+}
+
+int luaGetWorldUpTime(lua_State* L)
+{
+	// getWorldUpTime()
+	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	tfs::lua::pushNumber(L, uptime);
+	return 1;
+}
+
+int luaGetSubTypeName(lua_State* L)
+{
+	// getSubTypeName(subType)
+	int32_t subType = tfs::lua::getNumber<int32_t>(L, 1);
+	if (subType > 0) {
+		tfs::lua::pushString(L, Item::items[subType].name);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaCreateCombatArea(lua_State* L)
+{
+	// createCombatArea({area}, <optional> {extArea})
+	const auto env = tfs::lua::getScriptEnv();
+	if (env->getScriptId() != EVENT_ID_LOADING) {
+		tfs::lua::reportError(L, "This function can only be used while loading the script.");
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	uint32_t areaId = g_luaEnvironment.createAreaObject(env->getScriptInterface());
+	AreaCombat* area = g_luaEnvironment.getAreaObject(areaId);
+
+	int parameters = lua_gettop(L);
+	if (parameters >= 2) {
+		uint32_t rowsExtArea;
+		std::vector<uint32_t> vecExtArea;
+		if (!lua_istable(L, 2) || !getArea(L, vecExtArea, rowsExtArea)) {
+			tfs::lua::reportError(L, "Invalid extended area table.");
+			tfs::lua::pushBoolean(L, false);
+			return 1;
+		}
+		area->setupExtArea(vecExtArea, rowsExtArea);
+	}
+
+	uint32_t rowsArea = 0;
+	std::vector<uint32_t> vecArea;
+	if (!lua_istable(L, 1) || !getArea(L, vecArea, rowsArea)) {
+		tfs::lua::reportError(L, "Invalid area table.");
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	area->setupArea(vecArea, rowsArea);
+	tfs::lua::pushNumber(L, areaId);
+	return 1;
+}
+
+int luaDoAreaCombat(lua_State* L)
+{
+	// doAreaCombat(cid, type, pos, area, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
+	// false[, ignoreResistances = false]]]])
+	const auto& creature = tfs::lua::getCreature(L, 1);
+	if (!creature && (!tfs::lua::isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	uint32_t areaId = tfs::lua::getNumber<uint32_t>(L, 4);
+	const AreaCombat* area = g_luaEnvironment.getAreaObject(areaId);
+	if (area || areaId == 0) {
+		CombatType_t combatType = tfs::lua::getNumber<CombatType_t>(L, 2);
+
+		CombatParams params;
+		params.combatType = combatType;
+		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
+
+		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
+		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
+		params.ignoreResistances = tfs::lua::getBoolean(L, 11, false);
+
+		CombatDamage damage;
+		damage.origin = tfs::lua::getNumber<CombatOrigin>(L, 8, ORIGIN_SPELL);
+		damage.primary.type = combatType;
+		damage.primary.value = normal_random(tfs::lua::getNumber<int32_t>(L, 5), tfs::lua::getNumber<int32_t>(L, 6));
+
+		Combat::doAreaCombat(creature, tfs::lua::getPosition(L, 3), area, damage, params);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_AREA_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+	}
+	return 1;
+}
+
+int luaDoTargetCombat(lua_State* L)
+{
+	// doTargetCombat(cid, target, type, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
+	// false[, ignoreResistances = false]]]])
+	const auto& creature = tfs::lua::getCreature(L, 1);
+	if (!creature && (!tfs::lua::isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	const auto& target = tfs::lua::getCreature(L, 2);
+	if (!target) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	CombatType_t combatType = tfs::lua::getNumber<CombatType_t>(L, 3);
+
+	CombatParams params{
+	    .combatType = combatType,
+	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
+	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
+	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
+	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),
+	};
+
+	CombatDamage damage{
+	    .primary =
+	        {
+	            .type = combatType,
+	            .value = normal_random(tfs::lua::getNumber<int32_t>(L, 4), tfs::lua::getNumber<int32_t>(L, 5)),
+	        },
+	    .origin = tfs::lua::getNumber<CombatOrigin>(L, 7, ORIGIN_SPELL),
+	};
+
+	Combat::doTargetCombat(creature, target, damage, params);
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaDoChallengeCreature(lua_State* L)
+{
+	// doChallengeCreature(cid, target[, force = false])
+	const auto& creature = tfs::lua::getCreature(L, 1);
+	if (!creature) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	const auto& target = tfs::lua::getCreature(L, 2);
+	if (!target) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	target->challengeCreature(creature, tfs::lua::getBoolean(L, 3, false));
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaSaveServer(lua_State* L)
+{
+	g_globalEvents->save();
+	g_game.saveGameState();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaCleanMap(lua_State* L)
+{
+	tfs::lua::pushNumber(L, g_game.map.clean());
+	return 1;
+}
+
+int luaIsInWar(lua_State* L)
+{
+	// isInWar(cid, target)
+	const auto& player = tfs::lua::getPlayer(L, 1);
+	if (!player) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	const auto& targetPlayer = tfs::lua::getPlayer(L, 2);
+	if (!targetPlayer) {
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, player->isInWar(targetPlayer));
+	return 1;
+}
+
+int luaGetWaypointPositionByName(lua_State* L)
+{
+	// getWaypointPositionByName(name)
+	auto& waypoints = g_game.map.waypoints;
+
+	auto it = waypoints.find(tfs::lua::getString(L, -1));
+	if (it != waypoints.end()) {
+		tfs::lua::pushPosition(L, it->second);
+	} else {
+		tfs::lua::pushBoolean(L, false);
+	}
+	return 1;
+}
+
+int luaSendChannelMessage(lua_State* L)
+{
+	// sendChannelMessage(channelId, type, message)
+	uint32_t channelId = tfs::lua::getNumber<uint32_t>(L, 1);
+	ChatChannel* channel = g_chat->getChannelById(channelId);
+	if (!channel) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	SpeakClasses type = tfs::lua::getNumber<SpeakClasses>(L, 2);
+	std::string message = tfs::lua::getString(L, 3);
+	channel->sendToAll(message, type);
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaSendGuildChannelMessage(lua_State* L)
+{
+	// sendGuildChannelMessage(guildId, type, message)
+	uint32_t guildId = tfs::lua::getNumber<uint32_t>(L, 1);
+	ChatChannel* channel = g_chat->getGuildChannelById(guildId);
+	if (!channel) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	SpeakClasses type = tfs::lua::getNumber<SpeakClasses>(L, 2);
+	std::string message = tfs::lua::getString(L, 3);
+	channel->sendToAll(message, type);
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaIsScriptsInterface(lua_State* L)
+{
+	// isScriptsInterface()
+	if (tfs::lua::getScriptEnv()->getScriptInterface() == &g_scripts->getScriptInterface()) {
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		tfs::lua::reportError(L, "Event: can only be called inside (data/scripts/)");
+		tfs::lua::pushBoolean(L, false);
+	}
+	return 1;
+}
+
+int luaAddEvent(lua_State* L)
+{
+	// addEvent(callback, delay, ...)
+	int parameters = lua_gettop(L);
+	if (parameters < 2) {
+		tfs::lua::reportError(L, std::format("Not enough parameters: {:d}.", parameters));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	if (!lua_isfunction(L, 1)) {
+		tfs::lua::reportError(L, "callback parameter should be a function.");
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	if (!tfs::lua::isNumber(L, 2)) {
+		tfs::lua::reportError(L, "delay parameter should be a number.");
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	if (ConfigManager::getBoolean(ConfigManager::WARN_UNSAFE_SCRIPTS) ||
+	    ConfigManager::getBoolean(ConfigManager::CONVERT_UNSAFE_SCRIPTS)) {
+		std::vector<std::pair<int32_t, tfs::lua::LuaDataType>> indexes;
+		for (int i = 3; i <= parameters; ++i) {
+			if (lua_getmetatable(L, i) == 0) {
+				continue;
+			}
+			lua_rawgeti(L, -1, 't');
+
+			const auto type = tfs::lua::getNumber<tfs::lua::LuaDataType>(L, -1);
+			if (type != tfs::lua::LuaData_Unknown && type != tfs::lua::LuaData_Tile) {
+				indexes.push_back({i, type});
+			}
+			lua_pop(L, 2);
+		}
+
+		if (!indexes.empty()) {
+			if (ConfigManager::getBoolean(ConfigManager::WARN_UNSAFE_SCRIPTS)) {
+				bool plural = indexes.size() > 1;
+
+				std::string warningString = "Argument";
+				if (plural) {
+					warningString += 's';
+				}
+
+				for (const auto& entry : indexes) {
+					if (entry == indexes.front()) {
+						warningString += ' ';
+					} else if (entry == indexes.back()) {
+						warningString += " and ";
+					} else {
+						warningString += ", ";
+					}
+					warningString += '#';
+					warningString += std::to_string(entry.first);
+				}
+
+				if (plural) {
+					warningString += " are unsafe";
+				} else {
+					warningString += " is unsafe";
+				}
+
+				tfs::lua::reportError(L, warningString);
+			}
+
+			if (ConfigManager::getBoolean(ConfigManager::CONVERT_UNSAFE_SCRIPTS)) {
+				for (auto&& [index, type] : indexes | std::views::as_const) {
+					switch (type) {
+						case tfs::lua::LuaData_Item:
+						case tfs::lua::LuaData_Container:
+						case tfs::lua::LuaData_Teleport:
+						case tfs::lua::LuaData_Podium: {
+							lua_getglobal(L, "Item");
+							lua_getfield(L, -1, "getUniqueId");
+							break;
+						}
+						case tfs::lua::LuaData_Player:
+						case tfs::lua::LuaData_Monster:
+						case tfs::lua::LuaData_Npc: {
+							lua_getglobal(L, "Creature");
+							lua_getfield(L, -1, "getId");
+							break;
+						}
+						default:
+							break;
+					}
+					lua_replace(L, -2);
+					lua_pushvalue(L, index);
+					lua_call(L, 1, 1);
+					lua_replace(L, index);
+				}
+			}
+		}
+	}
+
+	LuaTimerEventDesc eventDesc;
+	eventDesc.parameters.reserve(parameters -
+	                             2); // safe to use -2 since we garanteed that there is at least two parameters
+	for (int i = 0; i < parameters - 2; ++i) {
+		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
+	}
+
+	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
+	lua_pop(L, 1);
+
+	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
+	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
+
+	auto& lastTimerEventId = lastEventTimerId;
+	eventDesc.eventId = g_scheduler.addEvent(
+	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
+
+	timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
+	tfs::lua::pushNumber(L, lastTimerEventId++);
+	return 1;
+}
+
+int luaStopEvent(lua_State* L)
+{
+	// stopEvent(eventid)
+	uint32_t eventId = tfs::lua::getNumber<uint32_t>(L, 1);
+
+	auto& events = timerEvents;
+	auto it = events.find(eventId);
+	if (it == events.end()) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	LuaTimerEventDesc timerEventDesc = std::move(it->second);
+	events.erase(it);
+
+	g_scheduler.stopEvent(timerEventDesc.eventId);
+	luaL_unref(L, LUA_REGISTRYINDEX, timerEventDesc.function);
+
+	for (auto parameter : timerEventDesc.parameters) {
+		luaL_unref(L, LUA_REGISTRYINDEX, parameter);
+	}
+
+	tfs::lua::pushBoolean(L, true);
+	return 1;
 }
 
 } // namespace
@@ -430,465 +841,57 @@ void LuaScriptInterface::registerGlobalBoolean(std::string_view name, bool value
 	lua_setglobal(L, name.data());
 }
 
-int LuaScriptInterface::luaDebugPrint(lua_State* L)
-{
-	// debugPrint(text)
-	tfs::lua::reportError(L, tfs::lua::getString(L, -1));
-	return 0;
-}
-
-int LuaScriptInterface::luaGetWorldUpTime(lua_State* L)
-{
-	// getWorldUpTime()
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
-	tfs::lua::pushNumber(L, uptime);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetSubTypeName(lua_State* L)
-{
-	// getSubTypeName(subType)
-	int32_t subType = tfs::lua::getNumber<int32_t>(L, 1);
-	if (subType > 0) {
-		tfs::lua::pushString(L, Item::items[subType].name);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaCreateCombatArea(lua_State* L)
-{
-	// createCombatArea({area}, <optional> {extArea})
-	const auto env = tfs::lua::getScriptEnv();
-	if (env->getScriptId() != EVENT_ID_LOADING) {
-		tfs::lua::reportError(L, "This function can only be used while loading the script.");
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	uint32_t areaId = g_luaEnvironment.createAreaObject(env->getScriptInterface());
-	AreaCombat* area = g_luaEnvironment.getAreaObject(areaId);
-
-	int parameters = lua_gettop(L);
-	if (parameters >= 2) {
-		uint32_t rowsExtArea;
-		std::vector<uint32_t> vecExtArea;
-		if (!lua_istable(L, 2) || !getArea(L, vecExtArea, rowsExtArea)) {
-			tfs::lua::reportError(L, "Invalid extended area table.");
-			tfs::lua::pushBoolean(L, false);
-			return 1;
-		}
-		area->setupExtArea(vecExtArea, rowsExtArea);
-	}
-
-	uint32_t rowsArea = 0;
-	std::vector<uint32_t> vecArea;
-	if (!lua_istable(L, 1) || !getArea(L, vecArea, rowsArea)) {
-		tfs::lua::reportError(L, "Invalid area table.");
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	area->setupArea(vecArea, rowsArea);
-	tfs::lua::pushNumber(L, areaId);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoAreaCombat(lua_State* L)
-{
-	// doAreaCombat(cid, type, pos, area, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
-	// false[, ignoreResistances = false]]]])
-	const auto& creature = tfs::lua::getCreature(L, 1);
-	if (!creature && (!tfs::lua::isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	uint32_t areaId = tfs::lua::getNumber<uint32_t>(L, 4);
-	const AreaCombat* area = g_luaEnvironment.getAreaObject(areaId);
-	if (area || areaId == 0) {
-		CombatType_t combatType = tfs::lua::getNumber<CombatType_t>(L, 2);
-
-		CombatParams params;
-		params.combatType = combatType;
-		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
-
-		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
-		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
-		params.ignoreResistances = tfs::lua::getBoolean(L, 11, false);
-
-		CombatDamage damage;
-		damage.origin = tfs::lua::getNumber<CombatOrigin>(L, 8, ORIGIN_SPELL);
-		damage.primary.type = combatType;
-		damage.primary.value = normal_random(tfs::lua::getNumber<int32_t>(L, 5), tfs::lua::getNumber<int32_t>(L, 6));
-
-		Combat::doAreaCombat(creature, tfs::lua::getPosition(L, 3), area, damage, params);
-		tfs::lua::pushBoolean(L, true);
-	} else {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_AREA_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaDoTargetCombat(lua_State* L)
-{
-	// doTargetCombat(cid, target, type, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
-	// false[, ignoreResistances = false]]]])
-	const auto& creature = tfs::lua::getCreature(L, 1);
-	if (!creature && (!tfs::lua::isNumber(L, 1) || tfs::lua::getNumber<uint32_t>(L, 1) != 0)) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const auto& target = tfs::lua::getCreature(L, 2);
-	if (!target) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	CombatType_t combatType = tfs::lua::getNumber<CombatType_t>(L, 3);
-
-	CombatParams params{
-	    .combatType = combatType,
-	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
-	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
-	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
-	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),
-	};
-
-	CombatDamage damage{
-	    .primary =
-	        {
-	            .type = combatType,
-	            .value = normal_random(tfs::lua::getNumber<int32_t>(L, 4), tfs::lua::getNumber<int32_t>(L, 5)),
-	        },
-	    .origin = tfs::lua::getNumber<CombatOrigin>(L, 7, ORIGIN_SPELL),
-	};
-
-	Combat::doTargetCombat(creature, target, damage, params);
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaDoChallengeCreature(lua_State* L)
-{
-	// doChallengeCreature(cid, target[, force = false])
-	const auto& creature = tfs::lua::getCreature(L, 1);
-	if (!creature) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const auto& target = tfs::lua::getCreature(L, 2);
-	if (!target) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	target->challengeCreature(creature, tfs::lua::getBoolean(L, 3, false));
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaAddEvent(lua_State* L)
-{
-	// addEvent(callback, delay, ...)
-	int parameters = lua_gettop(L);
-	if (parameters < 2) {
-		tfs::lua::reportError(L, std::format("Not enough parameters: {:d}.", parameters));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	if (!lua_isfunction(L, 1)) {
-		tfs::lua::reportError(L, "callback parameter should be a function.");
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	if (!tfs::lua::isNumber(L, 2)) {
-		tfs::lua::reportError(L, "delay parameter should be a number.");
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	if (ConfigManager::getBoolean(ConfigManager::WARN_UNSAFE_SCRIPTS) ||
-	    ConfigManager::getBoolean(ConfigManager::CONVERT_UNSAFE_SCRIPTS)) {
-		std::vector<std::pair<int32_t, tfs::lua::LuaDataType>> indexes;
-		for (int i = 3; i <= parameters; ++i) {
-			if (lua_getmetatable(L, i) == 0) {
-				continue;
-			}
-			lua_rawgeti(L, -1, 't');
-
-			const auto type = tfs::lua::getNumber<tfs::lua::LuaDataType>(L, -1);
-			if (type != tfs::lua::LuaData_Unknown && type != tfs::lua::LuaData_Tile) {
-				indexes.push_back({i, type});
-			}
-			lua_pop(L, 2);
-		}
-
-		if (!indexes.empty()) {
-			if (ConfigManager::getBoolean(ConfigManager::WARN_UNSAFE_SCRIPTS)) {
-				bool plural = indexes.size() > 1;
-
-				std::string warningString = "Argument";
-				if (plural) {
-					warningString += 's';
-				}
-
-				for (const auto& entry : indexes) {
-					if (entry == indexes.front()) {
-						warningString += ' ';
-					} else if (entry == indexes.back()) {
-						warningString += " and ";
-					} else {
-						warningString += ", ";
-					}
-					warningString += '#';
-					warningString += std::to_string(entry.first);
-				}
-
-				if (plural) {
-					warningString += " are unsafe";
-				} else {
-					warningString += " is unsafe";
-				}
-
-				tfs::lua::reportError(L, warningString);
-			}
-
-			if (ConfigManager::getBoolean(ConfigManager::CONVERT_UNSAFE_SCRIPTS)) {
-				for (auto&& [index, type] : indexes | std::views::as_const) {
-					switch (type) {
-						case tfs::lua::LuaData_Item:
-						case tfs::lua::LuaData_Container:
-						case tfs::lua::LuaData_Teleport:
-						case tfs::lua::LuaData_Podium: {
-							lua_getglobal(L, "Item");
-							lua_getfield(L, -1, "getUniqueId");
-							break;
-						}
-						case tfs::lua::LuaData_Player:
-						case tfs::lua::LuaData_Monster:
-						case tfs::lua::LuaData_Npc: {
-							lua_getglobal(L, "Creature");
-							lua_getfield(L, -1, "getId");
-							break;
-						}
-						default:
-							break;
-					}
-					lua_replace(L, -2);
-					lua_pushvalue(L, index);
-					lua_call(L, 1, 1);
-					lua_replace(L, index);
-				}
-			}
-		}
-	}
-
-	LuaTimerEventDesc eventDesc;
-	eventDesc.parameters.reserve(parameters -
-	                             2); // safe to use -2 since we garanteed that there is at least two parameters
-	for (int i = 0; i < parameters - 2; ++i) {
-		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
-	}
-
-	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
-	lua_pop(L, 1);
-
-	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
-	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
-
-	auto& lastTimerEventId = g_luaEnvironment.lastEventTimerId;
-	eventDesc.eventId = g_scheduler.addEvent(
-	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
-
-	g_luaEnvironment.timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
-	tfs::lua::pushNumber(L, lastTimerEventId++);
-	return 1;
-}
-
-int LuaScriptInterface::luaStopEvent(lua_State* L)
-{
-	// stopEvent(eventid)
-	uint32_t eventId = tfs::lua::getNumber<uint32_t>(L, 1);
-
-	auto& timerEvents = g_luaEnvironment.timerEvents;
-	auto it = timerEvents.find(eventId);
-	if (it == timerEvents.end()) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	LuaTimerEventDesc timerEventDesc = std::move(it->second);
-	timerEvents.erase(it);
-
-	g_scheduler.stopEvent(timerEventDesc.eventId);
-	luaL_unref(L, LUA_REGISTRYINDEX, timerEventDesc.function);
-
-	for (auto parameter : timerEventDesc.parameters) {
-		luaL_unref(L, LUA_REGISTRYINDEX, parameter);
-	}
-
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaSaveServer(lua_State* L)
-{
-	g_globalEvents->save();
-	g_game.saveGameState();
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaCleanMap(lua_State* L)
-{
-	tfs::lua::pushNumber(L, g_game.map.clean());
-	return 1;
-}
-
-int LuaScriptInterface::luaIsInWar(lua_State* L)
-{
-	// isInWar(cid, target)
-	const auto& player = tfs::lua::getPlayer(L, 1);
-	if (!player) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	const auto& targetPlayer = tfs::lua::getPlayer(L, 2);
-	if (!targetPlayer) {
-		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	tfs::lua::pushBoolean(L, player->isInWar(targetPlayer));
-	return 1;
-}
-
-int LuaScriptInterface::luaGetWaypointPositionByName(lua_State* L)
-{
-	// getWaypointPositionByName(name)
-	auto& waypoints = g_game.map.waypoints;
-
-	auto it = waypoints.find(tfs::lua::getString(L, -1));
-	if (it != waypoints.end()) {
-		tfs::lua::pushPosition(L, it->second);
-	} else {
-		tfs::lua::pushBoolean(L, false);
-	}
-	return 1;
-}
-
-int LuaScriptInterface::luaSendChannelMessage(lua_State* L)
-{
-	// sendChannelMessage(channelId, type, message)
-	uint32_t channelId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getChannelById(channelId);
-	if (!channel) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	SpeakClasses type = tfs::lua::getNumber<SpeakClasses>(L, 2);
-	std::string message = tfs::lua::getString(L, 3);
-	channel->sendToAll(message, type);
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaSendGuildChannelMessage(lua_State* L)
-{
-	// sendGuildChannelMessage(guildId, type, message)
-	uint32_t guildId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getGuildChannelById(guildId);
-	if (!channel) {
-		tfs::lua::pushBoolean(L, false);
-		return 1;
-	}
-
-	SpeakClasses type = tfs::lua::getNumber<SpeakClasses>(L, 2);
-	std::string message = tfs::lua::getString(L, 3);
-	channel->sendToAll(message, type);
-	tfs::lua::pushBoolean(L, true);
-	return 1;
-}
-
-int LuaScriptInterface::luaIsScriptsInterface(lua_State* L)
-{
-	// isScriptsInterface()
-	if (tfs::lua::getScriptEnv()->getScriptInterface() == &g_scripts->getScriptInterface()) {
-		tfs::lua::pushBoolean(L, true);
-	} else {
-		tfs::lua::reportError(L, "Event: can only be called inside (data/scripts/)");
-		tfs::lua::pushBoolean(L, false);
-	}
-	return 1;
-}
-
 void LuaScriptInterface::registerFunctions()
 {
 	// getWorldUpTime()
-	lua_register(L, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
+	lua_register(L, "getWorldUpTime", luaGetWorldUpTime);
 
 	// getSubTypeName(subType)
-	lua_register(L, "getSubTypeName", LuaScriptInterface::luaGetSubTypeName);
+	lua_register(L, "getSubTypeName", luaGetSubTypeName);
 
 	// createCombatArea({area}, <optional> {extArea})
-	lua_register(L, "createCombatArea", LuaScriptInterface::luaCreateCombatArea);
+	lua_register(L, "createCombatArea", luaCreateCombatArea);
 
 	// doAreaCombat(cid, type, pos, area, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
 	// false[, ignoreResistances = false]]]])
-	lua_register(L, "doAreaCombat", LuaScriptInterface::luaDoAreaCombat);
+	lua_register(L, "doAreaCombat", luaDoAreaCombat);
 
 	// doTargetCombat(cid, target, type, min, max, effect[, origin = ORIGIN_SPELL[, blockArmor = false[, blockShield =
 	// false[, ignoreResistances = false]]]])
-	lua_register(L, "doTargetCombat", LuaScriptInterface::luaDoTargetCombat);
+	lua_register(L, "doTargetCombat", luaDoTargetCombat);
 
 	// doChallengeCreature(cid, target[, force = false])
-	lua_register(L, "doChallengeCreature", LuaScriptInterface::luaDoChallengeCreature);
+	lua_register(L, "doChallengeCreature", luaDoChallengeCreature);
 
 	// addEvent(callback, delay, ...)
-	lua_register(L, "addEvent", LuaScriptInterface::luaAddEvent);
+	lua_register(L, "addEvent", luaAddEvent);
 
 	// stopEvent(eventid)
-	lua_register(L, "stopEvent", LuaScriptInterface::luaStopEvent);
+	lua_register(L, "stopEvent", luaStopEvent);
 
 	// saveServer()
-	lua_register(L, "saveServer", LuaScriptInterface::luaSaveServer);
+	lua_register(L, "saveServer", luaSaveServer);
 
 	// cleanMap()
-	lua_register(L, "cleanMap", LuaScriptInterface::luaCleanMap);
+	lua_register(L, "cleanMap", luaCleanMap);
 
 	// debugPrint(text)
-	lua_register(L, "debugPrint", LuaScriptInterface::luaDebugPrint);
+	lua_register(L, "debugPrint", luaDebugPrint);
 
 	// isInWar(cid, target)
-	lua_register(L, "isInWar", LuaScriptInterface::luaIsInWar);
+	lua_register(L, "isInWar", luaIsInWar);
 
 	// getWaypointPosition(name)
-	lua_register(L, "getWaypointPositionByName", LuaScriptInterface::luaGetWaypointPositionByName);
+	lua_register(L, "getWaypointPositionByName", luaGetWaypointPositionByName);
 
 	// sendChannelMessage(channelId, type, message)
-	lua_register(L, "sendChannelMessage", LuaScriptInterface::luaSendChannelMessage);
+	lua_register(L, "sendChannelMessage", luaSendChannelMessage);
 
 	// sendGuildChannelMessage(guildId, type, message)
-	lua_register(L, "sendGuildChannelMessage", LuaScriptInterface::luaSendGuildChannelMessage);
+	lua_register(L, "sendGuildChannelMessage", luaSendGuildChannelMessage);
 
 	// isScriptsInterface()
-	lua_register(L, "isScriptsInterface", LuaScriptInterface::luaIsScriptsInterface);
+	lua_register(L, "isScriptsInterface", luaIsScriptsInterface);
 
 	/* New functions */
 	// registerClass(className, baseClass, newFunction)
