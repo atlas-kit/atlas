@@ -13,7 +13,7 @@ extern Game g_game;
 
 namespace {
 
-int32_t luaPartyCreate(lua_State* L)
+int luaPartyCreate(lua_State* L)
 {
 	// Party(userdata)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 2);
