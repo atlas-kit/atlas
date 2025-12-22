@@ -1,8 +1,8 @@
+#include "../otpch.h"
+
 #include "modules.h"
 
 #include "register.h"
-
-#include <iostream>
 
 namespace tfs::lua {
 
