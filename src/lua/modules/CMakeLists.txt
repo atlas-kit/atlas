@@ -1,5 +1,5 @@
 set(luamodules_SRC
-	${CMAKE_CURRENT_LIST_DIR}/action.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/action.cpp
     ${CMAKE_CURRENT_LIST_DIR}/combat.cpp
     ${CMAKE_CURRENT_LIST_DIR}/condition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/configmanager.cpp
