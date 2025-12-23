@@ -38,7 +38,7 @@ void Weapons::clear(bool fromLua)
 {
 	for (auto it = weapons.begin(); it != weapons.end();) {
 		if (fromLua == it->second->fromLua) {
-			it = weapons.erase(it);
+			it = weapons.erase(it); // shared_ptr releases reference
 		} else {
 			++it;
 		}
@@ -61,9 +61,9 @@ void Weapons::loadDefaults()
 			case WEAPON_AXE:
 			case WEAPON_SWORD:
 			case WEAPON_CLUB: {
-				auto weapon = std::make_unique<WeaponMelee>(&scriptInterface);
+				auto weapon = std::make_shared<WeaponMelee>(&scriptInterface);
 				weapon->configureWeapon(it);
-				weapons[i] = std::move(weapon);
+				weapons[i] = weapon;
 				break;
 			}
 
@@ -73,9 +73,9 @@ void Weapons::loadDefaults()
 					continue;
 				}
 
-				auto weapon = std::make_unique<WeaponDistance>(&scriptInterface);
+				auto weapon = std::make_shared<WeaponDistance>(&scriptInterface);
 				weapon->configureWeapon(it);
-				weapons[i] = std::move(weapon);
+				weapons[i] = weapon;
 				break;
 			}
 
@@ -111,7 +111,8 @@ bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
 
 bool Weapons::registerLuaEvent(Weapon_ptr weapon)
 {
-	weapons[weapon->getID()] = std::move(weapon);
+	auto weaponId = weapon->getID();
+	weapons[weaponId] = std::move(weapon);
 	return true;
 }
 

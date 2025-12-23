@@ -12,7 +12,7 @@
 
 class Weapon;
 
-using Weapon_ptr = std::unique_ptr<Weapon>;
+using Weapon_ptr = std::shared_ptr<Weapon>;
 
 class Weapons final : public BaseEvents
 {
@@ -39,7 +39,7 @@ private:
 	Event_ptr getEvent(const std::string& nodeName) override;
 	bool registerEvent(Event_ptr event, const pugi::xml_node& node) override;
 
-	std::map<uint32_t, std::unique_ptr<Weapon>> weapons;
+	std::map<uint32_t, Weapon_ptr> weapons;
 
 	LuaScriptInterface scriptInterface{"Weapon Interface"};
 };
