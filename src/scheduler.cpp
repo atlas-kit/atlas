@@ -9,7 +9,7 @@ extern Dispatcher g_dispatcher;
 
 Scheduler g_scheduler;
 
-uint32_t Scheduler::addEvent(SchedulerTaskPtr task)
+uint32_t Scheduler::addEvent(SchedulerTask_ptr task)
 {
 	// check if the event has a valid id
 	if (task->getEventId() == 0) {
@@ -18,26 +18,21 @@ uint32_t Scheduler::addEvent(SchedulerTaskPtr task)
 
 	uint32_t eventId = task->getEventId();
 
-	// Release ownership for async operations - managed manually through callbacks
-	SchedulerTask* rawTask = task.release();
-
-	boost::asio::post(io_context, [this, rawTask]() {
+	boost::asio::post(io_context, [this, task = std::move(task)]() mutable {
 		// insert the event id in the list of active events
-		auto it = eventIdTimerMap.emplace(rawTask->getEventId(), boost::asio::steady_timer{io_context});
+		auto it = eventIdTimerMap.emplace(task->getEventId(), boost::asio::steady_timer{io_context});
 		auto& timer = it.first->second;
 
-		timer.expires_after(std::chrono::milliseconds(rawTask->getDelay()));
-		timer.async_wait([this, rawTask](const boost::system::error_code& error) {
-			eventIdTimerMap.erase(rawTask->getEventId());
+		timer.expires_after(std::chrono::milliseconds(task->getDelay()));
+		timer.async_wait([this, task = std::move(task)](const boost::system::error_code& error) mutable {
+			eventIdTimerMap.erase(task->getEventId());
 
 			if (error == boost::asio::error::operation_aborted || getState() == THREAD_STATE_TERMINATED) {
 				// the timer has been manually canceled(timer->cancel()) or Scheduler::shutdown has been called
-				delete rawTask;
 				return;
 			}
 
-			// Transfer ownership back to smart pointer for dispatcher
-			g_dispatcher.addTask(TaskPtr(rawTask));
+			g_dispatcher.addTask(std::move(task));
 		});
 	});
 
@@ -72,7 +67,7 @@ void Scheduler::shutdown()
 	});
 }
 
-SchedulerTaskPtr createSchedulerTask(uint32_t delay, TaskFunc&& f)
+SchedulerTask_ptr createSchedulerTask(uint32_t delay, TaskFunc&& f)
 {
-	return std::unique_ptr<SchedulerTask>(new SchedulerTask(delay, std::move(f)));
+	return SchedulerTask_ptr(new SchedulerTask(delay, std::move(f)));
 }

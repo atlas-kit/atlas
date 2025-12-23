@@ -1423,7 +1423,7 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(SchedulerTaskPtr task)
+void Player::setNextWalkActionTask(SchedulerTask_ptr task)
 {
 	if (walkTaskEvent != 0) {
 		g_scheduler.stopEvent(walkTaskEvent);
@@ -1433,7 +1433,7 @@ void Player::setNextWalkActionTask(SchedulerTaskPtr task)
 	walkTask = std::move(task);
 }
 
-void Player::setNextActionTask(SchedulerTaskPtr task)
+void Player::setNextActionTask(SchedulerTask_ptr task)
 {
 	if (actionTaskEvent != 0) {
 		g_scheduler.stopEvent(actionTaskEvent);
