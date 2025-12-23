@@ -20,8 +20,7 @@ void Party::setLeader(const std::shared_ptr<Player>& leader)
 
 void Party::disband()
 {
-	auto self = shared_from_this();
-	if (!tfs::events::party::onDisband(self)) {
+	if (!tfs::events::party::onDisband(shared_from_this())) {
 		return;
 	}
 
@@ -35,7 +34,7 @@ void Party::disband()
 	currentLeader->sendTextMessage(MESSAGE_INFO_DESCR, "Your party has been disbanded.");
 
 	for (const auto& invitee : inviteList | tfs::views::lock_weak_ptrs) {
-		invitee->removePartyInvitation(self);
+		invitee->removePartyInvitation(shared_from_this());
 		currentLeader->sendCreatureShield(invitee);
 	}
 	inviteList.clear();
@@ -65,12 +64,11 @@ bool Party::leaveParty(const std::shared_ptr<Player>& player, bool forceRemove /
 		return false;
 	}
 
-	auto self = shared_from_this();
-	if (player->getParty() != self && !tfs::owner_equal(leader, player)) {
+	if (player->getParty().get() != this && !tfs::owner_equal(leader, player)) {
 		return false;
 	}
 
-	bool canRemove = tfs::events::party::onLeave(self, player);
+	bool canRemove = tfs::events::party::onLeave(shared_from_this(), player);
 	if (!forceRemove && !canRemove) {
 		return false;
 	}
@@ -127,12 +125,11 @@ bool Party::leaveParty(const std::shared_ptr<Player>& player, bool forceRemove /
 
 bool Party::passPartyLeadership(const std::shared_ptr<Player>& player, bool forceRemove /* = false*/)
 {
-	auto self = shared_from_this();
-	if (!player || getLeader() == player || player->getParty() != self) {
+	if (!player || getLeader() == player || player->getParty().get() != this) {
 		return false;
 	}
 
-	if (!tfs::events::party::onPassLeadership(self, player) && !forceRemove) {
+	if (!tfs::events::party::onPassLeadership(shared_from_this(), player) && !forceRemove) {
 		return false;
 	}
 
@@ -168,9 +165,8 @@ bool Party::passPartyLeadership(const std::shared_ptr<Player>& player, bool forc
 
 bool Party::joinParty(const std::shared_ptr<Player>& player)
 {
-	auto self = shared_from_this();
 	// check if lua scripts allow the player to join
-	if (!tfs::events::party::onJoin(self, player)) {
+	if (!tfs::events::party::onJoin(shared_from_this(), player)) {
 		return false;
 	}
 
@@ -183,7 +179,7 @@ bool Party::joinParty(const std::shared_ptr<Player>& player)
 
 	// add player to the party
 	memberList.emplace(player);
-	player->setParty(self);
+	player->setParty(shared_from_this());
 	broadcastPartyMessage(MESSAGE_INFO_DESCR, std::format("{:s} has joined the party.", player->getName()));
 
 	// remove player pending invitations to this and other parties

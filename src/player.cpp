@@ -4152,11 +4152,10 @@ bool Player::isPartner(const std::shared_ptr<const Player>& player) const
 		return false;
 	}
 
-	const auto& party = getParty();
-	if (!party) {
-		return false;
+	if (const auto& party = getParty()) {
+		return tfs::owner_equal(party, player->party);
 	}
-	return tfs::owner_equal(party, player->party);
+	return false;
 }
 
 bool Player::isGuildMate(const std::shared_ptr<const Player>& player) const
@@ -4175,8 +4174,8 @@ void Player::sendPlayerPartyIcons(const std::shared_ptr<Player>& player)
 
 bool Player::addPartyInvitation(const std::shared_ptr<Party>& party)
 {
-	auto it = std::ranges::find_if(invitePartyList,
-	                               [&party](const auto& invite) { return tfs::owner_equal(invite, party); });
+	auto it =
+	    std::ranges::find_if(invitePartyList, [&party](const auto& invite) { return tfs::owner_equal(invite, party); });
 	if (it != invitePartyList.end()) {
 		return false;
 	}
