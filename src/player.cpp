@@ -113,8 +113,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		}
 	}
 
-	const auto partyRef = getParty();
-	if (partyRef) {
+	if (party) {
 		if (lookDistance == -1) {
 			s << " Your party has ";
 		} else if (sex == PLAYERSEX_FEMALE) {
@@ -124,7 +123,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		}
 
 		size_t memberCount =
-		    std::ranges::count_if(partyRef->getMembers(), [](const auto& member) { return !member.expired(); }) + 1;
+		    std::ranges::count_if(party->getMembers(), [](const auto& member) { return !member.expired(); }) + 1;
 		if (memberCount == 1) {
 			s << "1 member and ";
 		} else {
@@ -132,7 +131,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		}
 
 		size_t invitationCount =
-		    std::ranges::count_if(partyRef->getInvitees(), [](const auto& invitee) { return !invitee.expired(); });
+		    std::ranges::count_if(party->getInvitees(), [](const auto& invitee) { return !invitee.expired(); });
 		if (invitationCount == 1) {
 			s << "1 pending invitation.";
 		} else {
@@ -617,15 +616,7 @@ uint16_t Player::getContainerIndex(uint8_t cid) const
 
 bool Player::canOpenCorpse(uint32_t ownerId) const
 {
-	if (getID() == ownerId) {
-		return true;
-	}
-
-	if (const auto& partyRef = getParty()) {
-		return partyRef->canOpenCorpse(ownerId);
-	}
-
-	return false;
+	return getID() == ownerId || (party && party->canOpenCorpse(ownerId));
 }
 
 uint16_t Player::getLookCorpse() const
@@ -1192,8 +1183,8 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 
 		clearPartyInvitations();
 
-		if (const auto& partyRef = getParty()) {
-			partyRef->leaveParty(getPlayer(), true);
+		if (party) {
+			party->leaveParty(getPlayer(), true);
 		}
 
 		g_chat->removeUserFromAllChannels(getPlayer());
@@ -1313,8 +1304,8 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 		inMarket = false;
 	}
 
-	if (const auto& partyRef = getParty()) {
-		partyRef->updateSharedExperience();
+	if (party) {
+		party->updateSharedExperience();
 	}
 
 	if (teleport || oldPos.z != newPos.z) {
@@ -1745,8 +1736,8 @@ void Player::addExperience(const std::shared_ptr<Creature>& source, uint64_t exp
 			g_game.updateCreatureWalkthrough(getPlayer());
 		}
 
-		if (const auto& partyRef = getParty()) {
-			partyRef->updateSharedExperience();
+		if (party) {
+			party->updateSharedExperience();
 		}
 
 		g_creatureEvents->playerAdvance(getPlayer(), SKILL_LEVEL, prevLevel, level);
@@ -1830,8 +1821,8 @@ void Player::removeExperience(uint64_t exp, bool sendText /* = false*/)
 			g_game.updateCreatureWalkthrough(getPlayer());
 		}
 
-		if (const auto& partyRef = getParty()) {
-			partyRef->updateSharedExperience();
+		if (party) {
+			party->updateSharedExperience();
 		}
 
 		sendTextMessage(MESSAGE_EVENT_ADVANCE,
@@ -3577,8 +3568,8 @@ void Player::onIdleStatus()
 {
 	Creature::onIdleStatus();
 
-	if (const auto& partyRef = getParty()) {
-		partyRef->clearPlayerPoints(getPlayer());
+	if (party) {
+		party->clearPlayerPoints(getPlayer());
 	}
 }
 
@@ -3586,12 +3577,11 @@ void Player::onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& targ
 {
 	Creature::onAttackedCreatureDrainHealth(target, points);
 
-	const auto partyRef = getParty();
-	if (target && partyRef && !Combat::isPlayerCombat(target)) {
+	if (target && party && !Combat::isPlayerCombat(target)) {
 		if (const auto& tmpMonster = target->getMonster()) {
 			if (tmpMonster && tmpMonster->isHostile()) {
 				// We have fulfilled a requirement for shared experience
-				partyRef->updatePlayerTicks(getPlayer(), points);
+				party->updatePlayerTicks(getPlayer(), points);
 			}
 		}
 	}
@@ -3599,8 +3589,7 @@ void Player::onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& targ
 
 void Player::onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target, int32_t points)
 {
-	const auto partyRef = getParty();
-	if (target && partyRef) {
+	if (target && party) {
 		std::shared_ptr<Player> tmpPlayer = nullptr;
 
 		if (target->getPlayer()) {
@@ -3612,7 +3601,7 @@ void Player::onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target,
 		}
 
 		if (isPartner(tmpPlayer)) {
-			partyRef->updatePlayerTicks(getPlayer(), points);
+			party->updatePlayerTicks(getPlayer(), points);
 		}
 	}
 }
@@ -3670,10 +3659,9 @@ void Player::onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>&
 		return;
 	}
 
-	const auto partyRef = getParty();
-	if (target && !target->getPlayer() && partyRef && partyRef->isSharedExperienceActive() &&
-	    partyRef->isSharedExperienceEnabled()) {
-		partyRef->shareExperience(gainExp, target);
+	if (target && !target->getPlayer() && party && party->isSharedExperienceActive() &&
+	    party->isSharedExperienceEnabled()) {
+		party->shareExperience(gainExp, target);
 		// We will get a share of the experience through the sharing mechanism
 		return;
 	}
@@ -3892,8 +3880,7 @@ Skulls_t Player::getCombatSkull(const std::shared_ptr<const Creature>& creature)
 		return SKULL_YELLOW;
 	}
 
-	const auto partyRef = getParty();
-	if (partyRef && tfs::owner_equal(partyRef, player->party)) {
+	if (party && party == player->party) {
 		return SKULL_GREEN;
 	}
 	return creature->getSkull();
@@ -4060,15 +4047,14 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 		return SHIELD_NONE;
 	}
 
-	const auto partyRef = getParty();
-	if (partyRef) {
-		if (partyRef->getLeader() == player) {
-			if (partyRef->isSharedExperienceActive()) {
-				if (partyRef->isSharedExperienceEnabled()) {
+	if (party) {
+		if (party->getLeader() == player) {
+			if (party->isSharedExperienceActive()) {
+				if (party->isSharedExperienceEnabled()) {
 					return SHIELD_YELLOW_SHAREDEXP;
 				}
 
-				if (partyRef->canUseSharedExperience(player)) {
+				if (party->canUseSharedExperience(player)) {
 					return SHIELD_YELLOW_NOSHAREDEXP;
 				}
 
@@ -4078,13 +4064,13 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 			return SHIELD_YELLOW;
 		}
 
-		if (tfs::owner_equal(player->party, partyRef)) {
-			if (partyRef->isSharedExperienceActive()) {
-				if (partyRef->isSharedExperienceEnabled()) {
+		if (player->party == party) {
+			if (party->isSharedExperienceActive()) {
+				if (party->isSharedExperienceEnabled()) {
 					return SHIELD_BLUE_SHAREDEXP;
 				}
 
-				if (partyRef->canUseSharedExperience(player)) {
+				if (party->canUseSharedExperience(player)) {
 					return SHIELD_BLUE_NOSHAREDEXP;
 				}
 
@@ -4095,7 +4081,7 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 		}
 
 		// isInviting(player) if members aren't supposed to see the invited player emblem
-		if (partyRef->isPlayerInvited(player)) {
+		if (party->isPlayerInvited(player)) {
 			return SHIELD_WHITEBLUE;
 		}
 	}
@@ -4104,7 +4090,7 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 		return SHIELD_WHITEYELLOW;
 	}
 
-	if (player->getParty()) {
+	if (player->party) {
 		return SHIELD_GRAY;
 	}
 
@@ -4113,20 +4099,18 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 
 bool Player::isInviting(const std::shared_ptr<const Player>& player) const
 {
-	const auto partyRef = getParty();
-	if (!player || !partyRef || partyRef->getLeader().get() != this) {
+	if (!player || !party || party->getLeader().get() != this) {
 		return false;
 	}
-	return partyRef->isPlayerInvited(player);
+	return party->isPlayerInvited(player);
 }
 
 bool Player::isPartner(const std::shared_ptr<const Player>& player) const
 {
-	const auto partyRef = getParty();
-	if (!player || !partyRef || player.get() == this) {
+	if (!player || !party || player.get() == this) {
 		return false;
 	}
-	return tfs::owner_equal(partyRef, player->party);
+	return party == player->party;
 }
 
 bool Player::isGuildMate(const std::shared_ptr<const Player>& player) const
@@ -4145,8 +4129,8 @@ void Player::sendPlayerPartyIcons(const std::shared_ptr<Player>& player)
 
 bool Player::addPartyInvitation(const std::shared_ptr<Party>& party)
 {
-	auto it = std::find_if(invitePartyList.begin(), invitePartyList.end(),
-	                       [&party](const auto& invite) { return tfs::owner_equal(invite, party); });
+	auto it = std::ranges::find_if(invitePartyList,
+	                               [&party](const auto& invite) { return tfs::owner_equal(invite, party); });
 	if (it != invitePartyList.end()) {
 		return false;
 	}
@@ -4162,8 +4146,8 @@ void Player::removePartyInvitation(const std::shared_ptr<Party>& party)
 
 void Player::clearPartyInvitations()
 {
-	for (const auto& invitingParty : invitePartyList | tfs::views::lock_weak_ptrs) {
-		invitingParty->removeInvite(getPlayer(), false);
+	for (const auto& invite : invitePartyList | tfs::views::lock_weak_ptrs) {
+		invite->removeInvite(getPlayer(), false);
 	}
 	invitePartyList.clear();
 }

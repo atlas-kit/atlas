@@ -26,7 +26,7 @@ enum SharedExpStatus_t : uint8_t
 class Party : public std::enable_shared_from_this<Party>
 {
 public:
-	static std::shared_ptr<Party> create(const std::shared_ptr<Player>& leader);
+	explicit Party(const std::shared_ptr<Player>& leader);
 
 	auto getLeader() const { return leader.lock(); }
 	const auto& getMembers() const { return memberList; }
@@ -59,8 +59,6 @@ public:
 	void clearPlayerPoints(const std::shared_ptr<Player>& player);
 
 private:
-	explicit Party(const std::shared_ptr<Player>& leader);
-
 	SharedExpStatus_t getSharedExperienceStatus();
 
 	std::map<uint32_t, int64_t> ticksMap;

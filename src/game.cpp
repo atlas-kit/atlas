@@ -4866,7 +4866,10 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 
 	auto party = player->getParty();
 	if (!party) {
-		party = Party::create(player);
+		party = std::make_shared<Party>(player);
+		player->setParty(party);
+		g_game.updatePlayerShield(player);
+		player->sendCreatureSkull(player);
 	} else if (party->getLeader() != player) {
 		return;
 	}
@@ -4893,7 +4896,7 @@ void Game::playerJoinParty(uint32_t playerId, uint32_t leaderId)
 		return;
 	}
 
-	auto party = leader->getParty();
+	const auto& party = leader->getParty();
 	if (!party || party->getLeader() != leader) {
 		return;
 	}
@@ -4913,7 +4916,7 @@ void Game::playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId)
 		return;
 	}
 
-	auto party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4932,7 +4935,7 @@ void Game::playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId)
 		return;
 	}
 
-	auto party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4951,7 +4954,7 @@ void Game::playerLeaveParty(uint32_t playerId)
 		return;
 	}
 
-	auto party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || player->hasCondition(CONDITION_INFIGHT)) {
 		return;
 	}
@@ -4966,7 +4969,7 @@ void Game::playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpAc
 		return;
 	}
 
-	auto party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || (player->hasCondition(CONDITION_INFIGHT) && player->getZone() != ZONE_PROTECTION)) {
 		return;
 	}

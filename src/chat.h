@@ -7,8 +7,6 @@
 #include "const.h"
 #include "luascript.h"
 
-#include <memory>
-
 class Party;
 class Player;
 

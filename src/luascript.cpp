@@ -15708,7 +15708,8 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 
 	auto party = player->getParty();
 	if (!party) {
-		party = Party::create(player);
+		party = std::make_shared<Party>(player);
+		player->setParty(party);
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
 		tfs::lua::pushSharedPtr(L, party);
@@ -15722,10 +15723,9 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 int LuaScriptInterface::luaPartyDisband(lua_State* L)
 {
 	// party:disband()
-	auto* partyPtr = tfs::lua::getRawSharedPtr<Party>(L, 1);
-	if (partyPtr && *partyPtr) {
-		(*partyPtr)->disband();
-		partyPtr->reset();
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
+	if (party) {
+		party->disband();
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);

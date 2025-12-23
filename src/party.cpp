@@ -8,17 +8,8 @@
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
-#include "chat.h"
 
-extern Chat* g_chat;
 extern Game g_game;
-
-std::shared_ptr<Party> Party::create(const std::shared_ptr<Player>& leader)
-{
-	auto party = std::shared_ptr<Party>(new Party(leader));
-	leader->setParty(party);
-	return party;
-}
 
 Party::Party(const std::shared_ptr<Player>& leader) : leader{leader} {}
 
@@ -31,10 +22,6 @@ void Party::disband()
 
 	const auto currentLeader = leader.lock();
 	leader.reset();
-
-	if (g_chat) {
-		g_chat->deleteChannel(currentLeader, CHANNEL_PARTY);
-	}
 
 	currentLeader->setParty(nullptr);
 	currentLeader->sendClosePrivate(CHANNEL_PARTY);
@@ -69,12 +56,12 @@ void Party::disband()
 
 bool Party::leaveParty(const std::shared_ptr<Player>& player, bool forceRemove /* = false */)
 {
-	auto self = shared_from_this();
 	if (!player) {
 		return false;
 	}
 
-	if (!tfs::owner_equal(player->getParty(), self) && !tfs::owner_equal(leader, player)) {
+	auto self = shared_from_this();
+	if (player->getParty() != self && !tfs::owner_equal(leader, player)) {
 		return false;
 	}
 
@@ -136,7 +123,7 @@ bool Party::leaveParty(const std::shared_ptr<Player>& player, bool forceRemove /
 bool Party::passPartyLeadership(const std::shared_ptr<Player>& player, bool forceRemove /* = false*/)
 {
 	auto self = shared_from_this();
-	if (!player || getLeader() == player || !tfs::owner_equal(player->getParty(), self)) {
+	if (!player || getLeader() == player || player->getParty() != self) {
 		return false;
 	}
 
@@ -176,8 +163,9 @@ bool Party::passPartyLeadership(const std::shared_ptr<Player>& player, bool forc
 
 bool Party::joinParty(const std::shared_ptr<Player>& player)
 {
+	auto self = shared_from_this();
 	// check if lua scripts allow the player to join
-	if (!tfs::events::party::onJoin(shared_from_this(), player)) {
+	if (!tfs::events::party::onJoin(self, player)) {
 		return false;
 	}
 
@@ -190,7 +178,7 @@ bool Party::joinParty(const std::shared_ptr<Player>& player)
 
 	// add player to the party
 	memberList.emplace(player);
-	player->setParty(shared_from_this());
+	player->setParty(self);
 	broadcastPartyMessage(MESSAGE_INFO_DESCR, std::format("{:s} has joined the party.", player->getName()));
 
 	// remove player pending invitations to this and other parties
@@ -265,7 +253,6 @@ void Party::revokeInvitation(const std::shared_ptr<Player>& player)
 
 bool Party::invitePlayer(const std::shared_ptr<Player>& player)
 {
-	auto self = shared_from_this();
 	if (isPlayerInvited(player)) {
 		return false;
 	}
@@ -284,7 +271,7 @@ bool Party::invitePlayer(const std::shared_ptr<Player>& player)
 
 	// add player to invite lists
 	inviteList.emplace(player);
-	player->addPartyInvitation(self);
+	player->addPartyInvitation(shared_from_this());
 
 	// update leader-invitee party status
 	leader->sendCreatureShield(player);
