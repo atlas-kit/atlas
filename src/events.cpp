@@ -456,7 +456,7 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 
 namespace tfs::events::party {
 
-bool onJoin(Party* party, const std::shared_ptr<Player>& player)
+bool onJoin(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onJoin(player) or Party.onJoin(self, player)
 	if (partyHandlers.onJoin == -1) {
@@ -474,7 +474,7 @@ bool onJoin(Party* party, const std::shared_ptr<Player>& player)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onJoin);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -483,7 +483,7 @@ bool onJoin(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onLeave(Party* party, const std::shared_ptr<Player>& player)
+bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onLeave(player) or Party.onLeave(self, player)
 	if (partyHandlers.onLeave == -1) {
@@ -501,7 +501,7 @@ bool onLeave(Party* party, const std::shared_ptr<Player>& player)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onLeave);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -510,7 +510,7 @@ bool onLeave(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onDisband(Party* party)
+bool onDisband(const std::shared_ptr<Party>& party)
 {
 	// Party:onDisband() or Party.onDisband(self)
 	if (partyHandlers.onDisband == -1) {
@@ -528,13 +528,13 @@ bool onDisband(Party* party)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onDisband);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	return scriptInterface.callFunction(1);
 }
 
-bool onInvite(Party* party, const std::shared_ptr<Player>& player)
+bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onInvite(player) or Party.onInvite(self, player)
 	if (partyHandlers.onInvite == -1) {
@@ -552,7 +552,7 @@ bool onInvite(Party* party, const std::shared_ptr<Player>& player)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onInvite);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -561,7 +561,7 @@ bool onInvite(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
+bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onRevokeInvitation(player) or Party.onRevokeInvitation(self, player)
 	if (partyHandlers.onRevokeInvitation == -1) {
@@ -579,7 +579,7 @@ bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onRevokeInvitation);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -588,7 +588,7 @@ bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
+bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onPassLeadership(player) or Party.onPassLeadership(self, player)
 	if (partyHandlers.onPassLeadership == -1) {
@@ -606,7 +606,7 @@ bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onPassLeadership);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -615,7 +615,7 @@ bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-void onShareExperience(Party* party, uint64_t& exp)
+void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp)
 {
 	// Party:onShareExperience(exp) or Party.onShareExperience(self, exp)
 	if (partyHandlers.onShareExperience == -1) {
@@ -633,7 +633,7 @@ void onShareExperience(Party* party, uint64_t& exp)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onShareExperience);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushNumber(L, exp);

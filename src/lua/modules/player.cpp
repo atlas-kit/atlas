@@ -1528,9 +1528,8 @@ int luaPlayerGetParty(lua_State* L)
 		return 1;
 	}
 
-	Party* party = player->getParty();
-	if (party) {
-		tfs::lua::pushUserdata(L, party);
+	if (const auto& party = player->getParty()) {
+		tfs::lua::pushSharedPtr(L, party);
 		tfs::lua::setMetatable(L, -1, "Party");
 	} else {
 		lua_pushnil(L);
