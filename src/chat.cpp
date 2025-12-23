@@ -552,8 +552,7 @@ ChatChannel* Chat::getChannel(const std::shared_ptr<const Player>& player, uint1
 		}
 
 		case CHANNEL_PARTY: {
-			const auto& party = player->getParty();
-			if (party) {
+			if (const auto& party = player->getParty()) {
 				auto it = partyChannels.find(party);
 				if (it != partyChannels.end()) {
 					return &it->second;

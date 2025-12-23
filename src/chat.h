@@ -120,7 +120,7 @@ public:
 private:
 	std::map<uint16_t, ChatChannel> normalChannels;
 	std::map<uint16_t, PrivateChatChannel> privateChannels;
-	std::map<std::shared_ptr<Party>, ChatChannel, std::owner_less<std::shared_ptr<Party>>> partyChannels;
+	std::map<std::weak_ptr<Party>, ChatChannel, std::owner_less<std::weak_ptr<Party>>> partyChannels;
 	std::map<uint32_t, ChatChannel> guildChannels;
 
 	LuaScriptInterface scriptInterface;

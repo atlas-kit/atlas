@@ -4866,8 +4866,9 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 
 	auto party = player->getParty();
 	if (!party) {
-		party = std::make_shared<Party>(player);
-		player->setParty(party);
+		party = std::make_shared<Party>();
+		party->setLeader(player);
+
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
 	} else if (party->getLeader() != player) {

@@ -6,8 +6,6 @@
 
 #include "const.h"
 
-#include <memory>
-
 class Creature;
 class Player;
 
@@ -26,9 +24,9 @@ enum SharedExpStatus_t : uint8_t
 class Party : public std::enable_shared_from_this<Party>
 {
 public:
-	explicit Party(const std::shared_ptr<Player>& leader);
-
 	auto getLeader() const { return leader.lock(); }
+	void setLeader(const std::shared_ptr<Player>& leader);
+
 	const auto& getMembers() const { return memberList; }
 	const auto& getInvitees() const { return inviteList; }
 

@@ -10156,8 +10156,7 @@ int LuaScriptInterface::luaPlayerGetParty(lua_State* L)
 		return 1;
 	}
 
-	const auto& party = player->getParty();
-	if (party) {
+	if (const auto& party = player->getParty()) {
 		tfs::lua::pushSharedPtr(L, party);
 		tfs::lua::setMetatable(L, -1, "Party");
 	} else {
@@ -15708,8 +15707,9 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 
 	auto party = player->getParty();
 	if (!party) {
-		party = std::make_shared<Party>(player);
-		player->setParty(party);
+		party = std::make_shared<Party>();
+		party->setLeader(player);
+
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
 		tfs::lua::pushSharedPtr(L, party);
@@ -15723,8 +15723,7 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 int LuaScriptInterface::luaPartyDisband(lua_State* L)
 {
 	// party:disband()
-	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
-	if (party) {
+	if (const auto& party = tfs::lua::getSharedPtr<Party>(L, 1)) {
 		party->disband();
 		tfs::lua::pushBoolean(L, true);
 	} else {

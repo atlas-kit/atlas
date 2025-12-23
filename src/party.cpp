@@ -5,13 +5,18 @@
 
 #include "party.h"
 
+#include "chat.h"
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
 
 extern Game g_game;
 
-Party::Party(const std::shared_ptr<Player>& leader) : leader{leader} {}
+void Party::setLeader(const std::shared_ptr<Player>& leader)
+{
+	this->leader = leader;
+	leader->setParty(shared_from_this());
+}
 
 void Party::disband()
 {
