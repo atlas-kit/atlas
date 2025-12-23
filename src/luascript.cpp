@@ -1193,15 +1193,21 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(L, "isScriptsInterface", LuaScriptInterface::luaIsScriptsInterface);
 
 	// configManager table
-	luaL_register(L, "configManager", LuaScriptInterface::luaConfigManagerTable);
+	luaL_newlib(L, LuaScriptInterface::luaConfigManagerTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "configManager");
 	lua_pop(L, 1);
 
 	// db table
-	luaL_register(L, "db", LuaScriptInterface::luaDatabaseTable);
+	luaL_newlib(L, LuaScriptInterface::luaDatabaseTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "db");
 	lua_pop(L, 1);
 
 	// result table
-	luaL_register(L, "result", LuaScriptInterface::luaResultTable);
+	luaL_newlib(L, LuaScriptInterface::luaResultTable);
+	lua_pushvalue(L, -1);
+	lua_setglobal(L, "result");
 	lua_pop(L, 1);
 
 	/* New functions */
@@ -3765,7 +3771,8 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State* L)
 int LuaScriptInterface::luaIsValidUID(lua_State* L)
 {
 	// isValidUID(uid)
-	tfs::lua::pushBoolean(L, tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1)) != nullptr);
+	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
+	tfs::lua::pushBoolean(L, thing != nullptr);
 	return 1;
 }
 
@@ -3782,6 +3789,12 @@ int LuaScriptInterface::luaIsMoveable(lua_State* L)
 	// isMoveable(uid)
 	// isMovable(uid)
 	const auto& thing = tfs::lua::getScriptEnv()->getThingByUID(tfs::lua::getNumber<uint32_t>(L, -1));
+	if (!thing) {
+		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
 	if (const auto& item = thing->asItem()) {
 		tfs::lua::pushBoolean(L, item->isPushable());
 	} else if (const auto& creature = thing->asCreature()) {
@@ -4443,7 +4456,7 @@ int LuaScriptInterface::luaGameGetPlayers(lua_State* L)
 	lua_createtable(L, players.size(), 0);
 
 	int index = 0;
-	for (auto&& player : players) {
+	for (const auto& player : players) {
 		tfs::lua::pushSharedPtr(L, player);
 		tfs::lua::setMetatable(L, -1, "Player");
 		lua_rawseti(L, -2, ++index);
@@ -4458,7 +4471,7 @@ int LuaScriptInterface::luaGameGetNpcs(lua_State* L)
 	lua_createtable(L, npcs.size(), 0);
 
 	int index = 0;
-	for (auto&& npc : npcs) {
+	for (const auto& npc : npcs) {
 		tfs::lua::pushSharedPtr(L, npc);
 		tfs::lua::setMetatable(L, -1, "Npc");
 		lua_rawseti(L, -2, ++index);
@@ -4473,7 +4486,7 @@ int LuaScriptInterface::luaGameGetMonsters(lua_State* L)
 	lua_createtable(L, monsters.size(), 0);
 
 	int index = 0;
-	for (auto&& monster : monsters) {
+	for (const auto& monster : monsters) {
 		tfs::lua::pushSharedPtr(L, monster);
 		tfs::lua::setMetatable(L, -1, "Monster");
 		lua_rawseti(L, -2, ++index);
@@ -4638,11 +4651,11 @@ int LuaScriptInterface::luaGameGetTowns(lua_State* L)
 int LuaScriptInterface::luaGameGetHouses(lua_State* L)
 {
 	// Game.getHouses()
-	const auto& houses = g_game.getHouses();
+	const auto& houses = g_game.getHouses() | std::ranges::to<std::vector>();
 	lua_createtable(L, houses.size(), 0);
 
 	int index = 0;
-	for (auto&& house : houses | std::views::values | std::views::as_const) {
+	for (auto&& house : houses | std::views::as_const) {
 		tfs::lua::pushSharedPtr(L, house);
 		tfs::lua::setMetatable(L, -1, "House");
 		lua_rawseti(L, -2, ++index);
@@ -8492,7 +8505,7 @@ int LuaScriptInterface::luaCreatureGetSummons(lua_State* L)
 		return 1;
 	}
 
-	const auto summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, summons.size(), 0);
 
 	int index = 0;
@@ -10143,9 +10156,8 @@ int LuaScriptInterface::luaPlayerGetParty(lua_State* L)
 		return 1;
 	}
 
-	Party* party = player->getParty();
-	if (party) {
-		tfs::lua::pushUserdata(L, party);
+	if (const auto& party = player->getParty()) {
+		tfs::lua::pushSharedPtr(L, party);
 		tfs::lua::setMetatable(L, -1, "Party");
 	} else {
 		lua_pushnil(L);
@@ -10678,14 +10690,14 @@ int LuaScriptInterface::luaPlayerSetGhostMode(lua_State* L)
 	}
 
 	if (player->isInGhostMode()) {
-		for (auto&& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
+		for (const auto& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
 			if (!onlinePlayer->isAccessPlayer()) {
 				onlinePlayer->notifyStatusChange(player, VIPSTATUS_OFFLINE);
 			}
 		}
 		IOLoginData::updateOnlineStatus(player->getGUID(), false);
 	} else {
-		for (auto&& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
+		for (const auto& onlinePlayer : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
 			if (!onlinePlayer->isAccessPlayer()) {
 				onlinePlayer->notifyStatusChange(player, VIPSTATUS_ONLINE);
 			}
@@ -15693,12 +15705,14 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 		return 1;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party) {
-		party = new Party(player);
+		party = std::make_shared<Party>();
+		party->setLeader(player);
+
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
-		tfs::lua::pushUserdata(L, party);
+		tfs::lua::pushSharedPtr(L, party);
 		tfs::lua::setMetatable(L, -1, "Party");
 	} else {
 		lua_pushnil(L);
@@ -15709,11 +15723,8 @@ int32_t LuaScriptInterface::luaPartyCreate(lua_State* L)
 int LuaScriptInterface::luaPartyDisband(lua_State* L)
 {
 	// party:disband()
-	Party** partyPtr = tfs::lua::getRawUserdata<Party>(L, 1);
-	if (partyPtr && *partyPtr) {
-		Party*& party = *partyPtr;
+	if (const auto& party = tfs::lua::getSharedPtr<Party>(L, 1)) {
 		party->disband();
-		party = nullptr;
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -15724,7 +15735,7 @@ int LuaScriptInterface::luaPartyDisband(lua_State* L)
 int LuaScriptInterface::luaPartyGetLeader(lua_State* L)
 {
 	// party:getLeader()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (!party) {
 		lua_pushnil(L);
 		return 1;
@@ -15743,7 +15754,7 @@ int LuaScriptInterface::luaPartySetLeader(lua_State* L)
 {
 	// party:setLeader(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->passPartyLeadership(player, true));
 	} else {
@@ -15755,13 +15766,13 @@ int LuaScriptInterface::luaPartySetLeader(lua_State* L)
 int LuaScriptInterface::luaPartyGetMembers(lua_State* L)
 {
 	// party:getMembers()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (!party) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	const auto members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, members.size(), 0);
 
 	int index = 0;
@@ -15776,7 +15787,7 @@ int LuaScriptInterface::luaPartyGetMembers(lua_State* L)
 int LuaScriptInterface::luaPartyGetMemberCount(lua_State* L)
 {
 	// party:getMemberCount()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		tfs::lua::pushNumber(
 		    L, std::ranges::count_if(party->getMembers(), [](const auto& member) { return !member.expired(); }));
@@ -15789,13 +15800,13 @@ int LuaScriptInterface::luaPartyGetMemberCount(lua_State* L)
 int LuaScriptInterface::luaPartyGetInvitees(lua_State* L)
 {
 	// party:getInvitees()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (!party) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	const auto invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, invitees.size(), 0);
 
 	int index = 0;
@@ -15810,7 +15821,7 @@ int LuaScriptInterface::luaPartyGetInvitees(lua_State* L)
 int LuaScriptInterface::luaPartyGetInviteeCount(lua_State* L)
 {
 	// party:getInviteeCount()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		tfs::lua::pushNumber(
 		    L, std::ranges::count_if(party->getInvitees(), [](const auto& invitee) { return !invitee.expired(); }));
@@ -15824,7 +15835,7 @@ int LuaScriptInterface::luaPartyAddInvite(lua_State* L)
 {
 	// party:addInvite(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->invitePlayer(player));
 	} else {
@@ -15837,7 +15848,7 @@ int LuaScriptInterface::luaPartyRemoveInvite(lua_State* L)
 {
 	// party:removeInvite(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->removeInvite(player));
 	} else {
@@ -15850,7 +15861,7 @@ int LuaScriptInterface::luaPartyAddMember(lua_State* L)
 {
 	// party:addMember(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->joinParty(player));
 	} else {
@@ -15863,7 +15874,7 @@ int LuaScriptInterface::luaPartyRemoveMember(lua_State* L)
 {
 	// party:removeMember(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->leaveParty(player));
 	} else {
@@ -15875,7 +15886,7 @@ int LuaScriptInterface::luaPartyRemoveMember(lua_State* L)
 int LuaScriptInterface::luaPartyIsSharedExperienceActive(lua_State* L)
 {
 	// party:isSharedExperienceActive()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		tfs::lua::pushBoolean(L, party->isSharedExperienceActive());
 	} else {
@@ -15887,7 +15898,7 @@ int LuaScriptInterface::luaPartyIsSharedExperienceActive(lua_State* L)
 int LuaScriptInterface::luaPartyIsSharedExperienceEnabled(lua_State* L)
 {
 	// party:isSharedExperienceEnabled()
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		tfs::lua::pushBoolean(L, party->isSharedExperienceEnabled());
 	} else {
@@ -15900,7 +15911,7 @@ int LuaScriptInterface::luaPartyIsMemberSharingExp(lua_State* L)
 {
 	// party:isMemberSharingExp(player)
 	const auto& player = tfs::lua::getSharedPtr<const Player>(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party && player) {
 		tfs::lua::pushBoolean(L, party->getMemberSharedExperienceStatus(player) == SHAREDEXP_OK);
 	} else {
@@ -15913,7 +15924,7 @@ int LuaScriptInterface::luaPartyShareExperience(lua_State* L)
 {
 	// party:shareExperience(experience)
 	uint64_t experience = tfs::lua::getNumber<uint64_t>(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		party->shareExperience(experience);
 		tfs::lua::pushBoolean(L, true);
@@ -15927,7 +15938,7 @@ int LuaScriptInterface::luaPartySetSharedExperience(lua_State* L)
 {
 	// party:setSharedExperience(active)
 	bool active = tfs::lua::getBoolean(L, 2);
-	Party* party = tfs::lua::getUserdata<Party>(L, 1);
+	const auto& party = tfs::lua::getSharedPtr<Party>(L, 1);
 	if (party) {
 		tfs::lua::pushBoolean(L, party->setSharedExperience(party->getLeader(), active));
 	} else {

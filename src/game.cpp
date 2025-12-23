@@ -153,7 +153,7 @@ void Game::saveGameState()
 
 	std::cout << "Saving server..." << std::endl;
 
-	for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs) {
 		player->setLoginPosition(player->getPosition());
 		IOLoginData::savePlayer(player);
 	}
@@ -417,7 +417,7 @@ std::shared_ptr<Npc> Game::getNpcByName(const std::string& name)
 		return nullptr;
 	}
 
-	for (auto&& npc : npcs | std::views::values | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& npc : npcs | std::views::values | tfs::views::lock_weak_ptrs) {
 		if (boost::iequals(name, npc->getName())) {
 			return npc;
 		}
@@ -431,7 +431,7 @@ std::shared_ptr<Player> Game::getPlayerByName(const std::string& name)
 		return nullptr;
 	}
 
-	for (auto&& player : players | std::views::values | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& player : players | std::views::values | tfs::views::lock_weak_ptrs) {
 		if (boost::iequals(name, player->getName())) {
 			return player;
 		}
@@ -481,7 +481,7 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, std::shared_ptr<
 
 std::shared_ptr<Player> Game::getPlayerByAccount(uint32_t acc)
 {
-	for (auto&& player : getPlayers() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs) {
 		if (player->getAccount() == acc) {
 			return player;
 		}
@@ -1893,7 +1893,7 @@ bool Game::playerBroadcastMessage(const std::shared_ptr<Player>& player, const s
 
 	std::cout << "> " << player->getName() << " broadcasted: \"" << text << "\"." << std::endl;
 
-	for (auto&& onlinePlayer : getPlayers() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& onlinePlayer : getPlayers() | tfs::views::lock_weak_ptrs) {
 		onlinePlayer->sendPrivateMessage(player, TALKTYPE_BROADCAST, text);
 	}
 
@@ -2832,9 +2832,9 @@ void Game::playerAcceptTrade(uint32_t playerId)
 				playerRet = internalRemoveItem(playerTradeItem, playerTradeItem->getItemCount(), true);
 				tradePartnerRet = internalRemoveItem(partnerTradeItem, partnerTradeItem->getItemCount(), true);
 				if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
-					std::shared_ptr<Item> moveItem = nullptr;
+					std::shared_ptr<Item> moveItemOut = nullptr;
 					tradePartnerRet = internalMoveItem(playerTradeItem->getParent(), tradePartner, INDEX_WHEREEVER,
-					                                   playerTradeItem, playerTradeItem->getItemCount(), moveItem,
+					                                   playerTradeItem, playerTradeItem->getItemCount(), moveItemOut,
 					                                   FLAG_IGNOREAUTOSTACK, nullptr, partnerTradeItem);
 
 					if (tradePartnerRet == RETURNVALUE_NOERROR) {
@@ -4757,7 +4757,7 @@ void Game::cleanup()
 void Game::broadcastMessage(const std::string& text, MessageClasses type) const
 {
 	std::cout << "> Broadcasted message: \"" << text << "\"." << std::endl;
-	for (auto&& player : getPlayers() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs) {
 		player->sendTextMessage(type, text);
 	}
 }
@@ -4864,9 +4864,13 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	auto party = player->getParty();
 	if (!party) {
-		party = new Party(player);
+		party = std::make_shared<Party>();
+		party->setLeader(player);
+
+		g_game.updatePlayerShield(player);
+		player->sendCreatureSkull(player);
 	} else if (party->getLeader() != player) {
 		return;
 	}
@@ -4874,7 +4878,6 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!tfs::events::party::onInvite(party, invitedPlayer)) {
 		if (party->empty()) {
 			player->setParty(nullptr);
-			delete party;
 		}
 		return;
 	}
@@ -4894,7 +4897,7 @@ void Game::playerJoinParty(uint32_t playerId, uint32_t leaderId)
 		return;
 	}
 
-	Party* party = leader->getParty();
+	const auto& party = leader->getParty();
 	if (!party || party->getLeader() != leader) {
 		return;
 	}
@@ -4914,7 +4917,7 @@ void Game::playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4933,7 +4936,7 @@ void Game::playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || party->getLeader() != player) {
 		return;
 	}
@@ -4952,7 +4955,7 @@ void Game::playerLeaveParty(uint32_t playerId)
 		return;
 	}
 
-	Party* party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || player->hasCondition(CONDITION_INFIGHT)) {
 		return;
 	}
@@ -4967,7 +4970,7 @@ void Game::playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpAc
 		return;
 	}
 
-	Party* party = player->getParty();
+	const auto& party = player->getParty();
 	if (!party || (player->hasCondition(CONDITION_INFIGHT) && player->getZone() != ZONE_PROTECTION)) {
 		return;
 	}
