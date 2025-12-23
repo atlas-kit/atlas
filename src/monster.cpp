@@ -749,7 +749,7 @@ void Monster::onThink(uint32_t interval)
 					}
 				} else if (attackedCreature.get() == this) {
 					removeFollowCreature();
-				} else if (tfs::owner_equal(attackedCreature, getFollowCreature())) {
+				} else if (!tfs::owner_equal(attackedCreature, getFollowCreature())) {
 					// This happens just after a master orders an attack, so lets follow it as well.
 					setFollowCreature(attackedCreature);
 				}
@@ -951,7 +951,7 @@ void Monster::onThinkDefense(uint32_t interval)
 		}
 	}
 
-	const auto summons = getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& summons = getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	if (!isSummon() && summons.size() < mType->info.maxSummons && hasFollowPath) {
 		for (const summonBlock_t& summonBlock : mType->info.summons) {
 			if (summonBlock.speed > defenseTicks) {
