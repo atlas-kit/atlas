@@ -170,7 +170,6 @@ target_link_libraries(tfslib PRIVATE
 	${LUA_LIBRARIES}
 	${MYSQL_CLIENT_LIBS}
 	)
-set_target_properties(tfslib PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 if (APPLE)
 	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
@@ -182,7 +181,7 @@ if (ENABLE_HTTP)
 endif ()
 
 add_subdirectory(lua)
-target_sources(tfslib PRIVATE $<TARGET_OBJECTS:tfs_lua>)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 

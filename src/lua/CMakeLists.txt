@@ -7,20 +7,44 @@ set(lua_SRC
 	${CMAKE_CURRENT_LIST_DIR}/script.cpp
 	)
 
-set(lua_HDR
-	${CMAKE_CURRENT_LIST_DIR}/api.h
-	${CMAKE_CURRENT_LIST_DIR}/env.h
-	${CMAKE_CURRENT_LIST_DIR}/error.h
-	${CMAKE_CURRENT_LIST_DIR}/meta.h
-	${CMAKE_CURRENT_LIST_DIR}/modules.h
-	${CMAKE_CURRENT_LIST_DIR}/register.h
-	${CMAKE_CURRENT_LIST_DIR}/script.h
-	${CMAKE_CURRENT_LIST_DIR}/variant.h
+set(luamodules_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/modules/action.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/combat.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/condition.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/configmanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/container.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/creature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/creatureevent.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/database.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/game.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/globalevent.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/globals.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/group.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/guild.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/house.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/item.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/itemtype.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/modalwindow.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/monster.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/monsters.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/moveevent.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/networkmessage.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/npc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/outfit.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/party.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/player.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/podium.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/position.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/spell.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/stdlib.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/talkaction.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/teleport.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/thing.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/tile.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/variant.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/vocation.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/weapon.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/modules/xml.cpp
 	)
 
-add_subdirectory(modules)
-
-add_library(tfs_lua OBJECT ${lua_SRC} ${lua_HDR})
-set_target_properties(tfs_lua PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
-
-target_sources(tfs_lua PRIVATE $<TARGET_OBJECTS:luamodules>)
+add_library(luascript OBJECT ${lua_SRC} ${luamodules_SRC})

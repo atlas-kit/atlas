@@ -685,14 +685,14 @@
     <ClInclude Include="..\src\lua\variant.h">
       <Filter>Header Files\lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lua\register.h">
-      <Filter>Header Files\lua</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\lua\script.h">
       <Filter>Header Files\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\modules.h">
       <Filter>Header Files\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\modules\register.h">
+      <Filter>Header Files\lua\modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

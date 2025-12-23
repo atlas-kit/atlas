@@ -299,9 +299,9 @@
     <ClInclude Include="..\src\lua\error.h" />
     <ClInclude Include="..\src\lua\meta.h" />
     <ClInclude Include="..\src\lua\modules.h" />
-    <ClInclude Include="..\src\lua\register.h" />
     <ClInclude Include="..\src\lua\script.h" />
     <ClInclude Include="..\src\lua\variant.h" />
+    <ClInclude Include="..\src\lua\modules\register.h" />
     <ClInclude Include="..\src\mailbox.h" />
     <ClInclude Include="..\src\map.h" />
     <ClInclude Include="..\src\matrixarea.h" />

@@ -116,6 +116,7 @@ public:
 	void clearAreaObjects(LuaScriptInterface* interface);
 
 	void executeTimerEvent(uint32_t eventIndex);
+
 private:
 	std::unordered_map<uint32_t, Combat_ptr> combatMap;
 	std::unordered_map<uint32_t, AreaCombat*> areaMap;

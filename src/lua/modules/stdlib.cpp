@@ -1,9 +1,9 @@
 #include "../../otpch.h"
 
-#include "../api.h"
-#include "../script.h"
 #include "../../tools.h"
+#include "../api.h"
 #include "../register.h"
+#include "../script.h"
 
 namespace {
 
@@ -16,7 +16,4 @@ int luaSystemTime(lua_State* L)
 
 } // namespace
 
-void tfs::lua::registerStdLib(LuaScriptInterface& lsi)
-{
-	lsi.registerMethod("os", "mtime", luaSystemTime);
-}
+void tfs::lua::registerStdLib(LuaScriptInterface& lsi) { lsi.registerMethod("os", "mtime", luaSystemTime); }
