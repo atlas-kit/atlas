@@ -5,7 +5,6 @@
 
 #include "party.h"
 
-#include "chat.h"
 #include "configmanager.h"
 #include "events.h"
 #include "game.h"
