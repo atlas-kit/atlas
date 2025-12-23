@@ -116,14 +116,7 @@ bool Weapons::registerLuaEvent(Weapon_ptr weapon)
 	return true;
 }
 
-// monsters
-int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
-{
-	return static_cast<int32_t>(std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
-}
-
-// players
-int32_t Weapons::getMaxWeaponDamage(uint32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor)
+constexpr int32_t getMaxWeaponDamage(uint32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor)
 {
 	return static_cast<int32_t>(
 	    std::round((level / 5) + (((((attackSkill / 4.) + 1) * (attackValue / 3.)) * 1.03) / attackFactor)));
@@ -248,7 +241,7 @@ bool Weapon::useFist(const std::shared_ptr<Player>& player, const std::shared_pt
 	int32_t attackSkill = player->getSkillLevel(SKILL_FIST);
 	int32_t attackValue = 7;
 
-	int32_t maxDamage = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+	int32_t maxDamage = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 
 	CombatParams params;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -512,7 +505,7 @@ int32_t WeaponMelee::getElementDamage(const std::shared_ptr<const Player>& playe
 	int32_t attackValue = elementDamage;
 	float attackFactor = player->getAttackFactor();
 
-	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 	return -normal_random(0, static_cast<int32_t>(maxValue * player->getVocation()->meleeDamageMultiplier));
 }
 
@@ -525,7 +518,7 @@ int32_t WeaponMelee::getWeaponDamage(const std::shared_ptr<const Player>& player
 	float attackFactor = player->getAttackFactor();
 
 	int32_t maxValue =
-	    static_cast<int32_t>(Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor) *
+	    static_cast<int32_t>(getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor) *
 	                         player->getVocation()->meleeDamageMultiplier);
 	if (maxDamage) {
 		return -maxValue;
@@ -733,7 +726,7 @@ int32_t WeaponDistance::getElementDamage(const std::shared_ptr<const Player>& pl
 	float attackFactor = player->getAttackFactor();
 
 	int32_t minValue = 0;
-	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 	if (target) {
 		if (target->asPlayer()) {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.1));
@@ -761,7 +754,7 @@ int32_t WeaponDistance::getWeaponDamage(const std::shared_ptr<const Player>& pla
 	float attackFactor = player->getAttackFactor();
 
 	int32_t maxValue =
-	    static_cast<int32_t>(Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor) *
+	    static_cast<int32_t>(getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor) *
 	                         player->getVocation()->distDamageMultiplier);
 	if (maxDamage) {
 		return -maxValue;

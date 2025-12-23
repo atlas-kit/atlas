@@ -27,9 +27,6 @@ public:
 	void loadDefaults();
 	const Weapon* getWeapon(const std::shared_ptr<const Item>& item) const;
 
-	static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue);
-	static int32_t getMaxWeaponDamage(uint32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor);
-
 	bool registerLuaEvent(Weapon_ptr weapon);
 	void clear(bool fromLua) override final;
 
