@@ -696,7 +696,7 @@ void Game::playerMoveCreature(const std::shared_ptr<Player>& player, const std::
 {
 	if (!player->canDoAction()) {
 		uint32_t delay = player->getNextActionTime();
-		SchedulerTask* task =
+		auto task =
 		    createSchedulerTask(delay, [=, this, playerID = player->getID(), movingCreatureID = movingCreature->getID(),
 		                                toPos = toTile->getPosition()]() {
 			    playerMoveCreatureByID(playerID, movingCreatureID, movingCreatureOrigPos, toPos);
@@ -720,7 +720,7 @@ void Game::playerMoveCreature(const std::shared_ptr<Player>& player, const std::
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
 				playerAutoWalk(playerID, listDir);
 			});
-			SchedulerTask* task =
+			auto task =
 			    createSchedulerTask(RANGE_MOVE_CREATURE_INTERVAL, [=, this, playerID = player->getID(),
 			                                                       movingCreatureID = movingCreature->getID(),
 			                                                       toPos = toTile->getPosition()] {
@@ -983,7 +983,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
 				playerAutoWalk(playerID, listDir);
 			});
-			SchedulerTask* task =
+			auto task =
 			    createSchedulerTask(RANGE_MOVE_ITEM_INTERVAL, [=, this, playerID = player->getID()]() {
 				    playerMoveItemByPlayerID(playerID, fromPos, spriteId, fromStackPos, toPos, count);
 			    });
@@ -2182,7 +2182,7 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 
 	if (!player->canDoAction()) {
 		uint32_t delay = player->getNextActionTime();
-		SchedulerTask* task =
+		auto task =
 		    createSchedulerTask(delay, [=, this]() { playerUseItem(playerId, pos, stackPos, index, spriteId); });
 		player->setNextActionTask(std::move(task));
 		return;
@@ -2488,7 +2488,7 @@ void Game::playerBrowseField(uint32_t playerId, const Position& pos)
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
 				playerAutoWalk(playerID, listDir);
 			});
-			SchedulerTask* task =
+			auto task =
 			    createSchedulerTask(RANGE_BROWSE_FIELD_INTERVAL, [=, this]() { playerBrowseField(playerId, pos); });
 			player->setNextWalkActionTask(std::move(task));
 		} else {

@@ -48,7 +48,7 @@ Task_ptr createTask(uint32_t expiration, TaskFunc&& f);
 class Dispatcher : public ThreadHolder<Dispatcher>
 {
 public:
-	void addTask(Task_ptr task);
+	void addTask(Task_ptr&& task);
 
 	void addTask(TaskFunc&& f) { addTask(std::make_unique<Task>(std::move(f))); }
 

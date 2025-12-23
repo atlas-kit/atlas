@@ -34,7 +34,7 @@ SchedulerTask_ptr createSchedulerTask(uint32_t delay, TaskFunc&& f);
 class Scheduler : public ThreadHolder<Scheduler>
 {
 public:
-	uint32_t addEvent(SchedulerTask_ptr task);
+	uint32_t addEvent(SchedulerTask_ptr&& task);
 	void stopEvent(uint32_t eventId);
 
 	void shutdown();

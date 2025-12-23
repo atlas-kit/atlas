@@ -43,7 +43,7 @@ void Dispatcher::threadMain()
 	}
 }
 
-void Dispatcher::addTask(Task_ptr task)
+void Dispatcher::addTask(Task_ptr&& task)
 {
 	bool do_signal = false;
 

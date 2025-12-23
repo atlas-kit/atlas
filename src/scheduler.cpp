@@ -9,7 +9,7 @@ extern Dispatcher g_dispatcher;
 
 Scheduler g_scheduler;
 
-uint32_t Scheduler::addEvent(SchedulerTask_ptr task)
+uint32_t Scheduler::addEvent(SchedulerTask_ptr&& task)
 {
 	// check if the event has a valid id
 	if (task->getEventId() == 0) {
