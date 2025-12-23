@@ -1511,7 +1511,7 @@ void Player::onAttacking(uint32_t)
 	}
 
 	auto task = createSchedulerTask(std::max<uint32_t>(SCHEDULER_MINTICKS, delay),
-	                                 [id = getID()]() { g_game.checkCreatureAttack(id); });
+	                                [id = getID()]() { g_game.checkCreatureAttack(id); });
 	if (!classicSpeed) {
 		setNextActionTask(std::move(task));
 	} else {
