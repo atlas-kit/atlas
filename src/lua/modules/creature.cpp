@@ -904,7 +904,7 @@ int luaCreatureGetSummons(lua_State* L)
 		return 1;
 	}
 
-	const auto summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& summons = creature->getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, summons.size(), 0);
 
 	int index = 0;

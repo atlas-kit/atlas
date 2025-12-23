@@ -90,7 +90,7 @@ int luaPartyGetMembers(lua_State* L)
 		return 1;
 	}
 
-	const auto members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& members = party->getMembers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, members.size(), 0);
 
 	int index = 0;
@@ -124,7 +124,7 @@ int luaPartyGetInvitees(lua_State* L)
 		return 1;
 	}
 
-	const auto invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+	const auto& invitees = party->getInvitees() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
 	lua_createtable(L, invitees.size(), 0);
 
 	int index = 0;

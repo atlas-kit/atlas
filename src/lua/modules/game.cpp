@@ -60,7 +60,7 @@ int luaGameGetPlayers(lua_State* L)
 	lua_createtable(L, players.size(), 0);
 
 	int index = 0;
-	for (auto&& player : players) {
+	for (const auto& player : players) {
 		tfs::lua::pushSharedPtr(L, player);
 		tfs::lua::setMetatable(L, -1, "Player");
 		lua_rawseti(L, -2, ++index);
@@ -75,7 +75,7 @@ int luaGameGetNpcs(lua_State* L)
 	lua_createtable(L, npcs.size(), 0);
 
 	int index = 0;
-	for (auto&& npc : npcs) {
+	for (const auto& npc : npcs) {
 		tfs::lua::pushSharedPtr(L, npc);
 		tfs::lua::setMetatable(L, -1, "Npc");
 		lua_rawseti(L, -2, ++index);
@@ -90,7 +90,7 @@ int luaGameGetMonsters(lua_State* L)
 	lua_createtable(L, monsters.size(), 0);
 
 	int index = 0;
-	for (auto&& monster : monsters) {
+	for (const auto& monster : monsters) {
 		tfs::lua::pushSharedPtr(L, monster);
 		tfs::lua::setMetatable(L, -1, "Monster");
 		lua_rawseti(L, -2, ++index);
