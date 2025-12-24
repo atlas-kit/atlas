@@ -1042,6 +1042,8 @@ Weapon = {}
 ---@field onTradeRequest fun(player:Player, target:Player, item:Item):boolean
 ---@field onTradeAccept fun(player:Player, target:Player, item:Item, targetItem:Item):boolean
 ---@field onTradeCompleted fun(player:Player, target:Player, item:Item, targetItem:Item, isSuccess:boolean):nil
+---@field onPodiumRequest fun(player:Player, item:Item):nil
+---@field onPodiumEdit fun(player:Player, item:Item, outfit:Outfit, direction:integer, isVisible:boolean):nil
 ---@field onGainExperience fun(player:Player, source?:Creature, exp:integer, rawExp:integer, sendText:boolean):integer
 ---@field onLoseExperience fun(player:Player, exp:integer):integer
 ---@field onGainSkillTries fun(player:Player, skill:integer, tries:integer, artificial?:boolean):integer
