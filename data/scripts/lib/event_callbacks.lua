@@ -39,10 +39,10 @@ ec.onRevokeInvitation = {}
 ec.onPassLeadership = {}
 -- Player
 ec.onBrowseField = {}
-ec.onLook = {[4] = 1}
-ec.onLookInBattleList = {[3] = 1}
-ec.onLookInTrade = {[4] = 1}
-ec.onLookInShop = {[3] = 1}
+ec.onLook = {}
+ec.onLookInBattleList = {}
+ec.onLookInTrade = {}
+ec.onLookInShop = {}
 ec.onLookInMarket = {}
 ec.onTradeRequest = {}
 ec.onTradeAccept = {}
