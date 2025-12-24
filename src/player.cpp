@@ -3590,7 +3590,7 @@ void Player::onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& targ
 		return;
 	}
 
-	const auto& targetMonster = target->getMonster();
+	const auto& targetMonster = target->asMonster();
 	if (!targetMonster || !targetMonster->isHostile()) {
 		return;
 	}
