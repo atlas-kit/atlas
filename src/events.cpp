@@ -15,6 +15,13 @@ namespace {
 
 LuaScriptInterface scriptInterface{"Event Interface"};
 
+std::vector<std::pair<std::string, std::string>> scripts = {
+    {"Creature", "data/scripts/events/creature.lua"},
+    {"Player", "data/scripts/events/player.lua"},
+    {"Party", "data/scripts/events/party.lua"},
+    {"Monster", "data/scripts/events/monster.lua"},
+};
+
 struct CreatureHandlers
 {
 	int32_t onChangeOutfit = -1;
@@ -70,142 +77,65 @@ struct MonsterHandlers
 	int32_t onSpawn = -1;
 } monsterHandlers;
 
-bool load_from_xml()
+void load_from_xml()
 {
-	pugi::xml_document doc;
-	pugi::xml_parse_result result = doc.load_file("data/events/events.xml");
-	if (!result) {
-		printXMLError("Error - tfs::events::load_from_xml", "data/events/events.xml", result);
-		return false;
+	for (const auto& script : scripts) {
+		if (scriptInterface.loadFile(script.second) != 0) {
+			std::cout << "[Warning - Events] Cannot load " << script.second << std::endl;
+			std::cout << scriptInterface.getLastLuaError() << std::endl;
+		}
 	}
 
+	// Creature
 	creatureHandlers = {};
+	creatureHandlers.onChangeOutfit = scriptInterface.getMetaEvent("Creature", "onChangeOutfit");
+	creatureHandlers.onAreaCombat = scriptInterface.getMetaEvent("Creature", "onAreaCombat");
+	creatureHandlers.onTargetCombat = scriptInterface.getMetaEvent("Creature", "onTargetCombat");
+	creatureHandlers.onHear = scriptInterface.getMetaEvent("Creature", "onHear");
+	creatureHandlers.onChangeZone = scriptInterface.getMetaEvent("Creature", "onChangeZone");
+	creatureHandlers.onUpdateStorage = scriptInterface.getMetaEvent("Creature", "onUpdateStorage");
+
+	// Party
 	partyHandlers = {};
+	partyHandlers.onJoin = scriptInterface.getMetaEvent("Party", "onJoin");
+	partyHandlers.onLeave = scriptInterface.getMetaEvent("Party", "onLeave");
+	partyHandlers.onDisband = scriptInterface.getMetaEvent("Party", "onDisband");
+	partyHandlers.onShareExperience = scriptInterface.getMetaEvent("Party", "onShareExperience");
+	partyHandlers.onInvite = scriptInterface.getMetaEvent("Party", "onInvite");
+	partyHandlers.onRevokeInvitation = scriptInterface.getMetaEvent("Party", "onRevokeInvitation");
+	partyHandlers.onPassLeadership = scriptInterface.getMetaEvent("Party", "onPassLeadership");
+
+	// Player
 	playerHandlers = {};
+	playerHandlers.onBrowseField = scriptInterface.getMetaEvent("Player", "onBrowseField");
+	playerHandlers.onLook = scriptInterface.getMetaEvent("Player", "onLook");
+	playerHandlers.onLookInBattleList = scriptInterface.getMetaEvent("Player", "onLookInBattleList");
+	playerHandlers.onLookInTrade = scriptInterface.getMetaEvent("Player", "onLookInTrade");
+	playerHandlers.onLookInShop = scriptInterface.getMetaEvent("Player", "onLookInShop");
+	playerHandlers.onLookInMarket = scriptInterface.getMetaEvent("Player", "onLookInMarket");
+	playerHandlers.onMoveItem = scriptInterface.getMetaEvent("Player", "onMoveItem");
+	playerHandlers.onItemMoved = scriptInterface.getMetaEvent("Player", "onItemMoved");
+	playerHandlers.onMoveCreature = scriptInterface.getMetaEvent("Player", "onMoveCreature");
+	playerHandlers.onReportRuleViolation = scriptInterface.getMetaEvent("Player", "onReportRuleViolation");
+	playerHandlers.onRotateItem = scriptInterface.getMetaEvent("Player", "onRotateItem");
+	playerHandlers.onTurn = scriptInterface.getMetaEvent("Player", "onTurn");
+	playerHandlers.onTradeRequest = scriptInterface.getMetaEvent("Player", "onTradeRequest");
+	playerHandlers.onTradeAccept = scriptInterface.getMetaEvent("Player", "onTradeAccept");
+	playerHandlers.onTradeCompleted = scriptInterface.getMetaEvent("Player", "onTradeCompleted");
+	playerHandlers.onPodiumRequest = scriptInterface.getMetaEvent("Player", "onPodiumRequest");
+	playerHandlers.onPodiumEdit = scriptInterface.getMetaEvent("Player", "onPodiumEdit");
+	playerHandlers.onGainExperience = scriptInterface.getMetaEvent("Player", "onGainExperience");
+	playerHandlers.onLoseExperience = scriptInterface.getMetaEvent("Player", "onLoseExperience");
+	playerHandlers.onGainSkillTries = scriptInterface.getMetaEvent("Player", "onGainSkillTries");
+	playerHandlers.onWrapItem = scriptInterface.getMetaEvent("Player", "onWrapItem");
+	playerHandlers.onInventoryUpdate = scriptInterface.getMetaEvent("Player", "onInventoryUpdate");
+	playerHandlers.onNetworkMessage = scriptInterface.getMetaEvent("Player", "onNetworkMessage");
+	playerHandlers.onSpellCheck = scriptInterface.getMetaEvent("Player", "onSpellCheck");
+
+	// Monster
 	monsterHandlers = {};
-
-	std::set<std::string> classes;
-	for (auto eventNode : doc.child("events").children()) {
-		if (!eventNode.attribute("enabled").as_bool()) {
-			continue;
-		}
-
-		const std::string& className = eventNode.attribute("class").as_string();
-		auto res = classes.insert(className);
-		if (res.second) {
-			const std::string& lowercase = boost::algorithm::to_lower_copy(className);
-			if (scriptInterface.loadFile("data/events/scripts/" + lowercase + ".lua") != 0) {
-				std::cout << "[Warning - tfs::events::load_from_xml] Can not load script: " << lowercase << ".lua"
-				          << std::endl;
-				std::cout << scriptInterface.getLastLuaError() << std::endl;
-			}
-		}
-
-		const std::string& methodName = eventNode.attribute("method").as_string();
-		const auto event = scriptInterface.getMetaEvent(className, methodName);
-		if (className == "Creature") {
-			if (methodName == "onChangeOutfit") {
-				creatureHandlers.onChangeOutfit = event;
-			} else if (methodName == "onAreaCombat") {
-				creatureHandlers.onAreaCombat = event;
-			} else if (methodName == "onTargetCombat") {
-				creatureHandlers.onTargetCombat = event;
-			} else if (methodName == "onHear") {
-				creatureHandlers.onHear = event;
-			} else if (methodName == "onChangeZone") {
-				creatureHandlers.onChangeZone = event;
-			} else if (methodName == "onUpdateStorage") {
-				creatureHandlers.onUpdateStorage = event;
-			} else {
-				std::cout << "[Warning - tfs::events::load_from_xml] Unknown creature method: " << methodName
-				          << std::endl;
-			}
-		} else if (className == "Party") {
-			if (methodName == "onJoin") {
-				partyHandlers.onJoin = event;
-			} else if (methodName == "onLeave") {
-				partyHandlers.onLeave = event;
-			} else if (methodName == "onDisband") {
-				partyHandlers.onDisband = event;
-			} else if (methodName == "onShareExperience") {
-				partyHandlers.onShareExperience = event;
-			} else if (methodName == "onInvite") {
-				partyHandlers.onInvite = event;
-			} else if (methodName == "onRevokeInvitation") {
-				partyHandlers.onRevokeInvitation = event;
-			} else if (methodName == "onPassLeadership") {
-				partyHandlers.onPassLeadership = event;
-			} else {
-				std::cout << "[Warning - tfs::events::load_from_xml] Unknown party method: " << methodName << std::endl;
-			}
-		} else if (className == "Player") {
-			if (methodName == "onBrowseField") {
-				playerHandlers.onBrowseField = event;
-			} else if (methodName == "onLook") {
-				playerHandlers.onLook = event;
-			} else if (methodName == "onLookInBattleList") {
-				playerHandlers.onLookInBattleList = event;
-			} else if (methodName == "onLookInTrade") {
-				playerHandlers.onLookInTrade = event;
-			} else if (methodName == "onLookInShop") {
-				playerHandlers.onLookInShop = event;
-			} else if (methodName == "onLookInMarket") {
-				playerHandlers.onLookInMarket = event;
-			} else if (methodName == "onTradeRequest") {
-				playerHandlers.onTradeRequest = event;
-			} else if (methodName == "onTradeAccept") {
-				playerHandlers.onTradeAccept = event;
-			} else if (methodName == "onTradeCompleted") {
-				playerHandlers.onTradeCompleted = event;
-			} else if (methodName == "onPodiumRequest") {
-				playerHandlers.onPodiumRequest = event;
-			} else if (methodName == "onPodiumEdit") {
-				playerHandlers.onPodiumEdit = event;
-			} else if (methodName == "onMoveItem") {
-				playerHandlers.onMoveItem = event;
-			} else if (methodName == "onItemMoved") {
-				playerHandlers.onItemMoved = event;
-			} else if (methodName == "onMoveCreature") {
-				playerHandlers.onMoveCreature = event;
-			} else if (methodName == "onReportRuleViolation") {
-				playerHandlers.onReportRuleViolation = event;
-			} else if (methodName == "onRotateItem") {
-				playerHandlers.onRotateItem = event;
-			} else if (methodName == "onTurn") {
-				playerHandlers.onTurn = event;
-			} else if (methodName == "onGainExperience") {
-				playerHandlers.onGainExperience = event;
-			} else if (methodName == "onLoseExperience") {
-				playerHandlers.onLoseExperience = event;
-			} else if (methodName == "onGainSkillTries") {
-				playerHandlers.onGainSkillTries = event;
-			} else if (methodName == "onWrapItem") {
-				playerHandlers.onWrapItem = event;
-			} else if (methodName == "onInventoryUpdate") {
-				playerHandlers.onInventoryUpdate = event;
-			} else if (methodName == "onNetworkMessage") {
-				playerHandlers.onNetworkMessage = event;
-			} else if (methodName == "onSpellCheck") {
-				playerHandlers.onSpellCheck = event;
-			} else {
-				std::cout << "[Warning - tfs::events::load_from_xml] Unknown player method: " << methodName
-				          << std::endl;
-			}
-		} else if (className == "Monster") {
-			if (methodName == "onDropLoot") {
-				monsterHandlers.onDropLoot = event;
-			} else if (methodName == "onSpawn") {
-				monsterHandlers.onSpawn = event;
-			} else {
-				std::cout << "[Warning - tfs::events::load_from_xml] Unknown monster method: " << methodName
-				          << std::endl;
-			}
-		} else {
-			std::cout << "[Warning - tfs::events::load_from_xml] Unknown class: " << className << std::endl;
-		}
-	}
-
-	return true;
+	monsterHandlers.onDropLoot = scriptInterface.getMetaEvent("Monster", "onDropLoot");
+	monsterHandlers.onSpawn = scriptInterface.getMetaEvent("Monster", "onSpawn");
 }
 
 } // namespace
@@ -224,16 +154,16 @@ int32_t getScriptId(EventInfoId eventInfoId)
 	}
 }
 
-bool load()
+void load()
 {
 	scriptInterface.initState();
-	return load_from_xml();
+	load_from_xml();
 }
 
-bool reload()
+void reload()
 {
 	scriptInterface.reInitState();
-	return load_from_xml();
+	load_from_xml();
 }
 
 } // namespace tfs::events
