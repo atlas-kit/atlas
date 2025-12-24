@@ -15,13 +15,6 @@ namespace {
 
 LuaScriptInterface scriptInterface{"Event Interface"};
 
-std::vector<std::pair<std::string, std::string>> scripts = {
-    {"Creature", "data/scripts/events/creature.lua"},
-    {"Player", "data/scripts/events/player.lua"},
-    {"Party", "data/scripts/events/party.lua"},
-    {"Monster", "data/scripts/events/monster.lua"},
-};
-
 struct CreatureHandlers
 {
 	int32_t onChangeOutfit = -1;
