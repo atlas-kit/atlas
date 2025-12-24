@@ -77,11 +77,11 @@ struct MonsterHandlers
 	int32_t onSpawn = -1;
 } monsterHandlers;
 
-void load_from_xml()
+void load_from_scripts()
 {
-	for (const auto& script : scripts) {
-		if (scriptInterface.loadFile(script.second) != 0) {
-			std::cout << "[Warning - Events] Cannot load " << script.second << std::endl;
+	for (const auto& [className, file] : scripts) {
+		if (scriptInterface.loadFile(file) != 0) {
+			std::cout << "[Warning - tfs::events::load] Cannot load " << file << std::endl;
 			std::cout << scriptInterface.getLastLuaError() << std::endl;
 		}
 	}
@@ -157,13 +157,13 @@ int32_t getScriptId(EventInfoId eventInfoId)
 void load()
 {
 	scriptInterface.initState();
-	load_from_xml();
+	load_from_scripts();
 }
 
 void reload()
 {
 	scriptInterface.reInitState();
-	load_from_xml();
+	load_from_scripts();
 }
 
 } // namespace tfs::events
