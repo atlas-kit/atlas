@@ -14,7 +14,7 @@ local config = {
 		},
 		success = {sound = "Grrrrrrr", text = "You tamed the wild bear."}
 	},
-	[12260] = { -- hunting horn
+	[13247] = { -- hunting horn
 		name = "boar",
 		id = 10,
 		type = TYPE_MONSTER,
@@ -27,7 +27,7 @@ local config = {
 		},
 		success = {sound = "Oink", text = "You tamed the wild boar."}
 	},
-	[12304] = { -- maxilla maximus
+	[13291] = { -- maxilla maximus
 		name = "undead cavebear",
 		id = 12,
 		type = TYPE_MONSTER,
@@ -39,7 +39,7 @@ local config = {
 		},
 		success = {sound = "Grrrrrrr", text = "You tamed the undead cavebear."}
 	},
-	[12305] = { -- tin key
+	[13292] = { -- tin key
 		name = "inoperative tin lizzard",
 		mountName = "tin lizzard",
 		id = 8,
@@ -51,7 +51,7 @@ local config = {
 		},
 		success = {sound = "Krkrkrkrk", text = "You wind up the tin lizzard."}
 	},
-	[12306] = { -- leather whip
+	[13293] = { -- leather whip
 		name = "midnight panther",
 		id = 5,
 		type = TYPE_MONSTER,
@@ -63,7 +63,7 @@ local config = {
 		},
 		success = {sound = "Purrrrrrr", text = "You tamed the wild panther."}
 	},
-	[12307] = { -- harness
+	[13294] = { -- harness
 		name = "draptor",
 		id = 6,
 		type = TYPE_MONSTER,
@@ -75,7 +75,7 @@ local config = {
 		},
 		success = {sound = "Screeeeeeeeech", text = "You tamed the wild draptor."}
 	},
-	[12308] = { -- reins
+	[13295] = { -- reins
 		name = "black sheep",
 		id = 4,
 		type = TYPE_MONSTER,
@@ -88,7 +88,7 @@ local config = {
 		},
 		success = {sound = "Baaaaaah", text = "You tamed the black sheep."}
 	},
-	[12311] = { -- carrot on a stick
+	[13298] = { -- carrot on a stick
 		name = "terror bird",
 		id = 2,
 		type = TYPE_MONSTER,
@@ -101,7 +101,7 @@ local config = {
 		},
 		success = {sound = "Guruuuuh", text = "You tamed the bird."}
 	},
-	[12318] = { -- giant shrimp
+	[13305] = { -- giant shrimp
 		name = "crustacea gigantica",
 		id = 7,
 		type = TYPE_MONSTER,
@@ -113,7 +113,7 @@ local config = {
 		},
 		success = {sound = "Chrrrrr", text = "You tamed the gigantic creature."}
 	},
-	[12320] = { -- sweet smelling bait
+	[13307] = { -- sweet smelling bait
 		name = "wailing widow",
 		id = 1,
 		type = TYPE_MONSTER,
@@ -126,7 +126,7 @@ local config = {
 		},
 		success = {sound = "Sssssssss", text = "You tamed the wailing widow."}
 	},
-	[12509] = { -- scorpion sceptre
+	[13498] = { -- scorpion sceptre
 		name = "sandstone scorpion",
 		id = 21,
 		type = TYPE_MONSTER,
@@ -139,7 +139,7 @@ local config = {
 		},
 		success = {sound = "*rattle*", text = "You tamed the sandstone scorpion."}
 	},
-	[12519] = { -- slug drug
+	[13508] = { -- slug drug
 		name = "slug",
 		id = 14,
 		type = TYPE_MONSTER,
@@ -152,7 +152,7 @@ local config = {
 		},
 		success = {sound = "Sluuuuurp!", text = "You drugged the slug."}
 	},
-	[12546] = { -- fist on a stick
+	[13535] = { -- fist on a stick
 		name = "dromedary",
 		id = 20,
 		type = TYPE_MONSTER,
@@ -164,7 +164,7 @@ local config = {
 		},
 		success = {sound = "*blaaammm*", text = "You tamed the dromedary."}
 	},
-	[12547] = { -- diapason
+	[13536] = { -- diapason
 		name = "crystal wolf",
 		id = 16,
 		type = TYPE_MONSTER,
@@ -176,7 +176,7 @@ local config = {
 		},
 		success = {sound = "*kliiiiiiiiiiing* Aooooouuuuu!!", text = "The smooth sound of the diapason tamed the crystal wolf."}
 	},
-	[12548] = { -- bag of apple slices
+	[13537] = { -- bag of apple slices
 		mountName = "donkey",
 		lookType = 399,
 		id = 13,
@@ -189,7 +189,7 @@ local config = {
 		},
 		success = {sound = "Heeee-haaaaw!", text = "Munching a large pile of apple slices tamed the donkey."}
 	},
-	[12549] = { -- bamboo leaves
+	[13538] = { -- bamboo leaves
 		name = "panda",
 		id = 19,
 		type = TYPE_MONSTER,
@@ -202,7 +202,7 @@ local config = {
 		},
 		success = {sound = "Rrrrr...", text = "You tamed the panda."}
 	},
-	[12550] = { -- golden fir cone
+	[13539] = { -- golden fir cone
 		name = "enraged white deer",
 		mountName = "white deer",
 		id = 18,
@@ -216,7 +216,7 @@ local config = {
 		},
 		success = {sound = "*bell*", text = "You tamed the white deer."}
 	},
-	[12801] = { -- golden can of oil
+	[13938] = { -- golden can of oil
 		name = "inoperative uniwheel",
 		mountName = "uniwheel",
 		id = 15,
@@ -228,7 +228,7 @@ local config = {
 		},
 		success = {sound = "Vroooomratatatatatatat.", text = "The strange wheel seems to vibrate and slowly starts turning continuously."}
 	},
-	[12802] = { -- sugar oat
+	[13939] = { -- sugar oat
 		name = "wild horse",
 		id = 17,
 		type = TYPE_MONSTER,
@@ -241,7 +241,7 @@ local config = {
 		},
 		success = {sound = "*snort*", text = "The horse eats the sugar oat and accepts you as its new master."}
 	},
-	[14142] = { -- foxtail
+	[15545] = { -- foxtail
 		name = "manta ray",
 		id = 28,
 		type = TYPE_MONSTER,
@@ -253,7 +253,7 @@ local config = {
 		},
 		success = {sound = "~~~", text = "You tamed the manta ray."}
 	},
-	[14143] = { -- four-leaf clover
+	[15546] = { -- four-leaf clover
 		name = "ladybug",
 		id = 27,
 		type = TYPE_MONSTER,
@@ -265,7 +265,7 @@ local config = {
 		},
 		success = {sound = "Chhrk...", text = "You tamed the lady bug."}
 	},
-	[16153] = { -- iron loadstone
+	[18447] = { -- iron loadstone
 		name = "ironblight",
 		id = 29,
 		type = TYPE_MONSTER,
@@ -278,7 +278,7 @@ local config = {
 		},
 		success = {sound = "Plinnnggggggg", text = "You tamed the ironblight."}
 	},
-	[16154] = { -- glow wine
+	[18448] = { -- glow wine
 		name = "magma crawler",
 		id = 30,
 		type = TYPE_MONSTER,
@@ -291,7 +291,7 @@ local config = {
 		},
 		success = {sound = "ZzzZzzZzzzZz", text = "The magma crawler will accompany you as a friend from now on."}
 	},
-	[16155] = { -- decorative ribbon
+	[18449] = { -- decorative ribbon
 		name = "dragonling",
 		id = 31,
 		type = TYPE_MONSTER,
@@ -302,7 +302,7 @@ local config = {
 		},
 		success = {sound = "FI?", text = "The wild dragonling has accepted you as its master."}
 	},
-	[16251] = { -- golem wrench
+	[18516] = { -- golem wrench
 		name = "modified gnarlhound",
 		id = 32,
 		type = TYPE_MONSTER,
@@ -310,7 +310,7 @@ local config = {
 		chance = 100,
 		success = {sound = "Gnarl!", text = "You now own a modified gnarlhound."}
 	},
-	[17858] = { -- leech
+	[20138] = { -- leech
 		name = "water buffalo",
 		id = 35,
 		type = TYPE_MONSTER,
@@ -323,7 +323,7 @@ local config = {
 		},
 		success = {sound = "Looooow!", text = "The leech appeased the water buffalo and your taming was successful."}
 	},
-	[20274] = { -- nightmare horn
+	[22608] = { -- nightmare horn
 		name = "shock head",
 		id = 42,
 		type = TYPE_MONSTER,
@@ -335,7 +335,7 @@ local config = {
 		},
 		success = {sound = "Grrrrrrr", text = "You tamed the shock head."}
 	},
-	[21186] = { -- control unit
+	[23557] = { -- control unit
 		name = "walker",
 		id = 43,
 		type = TYPE_MONSTER,
@@ -348,7 +348,7 @@ local config = {
 		},
 		success = {sound = "*brzzz*", text = "You tamed the walker."}
 	},
-	[21439] = { -- the lion's heart
+	[23810] = { -- the lion's heart
 		name = "noble lion",
 		id = 40,
 		type = TYPE_MONSTER,
@@ -360,7 +360,7 @@ local config = {
 		},
 		success = {sound = "Grrr", text = "The noble lion will now accompany you as a friend and ally."}
 	},
-	[39548] = { -- colourful water lily
+	[44579] = { -- colourful water lily
 		name = "giant beaver",
 		id = 201,
 		type = TYPE_MONSTER,
@@ -387,18 +387,18 @@ function taming.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		return false
 	end
 
-	if target:getName():lower() == "horse" and item.itemid == 11815 then
+	if target:getName():lower() == "horse" and item.itemid == 13939 then
 		player:say("The horse happily munches the sugar oat and runs on. You shouldn't steal one of the horse station's horses anyway.", TALKTYPE_MONSTER_SAY)
 		item:remove(1)
 		return true
 	end
 
-	if target:getName():lower() == "white deer" and item.itemid == 11594 then
+	if target:getName():lower() == "white deer" and item.itemid == 13539 then
 		player:say("You should try to enrage this deer before your taming attempt. That way you make sure it's strong enough to carry you.", TALKTYPE_MONSTER_SAY)
 		return true
 	end
 
-	if target:getName():lower() == "desperate white deer" and item.itemid == 11594 then
+	if target:getName():lower() == "desperate white deer" and item.itemid == 13539 then
 		player:say("This deer doesn't show enough strength and is too desperate already. Only enraged deer have the necessary power to carry you.", TALKTYPE_MONSTER_SAY)
 		return true
 	end

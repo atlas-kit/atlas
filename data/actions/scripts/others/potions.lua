@@ -24,7 +24,7 @@ end
 
 local potions = {
 	[6558] = { -- flask of demonic blood
-		transform = {236, 7589},
+		transform = {7588, 7589},
 		effect = CONST_ME_DRAWBLOOD
 	},
 	[7439] = { -- berserk potion
@@ -59,7 +59,7 @@ local potions = {
 		description = "Only paladins may drink this potion.",
 		text = "You feel more accurate."
 	},
-	[32907] = { -- magic shield potion
+	[38219] = { -- magic shield potion
 		condition = manaShield,
 		vocations = {
 			VOCATION_SORCERER,
@@ -72,7 +72,7 @@ local potions = {
 		description = "Only sorcerers and druids of level 14 or above may drink this potion.",
 		capacity = magicShieldCapacity
 	},
-	[236] = { -- strong health potion
+	[7588] = { -- strong health potion
 		health = {250, 350},
 		vocations = {
 			VOCATION_PALADIN,
@@ -81,16 +81,16 @@ local potions = {
 			VOCATION_ELITE_KNIGHT
 		},
 		level = 50,
-		flask = 283,
+		flask = 7634,
 		description = "Only knights and paladins of level 50 or above may drink this fluid."
 	},
-	[237] = { -- strong mana potion
+	[7589] = { -- strong mana potion
 		mana = {115, 185},
 		level = 50,
-		flask = 283,
+		flask = 7634,
 		description = "Only players of level 50 or above may drink this fluid."
 	},
-	[238] = { -- great mana potion
+	[7590] = { -- great mana potion
 		mana = {150, 250},
 		vocations = {
 			VOCATION_SORCERER,
@@ -101,28 +101,28 @@ local potions = {
 			VOCATION_ROYAL_PALADIN
 		},
 		level = 80,
-		flask = 284,
+		flask = 7635,
 		description = "Only sorcerers, druids and paladins of level 80 or above may drink this fluid."
 	},
-	[239] = { -- great health potion
-		health = {430, 575},
+	[7591] = { -- great health potion
+		health = {425, 575},
 		vocations = {
 			VOCATION_KNIGHT,
 			VOCATION_ELITE_KNIGHT
 		},
 		level = 80,
-		flask = 284,
+		flask = 7635,
 		description = "Only knights of level 80 or above may drink this fluid."
 	},
-	[266] = { -- health potion
+	[7618] = { -- health potion
 		health = {125, 175},
-		flask = 285
+		flask = 7636
 	},
-	[268] = { -- mana potion
+	[7620] = { -- mana potion
 		mana = {75, 125},
-		flask = 285
+		flask = 7636
 	},
-	[291] = { -- great spirit potion
+	[8472] = { -- great spirit potion
 		health = {250, 350},
 		mana = {100, 200},
 		vocations = {
@@ -130,29 +130,29 @@ local potions = {
 			VOCATION_ROYAL_PALADIN
 		},
 		level = 80,
-		flask = 284,
+		flask = 7635,
 		description = "Only paladins of level 80 or above may drink this fluid."
 	},
-	[292] = { -- ultimate health potion
+	[8473] = { -- ultimate health potion
 		health = {650, 850},
 		vocations = {
 			VOCATION_KNIGHT,
 			VOCATION_ELITE_KNIGHT
 		},
 		level = 130,
-		flask = 284,
+		flask = 7635,
 		description = "Only knights of level 130 or above may drink this fluid."
 	},
-	[295] = { -- antidote potion
+	[8474] = { -- antidote potion
 		antidote = true,
-		flask = 285
+		flask = 7636
 	},
-	[803] = { -- small health potion
+	[8704] = { -- small health potion
 		health = {60, 90},
-		flask = 285
+		flask = 7636
 	},
-	[21002] = { -- ultimate mana potion
-		mana = {430, 575},
+	[26029] = { -- ultimate mana potion
+		mana = {425, 575},
 		vocations = {
 			VOCATION_SORCERER,
 			VOCATION_DRUID,
@@ -160,28 +160,28 @@ local potions = {
 			VOCATION_ELDER_DRUID
 		},
 		level = 130,
-		flask = 284,
+		flask = 7635,
 		description = "Only druids and sorcerers of level 130 or above may drink this fluid."
 	},
-	[21003] = { -- ultimate spirit potion
-		health = {413, 580},
+	[26030] = { -- ultimate spirit potion
+		health = {410, 580},
 		mana = {150, 250},
 		vocations = {
 			VOCATION_PALADIN,
 			VOCATION_ROYAL_PALADIN
 		},
 		level = 130,
-		flask = 284,
+		flask = 7635,
 		description = "Only paladins of level 130 or above may drink this fluid."
 	},
-	[21004] = { -- supreme health potion
-		health = {1083, 1125},
+	[26031] = { -- supreme health potion
+		health = {875, 1125},
 		vocations = {
 			VOCATION_KNIGHT,
 			VOCATION_ELITE_KNIGHT
 		},
 		level = 200,
-		flask = 284,
+		flask = 7635,
 		description = "Only knights of level 200 or above may drink this fluid."
 	}
 }

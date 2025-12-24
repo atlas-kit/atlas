@@ -13,12 +13,12 @@ function clawOfTheNoxiousSpawn.onUse(player, item, fromPosition, target, toPosit
 		if math.random(100) <= 5 then
 			player:addCondition(cursed)
 			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You are cursed by The Noxious Spawn!")
-			item:transform(9394)
+			item:transform(10312)
 			item:decay()
 			player:getPosition():sendMagicEffect(CONST_ME_MAGIC_RED)
 		else
 			player:removeCondition(CONDITION_POISON)
-			item:transform(9394)
+			item:transform(10311)
 			item:decay()
 			player:getPosition():sendMagicEffect(CONST_ME_MAGIC_GREEN)
 		end

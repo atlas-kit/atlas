@@ -1,4 +1,4 @@
-local corpseIds = {3976, 4241, 4242, 4243, 4246, 4247, 4248}
+local corpseIds = {3058, 3059, 3060, 3061, 3064, 3065, 3066}
 local removalLimit = 500
 
 local spell = Spell(SPELL_RUNE)

@@ -9,7 +9,7 @@ AccountStorageKeys = {
 }
 
 GlobalStorageKeys = {
-	cobraBastionFlask = 27344,
+	cobraBastionFlask = 30000,
 }
 
 PlayerStorageKeys = {
@@ -18,20 +18,20 @@ PlayerStorageKeys = {
 	lastPong = 7465,
 
 	-- Misc:
-	annihilatorReward = 27359,
-	goldenOutfit = 27360,
+	annihilatorReward = 30015,
+	goldenOutfit = 30016,
 	-- empty: 30017
 	promotion = 30018,
 	delayLargeSeaShell = 30019,
 	firstRod = 30020,
 	delayWallMirror = 30021,
 	-- empty: 30022
-	madSheepSummon = 27367,
-	crateUsable = 27368,
+	madSheepSummon = 30023,
+	crateUsable = 30024,
 	-- empty: 30025
-	afflictedOutfit = 27370,
-	afflictedPlagueMask = 27371,
-	afflictedPlagueBell = 27372,
+	afflictedOutfit = 30026,
+	afflictedPlagueMask = 30027,
+	afflictedPlagueBell = 30028,
 	-- empty: 30029
 	-- empty: 30030
 	nailCaseUseCount = 30031,
@@ -41,8 +41,8 @@ PlayerStorageKeys = {
 	mutatedPumpkin = 30035,
 
 	-- Achievements:
-	achievementsTotal = 17719,
-	achievementsCounter = 17720,
+	achievementsTotal = 19999,
+	achievementsCounter = 20000,
 	achievementsBase = 300000,
 
 	-- Bestiary:

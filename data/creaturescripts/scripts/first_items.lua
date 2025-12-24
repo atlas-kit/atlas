@@ -1,4 +1,4 @@
-local firstItems = {4101, 3270}
+local firstItems = {2050, 2382}
 
 function onLogin(player)
 	if player:getLastLoginSaved() == 0 then

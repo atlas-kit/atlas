@@ -2,9 +2,9 @@ local ferumbrasStaff = Action()
 
 function ferumbrasStaff.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if math.random(100) > 20 then
-		item:transform(22767)
+		item:transform(25423)
 	else
-		item:transform(22766)
+		item:transform(25422)
 	end
 	item:getPosition():sendMagicEffect(CONST_ME_MAGIC_RED)
 	item:decay()

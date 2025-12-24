@@ -12,7 +12,7 @@ function onLogin(player)
 	end
 
 	local staminaMinutes = player:getStamina()
-	local maxNormalStaminaRegen = 3227 - math.min(2340, staminaMinutes)
+	local maxNormalStaminaRegen = 2340 - math.min(2340, staminaMinutes)
 
 	local regainStaminaMinutes = offlineTime / configManager.getNumber(configKeys.STAMINA_REGEN_MINUTE)
 	if regainStaminaMinutes > maxNormalStaminaRegen then

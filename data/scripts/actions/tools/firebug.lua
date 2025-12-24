@@ -3,21 +3,21 @@ local fireBug = Action()
 function fireBug.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	local chance = math.random(10)
 	if chance > 4 then -- Success 6% chance
-		if target.itemid == 182 then -- Destroy spider webs/North - South
+		if target.itemid == 7538 then -- Destroy spider webs/North - South
 			toPosition:sendMagicEffect(CONST_ME_HITBYFIRE)
-			target:transform(188)
+			target:transform(7544)
 			target:decay()
-		elseif target.itemid == 183 then -- Destroy spider webs/East - West
+		elseif target.itemid == 7539 then -- Destroy spider webs/East - West
 			toPosition:sendMagicEffect(CONST_ME_HITBYFIRE)
-			target:transform(189)
+			target:transform(7545)
 			target:decay()
-		elseif target.itemid == 5464 then -- Burn Sugar Cane
+		elseif target.itemid == 5466 then -- Burn Sugar Cane
 			toPosition:sendMagicEffect(CONST_ME_FIREAREA)
-			target:transform(5464)
+			target:transform(5465)
 			target:decay()
-		elseif target.itemid == 2995 then -- Light up empty coal basins
+		elseif target.itemid == 1485 then -- Light up empty coal basins
 			toPosition:sendMagicEffect(CONST_ME_HITBYFIRE)
-			target:transform(2113)
+			target:transform(1484)
 		end
 	elseif chance == 2 then -- It removes the firebug 1% chance
 		item:remove(1)

@@ -1,52 +1,52 @@
 local config = {
-	[16252] = { -- gnomish voucher type MB
+	[18517] = { -- gnomish voucher type MB
 		female = 514,
 		male = 516,
 		effect = CONST_ME_GREEN_RINGS
 	},
-	[16253] = { -- gnomish voucher type MA1
+	[18518] = { -- gnomish voucher type MA1
 		female = 514,
 		male = 516,
 		addon = 1,
 		effect = CONST_ME_GREEN_RINGS,
 		achievement = "Funghitastic"
 	},
-	[16254] = { -- gnomish voucher type MA2
+	[18519] = { -- gnomish voucher type MA2
 		female = 514,
 		male = 516,
 		addon = 2,
 		effect = CONST_ME_GREEN_RINGS,
 		achievement = "Funghitastic"
 	},
-	[16255] = { -- gnomish voucher type CB
+	[18520] = { -- gnomish voucher type CB
 		female = 513,
 		male = 512,
 		effect = CONST_ME_GIANTICE
 	},
-	[16256] = { -- gnomish voucher type CA1
+	[18521] = { -- gnomish voucher type CA1
 		female = 513,
 		male = 512,
 		addon = 1,
 		effect = CONST_ME_GIANTICE,
 		achievement = "Crystal Clear"
 	},
-	[16257] = { -- gnomish voucher type CA2
+	[18522] = { -- gnomish voucher type CA2
 		female = 513,
 		male = 512,
 		addon = 2,
 		effect = CONST_ME_GIANTICE,
 		achievement = "Crystal Clear"
 	},
-	[32630] = { -- spooky hood
-		female = 1742,
-		male = 1741,
+	[35286] = { -- spooky hood
+		female = 1271,
+		male = 1270,
 		addon = 1,
 		effect = CONST_ME_GREEN_RINGS,
 		achievement = "Mainstreet Nightmare"
 	},
-	[32631] = { -- ghost claw
-		female = 1742,
-		male = 1741,
+	[35287] = { -- ghost claw
+		female = 1271,
+		male = 1270,
 		addon = 2,
 		effect = CONST_ME_GREEN_RINGS,
 		achievement = "Mainstreet Nightmare"

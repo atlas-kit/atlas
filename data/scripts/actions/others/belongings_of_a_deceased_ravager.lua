@@ -1,9 +1,9 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 2867, itemId = 3145}, -- blue gem
-	{chanceFrom = 2868, chanceTo = 3717, itemId = 3244}, -- crystal coin
-	{chanceFrom = 3718, chanceTo = 6000, itemId = 4508}, -- gold ingot
-	{chanceFrom = 6001, chanceTo = 1038, itemId = 3002}, -- green gem
-	{chanceFrom = 1039, chanceTo = 9087, itemId = 7776} -- ravager's axe
+	{chanceFrom = 0, chanceTo = 2000, itemId = 2158}, -- blue gem
+	{chanceFrom = 2001, chanceTo = 4000, itemId = 2160}, -- crystal coin
+	{chanceFrom = 4001, chanceTo = 6000, itemId = 9971}, -- gold ingot
+	{chanceFrom = 6001, chanceTo = 8000, itemId = 2155}, -- green gem
+	{chanceFrom = 8001, chanceTo = 10000, itemId = 2443} -- ravager's axe
 }
 
 local belongingsRavager = Action()

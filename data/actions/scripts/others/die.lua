@@ -1,4 +1,4 @@
-local depotTiles = {10145, 11063}
+local depotTiles = {11062, 11063}
 local diceEnabledOnDepot = true
 
 function onUse(player, item, fromPosition, target, toPosition, isHotkey)

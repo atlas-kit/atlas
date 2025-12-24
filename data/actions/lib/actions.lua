@@ -1,20 +1,20 @@
-local wildGrowth = {3013, 2130} -- wild growth destroyable by machete
+local wildGrowth = {1499, 11099} -- wild growth destroyable by machete
 local jungleGrass = { -- grass destroyable by machete
-	[427] = 2878,
-	[4118] = 2936,
-	[13000] = 14353
+	[2782] = 2781,
+	[3985] = 3984,
+	[19433] = 19431
 }
 local groundIds = {354, 355} -- pick usable ground
-local sandIds = {231, 231} -- desert sand
+local sandIds = {231, 9059} -- desert sand
 local holeId = { -- usable rope holes, for rope spots see global.lua
-	294, 369, 370, 387, 394, 414, 415, 416, 437, 438, 439, 440, 7881, 594, 595, 615,
-	609, 610, 615, 1401, 2724, 615, 608, 859, 4815, 868, 1082, 4813, 157, 158,
-	159, 160, 162, 163, 164, 369, 370, 414, 416, 437, 438, 684, 1212,
-	653, 671, 683, 684, 4438, 7862, 7881, 11247, 11974, 15894, 6767, 19025,
-	20993
+	294, 369, 370, 383, 392, 408, 409, 410, 427, 428, 429, 430, 462, 469, 470, 482,
+	484, 485, 489, 924, 1369, 3135, 3136, 4835, 4837, 7933, 7938, 8170, 8249, 8250,
+	8251, 8252, 8254, 8255, 8256, 8276, 8277, 8279, 8281, 8284, 8285, 8286, 8323,
+	8567, 8585, 8595, 8596, 8972, 9606, 9625, 13190, 14461, 19519, 21536, 23713,
+	26020
 }
-local holes = {593, 606, 608, 21341} -- holes opened by shovel
-local fruits = {3584, 3585, 3586, 3587, 3588, 3589, 3590, 3591, 3592, 3593, 3595, 3596, 5096, 8011, 8012, 8013} -- fruits to make decorated cake with knife
+local holes = {468, 481, 483, 23712} -- holes opened by shovel
+local fruits = {2673, 2674, 2675, 2676, 2677, 2678, 2679, 2680, 2681, 2682, 2684, 2685, 5097, 8839, 8840, 8841} -- fruits to make decorated cake with knife
 
 function destroyItem(player, target, toPosition)
 	if type(target) ~= "userdata" or not target:isItem() then
@@ -82,7 +82,7 @@ function onUseMachete(player, item, fromPosition, target, toPosition, isHotkey)
 end
 
 function onUsePick(player, item, fromPosition, target, toPosition, isHotkey)
-	if target.itemid == 9393 then -- shiny stone refining
+	if target.itemid == 11227 then -- shiny stone refining
 		local chance = math.random(1, 100)
 		if chance == 1 then
 			player:addItem(ITEM_CRYSTAL_COIN) -- 1% chance of getting crystal coin
@@ -91,7 +91,7 @@ function onUsePick(player, item, fromPosition, target, toPosition, isHotkey)
 		elseif chance <= 51 then
 			player:addItem(ITEM_PLATINUM_COIN) -- 45% chance of getting platinum coin
 		else
-			player:addItem(3945) -- 49% chance of getting small diamond
+			player:addItem(2145) -- 49% chance of getting small diamond
 		end
 		player:addAchievementProgress("Petrologist", 100)
 		target:getPosition():sendMagicEffect(CONST_ME_BLOCKHIT)
@@ -110,7 +110,7 @@ function onUsePick(player, item, fromPosition, target, toPosition, isHotkey)
 	end
 
 	if table.contains(groundIds, ground.itemid) and ground.actionid == actionIds.pickHole then
-		ground:transform(394)
+		ground:transform(392)
 		ground:decay()
 		toPosition:sendMagicEffect(CONST_ME_POFF)
 
@@ -138,7 +138,7 @@ function onUseRope(player, item, fromPosition, target, toPosition, isHotkey)
 
 	local ground = tile:getGround()
 
-	if ground and table.contains(ropeSpots, ground:getId()) or tile:getItemById(8240) then
+	if ground and table.contains(ropeSpots, ground:getId()) or tile:getItemById(14435) then
 		tile = Tile(toPosition:moveUpstairs())
 		if not tile then
 			return false
@@ -200,22 +200,22 @@ function onUseShovel(player, item, fromPosition, target, toPosition, isHotkey)
 		toPosition.z = toPosition.z + 1
 		tile:relocateTo(toPosition)
 		player:addAchievementProgress("The Undertaker", 500)
-	elseif target.itemid == 867 then -- large hole
-		target:transform(868)
+	elseif target.itemid == 7932 then -- large hole
+		target:transform(7933)
 		target:decay()
 		player:addAchievementProgress("The Undertaker", 500)
-	elseif target.itemid == 15418 then -- swamp digging
+	elseif target.itemid == 20230 then -- swamp digging
 		if (player:getStorageValue(PlayerStorageKeys.swampDigging)) <= os.time() then
 			local chance = math.random(100)
 			if chance >= 1 and chance <= 42 then
 				player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You dug up a dead snake.")
-				player:addItem(4389)
+				player:addItem(3077)
 			elseif chance >= 43 and chance <= 79 then
 				player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You dug up a small diamond.")
-				player:addItem(3945)
+				player:addItem(2145)
 			elseif chance >= 80 then
 				player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You dug up a leech.")
-				player:addItem(13883)
+				player:addItem(20138)
 			end
 			player:setStorageValue(PlayerStorageKeys.swampDigging, os.time() + 7 * 24 * 60 * 60)
 			player:getPosition():sendMagicEffect(CONST_ME_GREEN_RINGS)
@@ -223,10 +223,10 @@ function onUseShovel(player, item, fromPosition, target, toPosition, isHotkey)
 	elseif table.contains(sandIds, groundId) then
 		local randomValue = math.random(1, 100)
 		if target.actionid == actionIds.sandHole and randomValue <= 20 then
-			ground:transform(615)
+			ground:transform(489)
 			ground:decay()
 		elseif randomValue == 1 then
-			Game.createItem(3959, 1, toPosition)
+			Game.createItem(2159, 1, toPosition)
 			player:addAchievementProgress("Gold Digger", 100)
 		elseif randomValue > 95 then
 			Game.createMonster("Scarab", toPosition)
@@ -244,17 +244,17 @@ function onUseScythe(player, item, fromPosition, target, toPosition, isHotkey)
 		return false
 	end
 
-	if target.itemid == 1897 then -- wheat
-		target:transform(3651)
+	if target.itemid == 2739 then -- wheat
+		target:transform(2737)
 		target:decay()
-		Game.createItem(2636, 1, toPosition) -- bunch of wheat
+		Game.createItem(2694, 1, toPosition) -- bunch of wheat
 		player:addAchievementProgress("Happy Farmer", 200)
 		return true
 	end
-	if target.itemid == 5463 then -- burning sugar cane
-		target:transform(5463)
+	if target.itemid == 5465 then -- burning sugar cane
+		target:transform(5464)
 		target:decay()
-		Game.createItem(5464, 1, toPosition) -- bunch of sugar cane
+		Game.createItem(5467, 1, toPosition) -- bunch of sugar cane
 		player:addAchievementProgress("Natural Sweetener", 50)
 		return true
 	end
@@ -276,7 +276,7 @@ function onUseKitchenKnife(player, item, fromPosition, target, toPosition, isHot
 
 	if table.contains(fruits, target.itemid) and player:removeItem(6278, 1) then
 		target:remove(1)
-		player:addItem(6276, 1)
+		player:addItem(6279, 1)
 		player:getPosition():sendMagicEffect(CONST_ME_MAGIC_GREEN)
 		return true
 	end

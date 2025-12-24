@@ -1,13 +1,13 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 1483}, -- nothing
-	{chanceFrom = 1484, chanceTo = 5158, itemId = 1841}, -- yellow pillow
-	{chanceFrom = 5159, chanceTo = 6954, itemId = 651}, -- spellwand
-	{chanceFrom = 6955, chanceTo = 971, itemId = 2786}, -- piggy bank
-	{chanceFrom = 972, chanceTo = 8225, itemId = 6574}, -- bar of chocolate
-	{chanceFrom = 8226, chanceTo = 8738, itemId = 6390}, -- cream cake
-	{chanceFrom = 8739, chanceTo = 8936, itemId = 7377}, -- ice cream cone
-	{chanceFrom = 8937, chanceTo = 9073, itemId = 1922}, -- explosive present
-	{chanceFrom = 9074, chanceTo = 9087, itemId = 123} -- toy mouse
+	{chanceFrom = 0, chanceTo = 3394}, -- nothing
+	{chanceFrom = 3395, chanceTo = 5159, itemId = 1689}, -- yellow pillow
+	{chanceFrom = 5160, chanceTo = 6954, itemId = 7735}, -- spellwand
+	{chanceFrom = 6955, chanceTo = 8327, itemId = 2114}, -- piggy bank
+	{chanceFrom = 8328, chanceTo = 9141, itemId = 6574}, -- bar of chocolate
+	{chanceFrom = 9142, chanceTo = 9654, itemId = 6394}, -- cream cake
+	{chanceFrom = 9655, chanceTo = 9850, itemId = 7377}, -- ice cream cone
+	{chanceFrom = 9851, chanceTo = 9986, itemId = 9074}, -- explosive present
+	{chanceFrom = 9987, chanceTo = 10000, itemId = 7487} -- toy mouse
 }
 
 local suspiciousSurpriseBag = Action()

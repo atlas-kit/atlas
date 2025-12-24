@@ -1,8 +1,8 @@
-local waterIds = {622, 4597, 4598, 4599, 4600, 4601, 4602, 4609, 4610, 4611, 4612, 4613, 4614, 629, 630, 631, 632, 633, 634, 7236, 9582, 13988, 13989}
-local lootTrash = {3119, 2238, 2376, 2509, 2667}
-local lootCommon = {3035, 2167, 2168, 2669, 7588, 7589}
-local lootRare = {3026, 2146, 2149, 7158, 7159}
-local lootVeryRare = {281, 7633, 10220}
+local waterIds = {493, 4608, 4609, 4610, 4611, 4612, 4613, 4614, 4615, 4616, 4617, 4618, 4619, 4620, 4621, 4622, 4623, 4624, 4625, 7236, 10499, 15401, 15402}
+local lootTrash = {2234, 2238, 2376, 2509, 2667}
+local lootCommon = {2152, 2167, 2168, 2669, 7588, 7589}
+local lootRare = {2143, 2146, 2149, 7158, 7159}
+local lootVeryRare = {7632, 7633, 10220}
 local useWorms = true
 
 function onUse(player, item, fromPosition, target, toPosition, isHotkey)
@@ -54,7 +54,7 @@ function onUse(player, item, fromPosition, target, toPosition, isHotkey)
 			target:decay()
 
 			if math.random(1, 100) >= 97 then
-				player:addItem(431, 1)
+				player:addItem(15405, 1)
 				player:addAchievement("Desert Fisher")
 				return true
 			end
@@ -68,7 +68,7 @@ function onUse(player, item, fromPosition, target, toPosition, isHotkey)
 				player:addItem(7158, 1)
 				return true
 			elseif rareChance <= 4 then
-				player:addItem(3580, 1)
+				player:addItem(2669, 1)
 				return true
 			elseif rareChance <= 10 then
 				player:addItem(7159, 1)
@@ -76,7 +76,7 @@ function onUse(player, item, fromPosition, target, toPosition, isHotkey)
 			end
 		end
 		player:addAchievementProgress("Here, Fishy Fishy!", 1000)
-		player:addItem(3578, 1)
+		player:addItem(2667, 1)
 	end
 	return true
 end

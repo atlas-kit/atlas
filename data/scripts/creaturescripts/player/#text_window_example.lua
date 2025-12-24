@@ -2,7 +2,7 @@ local reactWindow = TalkAction("!textWindow")
 
 function reactWindow.onSay(player, words, param, type)
 	local txtWindow = TextWindow({
-		itemId = 3249,
+		itemId = 1234,
 		text = "Write something here:",
 		canWrite = true,
 		length = 100,

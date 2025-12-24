@@ -1,4 +1,4 @@
-local upFloorIds = {2814, 1968, 5542, 20474, 20475}
+local upFloorIds = {1386, 3678, 5543, 22845, 22846}
 function onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if table.contains(upFloorIds, item.itemid) then
 		fromPosition:moveUpstairs()

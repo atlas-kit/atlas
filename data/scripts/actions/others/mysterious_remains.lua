@@ -1,27 +1,27 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 596, itemId = 2786}, -- piggy bank
-	{chanceFrom = 597, chanceTo = 1986, itemId = 3001}, -- yellow gem
-	{chanceFrom = 1987, chanceTo = 2854, itemId = 9719}, -- bag of apple slices
-	{chanceFrom = 2855, chanceTo = 3525, itemId = 3343}, -- tusk
-	{chanceFrom = 3526, chanceTo = 538, itemId = 5880}, -- iron ore
-	{chanceFrom = 539, chanceTo = 3557, itemId = 5879}, -- spider silk
-	{chanceFrom = 3558, chanceTo = 857, itemId = 5882}, -- red dragon scale
-	{chanceFrom = 858, chanceTo = 4697, itemId = 3348}, -- stealth ring
-	{chanceFrom = 4698, chanceTo = 4845, itemId = 15564}, -- folded rift carpet
-	{chanceFrom = 5676, chanceTo = 2117, itemId = 16568}, -- folded void carpet
-	{chanceFrom = 2117, chanceTo = 6034, itemId = 2746}, -- war horn
-	{chanceFrom = 6035, chanceTo = 6819, itemId = 3324}, -- scarf
-	{chanceFrom = 6820, chanceTo = 6985, itemId = 4508}, -- gold ingot
-	{chanceFrom = 6986, chanceTo = 7151, itemId = 15590}, -- shaggy ogre bag
-	{chanceFrom = 7152, chanceTo = 7360, itemId = 3345}, -- magic light wand
-	{chanceFrom = 7361, chanceTo = 170, itemId = 6570}, -- surprise bag
-	{chanceFrom = 171, chanceTo = 881, itemId = 15558}, -- rift tapestry
-	{chanceFrom = 882, chanceTo = 7796, itemId = 13120}, -- gnomish supply package
-	{chanceFrom = 7797, chanceTo = 8110, itemId = 451}, -- garlic necklace
-	{chanceFrom = 8111, chanceTo = 8231, itemId = 2966}, -- violet gem
-	{chanceFrom = 8232, chanceTo = 8597, itemId = 3101}, -- slightly rusted legs
-	{chanceFrom = 8598, chanceTo = 8965, itemId = 4150, count = 10}, -- white mushroom
-	{chanceFrom = 8966, chanceTo = 9087, itemId = 14955, count = 2} -- opal
+	{chanceFrom = 0, chanceTo = 471, itemId = 2114}, -- piggy bank
+	{chanceFrom = 472, chanceTo = 1413, itemId = 2154}, -- yellow gem
+	{chanceFrom = 1414, chanceTo = 1988, itemId = 13537}, -- bag of apple slices
+	{chanceFrom = 1989, chanceTo = 2616, itemId = 3956}, -- tusk
+	{chanceFrom = 2617, chanceTo = 3191, itemId = 5880}, -- iron ore
+	{chanceFrom = 3192, chanceTo = 3557, itemId = 5879}, -- spider silk
+	{chanceFrom = 3558, chanceTo = 4342, itemId = 5882}, -- red dragon scale
+	{chanceFrom = 4343, chanceTo = 4708, itemId = 2165}, -- stealth ring
+	{chanceFrom = 4709, chanceTo = 4874, itemId = 25393}, -- folded rift carpet
+	{chanceFrom = 4875, chanceTo = 5040, itemId = 26192}, -- folded void carpet
+	{chanceFrom = 5041, chanceTo = 6034, itemId = 2079}, -- war horn
+	{chanceFrom = 6035, chanceTo = 6819, itemId = 2661}, -- scarf
+	{chanceFrom = 6820, chanceTo = 6985, itemId = 9971}, -- gold ingot
+	{chanceFrom = 6986, chanceTo = 7151, itemId = 25419}, -- shaggy ogre bag
+	{chanceFrom = 7152, chanceTo = 7360, itemId = 2162}, -- magic light wand
+	{chanceFrom = 7361, chanceTo = 7526, itemId = 6570}, -- surprise bag
+	{chanceFrom = 7527, chanceTo = 7944, itemId = 25387}, -- rift tapestry
+	{chanceFrom = 7945, chanceTo = 8624, itemId = 18215}, -- gnomish supply package
+	{chanceFrom = 8625, chanceTo = 8938, itemId = 2199}, -- garlic necklace
+	{chanceFrom = 8939, chanceTo = 9147, itemId = 2153}, -- violet gem
+	{chanceFrom = 9148, chanceTo = 9513, itemId = 9813}, -- slightly rusted legs
+	{chanceFrom = 9514, chanceTo = 9879, itemId = 2787, count = 10}, -- white mushroom
+	{chanceFrom = 9880, chanceTo = 10000, itemId = 24850, count = 2} -- opal
 }
 
 local mysteriousRemains = Action()

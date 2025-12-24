@@ -1,6 +1,6 @@
 local dollsTable = {
 	[5080] = {"Hug me!"},
-	[5668] = {
+	[5669] = {
 		"It's not winning that matters, but winning in style.",
 		"Today's your lucky day. Probably.",
 		"Do not meddle in the affairs of dragons, for you are crunchy and taste good with ketchup.",
@@ -19,8 +19,8 @@ local dollsTable = {
 		"Aaa... CHOO!",
 		"You... will.... burn!!"
 	},
-	[6387] = {"Merry Christmas |PLAYERNAME|."},
-	[6511] = {
+	[6388] = {"Merry Christmas |PLAYERNAME|."},
+	[6512] = {
 		"Ho ho ho",
 		"Jingle bells, jingle bells...",
 		"Have you been naughty?",
@@ -28,26 +28,26 @@ local dollsTable = {
 		"Merry Christmas!",
 		"Can you stop squeezing me now... I'm starting to feel a little sick."
 	},
-	[8146] = {"ARE YOU PREPARED TO FACE YOUR DESTINY?"},
-	[8149] = {
+	[8974] = {"ARE YOU PREPARED TO FACE YOUR DESTINY?"},
+	[8977] = {
 		"Weirdo, you're a weirdo! Actually all of you are!",
 		"Pie for breakfast, pie for lunch and pie for dinner!",
 		"All hail the control panel!",
 		"I own, god owns, perfect match!",
 		"Hug me! Feed me! Hail me!"
 	},
-	[8153] = {
+	[8981] = {
 		"It's news to me.",
 		"News, updated as infrequently as possible!",
 		"Extra! Extra! Read all about it!",
 		"Fresh off the press!"
 	},
-	[8154] = {
+	[8982] = {
 		"Hail!",
 		"So cold.",
 		"Run, mammoth!"
 	},
-	[21435] = {
+	[23806] = {
 		"I can hear their whisperings... Revenge!",
 		"You shall feel pain and terror, |PLAYERNAME|",
 		"I do not need a sword to slaughter you",
@@ -55,46 +55,46 @@ local dollsTable = {
 		"I can say 469 and more...",
 		"My dark magic lies on the world"
 	},
-	[21962] = {
+	[24331] = {
 		"Hail! (União&Força)",
 		"Hail |PLAYERNAME|! (União&Força)",
 		"Only the real killers can touch me!",
 		"The path of assassin is found in death, DIE!",
 		"<FART...> Ahhh... silent and deadly..."
 	},
-	[18343] = {
+	[20624] = {
 		"Hail!",
 		"Shhhhhh, please be quiet!",
 		"Books are great!! Aren't they?"
 	},
-	[14764] = {
+	[16107] = {
 		"My powers are limitless!",
 		"Hail!"
 	},
-	[12043] = {
+	[13030] = {
 		"For zze emperor!",
 		"Hail!",
 		"Hail |PLAYERNAME|!"
 	},
-	[12904] = {
+	[13559] = {
 		"Mhausheausheu! What a FAIL! Mwahaha!",
 		"Hail |PLAYERNAME|! You are wearing old socks!",
 		"You are so unpopular even your own shadow refuses to follow you.",
 		"Have fun!"
 	},
-	[9144] = {
+	[10063] = {
 		"Hail |PLAYERNAME|! Hail!",
 		"Hauopa!",
 		"WHERE IS MY HYDROMEL?!",
 		"Yala Boom"
 	},
-	[22120] = {
+	[24776] = {
 		"Silence! I smell something!",
 		"Let me guide you, |PLAYERNAME|!",
 		"I have a bad feeling about this.",
 		"Watch your steps - we found the pit latrine."
 	},
-	[21947] = {
+	[24316] = {
 		"Hail!",
 		"Don't be afraid of the darkness!",
 		"Feel lucky, |PLAYERNAME|!",
@@ -124,26 +124,26 @@ function dolls.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		elseif chance == 5 then
 			doTargetCombat(0, player, COMBAT_PHYSICALDAMAGE, -1, -1, CONST_ME_EXPLOSIONHIT)
 		end
-	elseif item.itemid == 5667 then
+	elseif item.itemid == 5669 then
 		player:addAchievementProgress("Superstitious", 100)
 		fromPosition:sendMagicEffect(CONST_ME_MAGIC_RED)
 		item:transform(item.itemid + 1)
 		item:decay()
-	elseif item.itemid == 6386 then
+	elseif item.itemid == 6388 then
 		fromPosition:sendMagicEffect(CONST_ME_SOUND_YELLOW)
-	elseif item.itemid == 19118 then
+	elseif item.itemid == 23806 then
 		item:transform(item.itemid + 1)
 		item:decay()
-	elseif item.itemid == 13287 then
+	elseif item.itemid == 16107 then
 		item:transform(item.itemid + 1)
 		item:decay()
-	elseif item.itemid == 11917 then
-		item:transform(12905)
+	elseif item.itemid == 13559 then
+		item:transform(13581)
 		item:decay()
-	elseif item.itemid == 8228 then
+	elseif item.itemid == 10063 then
 		item:transform(item.itemid + 1)
 		item:decay()
-	elseif item.itemid == 19786 then
+	elseif item.itemid == 24776 then
 		item:transform(item.itemid + 1)
 		item:decay()
 	end

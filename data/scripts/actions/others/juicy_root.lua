@@ -1,6 +1,6 @@
 local rootsTable = {
-	[18787] = 18789,
-	[18788] = 18790
+	[23475] = 23477,
+	[23476] = 23478
 }
 
 local juicyRoot = Action()
@@ -8,7 +8,7 @@ local juicyRoot = Action()
 function juicyRoot.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if math.random(2) == 1 then
 		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You successfully harvest some juicy roots.")
-		player:addItem(18974, 1) -- juicy roots
+		player:addItem(23662, 1) -- juicy roots
 	else
 		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "Your harvesting attempt destroyed more of the juicy roots than you could salvage.")
 	end

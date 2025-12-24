@@ -5,7 +5,7 @@ function saw.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		return false
 	end
 
-	target:transform(9114) -- wooden ties
+	target:transform(10033) -- wooden ties
 	return true
 end
 

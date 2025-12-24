@@ -3,7 +3,7 @@ function onStepOut(creature, item, position, fromPosition)
 		return true
 	end
 
-	if item:getId() == 799 then
+	if item:getId() == 670 then
 		item:transform(6594)
 	else
 		item:transform(item.itemid + 15)

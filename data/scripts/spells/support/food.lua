@@ -1,5 +1,5 @@
 local foods = {
-	3577, -- meat
+	2666, -- meat
 	2671, -- ham
 	2681, -- grape
 	2674, -- apple
