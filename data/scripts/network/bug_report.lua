@@ -14,11 +14,6 @@ function handler.onReceive(player, msg)
 		position = msg:getPosition()
 	end
 
-<<<<<<< HEAD
-	if Event.onReportBug then
-		Event.onReportBug(player, message, position)
-	end
-=======
 	if player:getAccountType() == ACCOUNT_TYPE_NORMAL then
 		return
 	end
@@ -41,7 +36,6 @@ function handler.onReceive(player, msg)
 	io.close(file)
 
 	player:sendTextMessage(MESSAGE_EVENT_DEFAULT, "Your report has been sent to " .. configManager.getString(configKeys.SERVER_NAME) .. ".")
->>>>>>> dev
 end
 
 handler:register()
