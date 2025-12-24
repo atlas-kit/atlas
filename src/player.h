@@ -12,6 +12,7 @@
 #include "guild.h"
 #include "inbox.h"
 #include "protocolgame.h"
+#include "scheduler.h"
 #include "storeinbox.h"
 #include "town.h"
 #include "vocation.h"
@@ -21,7 +22,6 @@ struct Mount;
 class NetworkMessage;
 class Npc;
 class Party;
-class SchedulerTask;
 
 enum skillsid_t
 {
@@ -105,8 +105,8 @@ public:
 	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
 	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
 
-	std::shared_ptr<Player> getPlayer() override { return std::static_pointer_cast<Player>(shared_from_this()); }
-	std::shared_ptr<const Player> getPlayer() const override
+	std::shared_ptr<Player> asPlayer() override { return std::static_pointer_cast<Player>(shared_from_this()); }
+	std::shared_ptr<const Player> asPlayer() const override
 	{
 		return std::static_pointer_cast<const Player>(shared_from_this());
 	}
@@ -233,14 +233,14 @@ public:
 
 	bool hasSecureMode() const { return secureMode; }
 
-	void setParty(Party* party) { this->party = party; }
-	Party* getParty() const { return party; }
+	void setParty(const std::shared_ptr<Party>& party) { this->party = party; }
+	std::shared_ptr<Party> getParty() const { return party; }
 	PartyShields_t getPartyShield(const std::shared_ptr<const Player>& player) const;
 	bool isInviting(const std::shared_ptr<const Player>& player) const;
 	bool isPartner(const std::shared_ptr<const Player>& player) const;
 	void sendPlayerPartyIcons(const std::shared_ptr<Player>& player);
-	bool addPartyInvitation(Party* party);
-	void removePartyInvitation(Party* party);
+	bool addPartyInvitation(const std::shared_ptr<Party>& party);
+	void removePartyInvitation(const std::shared_ptr<Party>& party);
 	void clearPartyInvitations();
 
 	GuildEmblems_t getGuildEmblem(const std::shared_ptr<const Player>& player) const;
@@ -585,7 +585,7 @@ public:
 	                     const std::shared_ptr<const Item>& item)
 	{
 		if (client) {
-			int32_t stackpos = tile->getStackposOfItem(getPlayer(), item);
+			int32_t stackpos = tile->getStackposOfItem(asPlayer(), item);
 			if (stackpos != -1) {
 				client->sendAddTileItem(pos, stackpos, item);
 			}
@@ -595,7 +595,7 @@ public:
 	                        const std::shared_ptr<const Item>& item)
 	{
 		if (client) {
-			int32_t stackpos = tile->getStackposOfItem(getPlayer(), item);
+			int32_t stackpos = tile->getStackposOfItem(asPlayer(), item);
 			if (stackpos != -1) {
 				client->sendUpdateTileItem(pos, stackpos, item);
 			}
@@ -610,9 +610,8 @@ public:
 	void sendUpdateTileCreature(const std::shared_ptr<const Creature>& creature)
 	{
 		if (client) {
-			client->sendUpdateTileCreature(creature->getPosition(),
-			                               creature->getTile()->getClientIndexOfCreature(getPlayer(), creature),
-			                               creature);
+			client->sendUpdateTileCreature(
+			    creature->getPosition(), creature->getTile()->getClientIndexOfCreature(asPlayer(), creature), creature);
 		}
 	}
 	void sendRemoveTileCreature(const std::shared_ptr<const Creature>& creature, const Position& pos, int32_t stackpos)
@@ -650,7 +649,7 @@ public:
 	                     MagicEffectClasses magicEffect = CONST_ME_NONE)
 	{
 		if (client) {
-			client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfCreature(getPlayer(), creature),
+			client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfCreature(asPlayer(), creature),
 			                        magicEffect);
 		}
 	}
@@ -664,7 +663,7 @@ public:
 	void sendCreatureTurn(const std::shared_ptr<const Creature>& creature)
 	{
 		if (client && canSeeCreature(creature)) {
-			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(getPlayer(), creature);
+			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(asPlayer(), creature);
 			if (stackpos != -1) {
 				client->sendCreatureTurn(creature, stackpos);
 			}
@@ -701,7 +700,7 @@ public:
 			return;
 		}
 
-		if (creature->getPlayer()) {
+		if (creature->asPlayer()) {
 			if (visible) {
 				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
 			} else {
@@ -711,7 +710,7 @@ public:
 		} else if (canSeeInvisibility()) {
 			client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
 		} else {
-			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(getPlayer(), creature);
+			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(asPlayer(), creature);
 			if (stackpos == -1) {
 				return;
 			}
@@ -1174,8 +1173,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask* task);
-	void setNextActionTask(SchedulerTask* task);
+	void setNextWalkActionTask(SchedulerTask_ptr task);
+	void setNextActionTask(SchedulerTask_ptr task);
 
 	void setNextAction(int64_t time)
 	{
@@ -1268,7 +1267,7 @@ private:
 
 	std::list<ShopInfo> shopItemList;
 
-	std::forward_list<Party*> invitePartyList;
+	std::forward_list<std::weak_ptr<Party>> invitePartyList;
 	std::forward_list<uint32_t> modalWindows;
 	std::forward_list<std::string> learnedInstantSpellList;
 	std::forward_list<std::unique_ptr<Condition>>
@@ -1308,9 +1307,9 @@ private:
 	std::weak_ptr<Item> writeItem;
 	std::weak_ptr<House> editHouse;
 	std::weak_ptr<Npc> shopOwner;
-	Party* party = nullptr;
+	std::shared_ptr<Party> party = nullptr;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask* walkTask = nullptr;
+	SchedulerTask_ptr walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;
