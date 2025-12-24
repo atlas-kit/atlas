@@ -2,11 +2,9 @@ function Creature:onChangeOutfit(outfit)
 	if Event.onChangeMount and not Event.onChangeMount(self, outfit.lookMount) then
 		return false
 	end
-
 	if Event.onChangeOutfit and not Event.onChangeOutfit(self, outfit) then
 		return false
 	end
-
 	return true
 end
 

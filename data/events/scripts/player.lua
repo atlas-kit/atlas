@@ -20,9 +20,6 @@ end
 function Player:onLookInTrade(partner, item, distance)
 	if Event.onLookInTrade then
 		Event.onLookInTrade(self, partner, item, distance)
-	else
-		local description = "You see " .. item:getDescription(distance)
-		self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 	end
 end
 

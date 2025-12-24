@@ -63,9 +63,5 @@ function Party:onShareExperience(exp)
 	end
 
 	exp = math.ceil((exp * sharedExperienceMultiplier) / (#self:getMembers() + 1))
-
-	if Event.onShareExperience then
-		return Event.onShareExperience(self, exp, rawExp)
-	end
-	return exp
+	return Event.onShareExperience and Event.onShareExperience(self, exp, rawExp) or exp
 end
