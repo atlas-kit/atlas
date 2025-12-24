@@ -81,6 +81,13 @@ function Player:onReportRuleViolation(targetName, reportType, reportReason, comm
 	end
 end
 
+function Player:onReportBug(message, position)
+	if hasEvent.onReportBug then
+		return Event.onReportBug(self, message, position)
+	end
+	return true
+end
+
 function Player:onRotateItem(item)
 	local onRotateItem = EventCallback.onRotateItem
 	if onRotateItem then

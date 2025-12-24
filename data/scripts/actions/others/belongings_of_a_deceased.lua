@@ -1,34 +1,34 @@
 local config = {
 	{chanceFrom = 0, chanceTo = 216}, -- nothing
-	{chanceFrom = 217, chanceTo = 1659, itemId = 2238}, -- worn leather boots
-	{chanceFrom = 1660, chanceTo = 3069, itemId = 2237}, -- dirty cape
-	{chanceFrom = 3070, chanceTo = 4465, itemId = 2115}, -- broken piggy bank
-	{chanceFrom = 4466, chanceTo = 5025, itemId = 2148, count = 6}, -- gold coin
-	{chanceFrom = 5026, chanceTo = 5546, itemId = 2787}, -- white mushroom
-	{chanceFrom = 5547, chanceTo = 6025, itemId = 5890}, -- chicken feather
-	{chanceFrom = 6026, chanceTo = 6513, itemId = 3976, count = 4}, -- worm
-	{chanceFrom = 6514, chanceTo = 6999, itemId = 2695}, -- egg
+	{chanceFrom = 217, chanceTo = 2367, itemId = 2552}, -- worn leather boots
+	{chanceFrom = 2368, chanceTo = 4251, itemId = 2551}, -- dirty cape
+	{chanceFrom = 4252, chanceTo = 4454, itemId = 2787}, -- broken piggy bank
+	{chanceFrom = 4455, chanceTo = 2117, itemId = 2945, count = 6}, -- gold coin
+	{chanceFrom = 2117, chanceTo = 5545, itemId = 4150}, -- white mushroom
+	{chanceFrom = 5546, chanceTo = 6025, itemId = 5890}, -- chicken feather
+	{chanceFrom = 6026, chanceTo = 6512, itemId = 3106, count = 4}, -- worm
+	{chanceFrom = 6513, chanceTo = 6999, itemId = 3546}, -- egg
 	{chanceFrom = 7000, chanceTo = 7398, itemId = 5899}, -- turtle shell
-	{chanceFrom = 7399, chanceTo = 7806, itemId = 5894}, -- bat wing
-	{chanceFrom = 7807, chanceTo = 8191, itemId = 2403}, -- knife
-	{chanceFrom = 8192, chanceTo = 8560, itemId = 10606}, -- bunch of troll hair
-	{chanceFrom = 8561, chanceTo = 8915, itemId = 8859}, -- spider fangs
-	{chanceFrom = 8916, chanceTo = 9211, itemId = 5902}, -- honeycomb
-	{chanceFrom = 9212, chanceTo = 9344, itemId = 2661}, -- scarf
-	{chanceFrom = 9345, chanceTo = 9440, itemId = 2199}, -- garlic necklace
-	{chanceFrom = 8441, chanceTo = 9525, itemId = 13926}, -- plague bell
-	{chanceFrom = 9526, chanceTo = 9598, itemId = 2143}, -- white pearl
-	{chanceFrom = 9599, chanceTo = 9664, itemId = 5879}, -- spider silk
-	{chanceFrom = 9665, chanceTo = 9728, itemId = 2114}, -- piggy bank
-	{chanceFrom = 9729, chanceTo = 9792, itemId = 13925}, -- plague mask
-	{chanceFrom = 9793, chanceTo = 9842, itemId = 10563}, -- book of prayers
-	{chanceFrom = 9843, chanceTo = 9886, itemId = 2110}, -- doll
-	{chanceFrom = 9887, chanceTo = 9929, itemId = 5880}, -- iron ore
-	{chanceFrom = 9930, chanceTo = 9968, itemId = 5895}, -- fish fin
-	{chanceFrom = 9969, chanceTo = 9995, itemId = 13508}, -- slug drug
-	{chanceFrom = 9996, chanceTo = 9997, itemId = 2195}, -- boots of haste
-	{chanceFrom = 9998, chanceTo = 9999, itemId = 5885}, -- flask of warrior's sweat
-	{chanceFrom = 9999, chanceTo = 10000, itemId = 5804} -- nose ring
+	{chanceFrom = 7399, chanceTo = 725, itemId = 5894}, -- bat wing
+	{chanceFrom = 726, chanceTo = 6286, itemId = 3291}, -- knife
+	{chanceFrom = 6287, chanceTo = 7730, itemId = 883}, -- bunch of troll hair
+	{chanceFrom = 7731, chanceTo = 8087, itemId = 3297}, -- spider fangs
+	{chanceFrom = 8088, chanceTo = 8295, itemId = 5902}, -- honeycomb
+	{chanceFrom = 8296, chanceTo = 8428, itemId = 3324}, -- scarf
+	{chanceFrom = 8429, chanceTo = 8524, itemId = 451}, -- garlic necklace
+	{chanceFrom = 7611, chanceTo = 8609, itemId = 9927}, -- plague bell
+	{chanceFrom = 8610, chanceTo = 8682, itemId = 2940}, -- white pearl
+	{chanceFrom = 8683, chanceTo = 8748, itemId = 5879}, -- spider silk
+	{chanceFrom = 8749, chanceTo = 8813, itemId = 2786}, -- piggy bank
+	{chanceFrom = 8814, chanceTo = 8878, itemId = 9926}, -- plague mask
+	{chanceFrom = 8879, chanceTo = 8928, itemId = 829}, -- book of prayers
+	{chanceFrom = 8929, chanceTo = 8972, itemId = 2782}, -- doll
+	{chanceFrom = 8973, chanceTo = 9015, itemId = 5880}, -- iron ore
+	{chanceFrom = 9016, chanceTo = 9055, itemId = 5895}, -- fish fin
+	{chanceFrom = 9056, chanceTo = 9082, itemId = 9690}, -- slug drug
+	{chanceFrom = 9083, chanceTo = 9084, itemId = 4391}, -- boots of haste
+	{chanceFrom = 9085, chanceTo = 9086, itemId = 5885}, -- flask of warrior's sweat
+	{chanceFrom = 9086, chanceTo = 9087, itemId = 5804} -- nose ring
 }
 
 local belongings = Action()

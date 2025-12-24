@@ -2,24 +2,24 @@ local juiceSquizer = Action()
 
 function juiceSquizer.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	local fruits = {
-		2673, -- pear
-		2674, -- red apple
-		2675, -- orange
-		2676, -- banana
-		2677, -- blueberry
-		2678, -- coconut
-		2679, -- cherry
-		2680, -- strawberry
-		2681, -- grapes
-		2682, -- melon
-		5097, -- mango
-		8839, -- plum
-		8840, -- raspberry
-		8841 -- lemon
+		3584, -- pear
+		3585, -- red apple
+		3586, -- orange
+		3587, -- banana
+		3588, -- blueberry
+		3589, -- coconut
+		3590, -- cherry
+		3591, -- strawberry
+		3592, -- grapes
+		3593, -- melon
+		5096, -- mango
+		8011, -- plum
+		8012, -- raspberry
+		8013 -- lemon
 	}
 	if table.contains(fruits, target.itemid) and player:removeItem(2006, 1, 0) then
 		target:remove(1)
-		player:addItem(2006, target.itemid == 2678 and 14 or 21) -- if target is a coconut, create coconut milk, otherwise create fruit juice
+		player:addItem(371, target.itemid == 1757 and 14 or 21) -- if target is a coconut, create coconut milk, otherwise create fruit juice
 		return true
 	end
 	return false

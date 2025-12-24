@@ -160,6 +160,13 @@ removeOnDespawn = true
 walkToSpawnRadius = 15
 monsterOverspawn = false
 
+-- Appearances/Protobuf (Client 12+)
+-- Set to true to use appearances.dat instead of items.otb
+-- This enables using client IDs directly instead of server IDs
+-- IMPORTANT: When enabled, items.xml and maps must use client IDs
+useAppearances = false
+appearancesFile = "data/items/appearances.dat"
+
 -- Stamina
 staminaSystem = true
 timeToRegenMinuteStamina = 3 * 60

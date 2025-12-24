@@ -1,8 +1,8 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 2500, itemId = 5741}, -- skull helmet
-	{chanceFrom = 2501, chanceTo = 5000, itemId = 2160}, -- crystal coin
-	{chanceFrom = 5001, chanceTo = 7500, itemId = 2436}, -- skull staff
-	{chanceFrom = 7501, chanceTo = 10000, itemId = 9969} -- black skull
+	{chanceFrom = 0, chanceTo = 3394, itemId = 5741}, -- skull helmet
+	{chanceFrom = 3395, chanceTo = 4999, itemId = 3244}, -- crystal coin
+	{chanceFrom = 5000, chanceTo = 142, itemId = 1812}, -- skull staff
+	{chanceFrom = 143, chanceTo = 9087, itemId = 4506} -- black skull
 }
 
 local belongingsShargon = Action()

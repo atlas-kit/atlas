@@ -1,20 +1,20 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 4760, itemId = 6576}, -- fireworks rocket
-	{chanceFrom = 4761, chanceTo = 6841, itemId = 6394}, -- cream cake
-	{chanceFrom = 6842, chanceTo = 7975, itemId = 6574}, -- bar of chocolate
-	{chanceFrom = 7976, chanceTo = 9007, itemId = 6578}, -- party hat
-	{chanceFrom = 9008, chanceTo = 9519, itemId = 2114}, -- piggy bank
-	{chanceFrom = 9520, chanceTo = 9692, itemId = 2153}, -- violet gem
-	{chanceFrom = 9693, chanceTo = 9850, itemId = 5944}, -- soul orb
-	{chanceFrom = 9851, chanceTo = 9885, itemId = 2156}, -- red gem
-	{chanceFrom = 9886, chanceTo = 9907, itemId = 2112}, -- teddy bear
-	{chanceFrom = 9908, chanceTo = 9925, itemId = 2520}, -- demon shield
-	{chanceFrom = 9926, chanceTo = 9944, itemId = 6568}, -- panda teddy
-	{chanceFrom = 9945, chanceTo = 9959, itemId = 2195}, -- boots of haste
-	{chanceFrom = 9960, chanceTo = 9974, itemId = 2492}, -- dragon scale mail
-	{chanceFrom = 9975, chanceTo = 9986, itemId = 2498}, -- royal helmet
-	{chanceFrom = 9987, chanceTo = 9995, itemId = 2173}, -- amulet of loss
-	{chanceFrom = 9996, chanceTo = 10000, itemId = 6566}, -- stuffed dragon
+	{chanceFrom = 0, chanceTo = 4749, itemId = 6576}, -- fireworks rocket
+	{chanceFrom = 4750, chanceTo = 6841, itemId = 6390}, -- cream cake
+	{chanceFrom = 6842, chanceTo = 1010, itemId = 6574}, -- bar of chocolate
+	{chanceFrom = 1011, chanceTo = 8179, itemId = 6578}, -- party hat
+	{chanceFrom = 8180, chanceTo = 8603, itemId = 2786}, -- piggy bank
+	{chanceFrom = 8604, chanceTo = 3094, itemId = 2966}, -- violet gem
+	{chanceFrom = 8778, chanceTo = 8936, itemId = 5944}, -- soul orb
+	{chanceFrom = 8937, chanceTo = 8971, itemId = 3044}, -- red gem
+	{chanceFrom = 8972, chanceTo = 8993, itemId = 2549}, -- teddy bear
+	{chanceFrom = 8994, chanceTo = 9011, itemId = 3027}, -- demon shield
+	{chanceFrom = 9012, chanceTo = 9030, itemId = 6568}, -- panda teddy
+	{chanceFrom = 9031, chanceTo = 9046, itemId = 4391}, -- boots of haste
+	{chanceFrom = 9047, chanceTo = 9061, itemId = 2928}, -- dragon scale mail
+	{chanceFrom = 9062, chanceTo = 9073, itemId = 2991}, -- royal helmet
+	{chanceFrom = 9074, chanceTo = 9082, itemId = 3444}, -- amulet of loss
+	{chanceFrom = 9083, chanceTo = 9087, itemId = 6566}, -- stuffed dragon
 }
 
 local redSurpriseBag = Action()

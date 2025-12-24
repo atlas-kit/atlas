@@ -1,25 +1,25 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 1450, itemId = 2152, count = 5}, -- platinum coin
-	{chanceFrom = 1451, chanceTo = 2850, itemId = 18421}, -- green crystal fragment
-	{chanceFrom = 2851, chanceTo = 3950, itemId = 18419}, -- cyan crystal fragment
-	{chanceFrom = 3951, chanceTo = 5050, itemId = 18420}, -- red crystal fragment
-	{chanceFrom = 5051, chanceTo = 6050, itemId = 2675, count = 20}, -- orange
-	{chanceFrom = 6051, chanceTo = 6850, itemId = 18413}, -- blue crystal shard
-	{chanceFrom = 6851, chanceTo = 7450, itemId = 18415}, -- green crystal shard
-	{chanceFrom = 7451, chanceTo = 8050, itemId = 2169}, -- time ring
-	{chanceFrom = 8051, chanceTo = 8450, itemId = 2213}, -- dwarven ring
-	{chanceFrom = 8451, chanceTo = 8750, itemId = 2167}, -- energy ring
-	{chanceFrom = 8751, chanceTo = 9050, itemId = 2165}, -- stealth ring
-	{chanceFrom = 9051, chanceTo = 9350, itemId = 7440}, -- mastermind potion
-	{chanceFrom = 9351, chanceTo = 9550, itemId = 2214}, -- ring of healing
-	{chanceFrom = 9551, chanceTo = 9750, itemId = 7439}, -- berserk potion
-	{chanceFrom = 9751, chanceTo = 9850, itemId = 18414}, -- violet crystal shard
-	{chanceFrom = 9851, chanceTo = 9950, itemId = 7443}, -- bullseye potion
-	{chanceFrom = 9951, chanceTo = 9960, itemId = 26145}, -- brown pit demon
-	{chanceFrom = 9961, chanceTo = 9970, itemId = 26146}, -- green pit demon
-	{chanceFrom = 9971, chanceTo = 9980, itemId = 26147}, -- blue pit demon
-	{chanceFrom = 9981, chanceTo = 9990, itemId = 26148}, -- black pit demon
-	{chanceFrom = 9991, chanceTo = 10000, itemId = 26149} -- red pit demon
+	{chanceFrom = 0, chanceTo = 2033, itemId = 2965, count = 5}, -- platinum coin
+	{chanceFrom = 2034, chanceTo = 4031, itemId = 728}, -- green crystal fragment
+	{chanceFrom = 4032, chanceTo = 2947, itemId = 597}, -- cyan crystal fragment
+	{chanceFrom = 2951, chanceTo = 5050, itemId = 21477}, -- red crystal fragment
+	{chanceFrom = 5051, chanceTo = 6050, itemId = 3586, count = 20}, -- orange
+	{chanceFrom = 6051, chanceTo = 6850, itemId = 463}, -- blue crystal shard
+	{chanceFrom = 6851, chanceTo = 7450, itemId = 605}, -- green crystal shard
+	{chanceFrom = 7451, chanceTo = 1726, itemId = 3406}, -- time ring
+	{chanceFrom = 1727, chanceTo = 7620, itemId = 912}, -- dwarven ring
+	{chanceFrom = 7621, chanceTo = 7922, itemId = 3404}, -- energy ring
+	{chanceFrom = 7923, chanceTo = 4522, itemId = 3348}, -- stealth ring
+	{chanceFrom = 4523, chanceTo = 8434, itemId = 7440}, -- mastermind potion
+	{chanceFrom = 8435, chanceTo = 8634, itemId = 913}, -- ring of healing
+	{chanceFrom = 8635, chanceTo = 8835, itemId = 7439}, -- berserk potion
+	{chanceFrom = 8836, chanceTo = 8936, itemId = 604}, -- violet crystal shard
+	{chanceFrom = 8937, chanceTo = 9036, itemId = 7443}, -- bullseye potion
+	{chanceFrom = 9037, chanceTo = 9047, itemId = 16521}, -- brown pit demon
+	{chanceFrom = 9048, chanceTo = 9057, itemId = 16522}, -- green pit demon
+	{chanceFrom = 9058, chanceTo = 9067, itemId = 16523}, -- blue pit demon
+	{chanceFrom = 9068, chanceTo = 9077, itemId = 16524}, -- black pit demon
+	{chanceFrom = 9078, chanceTo = 9087, itemId = 16525} -- red pit demon
 }
 
 local surpriseCube = Action()

@@ -105,10 +105,10 @@ function creatureSayCallback(cid, type, msg)
 	local player = Player(cid)
 	local vocationId = player:getVocation():getId()
 	local items = {
-		[VOCATION_SORCERER] = 2190,
-		[VOCATION_DRUID] = 2182,
-		[VOCATION_MASTER_SORCERER] = 2190,
-		[VOCATION_ELDER_DRUID] = 2182
+		[VOCATION_SORCERER] = 4256,
+		[VOCATION_DRUID] = 4248,
+		[VOCATION_MASTER_SORCERER] = 4256,
+		[VOCATION_ELDER_DRUID] = 4248
 	}
 
 	if msgcontains(msg, 'first rod') or msgcontains(msg, 'first wand') then

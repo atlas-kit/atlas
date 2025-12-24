@@ -5,6 +5,8 @@
 
 #include "items.h"
 
+#include "protobuf/appearances.h"
+#include "configmanager.h"
 #include "movement.h"
 #include "pugicast.h"
 #include "weapons.h"
@@ -383,7 +385,6 @@ Items::Items()
 void Items::clear()
 {
 	items.clear();
-	clientIdToServerIdMap.clear();
 	nameToItems.clear();
 	currencyItems.clear();
 	inventory.clear();
@@ -392,7 +393,17 @@ void Items::clear()
 bool Items::reload()
 {
 	clear();
-	loadFromOtb("data/items/items.otb");
+
+	if (ConfigManager::getBoolean(ConfigManager::USE_APPEARANCES)) {
+		const std::string& appearancesFile = ConfigManager::getString(ConfigManager::APPEARANCES_FILE);
+		if (!loadFromAppearances(appearancesFile)) {
+			return false;
+		}
+	} else {
+		if (!loadFromOtb("data/items/items.otb")) {
+			return false;
+		}
+	}
 
 	if (!loadFromXml()) {
 		return false;
@@ -537,13 +548,16 @@ bool Items::loadFromOtb(const std::string& file)
 			}
 		}
 
-		clientIdToServerIdMap.emplace(clientId, serverId);
-
-		// store the found item
-		if (serverId >= items.size()) {
-			items.resize(serverId + 1);
+		// Store using clientId as the primary index (for dual OTB/Appearances compatibility)
+		// All data (maps, scripts, items.xml) should use clientId
+		if (clientId == 0) {
+			continue; // Skip items without clientId
 		}
-		ItemType& iType = items[serverId];
+
+		if (clientId >= items.size()) {
+			items.resize(clientId + 1);
+		}
+		ItemType& iType = items[clientId];
 
 		iType.group = static_cast<itemgroup_t>(itemNode.type);
 		switch (itemNode.type) {
@@ -599,7 +613,7 @@ bool Items::loadFromOtb(const std::string& file)
 		iType.showClientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 		iType.showClientDuration = hasBitSet(FLAG_CLIENTDURATION, flags);
 
-		iType.id = serverId;
+		iType.id = clientId;      // Use clientId as primary ID
 		iType.clientId = clientId;
 		iType.speed = speed;
 		iType.lightLevel = lightLevel;
@@ -1941,10 +1955,9 @@ const ItemType& Items::getItemType(size_t id) const
 
 const ItemType& Items::getItemIdByClientId(uint16_t spriteId) const
 {
-	if (spriteId >= 100) {
-		if (uint16_t serverId = clientIdToServerIdMap.getServerId(spriteId)) {
-			return getItemType(serverId);
-		}
+	// Now that we always use clientId as primary index, this is simple
+	if (spriteId >= 100 && spriteId < items.size() && items[spriteId].id != 0) {
+		return getItemType(spriteId);
 	}
 	return items.front();
 }
@@ -1959,4 +1972,155 @@ uint16_t Items::getItemIdByName(const std::string& name)
 	if (result == nameToItems.end()) return 0;
 
 	return result->second;
+}
+
+bool Items::loadFromAppearances(const std::string& file)
+{
+	if (!g_appearances.loadFromFile(file)) {
+		return false;
+	}
+
+	// Populate items from appearances
+	const auto& objects = g_appearances.getObjects();
+	for (const auto& [id, appearance] : objects) {
+		if (id == 0) {
+			continue;
+		}
+
+		// Resize items vector if needed
+		if (id >= items.size()) {
+			items.resize(id + 1);
+		}
+
+		ItemType& iType = items[id];
+
+		// Set IDs - with appearances, id == clientId (no serverId separation)
+		iType.id = id;
+		iType.clientId = id;
+
+		// Set name and description from appearances
+		if (!appearance.name.empty()) {
+			iType.name = appearance.name;
+		}
+		if (!appearance.description.empty()) {
+			iType.description = appearance.description;
+		}
+
+		// Map appearance flags to ItemType properties
+		if (appearance.isGround) {
+			iType.group = ITEM_GROUP_GROUND;
+			iType.speed = static_cast<uint16_t>(appearance.groundSpeed);
+		}
+
+		if (appearance.isContainer) {
+			iType.group = ITEM_GROUP_CONTAINER;
+			iType.type = ITEM_TYPE_CONTAINER;
+		}
+
+		if (appearance.isFluidPool) {
+			iType.group = ITEM_GROUP_SPLASH;
+		}
+
+		if (appearance.isFluidContainer) {
+			iType.group = ITEM_GROUP_FLUID;
+		}
+
+		// Boolean properties
+		iType.blockSolid = appearance.isUnpassable;
+		iType.blockProjectile = appearance.isBlockMissile;
+		iType.blockPathFind = appearance.isBlockPath;
+		iType.hasHeight = appearance.hasElevation;
+		iType.useable = appearance.isUsable || appearance.isMultiUse;
+		iType.pickupable = appearance.isPickupable;
+		iType.moveable = !appearance.isUnmovable;
+		iType.stackable = appearance.isStackable;
+		iType.alwaysOnTop = appearance.isOnTop;
+		iType.isVertical = false;   // Not in appearances
+		iType.isHorizontal = false; // Not in appearances
+		iType.isHangable = appearance.isHangable;
+		iType.allowDistRead = false; // Not in appearances
+		iType.rotatable = appearance.isRotatable;
+		iType.canReadText = appearance.isWritable || appearance.isWritableOnce;
+		iType.canWriteText = appearance.isWritable;
+		iType.lookThrough = appearance.isTranslucent;
+		iType.isAnimation = appearance.isAnimateAlways;
+		iType.forceUse = appearance.isForceUse;
+
+		// Light properties
+		if (appearance.hasLight) {
+			iType.lightLevel = appearance.lightLevel;
+			iType.lightColor = appearance.lightColor;
+		}
+
+		// Text properties
+		if (appearance.isWritable || appearance.isWritableOnce) {
+			iType.maxTextLen = appearance.maxTextLength;
+		}
+
+		// Cloth/Equipment slot
+		if (appearance.isCloth) {
+			// Map cloth slot from appearances to slotPosition
+			switch (appearance.clothSlot) {
+				case 1:
+					iType.slotPosition = SLOTP_HEAD;
+					break;
+				case 2:
+					iType.slotPosition = SLOTP_NECKLACE;
+					break;
+				case 3:
+					iType.slotPosition = SLOTP_BACKPACK;
+					break;
+				case 4:
+					iType.slotPosition = SLOTP_ARMOR;
+					break;
+				case 5:
+					iType.slotPosition = SLOTP_RIGHT;
+					break;
+				case 6:
+					iType.slotPosition = SLOTP_LEFT;
+					break;
+				case 7:
+					iType.slotPosition = SLOTP_LEGS;
+					break;
+				case 8:
+					iType.slotPosition = SLOTP_FEET;
+					break;
+				case 9:
+					iType.slotPosition = SLOTP_RING;
+					break;
+				case 10:
+					iType.slotPosition = SLOTP_AMMO;
+					break;
+				default:
+					iType.slotPosition = SLOTP_HAND;
+					break;
+			}
+		}
+
+		// Classification (tier upgrade)
+		iType.classification = appearance.classification;
+
+		// Market properties
+		if (appearance.marketCategory > 0) {
+			iType.wareId = appearance.marketTradeAs > 0 ? appearance.marketTradeAs : id;
+		}
+
+		// Elevation
+		if (appearance.hasElevation) {
+			iType.hasHeight = true;
+		}
+
+		// AlwaysOnTop order
+		if (appearance.isOnTop) {
+			iType.alwaysOnTopOrder = 1;
+		} else if (appearance.isOnBottom) {
+			iType.alwaysOnTopOrder = 2;
+		} else if (appearance.isGroundBorder) {
+			iType.alwaysOnTopOrder = 3;
+		}
+	}
+
+	items.shrink_to_fit();
+	std::cout << ">> Loaded " << objects.size() << " items from appearances" << std::endl;
+	return true;
 }

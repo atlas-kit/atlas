@@ -1,21 +1,21 @@
 local traps = {
-	[1510] = { -- strange slits
-		transformTo = 1511,
+	[3028] = { -- strange slits
+		transformTo = 3029,
 		damage = {-60, -60}
 	},
-	[1513] = { -- spikes
+	[3031] = { -- spikes
 		damage = {-60, -60}
 	},
-	[2579] = { -- trap
-		transformTo = 2578,
+	[1571] = { -- trap
+		transformTo = 1570,
 		damage = {-30, -30}
 	},
-	[4208] = { -- jungle maw
-		transformTo = 4209,
+	[2941] = { -- jungle maw
+		transformTo = 2942,
 		damage = {-30, -30},
 		type = COMBAT_EARTHDAMAGE
 	},
-	[25331] = { -- lava (walkable)
+	[8770] = { -- lava (walkable)
 		damage = {-500, -500},
 		type = COMBAT_FIREDAMAGE
 	}

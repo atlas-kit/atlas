@@ -239,8 +239,10 @@ bool ConfigManager::load()
 	boolean[TWO_FACTOR_AUTH] = getGlobalBoolean(L, "enableTwoFactorAuth", true);
 	boolean[CHECK_DUPLICATE_STORAGE_KEYS] = getGlobalBoolean(L, "checkDuplicateStorageKeys", false);
 	boolean[MONSTER_OVERSPAWN] = getGlobalBoolean(L, "monsterOverspawn", false);
+	boolean[USE_APPEARANCES] = getGlobalBoolean(L, "useAppearances", false);
 
 	string[DEFAULT_PRIORITY] = getGlobalString(L, "defaultPriority", "high");
+	string[APPEARANCES_FILE] = getGlobalString(L, "appearancesFile", "data/items/appearances.dat");
 	string[SERVER_NAME] = getGlobalString(L, "serverName", "");
 	string[OWNER_NAME] = getGlobalString(L, "ownerName", "");
 	string[OWNER_EMAIL] = getGlobalString(L, "ownerEmail", "");

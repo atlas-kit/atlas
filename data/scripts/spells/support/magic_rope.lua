@@ -5,7 +5,7 @@ function spell.onCastSpell(creature, variant)
 	position:sendMagicEffect(CONST_ME_POFF)
 
 	local tile = Tile(position)
-	if not table.contains(ropeSpots, tile:getGround():getId()) and not tile:getItemById(14435) then
+	if not table.contains(ropeSpots, tile:getGround():getId()) and not tile:getItemById(10075) then
 		creature:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
 		return false
 	end

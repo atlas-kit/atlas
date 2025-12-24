@@ -1,7 +1,7 @@
 local config = {
-	{chance = {0.0, 1.54}, transformId = 11342, description = "This little figurine of Brog, the raging Titan, was skillfully made by |PLAYERNAME|.", achievement = true},
-	{chance = {1.54, 9.16}, transformId = 11341, description = "It was made by |PLAYERNAME| and is clearly a little figurine of.. hm, one does not recognise that yet."},
-	{chance = {9.16, 25.48}, transformId = 11340, description = "It was made by |PLAYERNAME|, whose potter skills could use some serious improvement."},
+	{chance = {0.0, 1.54}, transformId = 9508, description = "This little figurine of Brog, the raging Titan, was skillfully made by |PLAYERNAME|.", achievement = true},
+	{chance = {1.54, 9.16}, transformId = 9507, description = "It was made by |PLAYERNAME| and is clearly a little figurine of.. hm, one does not recognise that yet."},
+	{chance = {9.16, 25.48}, transformId = 9506, description = "It was made by |PLAYERNAME|, whose potter skills could use some serious improvement."},
 	{chance = {25.48, 100.0}, remove = true, sound = "Aw man. That did not work out too well."}
 }
 

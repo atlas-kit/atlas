@@ -6,6 +6,7 @@
     "boost-iostreams",
     "boost-lockfree",
     "boost-system",
+    "protobuf",
     {
       "name": "libiconv",
       "platform": "osx"

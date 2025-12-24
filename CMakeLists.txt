@@ -82,6 +82,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 find_package(Lua REQUIRED)
 find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
+find_package(Protobuf CONFIG REQUIRED)
 find_package(PugiXML CONFIG REQUIRED)
 find_package(simdutf CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)

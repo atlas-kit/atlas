@@ -1,98 +1,98 @@
 local items = {
 	equipment = {
-		[2147] = { -- small ruby
-			[COMBAT_FIREDAMAGE] = {id = 2343, targetId = 2147} -- helmet of the ancients (enchanted)
+		[3947] = { -- small ruby
+			[COMBAT_FIREDAMAGE] = {id = 577, targetId = 2944} -- helmet of the ancients (enchanted)
 		},
-		[2383] = { -- spike sword
-			[COMBAT_FIREDAMAGE] = {id = 7744}, [COMBAT_ICEDAMAGE] = {id = 7763},
-			[COMBAT_EARTHDAMAGE] = {id = 7854}, [COMBAT_ENERGYDAMAGE] = {id = 7869}
+		[3271] = { -- spike sword
+			[COMBAT_FIREDAMAGE] = {id = 660}, [COMBAT_ICEDAMAGE] = {id = 679},
+			[COMBAT_EARTHDAMAGE] = {id = 1157}, [COMBAT_ENERGYDAMAGE] = {id = 794}
 		},
-		[2391] = { -- war hammer
-			[COMBAT_FIREDAMAGE] = {id = 7758}, [COMBAT_ICEDAMAGE] = {id = 7777},
-			[COMBAT_EARTHDAMAGE] = {id = 7868}, [COMBAT_ENERGYDAMAGE] = {id = 7883}
+		[3279] = { -- war hammer
+			[COMBAT_FIREDAMAGE] = {id = 674}, [COMBAT_ICEDAMAGE] = {id = 693},
+			[COMBAT_EARTHDAMAGE] = {id = 793}, [COMBAT_ENERGYDAMAGE] = {id = 810}
 		},
-		[2423] = { -- clerical mace
-			[COMBAT_FIREDAMAGE] = {id = 7754}, [COMBAT_ICEDAMAGE] = {id = 7773},
-			[COMBAT_EARTHDAMAGE] = {id = 7864}, [COMBAT_ENERGYDAMAGE] = {id = 7879}
+		[1067] = { -- clerical mace
+			[COMBAT_FIREDAMAGE] = {id = 799}, [COMBAT_ICEDAMAGE] = {id = 689},
+			[COMBAT_EARTHDAMAGE] = {id = 1167}, [COMBAT_ENERGYDAMAGE] = {id = 1184}
 		},
-		[2429] = { -- barbarian axe
-			[COMBAT_FIREDAMAGE] = {id = 7749}, [COMBAT_ICEDAMAGE] = {id = 7768},
-			[COMBAT_EARTHDAMAGE] = {id = 7859}, [COMBAT_ENERGYDAMAGE] = {id = 7874}
+		[1073] = { -- barbarian axe
+			[COMBAT_FIREDAMAGE] = {id = 665}, [COMBAT_ICEDAMAGE] = {id = 684},
+			[COMBAT_EARTHDAMAGE] = {id = 1162}, [COMBAT_ENERGYDAMAGE] = {id = 801}
 		},
-		[2430] = { -- knight axe
-			[COMBAT_FIREDAMAGE] = {id = 7750}, [COMBAT_ICEDAMAGE] = {id = 7769},
-			[COMBAT_EARTHDAMAGE] = {id = 7860}, [COMBAT_ENERGYDAMAGE] = {id = 7875}
+		[1074] = { -- knight axe
+			[COMBAT_FIREDAMAGE] = {id = 666}, [COMBAT_ICEDAMAGE] = {id = 685},
+			[COMBAT_EARTHDAMAGE] = {id = 1163}, [COMBAT_ENERGYDAMAGE] = {id = 802}
 		},
-		[2445] = { -- crystal mace
-			[COMBAT_FIREDAMAGE] = {id = 7755}, [COMBAT_ICEDAMAGE] = {id = 7774},
-			[COMBAT_EARTHDAMAGE] = {id = 7865}, [COMBAT_ENERGYDAMAGE] = {id = 7880}
+		[1137] = { -- crystal mace
+			[COMBAT_FIREDAMAGE] = {id = 800}, [COMBAT_ICEDAMAGE] = {id = 690},
+			[COMBAT_EARTHDAMAGE] = {id = 1168}, [COMBAT_ENERGYDAMAGE] = {id = 807}
 		},
-		[2454] = { -- war axe
-			[COMBAT_FIREDAMAGE] = {id = 7753}, [COMBAT_ICEDAMAGE] = {id = 7772},
-			[COMBAT_EARTHDAMAGE] = {id = 7863}, [COMBAT_ENERGYDAMAGE] = {id = 7878}
+		[1146] = { -- war axe
+			[COMBAT_FIREDAMAGE] = {id = 669}, [COMBAT_ICEDAMAGE] = {id = 688},
+			[COMBAT_EARTHDAMAGE] = {id = 1166}, [COMBAT_ENERGYDAMAGE] = {id = 805}
 		},
 		[7380] = { -- headchopper
-			[COMBAT_FIREDAMAGE] = {id = 7752}, [COMBAT_ICEDAMAGE] = {id = 7771},
-			[COMBAT_EARTHDAMAGE] = {id = 7862}, [COMBAT_ENERGYDAMAGE] = {id = 7877}
+			[COMBAT_FIREDAMAGE] = {id = 668}, [COMBAT_ICEDAMAGE] = {id = 687},
+			[COMBAT_EARTHDAMAGE] = {id = 1165}, [COMBAT_ENERGYDAMAGE] = {id = 1182}
 		},
 		[7383] = { -- relic sword
-			[COMBAT_FIREDAMAGE] = {id = 7745}, [COMBAT_ICEDAMAGE] = {id = 7764},
-			[COMBAT_EARTHDAMAGE] = {id = 7855}, [COMBAT_ENERGYDAMAGE] = {id = 7870}
+			[COMBAT_FIREDAMAGE] = {id = 661}, [COMBAT_ICEDAMAGE] = {id = 680},
+			[COMBAT_EARTHDAMAGE] = {id = 1158}, [COMBAT_ENERGYDAMAGE] = {id = 795}
 		},
 		[7384] = { -- mystic blade
-			[COMBAT_FIREDAMAGE] = {id = 7746}, [COMBAT_ICEDAMAGE] = {id = 7765},
-			[COMBAT_EARTHDAMAGE] = {id = 7856}, [COMBAT_ENERGYDAMAGE] = {id = 7871}
+			[COMBAT_FIREDAMAGE] = {id = 662}, [COMBAT_ICEDAMAGE] = {id = 681},
+			[COMBAT_EARTHDAMAGE] = {id = 1159}, [COMBAT_ENERGYDAMAGE] = {id = 796}
 		},
 		[7389] = { -- heroic axe
-			[COMBAT_FIREDAMAGE] = {id = 7751}, [COMBAT_ICEDAMAGE] = {id = 7770},
-			[COMBAT_EARTHDAMAGE] = {id = 7861}, [COMBAT_ENERGYDAMAGE] = {id = 7876}
+			[COMBAT_FIREDAMAGE] = {id = 667}, [COMBAT_ICEDAMAGE] = {id = 686},
+			[COMBAT_EARTHDAMAGE] = {id = 1164}, [COMBAT_ENERGYDAMAGE] = {id = 803}
 		},
 		[7392] = { -- orcish maul
-			[COMBAT_FIREDAMAGE] = {id = 7757}, [COMBAT_ICEDAMAGE] = {id = 7776},
-			[COMBAT_EARTHDAMAGE] = {id = 7867}, [COMBAT_ENERGYDAMAGE] = {id = 7882}
+			[COMBAT_FIREDAMAGE] = {id = 673}, [COMBAT_ICEDAMAGE] = {id = 692},
+			[COMBAT_EARTHDAMAGE] = {id = 792}, [COMBAT_ENERGYDAMAGE] = {id = 809}
 		},
 		[7402] = { -- dragon slayer
-			[COMBAT_FIREDAMAGE] = {id = 7748}, [COMBAT_ICEDAMAGE] = {id = 7767},
-			[COMBAT_EARTHDAMAGE] = {id = 7858}, [COMBAT_ENERGYDAMAGE] = {id = 7873}
+			[COMBAT_FIREDAMAGE] = {id = 664}, [COMBAT_ICEDAMAGE] = {id = 683},
+			[COMBAT_EARTHDAMAGE] = {id = 1161}, [COMBAT_ENERGYDAMAGE] = {id = 798}
 		},
 		[7406] = { -- blacksteel sword
-			[COMBAT_FIREDAMAGE] = {id = 7747}, [COMBAT_ICEDAMAGE] = {id = 7766},
-			[COMBAT_EARTHDAMAGE] = {id = 7857}, [COMBAT_ENERGYDAMAGE] = {id = 7872}
+			[COMBAT_FIREDAMAGE] = {id = 663}, [COMBAT_ICEDAMAGE] = {id = 682},
+			[COMBAT_EARTHDAMAGE] = {id = 1160}, [COMBAT_ENERGYDAMAGE] = {id = 797}
 		},
 		[7415] = { -- cranial basher
-			[COMBAT_FIREDAMAGE] = {id = 7756}, [COMBAT_ICEDAMAGE] = {id = 7775},
-			[COMBAT_EARTHDAMAGE] = {id = 7866}, [COMBAT_ENERGYDAMAGE] = {id = 7881}
+			[COMBAT_FIREDAMAGE] = {id = 672}, [COMBAT_ICEDAMAGE] = {id = 691},
+			[COMBAT_EARTHDAMAGE] = {id = 1169}, [COMBAT_ENERGYDAMAGE] = {id = 808}
 		},
-		[8905] = { -- rainbow shield
-			[COMBAT_FIREDAMAGE] = {id = 8906}, [COMBAT_ICEDAMAGE] = {id = 8907},
-			[COMBAT_EARTHDAMAGE] = {id = 8909}, [COMBAT_ENERGYDAMAGE] = {id = 8908}
+		[2508] = { -- rainbow shield
+			[COMBAT_FIREDAMAGE] = {id = 3410}, [COMBAT_ICEDAMAGE] = {id = 3446},
+			[COMBAT_EARTHDAMAGE] = {id = 3448}, [COMBAT_ENERGYDAMAGE] = {id = 3447}
 		},
-		[9949] = { -- dracoyle statue
-			[COMBAT_EARTHDAMAGE] = {id = 9948} -- dracoyle statue (enchanted)
+		[5719] = { -- dracoyle statue
+			[COMBAT_EARTHDAMAGE] = {id = 5718} -- dracoyle statue (enchanted)
 		},
-		[9954] = { -- dracoyle statue
-			[COMBAT_EARTHDAMAGE] = {id = 9953} -- dracoyle statue (enchanted)
+		[5724] = { -- dracoyle statue
+			[COMBAT_EARTHDAMAGE] = {id = 5723} -- dracoyle statue (enchanted)
 		},
-		[10022] = { -- worn firewalker boots
-			[COMBAT_FIREDAMAGE] = {id = 9933, say = {text = "Take the boots off first."}},
+		[8192] = { -- worn firewalker boots
+			[COMBAT_FIREDAMAGE] = {id = 6286, say = {text = "Take the boots off first."}},
 			slot = {type = CONST_SLOT_FEET, check = true}
 		},
-		[24716] = { -- werewolf amulet
+		[19726] = { -- werewolf amulet
 			[COMBAT_NONE] = {
-				id = 24717,
+				id = 17447,
 				effects = {failure = CONST_ME_POFF, success = CONST_ME_THUNDER},
 				message = {text = "The amulet cannot be enchanted while worn."}
 			},
 			slot = {type = CONST_SLOT_NECKLACE, check = true}
 		},
-		[24718] = { -- werewolf helmet
+		[19728] = { -- werewolf helmet
 			[COMBAT_NONE] = {
 				id = {
-					[SKILL_CLUB] = {id = 24783},
-					[SKILL_SWORD] = {id = 24783},
-					[SKILL_AXE] = {id = 24783},
-					[SKILL_DISTANCE] = {id = 24783},
-					[SKILL_MAGLEVEL] = {id = 24783}
+					[SKILL_CLUB] = {id = 17513},
+					[SKILL_SWORD] = {id = 17513},
+					[SKILL_AXE] = {id = 17513},
+					[SKILL_DISTANCE] = {id = 17513},
+					[SKILL_MAGLEVEL] = {id = 17513}
 				},
 				effects = {failure = CONST_ME_POFF, success = CONST_ME_THUNDER},
 				message = {text = "The helmet cannot be enchanted while worn."},
@@ -100,23 +100,23 @@ local items = {
 			},
 			slot = {type = CONST_SLOT_HEAD, check = true}
 		},
-		charges = 1000, effect = CONST_ME_MAGIC_RED
+		charges = 1245, effect = CONST_ME_MAGIC_RED
 	},
 
 	valuables = {
-		[2146] = {id = 7759, shrine = {7508, 7509, 7510, 7511}}, -- small sapphire
-		[2147] = {id = 7760, shrine = {7504, 7505, 7506, 7507}}, -- small ruby
-		[2149] = {id = 7761, shrine = {7516, 7517, 7518, 7519}}, -- small emerald
-		[2150] = {id = 7762, shrine = {7512, 7513, 7514, 7515}}, -- small amethyst
+		[4210] = {id = 675, shrine = {150, 7509, 7510, 7511}}, -- small sapphire
+		[4211] = {id = 676, shrine = {146, 7505, 7506, 7507}}, -- small ruby
+		[4213] = {id = 677, shrine = {158, 7517, 7518, 7519}}, -- small emerald
+		[4214] = {id = 678, shrine = {154, 7513, 7514, 7515}}, -- small amethyst
 		soul = 2, mana = 300, effect = CONST_ME_HOLYDAMAGE
 	},
 
-	[2342] = {combatType = COMBAT_FIREDAMAGE, targetId = 2147}, -- helmet of the ancients
-	[7759] = {combatType = COMBAT_ICEDAMAGE}, -- small enchanted sapphire
-	[7760] = {combatType = COMBAT_FIREDAMAGE}, -- small enchanted ruby
-	[7761] = {combatType = COMBAT_EARTHDAMAGE}, -- small enchanted emerald
-	[7762] = {combatType = COMBAT_ENERGYDAMAGE}, -- small enchanted amethyst
-	[24739] = {combatType = COMBAT_NONE} -- moonlight crystals
+	[576] = {combatType = COMBAT_FIREDAMAGE, targetId = 3947}, -- helmet of the ancients
+	[675] = {combatType = COMBAT_ICEDAMAGE}, -- small enchanted sapphire
+	[676] = {combatType = COMBAT_FIREDAMAGE}, -- small enchanted ruby
+	[677] = {combatType = COMBAT_EARTHDAMAGE}, -- small enchanted emerald
+	[678] = {combatType = COMBAT_ENERGYDAMAGE}, -- small enchanted amethyst
+	[19749] = {combatType = COMBAT_NONE} -- moonlight crystals
 }
 
 function onUse(player, item, fromPosition, target, toPosition, isHotkey)

@@ -1,29 +1,29 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 1438, itemId = 2787, count = 20}, -- white mushroom
-	{chanceFrom = 1439, chanceTo = 2454, itemId = 18397}, -- mushroom pie
-	{chanceFrom = 2455, chanceTo = 3259, itemId = 18437, count = 15}, -- envenomed arrow
-	{chanceFrom = 3260, chanceTo = 4057, itemId = 18304, count = 15}, -- crystalline arrow
-	{chanceFrom = 4058, chanceTo = 4836, itemId = 18457}, -- teleport crystal
-	{chanceFrom = 4837, chanceTo = 5443, itemId = 7588, count = 2}, -- strong health potion
-	{chanceFrom = 5444, chanceTo = 6024, itemId = 7589, count = 2}, -- strong mana potion
-	{chanceFrom = 6025, chanceTo = 6568, itemId = 7618, count = 4}, -- health potion
-	{chanceFrom = 6569, chanceTo = 7069, itemId = 7620, count = 4}, -- mana potion
-	{chanceFrom = 7070, chanceTo = 7518, itemId = 7590}, -- great mana potion
-	{chanceFrom = 7519, chanceTo = 7930, itemId = 7591}, -- great health potion
-	{chanceFrom = 7931, chanceTo = 8270, itemId = 7443}, -- bullseye potion
-	{chanceFrom = 8271, chanceTo = 8587, itemId = 7439}, -- berserk potion
-	{chanceFrom = 8588, chanceTo = 8900, itemId = 5911}, -- red piece of cloth
-	{chanceFrom = 8901, chanceTo = 9204, itemId = 2152, count = 5}, -- platinum coin
-	{chanceFrom = 9205, chanceTo = 9504, itemId = 7440}, -- mastermind potion
-	{chanceFrom = 9505, chanceTo = 9629, itemId = 18455}, -- pet pig
-	{chanceFrom = 9630, chanceTo = 9741, itemId = 18522}, -- gnomish voucher type CA2
-	{chanceFrom = 9742, chanceTo = 9837, itemId = 18519}, -- gnomish voucher type MA2
-	{chanceFrom = 9838, chanceTo = 9890, itemId = 2160}, -- crystal coin
-	{chanceFrom = 9891, chanceTo = 9923, itemId = 2156}, -- red gem
-	{chanceFrom = 9924, chanceTo = 9956, itemId = 2154}, -- yellow gem
-	{chanceFrom = 9957, chanceTo = 9986, itemId = 18509}, -- red teleport crystal
-	{chanceFrom = 9987, chanceTo = 9993, itemId = 2158}, -- blue gem
-	{chanceFrom = 9994, chanceTo = 10000, itemId = 2155} -- green gem
+	{chanceFrom = 0, chanceTo = 2021, itemId = 4150, count = 20}, -- white mushroom
+	{chanceFrom = 2022, chanceTo = 3342, itemId = 12296}, -- mushroom pie
+	{chanceFrom = 3349, chanceTo = 3259, itemId = 4213, count = 15}, -- envenomed arrow
+	{chanceFrom = 3260, chanceTo = 3793, itemId = 11914, count = 15}, -- crystalline arrow
+	{chanceFrom = 3794, chanceTo = 4825, itemId = 2544}, -- teleport crystal
+	{chanceFrom = 4826, chanceTo = 5442, itemId = 236, count = 2}, -- strong health potion
+	{chanceFrom = 5443, chanceTo = 6024, itemId = 237, count = 2}, -- strong mana potion
+	{chanceFrom = 6025, chanceTo = 6568, itemId = 266, count = 4}, -- health potion
+	{chanceFrom = 6569, chanceTo = 7069, itemId = 268, count = 4}, -- mana potion
+	{chanceFrom = 7070, chanceTo = 160, itemId = 238}, -- great mana potion
+	{chanceFrom = 161, chanceTo = 865, itemId = 239}, -- great health potion
+	{chanceFrom = 866, chanceTo = 7536, itemId = 7443}, -- bullseye potion
+	{chanceFrom = 7537, chanceTo = 7757, itemId = 7439}, -- berserk potion
+	{chanceFrom = 7758, chanceTo = 8072, itemId = 5911}, -- red piece of cloth
+	{chanceFrom = 8073, chanceTo = 8288, itemId = 2965, count = 5}, -- platinum coin
+	{chanceFrom = 8289, chanceTo = 8588, itemId = 7440}, -- mastermind potion
+	{chanceFrom = 8589, chanceTo = 8713, itemId = 2479}, -- pet pig
+	{chanceFrom = 8714, chanceTo = 8826, itemId = 118}, -- gnomish voucher type CA2
+	{chanceFrom = 8827, chanceTo = 8923, itemId = 180}, -- gnomish voucher type MA2
+	{chanceFrom = 8924, chanceTo = 8976, itemId = 3244}, -- crystal coin
+	{chanceFrom = 8977, chanceTo = 9009, itemId = 3044}, -- red gem
+	{chanceFrom = 9010, chanceTo = 9042, itemId = 3001}, -- yellow gem
+	{chanceFrom = 9043, chanceTo = 9073, itemId = 6284}, -- red teleport crystal
+	{chanceFrom = 9074, chanceTo = 9080, itemId = 3145}, -- blue gem
+	{chanceFrom = 9081, chanceTo = 9087, itemId = 3002} -- green gem
 }
 
 local gnomish = Action()

@@ -1,14 +1,14 @@
 local config = {
-	{chanceFrom = 0, chanceTo = 1875, itemId = 23529, count = 2}, -- glooth spear
-	{chanceFrom = 1876, chanceTo = 3418, itemId = 23554}, -- glooth amulet
-	{chanceFrom = 3419, chanceTo = 4933, itemId = 23549}, -- glooth club
-	{chanceFrom = 4934, chanceTo = 6397, itemId = 23551}, -- glooth axe
-	{chanceFrom = 6398, chanceTo = 7829, itemId = 23550}, -- glooth blade
-	{chanceFrom = 7830, chanceTo = 8462, itemId = 23666}, -- glooth backpack
-	{chanceFrom = 8463, chanceTo = 8975, itemId = 23514, count = 10}, -- glooth sandwich
-	{chanceFrom = 8976, chanceTo = 9469, itemId = 23515, count = 10}, -- bowl of glooth soup
-	{chanceFrom = 9470, chanceTo = 9922, itemId = 23517, count = 10}, -- glooth steak
-	{chanceFrom = 9923, chanceTo = 10000, itemId = 23557} -- control unit
+	{chanceFrom = 0, chanceTo = 2662, itemId = 15218, count = 2}, -- glooth spear
+	{chanceFrom = 2663, chanceTo = 1507, itemId = 15243}, -- glooth amulet
+	{chanceFrom = 1508, chanceTo = 4931, itemId = 14388}, -- glooth club
+	{chanceFrom = 4932, chanceTo = 6396, itemId = 14390}, -- glooth axe
+	{chanceFrom = 6397, chanceTo = 752, itemId = 14389}, -- glooth blade
+	{chanceFrom = 753, chanceTo = 7632, itemId = 15353}, -- glooth backpack
+	{chanceFrom = 7633, chanceTo = 8147, itemId = 15203, count = 10}, -- glooth sandwich
+	{chanceFrom = 8148, chanceTo = 8553, itemId = 15204, count = 10}, -- bowl of glooth soup
+	{chanceFrom = 8554, chanceTo = 9008, itemId = 14369, count = 10}, -- glooth steak
+	{chanceFrom = 9009, chanceTo = 9087, itemId = 15246} -- control unit
 }
 
 local gloothBag = Action()
