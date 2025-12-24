@@ -21,7 +21,7 @@ Weapons::Weapons() { scriptInterface.initState(); }
 
 Weapons::~Weapons() { clear(false); }
 
-const Weapon* Weapons::getWeapon(const std::shared_ptr<const Item>& item) const
+std::shared_ptr<const Weapon> Weapons::getWeapon(const std::shared_ptr<const Item>& item) const
 {
 	if (!item) {
 		return nullptr;
@@ -31,7 +31,7 @@ const Weapon* Weapons::getWeapon(const std::shared_ptr<const Item>& item) const
 	if (it == weapons.end()) {
 		return nullptr;
 	}
-	return it->second.get();
+	return it->second;
 }
 
 void Weapons::clear(bool fromLua)
@@ -557,8 +557,7 @@ bool WeaponDistance::useWeapon(const std::shared_ptr<Player>& player, const std:
 	const ItemType& it = Item::items[id];
 	if (it.weaponType == WEAPON_AMMO) {
 		const auto& mainWeaponItem = player->getWeapon(true);
-		const Weapon* mainWeapon = g_weapons->getWeapon(mainWeaponItem);
-		if (mainWeapon) {
+		if (const auto& mainWeapon = g_weapons->getWeapon(mainWeaponItem)) {
 			damageModifier = mainWeapon->playerWeaponCheck(player, target, mainWeaponItem->getShootRange());
 		} else if (mainWeaponItem) {
 			damageModifier = playerWeaponCheck(player, target, mainWeaponItem->getShootRange());

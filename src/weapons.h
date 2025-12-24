@@ -25,7 +25,7 @@ public:
 	Weapons& operator=(const Weapons&) = delete;
 
 	void loadDefaults();
-	const Weapon* getWeapon(const std::shared_ptr<const Item>& item) const;
+	std::shared_ptr<const Weapon> getWeapon(const std::shared_ptr<const Item>& item) const;
 
 	bool registerLuaEvent(Weapon_ptr weapon);
 	void clear(bool fromLua) override final;
