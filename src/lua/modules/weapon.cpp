@@ -74,6 +74,7 @@ int luaWeaponAction(lua_State* L)
 		} else {
 			std::cout << "Error: [Weapon::action] No valid action " << typeName << '\n';
 			tfs::lua::pushBoolean(L, false);
+			return 1;
 		}
 		tfs::lua::pushBoolean(L, true);
 	} else {
