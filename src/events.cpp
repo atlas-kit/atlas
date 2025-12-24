@@ -1224,7 +1224,6 @@ void onPodiumEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 	tfs::lua::pushOutfit(L, outfit);
 
 	tfs::lua::pushNumber(L, direction);
-
 	tfs::lua::pushBoolean(L, podiumVisible);
 
 	scriptInterface.callVoidFunction(5);
