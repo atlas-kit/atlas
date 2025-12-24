@@ -498,9 +498,9 @@ public:
 	auto getHouses() const { return houses | std::views::values; }
 	void payHouses(RentPeriod_t rentPeriod) const;
 
-	auto getParties() const { return parties; }
-	void addParty(Party* party) { parties.insert(party); }
-	void removeParty(Party* party) { parties.erase(party); }
+	const auto& getParties() const { return parties; }
+	void addParty(const std::shared_ptr<Party>& party) { parties.insert(party); }
+	void removeParty(const std::shared_ptr<Party>& party) { parties.erase(party); }
 
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
@@ -538,7 +538,7 @@ private:
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 
-	std::set<Party*> parties;
+	std::set<std::shared_ptr<Party>> parties;
 
 	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
 
