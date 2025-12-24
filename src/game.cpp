@@ -4876,6 +4876,7 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!tfs::events::party::onInvite(party, invitedPlayer)) {
 		if (party->empty()) {
 			player->setParty(nullptr);
+			removeParty(party);
 		}
 		return;
 	}
