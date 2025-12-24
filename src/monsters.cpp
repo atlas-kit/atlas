@@ -71,8 +71,7 @@ std::unique_ptr<ConditionDamage> Monsters::getDamageCondition(ConditionType_t co
                                                               int32_t minDamage, int32_t startDamage,
                                                               uint32_t tickInterval)
 {
-	auto condition = std::unique_ptr<ConditionDamage>(
-	    static_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0).release()));
+	auto condition = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, conditionType);
 	condition->setParam(CONDITION_PARAM_TICKINTERVAL, tickInterval);
 	condition->setParam(CONDITION_PARAM_MINVALUE, minDamage);
 	condition->setParam(CONDITION_PARAM_MAXVALUE, maxDamage);

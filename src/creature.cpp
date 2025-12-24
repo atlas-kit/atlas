@@ -987,9 +987,9 @@ bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* 
 		int64_t walkDelay = getWalkDelay();
 		if (walkDelay > 0) {
 			g_scheduler.addEvent(createSchedulerTask(
-			    walkDelay, [id = getID(), cond = std::shared_ptr<Condition>(condition.release())]() {
-				    if (cond) {
-					    g_game.forceAddCondition(id, cond->clone());
+			    walkDelay, [id = getID(), condition = std::move(condition)]() mutable {
+				    if (condition) {
+					    g_game.forceAddCondition(id, std::move(condition));
 				    }
 			    }));
 			return false;

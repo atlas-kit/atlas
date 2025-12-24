@@ -15,9 +15,9 @@ int luaConditionCreate(lua_State* L)
 	ConditionType_t conditionType = tfs::lua::getNumber<ConditionType_t>(L, 2);
 	ConditionId_t conditionId = tfs::lua::getNumber<ConditionId_t>(L, 3, CONDITIONID_COMBAT);
 
-	Condition* condition = Condition::createCondition(conditionId, conditionType, 0, 0);
+	auto condition = Condition::createCondition(conditionId, conditionType, 0, 0);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition);
+		tfs::lua::pushUserdata(L, condition.release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);
@@ -101,7 +101,7 @@ int luaConditionClone(lua_State* L)
 	// condition:clone()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition->clone());
+		tfs::lua::pushUserdata(L, condition->clone().release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);

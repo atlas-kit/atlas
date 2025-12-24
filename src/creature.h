@@ -10,8 +10,6 @@
 #include "position.h"
 #include "tile.h"
 
-#include <memory>
-
 class Condition;
 class Container;
 class Item;
