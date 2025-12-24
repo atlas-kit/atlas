@@ -14,9 +14,30 @@ function handler.onReceive(player, msg)
 		position = msg:getPosition()
 	end
 
-	if Event.onReportBug then
-		Event.onReportBug(player, message, position)
+	if player:getAccountType() == ACCOUNT_TYPE_NORMAL then
+		return
 	end
+
+	local name = player:getName()
+	local file = io.open("data/reports/bugs/" .. name .. " report.txt", "a")
+
+	if not file then
+		player:sendTextMessage(MESSAGE_EVENT_DEFAULT, "There was an error when processing your report, please contact a gamemaster.")
+		return
+	end
+
+	io.output(file)
+	io.write("------------------------------\n")
+	io.write("Name: " .. name)
+	if position ~= nil then
+		io.write(" [Map position: " .. position.x .. ", " .. position.y .. ", " .. position.z .. "]")
+	end
+	local playerPosition = player:getPosition()
+	io.write(" [Player Position: " .. playerPosition.x .. ", " .. playerPosition.y .. ", " .. playerPosition.z .. "]\n")
+	io.write("Comment: " .. message .. "\n")
+	io.close(file)
+
+	player:sendTextMessage(MESSAGE_EVENT_DEFAULT, "Your report has been sent to " .. configManager.getString(configKeys.SERVER_NAME) .. ".")
 end
 
 handler:register()
