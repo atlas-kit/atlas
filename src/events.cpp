@@ -32,6 +32,24 @@ struct CreatureHandlers
 	int32_t onUpdateStorage = -1;
 } creatureHandlers;
 
+void load_creature_from_scripts()
+{
+	creatureHandlers = {};
+
+	if (scriptInterface.loadFile("data/scripts/events/creature.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_creature_from_scripts] Cannot load creature events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
+		return;
+	}
+
+	creatureHandlers.onChangeOutfit = scriptInterface.getMetaEvent("Creature", "onChangeOutfit");
+	creatureHandlers.onAreaCombat = scriptInterface.getMetaEvent("Creature", "onAreaCombat");
+	creatureHandlers.onTargetCombat = scriptInterface.getMetaEvent("Creature", "onTargetCombat");
+	creatureHandlers.onHear = scriptInterface.getMetaEvent("Creature", "onHear");
+	creatureHandlers.onChangeZone = scriptInterface.getMetaEvent("Creature", "onChangeZone");
+	creatureHandlers.onUpdateStorage = scriptInterface.getMetaEvent("Creature", "onUpdateStorage");
+}
+
 struct PartyHandlers
 {
 	int32_t onJoin = -1;
@@ -42,6 +60,25 @@ struct PartyHandlers
 	int32_t onRevokeInvitation = -1;
 	int32_t onPassLeadership = -1;
 } partyHandlers;
+
+void load_party_from_scripts()
+{
+	partyHandlers = {};
+
+	if (scriptInterface.loadFile("data/scripts/events/party.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_party_from_scripts] Cannot load party events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
+		return;
+	}
+
+	partyHandlers.onJoin = scriptInterface.getMetaEvent("Party", "onJoin");
+	partyHandlers.onLeave = scriptInterface.getMetaEvent("Party", "onLeave");
+	partyHandlers.onDisband = scriptInterface.getMetaEvent("Party", "onDisband");
+	partyHandlers.onShareExperience = scriptInterface.getMetaEvent("Party", "onShareExperience");
+	partyHandlers.onInvite = scriptInterface.getMetaEvent("Party", "onInvite");
+	partyHandlers.onRevokeInvitation = scriptInterface.getMetaEvent("Party", "onRevokeInvitation");
+	partyHandlers.onPassLeadership = scriptInterface.getMetaEvent("Party", "onPassLeadership");
+}
 
 struct PlayerHandlers
 {
@@ -71,42 +108,16 @@ struct PlayerHandlers
 	int32_t onSpellCheck = -1;
 } playerHandlers;
 
-struct MonsterHandlers
+void load_player_from_scripts()
 {
-	int32_t onDropLoot = -1;
-	int32_t onSpawn = -1;
-} monsterHandlers;
+	playerHandlers = {};
 
-void load_from_scripts()
-{
-	for (const auto& [className, file] : scripts) {
-		if (scriptInterface.loadFile(file) != 0) {
-			std::cout << "[Warning - tfs::events::load] Cannot load " << file << std::endl;
-			std::cout << scriptInterface.getLastLuaError() << std::endl;
-		}
+	if (scriptInterface.loadFile("data/scripts/events/player.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_player_from_scripts] Cannot load player events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
+		return;
 	}
 
-	// Creature
-	creatureHandlers = {};
-	creatureHandlers.onChangeOutfit = scriptInterface.getMetaEvent("Creature", "onChangeOutfit");
-	creatureHandlers.onAreaCombat = scriptInterface.getMetaEvent("Creature", "onAreaCombat");
-	creatureHandlers.onTargetCombat = scriptInterface.getMetaEvent("Creature", "onTargetCombat");
-	creatureHandlers.onHear = scriptInterface.getMetaEvent("Creature", "onHear");
-	creatureHandlers.onChangeZone = scriptInterface.getMetaEvent("Creature", "onChangeZone");
-	creatureHandlers.onUpdateStorage = scriptInterface.getMetaEvent("Creature", "onUpdateStorage");
-
-	// Party
-	partyHandlers = {};
-	partyHandlers.onJoin = scriptInterface.getMetaEvent("Party", "onJoin");
-	partyHandlers.onLeave = scriptInterface.getMetaEvent("Party", "onLeave");
-	partyHandlers.onDisband = scriptInterface.getMetaEvent("Party", "onDisband");
-	partyHandlers.onShareExperience = scriptInterface.getMetaEvent("Party", "onShareExperience");
-	partyHandlers.onInvite = scriptInterface.getMetaEvent("Party", "onInvite");
-	partyHandlers.onRevokeInvitation = scriptInterface.getMetaEvent("Party", "onRevokeInvitation");
-	partyHandlers.onPassLeadership = scriptInterface.getMetaEvent("Party", "onPassLeadership");
-
-	// Player
-	playerHandlers = {};
 	playerHandlers.onBrowseField = scriptInterface.getMetaEvent("Player", "onBrowseField");
 	playerHandlers.onLook = scriptInterface.getMetaEvent("Player", "onLook");
 	playerHandlers.onLookInBattleList = scriptInterface.getMetaEvent("Player", "onLookInBattleList");
@@ -131,9 +142,24 @@ void load_from_scripts()
 	playerHandlers.onInventoryUpdate = scriptInterface.getMetaEvent("Player", "onInventoryUpdate");
 	playerHandlers.onNetworkMessage = scriptInterface.getMetaEvent("Player", "onNetworkMessage");
 	playerHandlers.onSpellCheck = scriptInterface.getMetaEvent("Player", "onSpellCheck");
+}
 
-	// Monster
+struct MonsterHandlers
+{
+	int32_t onDropLoot = -1;
+	int32_t onSpawn = -1;
+} monsterHandlers;
+
+void load_monster_from_scripts()
+{
 	monsterHandlers = {};
+
+	if (scriptInterface.loadFile("data/scripts/events/monster.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_monster_from_scripts] Cannot load monster events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
+		return;
+	}
+
 	monsterHandlers.onDropLoot = scriptInterface.getMetaEvent("Monster", "onDropLoot");
 	monsterHandlers.onSpawn = scriptInterface.getMetaEvent("Monster", "onSpawn");
 }
@@ -157,13 +183,21 @@ int32_t getScriptId(EventInfoId eventInfoId)
 void load()
 {
 	scriptInterface.initState();
-	load_from_scripts();
+
+	load_creature_from_scripts();
+	load_party_from_scripts();
+	load_player_from_scripts();
+	load_monster_from_scripts();
 }
 
 void reload()
 {
 	scriptInterface.reInitState();
-	load_from_scripts();
+
+	load_creature_from_scripts();
+	load_party_from_scripts();
+	load_player_from_scripts();
+	load_monster_from_scripts();
 }
 
 } // namespace tfs::events
