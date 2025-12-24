@@ -15,7 +15,7 @@ function handler.onReceive(player, msg)
 	end
 
 	if Event.onReportBug then
-		return Event.onReportBug(player, message, position)
+		Event.onReportBug(player, message, position)
 	end
 end
 
