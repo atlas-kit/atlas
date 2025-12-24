@@ -379,7 +379,6 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 	tfs::lua::setCreatureMetatable(L, -1, speaker);
 
 	tfs::lua::pushString(L, words);
-
 	tfs::lua::pushNumber(L, type);
 
 	scriptInterface.callVoidFunction(4);
@@ -407,7 +406,6 @@ void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone
 	tfs::lua::setCreatureMetatable(L, -1, creature);
 
 	tfs::lua::pushNumber(L, fromZone);
-
 	tfs::lua::pushNumber(L, toZone);
 
 	scriptInterface.callVoidFunction(3);
@@ -713,7 +711,6 @@ void onLook(const std::shared_ptr<Player>& player, const Position& position, con
 	}
 
 	tfs::lua::pushPosition(L, position, stackpos);
-
 	tfs::lua::pushNumber(L, lookDistance);
 
 	scriptInterface.callVoidFunction(4);
@@ -914,13 +911,10 @@ void onItemMoved(const std::shared_ptr<Player>& player, const std::shared_ptr<It
 	tfs::lua::setItemMetatable(L, -1, item);
 
 	tfs::lua::pushNumber(L, count);
-
 	tfs::lua::pushPosition(L, fromPosition);
-
 	tfs::lua::pushPosition(L, toPosition);
 
 	tfs::lua::pushThing(L, fromThing);
-
 	tfs::lua::pushThing(L, toThing);
 
 	scriptInterface.callVoidFunction(7);
@@ -953,7 +947,6 @@ bool onMoveCreature(const std::shared_ptr<Player>& player, const std::shared_ptr
 	tfs::lua::setCreatureMetatable(L, -1, creature);
 
 	tfs::lua::pushPosition(L, fromPosition);
-
 	tfs::lua::pushPosition(L, toPosition);
 
 	return scriptInterface.callFunction(4);
@@ -984,11 +977,9 @@ void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::str
 	tfs::lua::pushString(L, targetName);
 
 	tfs::lua::pushNumber(L, reportType);
-
 	tfs::lua::pushNumber(L, reportReason);
 
 	tfs::lua::pushString(L, comment);
-
 	tfs::lua::pushString(L, translation);
 
 	scriptInterface.callVoidFunction(6);
@@ -1017,9 +1008,7 @@ bool onReportBug(const std::shared_ptr<Player>& player, const std::string& messa
 	tfs::lua::setMetatable(L, -1, "Player");
 
 	tfs::lua::pushString(L, message);
-
 	tfs::lua::pushPosition(L, position);
-
 	tfs::lua::pushNumber(L, category);
 
 	return scriptInterface.callFunction(4);
@@ -1404,7 +1393,6 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
 	tfs::lua::setItemMetatable(L, -1, item);
 
 	tfs::lua::pushNumber(L, slot);
-
 	tfs::lua::pushBoolean(L, equip);
 
 	scriptInterface.callVoidFunction(4);
@@ -1489,11 +1477,8 @@ bool onSpawn(const std::shared_ptr<Monster>& monster, const Position& position, 
 
 	tfs::lua::pushSharedPtr(L, monster);
 	tfs::lua::setMetatable(L, -1, "Monster");
-
 	tfs::lua::pushPosition(L, position);
-
 	tfs::lua::pushBoolean(L, startup);
-
 	tfs::lua::pushBoolean(L, artificial);
 
 	return scriptInterface.callFunction(4);

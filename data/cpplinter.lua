@@ -1029,10 +1029,10 @@ Weapon = {}
 ---@field onInvite fun(party:Party, player:Player):boolean
 ---@field onRevokeInvitation fun(party:Party, player:Player):boolean
 ---@field onPassLeadership fun(party:Party, player:Player):boolean
----@field onLook fun(player:Player, thing:Thing, position:Position, distance:integer, description?:string):string
----@field onLookInBattleList fun(player:Player, creature:Creature, distance:integer, description?:string):string
----@field onLookInTrade fun(player:Player, partner:Player, item:Item, distance:integer, description?:string):string
----@field onLookInShop fun(player:Player, itemType:ItemType, count:integer, description?:string):string
+---@field onLook fun(player:Player, thing:Thing, position:Position, distance:integer):string
+---@field onLookInBattleList fun(player:Player, creature:Creature, distance:integer):string
+---@field onLookInTrade fun(player:Player, partner:Player, item:Item, distance:integer):string
+---@field onLookInShop fun(player:Player, itemType:ItemType, count:integer):string
 ---@field onMoveItem fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):integer
 ---@field onItemMoved fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):nil
 ---@field onMoveCreature fun(player:Player, creature:Creature, fromPosition:Position, toPosition:Position):boolean
