@@ -18,9 +18,7 @@ function handler.onReceive(player, msg)
 		return
 	end
 
-	local name = player:getName()
-	local file = io.open("data/reports/bugs/" .. name .. " report.txt", "a")
-
+	local file = io.open("data/reports/bugs/" .. player:getName() .. " report.txt", "a")
 	if not file then
 		player:sendTextMessage(MESSAGE_EVENT_DEFAULT, "There was an error when processing your report, please contact a gamemaster.")
 		return
@@ -28,7 +26,7 @@ function handler.onReceive(player, msg)
 
 	io.output(file)
 	io.write("------------------------------\n")
-	io.write("Name: " .. name)
+	io.write("Name: " .. player:getName())
 	if position ~= nil then
 		io.write(" [Map position: " .. position.x .. ", " .. position.y .. ", " .. position.z .. "]")
 	end
