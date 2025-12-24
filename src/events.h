@@ -6,7 +6,7 @@
 
 #include "const.h"
 #include "creature.h"
-#include "luascript.h"
+#include "lua/script.h"
 #include "networkmessage.h"
 
 class ItemType;
@@ -46,13 +46,13 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 
 namespace tfs::events::party {
 
-bool onJoin(Party* party, const std::shared_ptr<Player>& player);
-bool onLeave(Party* party, const std::shared_ptr<Player>& player);
-bool onDisband(Party* party);
-void onShareExperience(Party* party, uint64_t& exp);
-bool onInvite(Party* party, const std::shared_ptr<Player>& player);
-bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player);
-bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player);
+bool onJoin(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
+bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
+bool onDisband(const std::shared_ptr<Party>& party);
+void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp);
+bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
+bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
+bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
 
 } // namespace tfs::events::party
 
@@ -77,8 +77,6 @@ bool onMoveCreature(const std::shared_ptr<Player>& player, const std::shared_ptr
                     const Position& fromPosition, const Position& toPosition);
 void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::string& targetName, uint8_t reportType,
                            uint8_t reportReason, const std::string& comment, const std::string& translation);
-bool onReportBug(const std::shared_ptr<Player>& player, const std::string& message, const Position& position,
-                 uint8_t category);
 void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item);
 bool onTurn(const std::shared_ptr<Player>& player, Direction direction);
 bool onTradeRequest(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& target,

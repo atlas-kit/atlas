@@ -22,8 +22,12 @@ std::string NetworkMessage::getString(uint16_t stringLen /* = 0*/)
 
 	auto it = reinterpret_cast<char*>(buffer.data() + info.position);
 	info.position += stringLen;
-	auto out = std::string(simdutf::utf8_length_from_latin1(it, stringLen), '\0');
-	std::ignore = simdutf::convert_latin1_to_utf8(it, stringLen, out.data());
+	const auto outLen = simdutf::utf8_length_from_latin1(it, stringLen);
+	auto out = std::string();
+	out.resize_and_overwrite(outLen, [&](char* data, size_t) {
+		std::ignore = simdutf::convert_latin1_to_utf8(it, stringLen, data);
+		return outLen;
+	});
 	return out;
 }
 
@@ -34,6 +38,16 @@ Position NetworkMessage::getPosition()
 	pos.y = get<uint16_t>();
 	pos.z = getByte();
 	return pos;
+}
+
+bool NetworkMessage::getBool()
+{
+	const uint8_t value = getByte();
+	if (value > 1) {
+		std::cout << "[Warning - NetworkMessage::getBool] Invalid boolean value received: " << static_cast<int>(value)
+		          << std::endl;
+	}
+	return value != 0;
 }
 
 void NetworkMessage::addString(std::string_view value)
@@ -189,3 +203,5 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 }
 
 void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Item::items[itemId].clientId); }
+
+void NetworkMessage::addBool(bool value) { addByte(value ? 1 : 0); }

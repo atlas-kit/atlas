@@ -6,14 +6,13 @@
 
 #include "thread_holder_base.h"
 
-using TaskFunc = std::function<void(void)>;
+using TaskFunc = std::move_only_function<void(void)>;
 const int DISPATCHER_TASK_EXPIRATION = 2000;
 const auto SYSTEM_TIME_ZERO = std::chrono::system_clock::time_point(std::chrono::milliseconds(0));
 
 class Task
 {
 public:
-	// DO NOT allocate this class on the stack
 	explicit Task(TaskFunc&& f) : func(std::move(f)) {}
 	Task(uint32_t ms, TaskFunc&& f) :
 	    expiration(std::chrono::system_clock::now() + std::chrono::milliseconds(ms)), func(std::move(f))
@@ -41,17 +40,19 @@ private:
 	TaskFunc func;
 };
 
-Task* createTask(TaskFunc&& f);
-Task* createTask(uint32_t expiration, TaskFunc&& f);
+using Task_ptr = std::unique_ptr<Task>;
+
+Task_ptr createTask(TaskFunc&& f);
+Task_ptr createTask(uint32_t expiration, TaskFunc&& f);
 
 class Dispatcher : public ThreadHolder<Dispatcher>
 {
 public:
-	void addTask(Task* task);
+	void addTask(Task_ptr&& task);
 
-	void addTask(TaskFunc&& f) { addTask(new Task(std::move(f))); }
+	void addTask(TaskFunc&& f) { addTask(std::make_unique<Task>(std::move(f))); }
 
-	void addTask(uint32_t expiration, TaskFunc&& f) { addTask(new Task(expiration, std::move(f))); }
+	void addTask(uint32_t expiration, TaskFunc&& f) { addTask(std::make_unique<Task>(expiration, std::move(f))); }
 
 	void shutdown();
 
@@ -63,7 +64,7 @@ private:
 	std::mutex taskLock;
 	std::condition_variable taskSignal;
 
-	std::vector<Task*> taskList;
+	std::vector<Task_ptr> taskList;
 	uint64_t dispatcherCycle = 0;
 };
 

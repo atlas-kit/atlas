@@ -6,6 +6,9 @@
 #include "events.h"
 
 #include "item.h"
+#include "lua/env.h"
+#include "lua/error.h"
+#include "lua/meta.h"
 #include "player.h"
 
 namespace {
@@ -45,7 +48,6 @@ struct PlayerHandlers
 	int32_t onItemMoved = -1;
 	int32_t onMoveCreature = -1;
 	int32_t onReportRuleViolation = -1;
-	int32_t onReportBug = -1;
 	int32_t onRotateItem = -1;
 	int32_t onTurn = -1;
 	int32_t onTradeRequest = -1;
@@ -167,8 +169,6 @@ bool load_from_xml()
 				playerHandlers.onMoveCreature = event;
 			} else if (methodName == "onReportRuleViolation") {
 				playerHandlers.onReportRuleViolation = event;
-			} else if (methodName == "onReportBug") {
-				playerHandlers.onReportBug = event;
 			} else if (methodName == "onRotateItem") {
 				playerHandlers.onRotateItem = event;
 			} else if (methodName == "onTurn") {
@@ -252,7 +252,7 @@ bool onChangeOutfit(const std::shared_ptr<Creature>& creature, const Outfit_t& o
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onChangeOutfit, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -278,7 +278,7 @@ ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::s
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onAreaCombat, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -299,7 +299,7 @@ ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::s
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 3, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -321,7 +321,7 @@ ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std:
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onTargetCombat, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -340,7 +340,7 @@ ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std:
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -363,7 +363,7 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onHear, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -393,7 +393,7 @@ void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onChangeZone, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -421,7 +421,7 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureHandlers.onUpdateStorage, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -453,7 +453,7 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 
 namespace tfs::events::party {
 
-bool onJoin(Party* party, const std::shared_ptr<Player>& player)
+bool onJoin(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onJoin(player) or Party.onJoin(self, player)
 	if (partyHandlers.onJoin == -1) {
@@ -465,13 +465,13 @@ bool onJoin(Party* party, const std::shared_ptr<Player>& player)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onJoin, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onJoin);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -480,7 +480,7 @@ bool onJoin(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onLeave(Party* party, const std::shared_ptr<Player>& player)
+bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onLeave(player) or Party.onLeave(self, player)
 	if (partyHandlers.onLeave == -1) {
@@ -492,13 +492,13 @@ bool onLeave(Party* party, const std::shared_ptr<Player>& player)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onLeave, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onLeave);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -507,7 +507,7 @@ bool onLeave(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onDisband(Party* party)
+bool onDisband(const std::shared_ptr<Party>& party)
 {
 	// Party:onDisband() or Party.onDisband(self)
 	if (partyHandlers.onDisband == -1) {
@@ -519,19 +519,19 @@ bool onDisband(Party* party)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onDisband, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onDisband);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	return scriptInterface.callFunction(1);
 }
 
-bool onInvite(Party* party, const std::shared_ptr<Player>& player)
+bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onInvite(player) or Party.onInvite(self, player)
 	if (partyHandlers.onInvite == -1) {
@@ -543,13 +543,13 @@ bool onInvite(Party* party, const std::shared_ptr<Player>& player)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onInvite, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onInvite);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -558,7 +558,7 @@ bool onInvite(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
+bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onRevokeInvitation(player) or Party.onRevokeInvitation(self, player)
 	if (partyHandlers.onRevokeInvitation == -1) {
@@ -570,13 +570,13 @@ bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onRevokeInvitation, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onRevokeInvitation);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -585,7 +585,7 @@ bool onRevokeInvitation(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
+bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
 {
 	// Party:onPassLeadership(player) or Party.onPassLeadership(self, player)
 	if (partyHandlers.onPassLeadership == -1) {
@@ -597,13 +597,13 @@ bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onPassLeadership, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onPassLeadership);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushSharedPtr(L, player);
@@ -612,7 +612,7 @@ bool onPassLeadership(Party* party, const std::shared_ptr<Player>& player)
 	return scriptInterface.callFunction(2);
 }
 
-void onShareExperience(Party* party, uint64_t& exp)
+void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp)
 {
 	// Party:onShareExperience(exp) or Party.onShareExperience(self, exp)
 	if (partyHandlers.onShareExperience == -1) {
@@ -624,19 +624,19 @@ void onShareExperience(Party* party, uint64_t& exp)
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(partyHandlers.onShareExperience, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(partyHandlers.onShareExperience);
 
-	tfs::lua::pushUserdata(L, party);
+	tfs::lua::pushSharedPtr(L, party);
 	tfs::lua::setMetatable(L, -1, "Party");
 
 	tfs::lua::pushNumber(L, exp);
 
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -661,7 +661,7 @@ bool onBrowseField(const std::shared_ptr<Player>& player, const Position& positi
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onBrowseField, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -688,7 +688,7 @@ void onLook(const std::shared_ptr<Player>& player, const Position& position, con
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLook, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -727,7 +727,7 @@ void onLookInBattleList(const std::shared_ptr<Player>& player, const std::shared
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLookInBattleList, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -757,7 +757,7 @@ void onLookInTrade(const std::shared_ptr<Player>& player, const std::shared_ptr<
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLookInTrade, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -789,7 +789,7 @@ bool onLookInShop(const std::shared_ptr<Player>& player, const ItemType* itemTyp
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLookInShop, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -818,7 +818,7 @@ bool onLookInMarket(const std::shared_ptr<Player>& player, const ItemType* itemT
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLookInMarket, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -848,7 +848,7 @@ ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_
 		return RETURNVALUE_NOTPOSSIBLE;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onMoveItem, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -870,7 +870,7 @@ ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_
 	ReturnValue returnValue;
 	if (tfs::lua::protectedCall(L, 7, 1) != 0) {
 		returnValue = RETURNVALUE_NOTPOSSIBLE;
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		returnValue = tfs::lua::getNumber<ReturnValue>(L, -1);
 		lua_pop(L, 1);
@@ -895,7 +895,7 @@ void onItemMoved(const std::shared_ptr<Player>& player, const std::shared_ptr<It
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onItemMoved, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -931,7 +931,7 @@ bool onMoveCreature(const std::shared_ptr<Player>& player, const std::shared_ptr
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onMoveCreature, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -962,7 +962,7 @@ void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::str
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onReportRuleViolation, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -982,35 +982,6 @@ void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::str
 	scriptInterface.callVoidFunction(6);
 }
 
-bool onReportBug(const std::shared_ptr<Player>& player, const std::string& message, const Position& position,
-                 uint8_t category)
-{
-	// Player:onReportBug(message, position, category)
-	if (playerHandlers.onReportBug == -1) {
-		return true;
-	}
-
-	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::player::onReportBug] Call stack overflow" << std::endl;
-		return false;
-	}
-
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onReportBug, &scriptInterface);
-
-	lua_State* L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(playerHandlers.onReportBug);
-
-	tfs::lua::pushSharedPtr(L, player);
-	tfs::lua::setMetatable(L, -1, "Player");
-
-	tfs::lua::pushString(L, message);
-	tfs::lua::pushPosition(L, position);
-	tfs::lua::pushNumber(L, category);
-
-	return scriptInterface.callFunction(4);
-}
-
 void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item)
 {
 	// Player:onRotateItem(item)
@@ -1023,7 +994,7 @@ void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onRotateItem, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1050,7 +1021,7 @@ bool onTurn(const std::shared_ptr<Player>& player, Direction direction)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onTurn, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1077,7 +1048,7 @@ bool onTradeRequest(const std::shared_ptr<Player>& player, const std::shared_ptr
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onTradeRequest, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1108,7 +1079,7 @@ bool onTradeAccept(const std::shared_ptr<Player>& player, const std::shared_ptr<
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onTradeAccept, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1142,7 +1113,7 @@ void onTradeCompleted(const std::shared_ptr<Player>& player, const std::shared_p
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onTradeCompleted, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1177,7 +1148,7 @@ void onPodiumRequest(const std::shared_ptr<Player>& player, const std::shared_pt
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onPodiumRequest, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1206,7 +1177,7 @@ void onPodiumEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onPodiumEdit, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1239,7 +1210,7 @@ void onGainExperience(const std::shared_ptr<Player>& player, const std::shared_p
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onGainExperience, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1260,7 +1231,7 @@ void onGainExperience(const std::shared_ptr<Player>& player, const std::shared_p
 	tfs::lua::pushBoolean(L, sendText);
 
 	if (tfs::lua::protectedCall(L, 5, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -1281,7 +1252,7 @@ void onLoseExperience(const std::shared_ptr<Player>& player, uint64_t& exp)
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onLoseExperience, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1293,7 +1264,7 @@ void onLoseExperience(const std::shared_ptr<Player>& player, uint64_t& exp)
 	tfs::lua::pushNumber(L, exp);
 
 	if (tfs::lua::protectedCall(L, 2, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		exp = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -1314,7 +1285,7 @@ void onGainSkillTries(const std::shared_ptr<Player>& player, skills_t skill, uin
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onGainSkillTries, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1327,7 +1298,7 @@ void onGainSkillTries(const std::shared_ptr<Player>& player, skills_t skill, uin
 	tfs::lua::pushNumber(L, tries);
 
 	if (tfs::lua::protectedCall(L, 3, 1) != 0) {
-		reportErrorFunc(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		tries = tfs::lua::getNumber<uint64_t>(L, -1);
 		lua_pop(L, 1);
@@ -1348,7 +1319,7 @@ void onWrapItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Ite
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onWrapItem, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1376,7 +1347,7 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onInventoryUpdate, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1406,7 +1377,7 @@ void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, N
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onNetworkMessage, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1435,7 +1406,7 @@ bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell)
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerHandlers.onSpellCheck, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1465,7 +1436,7 @@ bool onSpawn(const std::shared_ptr<Monster>& monster, const Position& position, 
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(monsterHandlers.onSpawn, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();
@@ -1492,7 +1463,7 @@ void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<C
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(monsterHandlers.onDropLoot, &scriptInterface);
 
 	lua_State* L = scriptInterface.getLuaState();

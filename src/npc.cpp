@@ -6,6 +6,9 @@
 #include "npc.h"
 
 #include "game.h"
+#include "lua/env.h"
+#include "lua/error.h"
+#include "lua/meta.h"
 #include "pugicast.h"
 
 extern Game g_game;
@@ -15,11 +18,11 @@ uint32_t Npc::npcAutoID = 0x20000000;
 
 void Npcs::reload()
 {
-	for (auto&& npc : g_game.getNpcs() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& npc : g_game.getNpcs() | tfs::views::lock_weak_ptrs) {
 		npc->closeAllShopWindows();
 	}
 
-	for (auto&& npc : g_game.getNpcs() | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& npc : g_game.getNpcs() | tfs::views::lock_weak_ptrs) {
 		npc->reload();
 	}
 }
@@ -77,7 +80,7 @@ void Npc::reload()
 	SpectatorVec players;
 	g_game.map.getSpectators(players, getPosition(), true, true);
 	for (const auto& player : players) {
-		assert(player->getPlayer() != nullptr);
+		assert(player->asPlayer() != nullptr);
 		spectators.insert(std::static_pointer_cast<Player>(player));
 	}
 
@@ -90,7 +93,7 @@ void Npc::reload()
 
 	// Simulate that the creature is placed on the map again.
 	if (npcEventHandler) {
-		npcEventHandler->onCreatureAppear(getNpc());
+		npcEventHandler->onCreatureAppear(asNpc());
 	}
 }
 
@@ -142,7 +145,7 @@ bool Npc::loadFromXml()
 
 	if ((attr = npcNode.attribute("skull"))) {
 		setSkull(getSkullType(boost::algorithm::to_lower_copy<std::string>(attr.as_string())));
-		g_game.updateCreatureSkull(getNpc());
+		g_game.updateCreatureSkull(asNpc());
 	}
 
 	pugi::xml_node healthNode = npcNode.child("health");
@@ -190,7 +193,7 @@ bool Npc::loadFromXml()
 
 	pugi::xml_attribute scriptFile = npcNode.attribute("script");
 	if (scriptFile) {
-		auto handler = std::make_unique<NpcEventsHandler>(scriptFile.as_string(), getNpc());
+		auto handler = std::make_unique<NpcEventsHandler>(scriptFile.as_string(), asNpc());
 		if (!handler->isLoaded()) {
 			return false;
 		}
@@ -233,7 +236,7 @@ void Npc::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, Magi
 		SpectatorVec players;
 		g_game.map.getSpectators(players, getPosition(), true, true);
 		for (const auto& player : players) {
-			assert(player->getPlayer() != nullptr);
+			assert(player->asPlayer() != nullptr);
 			spectators.insert(std::static_pointer_cast<Player>(player));
 		}
 
@@ -247,7 +250,7 @@ void Npc::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, Magi
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureAppear(creature);
 		}
-	} else if (const auto& player = creature->getPlayer()) {
+	} else if (const auto& player = creature->asPlayer()) {
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureAppear(creature);
 		}
@@ -266,7 +269,7 @@ void Npc::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLog
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureDisappear(creature);
 		}
-	} else if (const auto& player = creature->getPlayer()) {
+	} else if (const auto& player = creature->asPlayer()) {
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureDisappear(creature);
 		}
@@ -282,13 +285,13 @@ void Npc::onCreatureMove(const std::shared_ptr<Creature>& creature, const std::s
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
-	if (creature.get() == this || creature->getPlayer()) {
+	if (creature.get() == this || creature->asPlayer()) {
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureMove(creature, oldPos, newPos);
 		}
 
 		if (creature.get() != this) {
-			const auto& player = creature->getPlayer();
+			const auto& player = creature->asPlayer();
 
 			// if player is now in range, add to spectators list, otherwise erase
 			if (player->canSee(getPosition())) {
@@ -309,7 +312,7 @@ void Npc::onCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClasses 
 	}
 
 	// only players for script events
-	if (const auto& player = creature->getPlayer()) {
+	if (const auto& player = creature->asPlayer()) {
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureSay(player, type, text);
 		}
@@ -336,13 +339,13 @@ void Npc::onThink(uint32_t interval)
 	}
 }
 
-void Npc::doSay(const std::string& text) { g_game.internalCreatureSay(getNpc(), TALKTYPE_SAY, text, false); }
+void Npc::doSay(const std::string& text) { g_game.internalCreatureSay(asNpc(), TALKTYPE_SAY, text, false); }
 
 void Npc::doSayToPlayer(const std::shared_ptr<Player>& player, const std::string& text)
 {
 	if (player) {
-		player->sendCreatureSay(getNpc(), TALKTYPE_PRIVATE_NP, text);
-		player->onCreatureSay(getNpc(), TALKTYPE_PRIVATE_NP, text);
+		player->sendCreatureSay(asNpc(), TALKTYPE_PRIVATE_NP, text);
+		player->onCreatureSay(asNpc(), TALKTYPE_PRIVATE_NP, text);
 	}
 }
 
@@ -424,7 +427,7 @@ bool Npc::canWalkTo(const Position& fromPos, Direction dir) const
 	}
 
 	const auto& tile = g_game.map.getTile(toPos);
-	if (!tile || tile->queryAdd(0, getNpc(), 1, 0) != RETURNVALUE_NOERROR) {
+	if (!tile || tile->queryAdd(0, asNpc(), 1, 0) != RETURNVALUE_NOERROR) {
 		return false;
 	}
 
@@ -490,7 +493,7 @@ void Npc::turnToCreature(const std::shared_ptr<Creature>& creature)
 			dir = DIRECTION_SOUTH;
 		}
 	}
-	g_game.internalCreatureTurn(getNpc(), dir);
+	g_game.internalCreatureTurn(asNpc(), dir);
 }
 
 void Npc::setCreatureFocus(const std::shared_ptr<Creature>& creature)
@@ -577,11 +580,11 @@ void NpcScriptInterface::registerFunctions()
 	lua_register(L, "doSellItem", NpcScriptInterface::luaDoSellItem);
 
 	// metatable
-	tfs::lua::registerMethod(L, "Npc", "getParameter", NpcScriptInterface::luaNpcGetParameter);
-	tfs::lua::registerMethod(L, "Npc", "setFocus", NpcScriptInterface::luaNpcSetFocus);
+	registerMethod("Npc", "getParameter", NpcScriptInterface::luaNpcGetParameter);
+	registerMethod("Npc", "setFocus", NpcScriptInterface::luaNpcSetFocus);
 
-	tfs::lua::registerMethod(L, "Npc", "openShopWindow", NpcScriptInterface::luaNpcOpenShopWindow);
-	tfs::lua::registerMethod(L, "Npc", "closeShopWindow", NpcScriptInterface::luaNpcCloseShopWindow);
+	registerMethod("Npc", "openShopWindow", NpcScriptInterface::luaNpcOpenShopWindow);
+	registerMethod("Npc", "closeShopWindow", NpcScriptInterface::luaNpcCloseShopWindow);
 }
 
 int NpcScriptInterface::luaActionSay(lua_State* L)
@@ -675,11 +678,11 @@ int NpcScriptInterface::luaActionFollow(lua_State* L)
 int NpcScriptInterface::luagetDistanceTo(lua_State* L)
 {
 	// getDistanceTo(uid)
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 
 	const auto& npc = env->getNpc();
 	if (!npc) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -688,7 +691,7 @@ int NpcScriptInterface::luagetDistanceTo(lua_State* L)
 
 	const auto& thing = env->getThingByUID(uid);
 	if (!thing) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
@@ -763,7 +766,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State* L)
 	}
 
 	if (!lua_istable(L, -1)) {
-		reportErrorFunc(L, "item list is not a table.");
+		tfs::lua::reportError(L, "item list is not a table.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -792,7 +795,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State* L)
 
 	const auto& player = tfs::lua::getPlayer(L, -1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -802,7 +805,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State* L)
 
 	const auto& npc = tfs::lua::getScriptEnv()->getNpc();
 	if (!npc) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -820,14 +823,14 @@ int NpcScriptInterface::luaCloseShopWindow(lua_State* L)
 	// closeShopWindow(cid)
 	const auto& npc = tfs::lua::getScriptEnv()->getNpc();
 	if (!npc) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& player = tfs::lua::getPlayer(L, 1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -860,7 +863,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State* L)
 	// doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: 1> canDropOnMap)
 	const auto& player = tfs::lua::getPlayer(L, 1);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -952,21 +955,21 @@ int NpcScriptInterface::luaNpcOpenShopWindow(lua_State* L)
 {
 	// npc:openShopWindow(cid, items, buyCallback, sellCallback)
 	if (!lua_istable(L, 3)) {
-		reportErrorFunc(L, "item list is not a table.");
+		tfs::lua::reportError(L, "item list is not a table.");
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& player = tfs::lua::getPlayer(L, 2);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& npc = tfs::lua::getSharedPtr<Npc>(L, 1);
 	if (!npc) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -1019,14 +1022,14 @@ int NpcScriptInterface::luaNpcCloseShopWindow(lua_State* L)
 	// npc:closeShopWindow(player)
 	const auto& player = tfs::lua::getPlayer(L, 2);
 	if (!player) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_PLAYER_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
 
 	const auto& npc = tfs::lua::getSharedPtr<Npc>(L, 1);
 	if (!npc) {
-		reportErrorFunc(L, tfs::lua::getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
 		tfs::lua::pushBoolean(L, false);
 		return 1;
 	}
@@ -1090,7 +1093,7 @@ void NpcEventsHandler::onCreatureAppear(const std::shared_ptr<Creature>& creatur
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureAppearEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1113,7 +1116,7 @@ void NpcEventsHandler::onCreatureDisappear(const std::shared_ptr<Creature>& crea
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureDisappearEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1137,7 +1140,7 @@ void NpcEventsHandler::onCreatureMove(const std::shared_ptr<Creature>& creature,
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureMoveEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1163,7 +1166,7 @@ void NpcEventsHandler::onCreatureSay(const std::shared_ptr<Creature>& creature, 
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureSayEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1189,7 +1192,7 @@ void NpcEventsHandler::onPlayerTrade(const std::shared_ptr<Player>& player, int3
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(-1, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1217,7 +1220,7 @@ void NpcEventsHandler::onPlayerCloseChannel(const std::shared_ptr<Player>& playe
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerCloseChannelEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1240,7 +1243,7 @@ void NpcEventsHandler::onPlayerEndTrade(const std::shared_ptr<Player>& player)
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerEndTradeEvent, scriptInterface.get());
 	env->setNpc(npc);
 
@@ -1263,7 +1266,7 @@ void NpcEventsHandler::onThink()
 		return;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(thinkEvent, scriptInterface.get());
 	env->setNpc(npc);
 

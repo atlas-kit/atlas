@@ -239,7 +239,7 @@ void Spawn::startSpawnCheck()
 
 Spawn::~Spawn()
 {
-	for (auto&& monster : spawnedMap | std::views::values | tfs::views::lock_weak_ptrs | std::views::as_const) {
+	for (const auto& monster : spawnedMap | std::views::values | tfs::views::lock_weak_ptrs) {
 		monster->setSpawn(nullptr);
 	}
 }
@@ -249,7 +249,7 @@ bool Spawn::findPlayer(const Position& pos)
 	SpectatorVec spectators;
 	g_game.map.getSpectators(spectators, pos, false, true);
 	for (const auto& spectator : spectators) {
-		assert(spectator->getPlayer() != nullptr);
+		assert(spectator->asPlayer() != nullptr);
 		if (!std::static_pointer_cast<Player>(spectator)->hasFlag(PlayerFlag_IgnoredByMonsters)) {
 			return true;
 		}

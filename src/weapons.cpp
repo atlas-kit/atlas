@@ -8,7 +8,9 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "game.h"
-#include "luavariant.h"
+#include "lua/env.h"
+#include "lua/meta.h"
+#include "lua/variant.h"
 #include "pugicast.h"
 
 extern Game g_game;
@@ -401,7 +403,7 @@ bool Weapon::executeUseWeapon(const std::shared_ptr<Player>& player, const LuaVa
 		return false;
 	}
 
-	ScriptEnvironment* env = tfs::lua::getScriptEnv();
+	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(scriptId, scriptInterface);
 
 	lua_State* L = scriptInterface->getLuaState();
@@ -732,7 +734,7 @@ int32_t WeaponDistance::getElementDamage(const std::shared_ptr<const Player>& pl
 	int32_t minValue = 0;
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 	if (target) {
-		if (target->getPlayer()) {
+		if (target->asPlayer()) {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.1));
 		} else {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.2));
@@ -766,7 +768,7 @@ int32_t WeaponDistance::getWeaponDamage(const std::shared_ptr<const Player>& pla
 
 	int32_t minValue;
 	if (target) {
-		if (target->getPlayer()) {
+		if (target->asPlayer()) {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.1));
 		} else {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.2));
