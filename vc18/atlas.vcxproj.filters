@@ -401,6 +401,9 @@
     <ClCompile Include="..\src\lua\modules\stdlib.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\protobuf\appearances.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\http\http.h">
@@ -690,6 +693,9 @@
     </ClInclude>
     <ClInclude Include="..\src\lua\modules.h">
       <Filter>Header Files\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\protobuf\appearances.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\modules\register.h">
       <Filter>Header Files\lua\modules</Filter>
