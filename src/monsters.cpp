@@ -364,8 +364,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				conditionType = CONDITION_PARALYZE;
 			}
 
-			auto condition = std::unique_ptr<ConditionSpeed>(static_cast<ConditionSpeed*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0).release()));
+			auto condition = std::make_unique<ConditionSpeed>(CONDITIONID_COMBAT, conditionType, duration, false, 0, 0);
 			condition->setFormulaVars(minSpeedChange / 1000.0, 0, maxSpeedChange / 1000.0, 0);
 			combat->addCondition(std::move(condition));
 		} else if (tmpName == "outfit") {
@@ -378,8 +377,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			if ((attr = node.attribute("monster"))) {
 				MonsterType* mType = g_monsters.getMonsterType(attr.as_string());
 				if (mType) {
-					auto condition = std::unique_ptr<ConditionOutfit>(static_cast<ConditionOutfit*>(
-					    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0).release()));
+					auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 					condition->setOutfit(mType->info.outfit);
 					combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
 					combat->addCondition(std::move(condition));
@@ -388,8 +386,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				Outfit_t outfit;
 				outfit.lookTypeEx = pugi::cast<uint16_t>(attr.value());
 
-				auto condition = std::unique_ptr<ConditionOutfit>(static_cast<ConditionOutfit*>(
-				    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0).release()));
+				auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 				condition->setOutfit(outfit);
 				combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
 				combat->addCondition(std::move(condition));
@@ -692,8 +689,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				conditionType = CONDITION_PARALYZE;
 			}
 
-			auto condition = std::unique_ptr<ConditionSpeed>(static_cast<ConditionSpeed*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0).release()));
+			auto condition = std::make_unique<ConditionSpeed>(CONDITIONID_COMBAT, conditionType, duration, false, 0, 0);
 			condition->setFormulaVars(minSpeedChange / 1000.0, 0, maxSpeedChange / 1000.0, 0);
 			combat->addCondition(std::move(condition));
 		} else if (tmpName == "outfit") {
@@ -703,8 +699,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				duration = spell->duration;
 			}
 
-			auto condition = std::unique_ptr<ConditionOutfit>(static_cast<ConditionOutfit*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0).release()));
+			auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 			condition->setOutfit(spell->outfit);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
 			combat->addCondition(std::move(condition));
