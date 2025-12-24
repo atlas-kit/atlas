@@ -21,7 +21,7 @@ GlobalEvents* g_globalEvents = nullptr;
 Spells* g_spells = nullptr;
 TalkActions* g_talkActions = nullptr;
 MoveEvents* g_moveEvents = nullptr;
-std::unique_ptr<Weapons> g_weapons;
+std::unique_ptr<Weapons> g_weapons = nullptr;
 Scripts* g_scripts = nullptr;
 
 extern LuaEnvironment g_luaEnvironment;
