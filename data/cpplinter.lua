@@ -1098,136 +1098,103 @@ XMLNode = {}
 
 --- Adds an item to a player's inventory.
 function doPlayerAddItem(uid, itemid, count) end
-
 ---@alias doPlayerAddItem fun(uid: number, itemid: number, count?: number): number
 
 --- Checks if a given UID is valid.
 function isValidUID(uid) end
-
 ---@alias isValidUID fun(uid: number): boolean
 
 --- Checks if a given UID is a depot.
 function isDepot(uid) end
-
 ---@alias isDepot fun(uid: number): boolean
 
 --- Checks if an item is movable.
 function isMovable(uid) end
-
 ---@alias isMovable fun(uid: number): boolean
 
 --- Adds an item to a container.
 function doAddContainerItem(uid, itemid, count) end
-
 ---@alias doAddContainerItem fun(uid: number, itemid: number, count?: number)
 
 --- Retrieves the depot ID associated with a given UID.
 function getDepotId(uid) end
-
 ---@alias getDepotId fun(uid: number): number
 
 --- Gets the uptime of the world/server.
 function getWorldUpTime() end
-
 ---@alias getWorldUpTime fun(): number
 
 --- Gets the name of a subtype.
 function getSubTypeName(subType) end
-
 ---@alias getSubTypeName fun(subType: number): string
 
 --- Creates a combat area.
 function createCombatArea(area, extArea) end
-
 ---@alias createCombatArea fun(area: table, extArea?: table)
 
 --- Executes area combat.
 function doAreaCombat(cid, type, pos, area, min, max, effect, origin, blockArmor, blockShield, ignoreResistances) end
-
 ---@alias doAreaCombat fun(cid: number, type: number, pos: table, area: table, min: number, max: number, effect: number, origin?: number, blockArmor?: boolean, blockShield?: boolean, ignoreResistances?: boolean)
 
 --- Executes target combat.
 function doTargetCombat(cid, target, type, min, max, effect, origin, blockArmor, blockShield, ignoreResistances) end
-
 ---@alias doTargetCombat fun(cid: number, target: number, type: number, min: number, max: number, effect: number, origin?: number, blockArmor?: boolean, blockShield?: boolean, ignoreResistances?: boolean)
 
 --- Challenges a creature.
 function doChallengeCreature(cid, target, force) end
-
 ---@alias doChallengeCreature fun(cid: number, target: number, force?: boolean)
 
 --- Schedules an event to be called after a delay.
 function addEvent(callback, delay, ...) end
-
 ---@alias addEvent fun(callback: function, delay: number, ...: any): number
 
 --- Stops a scheduled event.
 function stopEvent(eventid) end
-
 ---@alias stopEvent fun(eventid: number)
 
 --- Saves the server state.
 function saveServer() end
-
 ---@alias saveServer fun()
 
 --- Cleans the map.
 function cleanMap() end
-
 ---@alias cleanMap fun()
 
 --- Outputs a debug message.
 function debugPrint(text) end
-
 ---@alias debugPrint fun(text: string)
 
 --- Checks if two creatures are in war.
 function isInWar(cid, target) end
-
 ---@alias isInWar fun(cid: number, target: number): boolean
 
 --- Gets the position of a waypoint by name.
 function getWaypointPositionByName(name) return {} end
-
 ---@alias getWaypointPositionByName fun(name: string): table
 
 --- Sends a message to a channel.
 function sendChannelMessage(channelId, type, message) end
-
 ---@alias sendChannelMessage fun(channelId: number, type: number, message: string)
 
 --- Sends a message to a guild channel.
 function sendGuildChannelMessage(guildId, type, message) end
-
 ---@alias sendGuildChannelMessage fun(guildId: number, type: number, message: string)
 
 --- Checks if the current interface is a scripts interface.
 function isScriptsInterface() end
-
 ---@alias isScriptsInterface fun(): boolean
 
 function getNpcCid() end
-
 function selfSay(message, player) end
-
 function selfMove(direction) end
-
 function selfMoveTo(...) end
-
 function selfTurn(direction) end
-
 function selfFollow(creature) end
-
 function getDistanceTo(creature) end
-
 function doNpcSetCreatureFocus(creature) end
-
 function getNpcParameter(key) end
-
 function openShopWindow(shopWindow) end
-
 function closeShopWindow() end
-
 function doSellItem(item) end
 
 storages = {}
@@ -1505,9 +1472,9 @@ TILESTATE_SUPPORTS_HANGABLE = 1 * 2 ^ 23
 
 TILESTATE_FLOORCHANGE =
 	TILESTATE_FLOORCHANGE_DOWN or TILESTATE_FLOORCHANGE_NORTH or
-	TILESTATE_FLOORCHANGE_SOUTH or TILESTATE_FLOORCHANGE_EAST or
-	TILESTATE_FLOORCHANGE_WEST or TILESTATE_FLOORCHANGE_SOUTH_ALT or
-	TILESTATE_FLOORCHANGE_EAST_ALT
+		TILESTATE_FLOORCHANGE_SOUTH or TILESTATE_FLOORCHANGE_EAST or
+		TILESTATE_FLOORCHANGE_WEST or TILESTATE_FLOORCHANGE_SOUTH_ALT or
+		TILESTATE_FLOORCHANGE_EAST_ALT
 
 SPELL_UNDEFINED = 0
 SPELL_INSTANT = 1
@@ -1567,14 +1534,14 @@ CALLBACK_PARAM_TARGETTILE = 2
 CALLBACK_PARAM_TARGETCREATURE = 3
 
 ---@enum ExperienceRateType
-ExperienceRateType = { BASE = 1, LOW_LEVEL = 2, BONUS = 3, STAMINA = 4 }
+ExperienceRateType = {BASE = 1, LOW_LEVEL = 2, BONUS = 3, STAMINA = 4}
 
 GUEST_LIST = 0x100
 SUBOWNER_LIST = 0x101
 
 PODIUM_SHOW_PLATFORM = 0 -- show the platform below the outfit
 PODIUM_SHOW_OUTFIT = 1   -- show outfit
-PODIUM_SHOW_MOUNT = 2    -- show mount
+PODIUM_SHOW_MOUNT = 2     -- show mount
 
 DIRECTION_NORTH = 0
 DIRECTION_EAST = 1
@@ -1621,7 +1588,7 @@ MESSAGE_REPORT = 38         -- White, over player + conosle
 MESSAGE_HOTKEY_PRESSED = 39 -- Green, over player + console
 -- MESSAGE_TUTORIAL_HINT = 40 -- not working (?)
 -- MESSAGE_THANK_YOU = 41 -- not working (?)
-MESSAGE_MARKET = 42          -- Window "Market Message" + "Ok" button
+MESSAGE_MARKET = 42 -- Window "Market Message" + "Ok" button
 -- MESSAGE_MANA = 43 -- not working (?)
 MESSAGE_BEYOND_LAST = 44     -- White, console only
 MESSAGE_TOURNAMENT_INFO = 45 -- Window "Tournament" + "Ok" button
@@ -2200,7 +2167,7 @@ ITEM_GROUP_WRITEABLE = 9  -- deprecated
 ITEM_GROUP_KEY = 10       -- deprecated
 ITEM_GROUP_SPLASH = 11
 ITEM_GROUP_FLUID = 12
-ITEM_GROUP_DOOR = 13 -- deprecated
+ITEM_GROUP_DOOR = 13      -- deprecated
 ITEM_GROUP_DEPRECATED = 14
 ITEM_GROUP_PODIUM = 15
 ITEM_GROUP_LAST = 16
@@ -2233,9 +2200,9 @@ TALKTYPE_PRIVATE_NP = 10         -- NPC speaking to player
 TALKTYPE_PRIVATE_NP_CONSOLE = 11 -- NPC channel message, no text on game screen, for sendPrivateMessage use only
 TALKTYPE_PRIVATE_PN = 12         -- Player speaking to NPC
 TALKTYPE_BROADCAST = 13
-TALKTYPE_CHANNEL_R1 = 14         -- red - #c text
-TALKTYPE_PRIVATE_RED_FROM = 15   -- @name@text
-TALKTYPE_PRIVATE_RED_TO = 16     -- @name@text
+TALKTYPE_CHANNEL_R1 = 14       -- red - #c text
+TALKTYPE_PRIVATE_RED_FROM = 15 -- @name@text
+TALKTYPE_PRIVATE_RED_TO = 16   -- @name@text
 TALKTYPE_MONSTER_SAY = 36
 TALKTYPE_MONSTER_YELL = 37
 TALKTYPE_POTION = 52 -- Like MONSTER_SAY but can be disabled in client settings
