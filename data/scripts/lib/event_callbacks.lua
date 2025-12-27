@@ -21,6 +21,10 @@ end})
 
 --@ Definitions of valid Event types to hook according to the given field name
 --@ The fields within the assigned table, allow to save arbitrary information
+-- Server
+ec.onServerStartup = {}
+ec.onServerShutdown = {}
+ec.onServerSave = {}
 -- Creature
 ec.onCreatureChangeOutfit = {}
 ec.onCreatureChangeMount = {}

@@ -16,6 +16,28 @@ namespace {
 
 LuaScriptInterface scriptInterface{"Event Interface"};
 
+struct ServerHandlers
+{
+	int32_t onStartup = -1;
+	int32_t onShutdown = -1;
+	int32_t onSave = -1;
+} serverHandlers;
+
+void load_server_from_scripts()
+{
+	serverHandlers = {};
+
+	if (scriptInterface.loadFile("data/scripts/events/server.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_server_from_scripts] Cannot load server events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
+		return;
+	}
+
+	serverHandlers.onStartup = scriptInterface.getMetaEvent("Server", "onStartup");
+	serverHandlers.onShutdown = scriptInterface.getMetaEvent("Server", "onShutdown");
+	serverHandlers.onSave = scriptInterface.getMetaEvent("Server", "onSave");
+}
+
 struct CreatureHandlers
 {
 	int32_t onChangeOutfit = -1;
@@ -223,6 +245,73 @@ void reload()
 }
 
 } // namespace tfs::events
+
+namespace tfs::events::server {
+
+void onStartup()
+{
+	// Server:onStartup()
+	if (serverHandlers.onStartup == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::server::onStartup] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(serverHandlers.onStartup, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(serverHandlers.onStartup);
+
+	scriptInterface.callVoidFunction(0);
+}
+
+void onShutdown()
+{
+	// Server:onShutdown()
+	if (serverHandlers.onShutdown == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::server::onShutdown] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(serverHandlers.onShutdown, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(serverHandlers.onShutdown);
+
+	scriptInterface.callVoidFunction(0);
+}
+
+void onSave()
+{
+	// Server:onSave()
+	if (serverHandlers.onSave == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::server::onSave] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(serverHandlers.onSave, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(serverHandlers.onSave);
+
+	scriptInterface.callVoidFunction(0);
+}
+
+} // namespace tfs::events::server
 
 namespace tfs::events::creature {
 
