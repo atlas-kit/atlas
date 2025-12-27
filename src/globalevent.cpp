@@ -295,7 +295,6 @@ std::string_view GlobalEvent::getScriptEventName() const
 	switch (eventType) {
 		case GLOBALEVENT_RECORD:
 			return "onRecord";
-
 		case GLOBALEVENT_TIMER:
 			return "onTime";
 		default:
