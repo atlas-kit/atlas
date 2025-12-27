@@ -9,6 +9,7 @@
 #include "base64.h"
 #include "condition.h"
 #include "configmanager.h"
+#include "events.h"
 #include "game.h"
 #include "iologindata.h"
 #include "iomarket.h"
@@ -19,7 +20,6 @@
 #include "scheduler.h"
 
 extern Chat* g_chat;
-extern CreatureEvents* g_creatureEvents;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Scheduler g_scheduler;
@@ -226,10 +226,6 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 			}
 		}
 
-		if (operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
-			player->registerCreatureEvent("ExtendedOpcode");
-		}
-
 		player->lastIP = player->getIP();
 		player->lastLoginSaved = std::max<time_t>(time(nullptr), player->lastLoginSaved + 1);
 		acceptPackets = true;
@@ -285,10 +281,10 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 	player->resetIdleTime();
 	acceptPackets = true;
 
-	g_creatureEvents->playerReconnect(player);
+	tfs::events::player::onReconnect(player);
 }
 
-void ProtocolGame::logout(bool displayEffect, bool forced)
+void ProtocolGame::forceLogout(bool displayEffect)
 {
 	// dispatcher thread
 	if (!player) {
@@ -296,24 +292,39 @@ void ProtocolGame::logout(bool displayEffect, bool forced)
 	}
 
 	if (!player->isRemoved()) {
-		if (!forced) {
-			if (!player->isAccessPlayer()) {
-				if (player->getTile()->hasFlag(TILESTATE_NOLOGOUT)) {
-					player->sendCancelMessage(RETURNVALUE_YOUCANNOTLOGOUTHERE);
-					return;
-				}
+		if (displayEffect && !player->isDead() && !player->isInGhostMode()) {
+			g_game.addMagicEffect(player->getPosition(), CONST_ME_POFF);
+		}
+	}
 
-				if (!player->getTile()->hasFlag(TILESTATE_PROTECTIONZONE) && player->hasCondition(CONDITION_INFIGHT)) {
-					player->sendCancelMessage(RETURNVALUE_YOUMAYNOTLOGOUTDURINGAFIGHT);
-					return;
-				}
-			}
+	sendSessionEnd(SESSION_END_FORCECLOSE);
+	disconnect();
 
-			// scripting event - onLogout
-			if (!g_creatureEvents->playerLogout(player)) {
-				// Let the script handle the error message
+	g_game.removeCreature(player);
+}
+
+void ProtocolGame::logout(bool displayEffect)
+{
+	// dispatcher thread
+	if (!player) {
+		return;
+	}
+
+	if (!player->isRemoved()) {
+		if (!player->isAccessPlayer()) {
+			if (player->getTile()->hasFlag(TILESTATE_NOLOGOUT)) {
+				player->sendCancelMessage(RETURNVALUE_YOUCANNOTLOGOUTHERE);
 				return;
 			}
+
+			if (!player->getTile()->hasFlag(TILESTATE_PROTECTIONZONE) && player->hasCondition(CONDITION_INFIGHT)) {
+				player->sendCancelMessage(RETURNVALUE_YOUMAYNOTLOGOUTDURINGAFIGHT);
+				return;
+			}
+		}
+
+		if (!tfs::events::player::onLogout(player)) {
+			return;
 		}
 
 		if (displayEffect && !player->isDead() && !player->isInGhostMode()) {
@@ -321,7 +332,7 @@ void ProtocolGame::logout(bool displayEffect, bool forced)
 		}
 	}
 
-	sendSessionEnd(forced ? SESSION_END_FORCECLOSE : SESSION_END_LOGOUT);
+	sendSessionEnd(SESSION_END_LOGOUT);
 	disconnect();
 
 	g_game.removeCreature(player);
@@ -523,7 +534,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	switch (recvbyte) {
 		case 0x14:
-			g_dispatcher.addTask([thisPtr = getThis()]() { thisPtr->logout(true, false); });
+			g_dispatcher.addTask([thisPtr = getThis()]() { thisPtr->logout(true); });
 			break;
 		// case 0x2A: break; // bestiary tracker
 		// case 0x2C: break; // team finder (leader)
@@ -1626,7 +1637,7 @@ void ProtocolGame::sendCreatureShield(const std::shared_ptr<const Creature>& cre
 	NetworkMessage msg;
 	msg.addByte(0x91);
 	msg.add<uint32_t>(creature->getID());
-	msg.addByte(player->getPartyShield(creature->getPlayer()));
+	msg.addByte(player->getPartyShield(creature->asPlayer()));
 	writeToOutputBuffer(msg);
 }
 
@@ -2417,7 +2428,7 @@ void ProtocolGame::sendCreatureSay(const std::shared_ptr<const Creature>& creatu
 	msg.addByte(0x00); // "(Traded)" suffix after player name
 
 	// Add level only for players
-	if (const auto& speaker = creature->getPlayer()) {
+	if (const auto& speaker = creature->asPlayer()) {
 		msg.add<uint16_t>(speaker->getLevel());
 	} else {
 		msg.add<uint16_t>(0x00);
@@ -2450,7 +2461,7 @@ void ProtocolGame::sendToChannel(const std::shared_ptr<const Creature>& creature
 		msg.addByte(0x00); // "(Traded)" suffix after player name
 
 		// Add level only for players
-		if (const auto& speaker = creature->getPlayer()) {
+		if (const auto& speaker = creature->asPlayer()) {
 			msg.add<uint16_t>(speaker->getLevel());
 		} else {
 			msg.add<uint16_t>(0x00);
@@ -3377,7 +3388,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 
 	if (creatureType == CREATURETYPE_MONSTER) {
 		if (const auto& master = creature->getMaster()) {
-			if (const auto& masterPlayer = master->getPlayer()) {
+			if (const auto& masterPlayer = master->asPlayer()) {
 				masterId = master->getID();
 				creatureType = CREATURETYPE_SUMMON_OWN;
 			}
@@ -3427,7 +3438,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 
 	msg.addByte(player->getCombatSkull(creature));
 
-	const auto& otherPlayer = creature->getPlayer();
+	const auto& otherPlayer = creature->asPlayer();
 	msg.addByte(player->getPartyShield(otherPlayer));
 
 	if (!known) {
@@ -3445,7 +3456,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 		msg.addByte(otherPlayer ? otherPlayer->getVocation()->getClientId() : 0x00);
 	}
 
-	if (const auto npc = creature->getNpc()) {
+	if (const auto npc = creature->asNpc()) {
 		msg.addByte(npc->getSpeechBubble());
 	} else {
 		msg.addByte(SPEECHBUBBLE_NONE);
@@ -3460,7 +3471,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 void ProtocolGame::AddCreatureIcons(NetworkMessage& msg, const std::shared_ptr<const Creature>& creature)
 {
 	const auto& creatureIcons = creature->getIcons();
-	if (const auto& monster = creature->getMonster()) {
+	if (const auto& monster = creature->asMonster()) {
 		const auto& monsterIcons = monster->getSpecialIcons();
 		msg.addByte(creatureIcons.size() + monsterIcons.size());
 		for (const auto& [iconId, level] : monsterIcons) {

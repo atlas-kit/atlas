@@ -16,7 +16,6 @@
 #include "weapons.h"
 
 Actions* g_actions = nullptr;
-CreatureEvents* g_creatureEvents = nullptr;
 Chat* g_chat = nullptr;
 GlobalEvents* g_globalEvents = nullptr;
 Spells* g_spells = nullptr;
@@ -35,7 +34,6 @@ ScriptingManager::~ScriptingManager()
 	delete g_talkActions;
 	delete g_moveEvents;
 	delete g_chat;
-	delete g_creatureEvents;
 	delete g_globalEvents;
 	delete g_scripts;
 }
@@ -73,22 +71,12 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 
-	g_creatureEvents = new CreatureEvents();
-	if (!g_creatureEvents->loadFromXml()) {
-		std::cout << "> ERROR: Unable to load creature events!" << std::endl;
-		return false;
-	}
-
 	g_globalEvents = new GlobalEvents();
 	if (!g_globalEvents->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load global events!" << std::endl;
 		return false;
 	}
 
-	if (!tfs::events::load()) {
-		std::cout << "> ERROR: Unable to load events!" << std::endl;
-		return false;
-	}
-
+	tfs::events::load();
 	return true;
 }

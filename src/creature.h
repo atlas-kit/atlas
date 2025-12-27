@@ -5,7 +5,6 @@
 #define FS_CREATURE_H
 
 #include "const.h"
-#include "creatureevent.h"
 #include "enums.h"
 #include "position.h"
 #include "tile.h"
@@ -17,7 +16,6 @@ class Monster;
 class Npc;
 class Player;
 
-using CreatureEventList = std::list<CreatureEvent*>;
 using CreatureIconHashMap = std::unordered_map<CreatureIcon_t, uint16_t>;
 
 enum slots_t : uint8_t
@@ -99,12 +97,12 @@ public:
 		return std::static_pointer_cast<const Creature>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<Player> getPlayer() { return nullptr; }
-	virtual std::shared_ptr<const Player> getPlayer() const { return nullptr; }
-	virtual std::shared_ptr<Npc> getNpc() { return nullptr; }
-	virtual std::shared_ptr<const Npc> getNpc() const { return nullptr; }
-	virtual std::shared_ptr<Monster> getMonster() { return nullptr; }
-	virtual std::shared_ptr<const Monster> getMonster() const { return nullptr; }
+	virtual std::shared_ptr<Player> asPlayer() { return nullptr; }
+	virtual std::shared_ptr<const Player> asPlayer() const { return nullptr; }
+	virtual std::shared_ptr<Npc> asNpc() { return nullptr; }
+	virtual std::shared_ptr<const Npc> asNpc() const { return nullptr; }
+	virtual std::shared_ptr<Monster> asMonster() { return nullptr; }
+	virtual std::shared_ptr<const Monster> asMonster() const { return nullptr; }
 
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
@@ -354,10 +352,6 @@ public:
 	}
 	bool isMovementBlocked() const { return movementBlocked; }
 
-	// creature script events
-	bool registerCreatureEvent(const std::string& name);
-	bool unregisterCreatureEvent(const std::string& name);
-
 	std::shared_ptr<Thing> getParent() const override final { return tile.lock(); }
 	void setParent(const std::shared_ptr<Thing>& thing) override final
 	{
@@ -386,8 +380,6 @@ public:
 	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
 
-	CreatureEventList getCreatureEvents(CreatureEventType_t type);
-
 protected:
 	struct CountBlock_t
 	{
@@ -395,7 +387,6 @@ protected:
 		int64_t ticks;
 	};
 
-	CreatureEventList eventsList;
 	std::vector<Condition*> conditions;
 	CreatureIconHashMap creatureIcons;
 
@@ -433,12 +424,6 @@ protected:
 	bool hiddenHealth = false;
 	bool canUseDefense = true;
 	bool movementBlocked = false;
-
-	// creature script events
-	bool hasEventRegistered(CreatureEventType_t event) const
-	{
-		return (0 != (scriptEventsBitField & (static_cast<uint32_t>(1) << event)));
-	}
 
 	void onCreatureDisappear(const std::shared_ptr<const Creature>& creature, bool isLogout);
 	virtual void doAttacking(uint32_t) {}

@@ -398,7 +398,7 @@ public:
 	void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
 	void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
 
-	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);
+	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
 	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
@@ -498,6 +498,10 @@ public:
 	auto getHouses() const { return houses | std::views::values; }
 	void payHouses(RentPeriod_t rentPeriod) const;
 
+	const auto& getParties() const { return parties; }
+	void addParty(const std::shared_ptr<Party>& party) { parties.insert(party); }
+	void removeParty(const std::shared_ptr<Party>& party) { parties.erase(party); }
+
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
 	void playerWhisper(const std::shared_ptr<Player>& player, const std::string& text);
@@ -533,6 +537,8 @@ private:
 	std::map<uint32_t, std::shared_ptr<BedItem>> bedSleepersMap;
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
+
+	std::set<std::shared_ptr<Party>> parties;
 
 	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
 

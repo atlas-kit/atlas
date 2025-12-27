@@ -11,7 +11,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/connection.cpp
 	${CMAKE_CURRENT_LIST_DIR}/container.cpp
 	${CMAKE_CURRENT_LIST_DIR}/creature.cpp
-	${CMAKE_CURRENT_LIST_DIR}/creatureevent.cpp
 	${CMAKE_CURRENT_LIST_DIR}/database.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasemanager.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasetasks.cpp
@@ -33,7 +32,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/http/login_attempts.cpp
 	${CMAKE_CURRENT_LIST_DIR}/item.cpp
 	${CMAKE_CURRENT_LIST_DIR}/items.cpp
-	${CMAKE_CURRENT_LIST_DIR}/luascript.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/map.cpp
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.cpp
@@ -87,7 +85,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/connection.h
 	${CMAKE_CURRENT_LIST_DIR}/const.h
 	${CMAKE_CURRENT_LIST_DIR}/container.h
-	${CMAKE_CURRENT_LIST_DIR}/creatureevent.h
 	${CMAKE_CURRENT_LIST_DIR}/creature.h
 	${CMAKE_CURRENT_LIST_DIR}/database.h
 	${CMAKE_CURRENT_LIST_DIR}/databasemanager.h
@@ -114,7 +111,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/itemloader.h
 	${CMAKE_CURRENT_LIST_DIR}/items.h
 	${CMAKE_CURRENT_LIST_DIR}/lockfree.h
-	${CMAKE_CURRENT_LIST_DIR}/luascript.h
 	${CMAKE_CURRENT_LIST_DIR}/luavariant.h
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.h
 	${CMAKE_CURRENT_LIST_DIR}/map.h
@@ -174,7 +170,6 @@ target_link_libraries(tfslib PRIVATE
 	${LUA_LIBRARIES}
 	${MYSQL_CLIENT_LIBS}
 	)
-set_target_properties(tfslib PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
 if (APPLE)
 	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
@@ -184,6 +179,9 @@ if (ENABLE_HTTP)
 	add_subdirectory(http)
 	target_link_libraries(tfslib PRIVATE http)
 endif ()
+
+add_subdirectory(lua)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 
