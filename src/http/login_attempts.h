@@ -18,13 +18,11 @@ struct AttemptInfo
 	std::chrono::system_clock::time_point blockUntil;
 };
 
-namespace {
-static constexpr int MAX_ATTEMPTS = 3;
-static constexpr std::chrono::minutes BLOCK_DURATION{30};
+inline constexpr int MAX_ATTEMPTS = 3;
+inline constexpr std::chrono::minutes BLOCK_DURATION{30};
 
-std::shared_mutex mutex;
-std::unordered_map<std::string, AttemptInfo> attempts;
-} // namespace
+extern std::shared_mutex mutex;
+extern std::unordered_map<std::string, AttemptInfo> attempts;
 
 int get_remaining_block_time_minutes(std::string_view ip);
 void record_failure(std::string_view ip);

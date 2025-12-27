@@ -35,7 +35,7 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 
 	if (const int minutes_left = tfs::http::login_attempts::get_remaining_block_time_minutes(ip); minutes_left > 0) {
 		return make_error_response({.code = 3,
-		                            .message = std::format("Too many failed login attempts. Please try again in {} {} ",
+		                            .message = std::format("Too many failed login attempts. Please try again in {} {}",
 		                                                   minutes_left, minutes_left == 1 ? "minute" : "minutes")});
 	}
 
