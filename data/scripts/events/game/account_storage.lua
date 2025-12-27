@@ -5,7 +5,7 @@ do
 	event.onGameStartup = function()
 		local resultId = db.storeQuery("SELECT `account_id`, `key`, `value` FROM `account_storage`")
 		if not resultId then
-			return true
+			return
 		end
 	
 		repeat
@@ -15,8 +15,6 @@ do
 			Game.setAccountStorageValue(accountId, key, value)
 		until not result.next(resultId)
 		result.free(resultId)
-	
-		return true
 	end
 	
 	event:register()
@@ -31,7 +29,6 @@ do
 		if not success then
 			print("Failed to save account-level storage values.")
 		end
-		return true
 	end
 	
 	event:register()
