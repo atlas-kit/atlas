@@ -1501,7 +1501,7 @@ bool onLogout(const std::shared_ptr<Player>& player)
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::player::Logout] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::player::onLogout] Call stack overflow" << std::endl;
 		return false;
 	}
 
@@ -1545,7 +1545,7 @@ bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t o
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::player::Logout] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::player::onAdvance] Call stack overflow" << std::endl;
 		return false;
 	}
 
@@ -1570,7 +1570,7 @@ void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::player::ModalWindow] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::player::onModalWindow] Call stack overflow" << std::endl;
 		return;
 	}
 
@@ -1649,7 +1649,7 @@ bool onSpawn(const std::shared_ptr<Monster>& monster, const Position& position, 
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::monster:onSpawn] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::monster::onSpawn] Call stack overflow" << std::endl;
 		return false;
 	}
 
