@@ -998,8 +998,8 @@ Weapon = {}
 ---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
 ---@field onCreatureHear fun(creature:Creature, speaker:Creature, words:string, type:integer):nil
 ---@field onCreatureChangeZone fun(creature:Creature, fromZone:integer, toZone:integer):nil
----@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):nil
----@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):nil
+---@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
+---@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
 ---@field onCreatureUpdateStorage fun(creature:Creature, key:integer, value?:integer, oldValue?:integer, isSpawn?:boolean):nil
 ---@field onCreatureThink fun(creature:Creature, interval:integer):nil
 ---@field onCreaturePrepareDeath fun(creature:Creature, killer:Creature):boolean

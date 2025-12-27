@@ -40,16 +40,18 @@ function Creature:onUpdateStorage(key, value, oldValue, isSpawn)
 	end
 end
 
-function Creature:onChangeHealth(attacker, damage)
+function Creature:onChangeHealth(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	if Event.onCreatureChangeHealth then
-		Event.onCreatureChangeHealth(self, attacker, damage)
+		return Event.onCreatureChangeHealth(self, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	end
+	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
 
-function Creature:onChangeMana(attacker, damage)
+function Creature:onChangeMana(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	if Event.onCreatureChangeMana then
-		Event.onCreatureChangeMana(self, attacker, damage)
+		return Event.onCreatureChangeMana(self, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	end
+	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
 
 function Creature:onThink(interval)

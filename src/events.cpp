@@ -378,6 +378,44 @@ void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone
 	scriptInterface.callVoidFunction(3);
 }
 
+void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
+                     std::optional<int32_t> oldValue, bool isSpawn)
+{
+	// Creature:onUpdateStorage(key, value, oldValue, isSpawn)
+	if (creatureHandlers.onUpdateStorage == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onUpdateStorage] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onUpdateStorage, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onUpdateStorage);
+
+	tfs::lua::pushThing(L, creature);
+	tfs::lua::pushNumber(L, key);
+
+	if (value) {
+		tfs::lua::pushNumber(L, value.value());
+	} else {
+		lua_pushnil(L);
+	}
+
+	if (oldValue) {
+		tfs::lua::pushNumber(L, oldValue.value());
+	} else {
+		lua_pushnil(L);
+	}
+
+	tfs::lua::pushBoolean(L, isSpawn);
+	scriptInterface.callVoidFunction(5);
+}
+
 void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
                     CombatDamage& damage)
 {
@@ -473,44 +511,6 @@ void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_p
 	}
 
 	tfs::lua::resetScriptEnv();
-}
-
-void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
-                     std::optional<int32_t> oldValue, bool isSpawn)
-{
-	// Creature:onUpdateStorage(key, value, oldValue, isSpawn)
-	if (creatureHandlers.onUpdateStorage == -1) {
-		return;
-	}
-
-	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::creature::onUpdateStorage] Call stack overflow" << std::endl;
-		return;
-	}
-
-	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(creatureHandlers.onUpdateStorage, &scriptInterface);
-
-	const auto L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(creatureHandlers.onUpdateStorage);
-
-	tfs::lua::pushThing(L, creature);
-	tfs::lua::pushNumber(L, key);
-
-	if (value) {
-		tfs::lua::pushNumber(L, value.value());
-	} else {
-		lua_pushnil(L);
-	}
-
-	if (oldValue) {
-		tfs::lua::pushNumber(L, oldValue.value());
-	} else {
-		lua_pushnil(L);
-	}
-
-	tfs::lua::pushBoolean(L, isSpawn);
-	scriptInterface.callVoidFunction(5);
 }
 
 void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval)

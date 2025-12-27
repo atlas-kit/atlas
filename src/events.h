@@ -39,12 +39,12 @@ ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std:
 void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& speaker,
             const std::string& words, SpeakClasses type);
 void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone);
+void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
+    std::optional<int32_t> oldValue, bool isSpawn);
 void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
                     CombatDamage& damage);
 void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
-                  CombatDamage& damage);
-void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
-                     std::optional<int32_t> oldValue, bool isSpawn);
+                    CombatDamage& damage);
 void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval);
 bool onPrepareDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& killer);
 void onDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& corpse,
