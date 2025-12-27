@@ -160,7 +160,9 @@ void load_player_from_scripts()
 	playerHandlers.onJoin = scriptInterface.getMetaEvent("Player", "onJoin");
 	playerHandlers.onLogout = scriptInterface.getMetaEvent("Player", "onLogout");
 	playerHandlers.onReconnect = scriptInterface.getMetaEvent("Player", "onReconnect");
+	playerHandlers.onAdvance = scriptInterface.getMetaEvent("Player", "onAdvance");
 	playerHandlers.onModalWindow = scriptInterface.getMetaEvent("Player", "onModalWindow");
+	playerHandlers.onTextEdit = scriptInterface.getMetaEvent("Player", "onTextEdit");
 	playerHandlers.onExtendedOpcode = scriptInterface.getMetaEvent("Player", "onExtendedOpcode");
 }
 
