@@ -999,8 +999,8 @@ Weapon = {}
 ---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
 ---@field onCreatureHear fun(creature:Creature, speaker:Creature, words:string, type:integer):nil
 ---@field onCreatureChangeZone fun(creature:Creature, fromZone:integer, toZone:integer):nil
----@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer);
----@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer);
+---@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
+---@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
 ---@field onCreatureUpdateStorage fun(creature:Creature, key:integer, value?:integer, oldValue?:integer, isSpawn?:boolean):nil
 ---@field onCreatureThink fun(creature:Creature, interval:integer):nil
 ---@field onCreaturePrepareDeath fun(creature:Creature, killer:Creature):boolean
@@ -1032,13 +1032,13 @@ Weapon = {}
 ---@field onPlayerGainSkillTries fun(player:Player, skill:integer, tries:integer, artificial?:boolean):integer
 ---@field onPlayerNetworkMessage fun(player:Player, recvByte:integer, msg:NetworkMessage):nil
 ---@field onPlayerUpdateInventory fun(player:Player, item:Item, slot:integer, equip?:boolean):nil
----@field onPlayerRotateItem fun(player:Player, item:Item)
+---@field onPlayerRotateItem fun(player:Player, item:Item):nil
 ---@field onPlayerSpellCheck fun(player:Player, spell:Spell):boolean
 ---@field onPlayerLogin fun(player:Player):boolean
 ---@field onPlayerJoin fun(player:Player):nil
 ---@field onPlayerLogout fun(player:Player):boolean
 ---@field onPlayerReconnect fun(player:Player):nil
----@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):boolean
+---@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):nil
 ---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
 ---@field onPlayerTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
 ---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil

@@ -601,6 +601,103 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 	scriptInterface.callVoidFunction(5);
 }
 
+void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
+                    CombatDamage& damage)
+{
+	// Creature:onChangeHealth(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
+	if (creatureHandlers.onChangeHealth == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onChangeHealth] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onChangeHealth, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onChangeHealth);
+
+	tfs::lua::pushThing(L, creature);
+
+	if (attacker) {
+		tfs::lua::pushThing(L, attacker);
+	} else {
+		lua_pushnil(L);
+	}
+
+	tfs::lua::pushNumber(L, damage.primary.value);
+	tfs::lua::pushNumber(L, damage.primary.type);
+	tfs::lua::pushNumber(L, damage.secondary.value);
+	tfs::lua::pushNumber(L, damage.secondary.type);
+	tfs::lua::pushNumber(L, damage.origin);
+
+	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
+		tfs::lua::reportError(L, tfs::lua::popString(L));
+	} else {
+		damage.primary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value));
+		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
+		damage.secondary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -2, damage.secondary.value));
+		damage.secondary.type = tfs::lua::getNumber<CombatType_t>(L, -1, damage.secondary.type);
+		lua_pop(L, 4);
+
+		if (damage.primary.type != COMBAT_HEALING) {
+			damage.primary.value = -damage.primary.value;
+			damage.secondary.value = -damage.secondary.value;
+		}
+	}
+
+	tfs::lua::resetScriptEnv();
+}
+
+void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
+                  CombatDamage& damage)
+{
+	// Creature:onChangeMana(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
+	if (creatureHandlers.onChangeMana == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onChangeMana] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onChangeMana, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onChangeMana);
+
+	tfs::lua::pushThing(L, creature);
+
+	if (attacker) {
+		tfs::lua::pushThing(L, attacker);
+	} else {
+		lua_pushnil(L);
+	}
+
+	tfs::lua::pushNumber(L, damage.primary.value);
+	tfs::lua::pushNumber(L, damage.primary.type);
+	tfs::lua::pushNumber(L, damage.secondary.value);
+	tfs::lua::pushNumber(L, damage.secondary.type);
+	tfs::lua::pushNumber(L, damage.origin);
+
+	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
+		tfs::lua::reportError(L, tfs::lua::popString(L));
+	} else {
+		damage.primary.value = tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value);
+		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
+		damage.secondary.value = tfs::lua::getNumber<int32_t>(L, -2, damage.secondary.value);
+		damage.secondary.type = tfs::lua::getNumber<CombatType_t>(L, -1, damage.secondary.type);
+		lua_pop(L, 4);
+	}
+
+	tfs::lua::resetScriptEnv();
+}
+
 void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval)
 {
 	// Creature:onThink(interval)
@@ -1627,16 +1724,16 @@ void onReconnect(const std::shared_ptr<Player>& player)
 	scriptInterface.callVoidFunction(1);
 }
 
-bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel)
+void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel)
 {
 	// Player:onAdvance(skill, oldLevel, newLevel)
 	if (playerHandlers.onAdvance == -1) {
-		return true;
+		return;
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - tfs::events::player::onAdvance] Call stack overflow" << std::endl;
-		return false;
+		return;
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
@@ -1649,7 +1746,7 @@ bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t o
 	tfs::lua::pushNumber(L, static_cast<uint32_t>(skill));
 	tfs::lua::pushNumber(L, oldLevel);
 	tfs::lua::pushNumber(L, newLevel);
-	return scriptInterface.callFunction(4);
+	scriptInterface.callVoidFunction(4);
 }
 
 void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId)
