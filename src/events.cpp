@@ -412,7 +412,7 @@ void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared
 	tfs::lua::pushNumber(L, damage.origin);
 
 	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
-		tfs::lua::reportError(tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		damage.primary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value));
 		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
@@ -463,7 +463,7 @@ void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_p
 	tfs::lua::pushNumber(L, damage.origin);
 
 	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
-		tfs::lua::reportError(tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L));
 	} else {
 		damage.primary.value = tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value);
 		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
