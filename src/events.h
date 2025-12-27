@@ -53,8 +53,6 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
                      std::optional<int32_t> oldValue, bool isSpawn);
 void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
                     CombatDamage& damage);
-void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
-                  CombatDamage& damage);
 void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval);
 bool onPrepareDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& killer);
 void onDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& corpse,
