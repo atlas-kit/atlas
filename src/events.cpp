@@ -265,7 +265,6 @@ void onStartup()
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(gameHandlers.onStartup, &scriptInterface);
 
-	const auto L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(gameHandlers.onStartup);
 
 	scriptInterface.callVoidFunction(0);
@@ -286,7 +285,6 @@ void onShutdown()
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(gameHandlers.onShutdown, &scriptInterface);
 
-	const auto L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(gameHandlers.onShutdown);
 
 	scriptInterface.callVoidFunction(0);
@@ -307,7 +305,6 @@ void onSave()
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(gameHandlers.onSave, &scriptInterface);
 
-	const auto L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(gameHandlers.onSave);
 
 	scriptInterface.callVoidFunction(0);
