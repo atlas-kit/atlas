@@ -111,7 +111,7 @@ bool onLogin(const std::shared_ptr<Player>& player);
 void onJoin(const std::shared_ptr<Player>& player);
 bool onLogout(const std::shared_ptr<Player>& player);
 void onReconnect(const std::shared_ptr<Player>& player);
-bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel);
+void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel);
 void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId);
 bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, std::string_view text,
                 const uint32_t windowTextId);

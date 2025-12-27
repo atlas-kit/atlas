@@ -63,9 +63,8 @@ end
 
 function Player:onRotateItem(item)
 	if Event.onPlayerRotateItem then
-		return Event.onPlayerRotateItem(self, item)
+		Event.onPlayerRotateItem(self, item)
 	end
-	return true
 end
 
 function Player:onTurn(direction)
@@ -297,9 +296,8 @@ end
 
 function Player:onAdvance(skill, oldLevel, newLevel)
 	if Event.onPlayerAdvance then
-		return Event.onPlayerAdvance(self, skill, oldLevel, newLevel)
+		Event.onPlayerAdvance(self, skill, oldLevel, newLevel)
 	end
-	return true
 end
 
 function Player:onModalWindow(modalWindowId, buttonId, choiceId)

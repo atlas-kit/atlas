@@ -1539,16 +1539,16 @@ void onReconnect(const std::shared_ptr<Player>& player)
 	scriptInterface.callVoidFunction(1);
 }
 
-bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel)
+void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel)
 {
 	// Player:onAdvance(skill, oldLevel, newLevel)
 	if (playerHandlers.onAdvance == -1) {
-		return true;
+		return;
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - tfs::events::player::onAdvance] Call stack overflow" << std::endl;
-		return false;
+		return;
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
@@ -1561,7 +1561,7 @@ bool onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t o
 	tfs::lua::pushNumber(L, static_cast<uint32_t>(skill));
 	tfs::lua::pushNumber(L, oldLevel);
 	tfs::lua::pushNumber(L, newLevel);
-	return scriptInterface.callFunction(4);
+	scriptInterface.callVoidFunction(4);
 }
 
 void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId)

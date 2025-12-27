@@ -1031,13 +1031,13 @@ Weapon = {}
 ---@field onPlayerGainSkillTries fun(player:Player, skill:integer, tries:integer, artificial?:boolean):integer
 ---@field onPlayerNetworkMessage fun(player:Player, recvByte:integer, msg:NetworkMessage):nil
 ---@field onPlayerUpdateInventory fun(player:Player, item:Item, slot:integer, equip?:boolean):nil
----@field onPlayerRotateItem fun(player:Player, item:Item)
+---@field onPlayerRotateItem fun(player:Player, item:Item):nil
 ---@field onPlayerSpellCheck fun(player:Player, spell:Spell):boolean
 ---@field onPlayerLogin fun(player:Player):boolean
 ---@field onPlayerJoin fun(player:Player):nil
 ---@field onPlayerLogout fun(player:Player):boolean
 ---@field onPlayerReconnect fun(player:Player):nil
----@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):boolean
+---@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):nil
 ---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
 ---@field onPlayerTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
 ---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil
