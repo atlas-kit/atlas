@@ -31,13 +31,13 @@ int32_t getScriptId(EventInfoId eventInfoId);
 
 } // namespace tfs::events
 
-namespace tfs::events::server {
+namespace tfs::events::game {
 
 void onStartup();
 void onShutdown();
 void onSave();
 
-} // namespace tfs::events::server
+} // namespace tfs::events::game
 
 namespace tfs::events::creature {
 

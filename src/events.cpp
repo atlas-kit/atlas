@@ -16,26 +16,26 @@ namespace {
 
 LuaScriptInterface scriptInterface{"Event Interface"};
 
-struct ServerHandlers
+struct GameHandlers
 {
 	int32_t onStartup = -1;
 	int32_t onShutdown = -1;
 	int32_t onSave = -1;
-} serverHandlers;
+} gameHandlers;
 
-void load_server_from_scripts()
+void load_game_from_scripts()
 {
-	serverHandlers = {};
+	gameHandlers = {};
 
-	if (scriptInterface.loadFile("data/scripts/events/server.lua") != 0) {
-		std::cout << "[Warning - tfs::events::load_server_from_scripts] Cannot load server events." << std::endl;
+	if (scriptInterface.loadFile("data/scripts/events/game.lua") != 0) {
+		std::cout << "[Warning - tfs::events::load_game_from_scripts] Cannot load game events." << std::endl;
 		std::cout << scriptInterface.getLastLuaError() << std::endl;
 		return;
 	}
 
-	serverHandlers.onStartup = scriptInterface.getMetaEvent("Server", "onStartup");
-	serverHandlers.onShutdown = scriptInterface.getMetaEvent("Server", "onShutdown");
-	serverHandlers.onSave = scriptInterface.getMetaEvent("Server", "onSave");
+	gameHandlers.onStartup = scriptInterface.getMetaEvent("Game", "onStartup");
+	gameHandlers.onShutdown = scriptInterface.getMetaEvent("Game", "onShutdown");
+	gameHandlers.onSave = scriptInterface.getMetaEvent("Game", "onSave");
 }
 
 struct CreatureHandlers
@@ -228,6 +228,7 @@ void load()
 {
 	scriptInterface.initState();
 
+	load_game_from_scripts();
 	load_creature_from_scripts();
 	load_party_from_scripts();
 	load_player_from_scripts();
@@ -238,6 +239,7 @@ void reload()
 {
 	scriptInterface.reInitState();
 
+	load_game_from_scripts();
 	load_creature_from_scripts();
 	load_party_from_scripts();
 	load_player_from_scripts();
@@ -246,72 +248,72 @@ void reload()
 
 } // namespace tfs::events
 
-namespace tfs::events::server {
+namespace tfs::events::game {
 
 void onStartup()
 {
-	// Server:onStartup()
-	if (serverHandlers.onStartup == -1) {
+	// Game:onStartup()
+	if (gameHandlers.onStartup == -1) {
 		return;
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::server::onStartup] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::game::onStartup] Call stack overflow" << std::endl;
 		return;
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(serverHandlers.onStartup, &scriptInterface);
+	env->setScriptId(gameHandlers.onStartup, &scriptInterface);
 
 	const auto L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(serverHandlers.onStartup);
+	scriptInterface.pushFunction(gameHandlers.onStartup);
 
 	scriptInterface.callVoidFunction(0);
 }
 
 void onShutdown()
 {
-	// Server:onShutdown()
-	if (serverHandlers.onShutdown == -1) {
+	// Game:onShutdown()
+	if (gameHandlers.onShutdown == -1) {
 		return;
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::server::onShutdown] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::game::onShutdown] Call stack overflow" << std::endl;
 		return;
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(serverHandlers.onShutdown, &scriptInterface);
+	env->setScriptId(gameHandlers.onShutdown, &scriptInterface);
 
 	const auto L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(serverHandlers.onShutdown);
+	scriptInterface.pushFunction(gameHandlers.onShutdown);
 
 	scriptInterface.callVoidFunction(0);
 }
 
 void onSave()
 {
-	// Server:onSave()
-	if (serverHandlers.onSave == -1) {
+	// Game:onSave()
+	if (gameHandlers.onSave == -1) {
 		return;
 	}
 
 	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::server::onSave] Call stack overflow" << std::endl;
+		std::cout << "[Error - tfs::events::game::onSave] Call stack overflow" << std::endl;
 		return;
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(serverHandlers.onSave, &scriptInterface);
+	env->setScriptId(gameHandlers.onSave, &scriptInterface);
 
 	const auto L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(serverHandlers.onSave);
+	scriptInterface.pushFunction(gameHandlers.onSave);
 
 	scriptInterface.callVoidFunction(0);
 }
 
-} // namespace tfs::events::server
+} // namespace tfs::events::game
 
 namespace tfs::events::creature {
 

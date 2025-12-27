@@ -98,13 +98,13 @@ void Game::setGameState(GameState_t newState)
 
 			loadPlayersRecord();
 
-			tfs::events::server::onStartup();
+			tfs::events::game::onStartup();
 			break;
 		}
 
 		case GAME_STATE_SHUTDOWN: {
-			tfs::events::server::onSave();
-			tfs::events::server::onShutdown();
+			tfs::events::game::onSave();
+			tfs::events::game::onShutdown();
 
 			// kick all players that are still online
 			for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>()) {
@@ -125,7 +125,7 @@ void Game::setGameState(GameState_t newState)
 		}
 
 		case GAME_STATE_CLOSED: {
-			tfs::events::server::onSave();
+			tfs::events::game::onSave();
 
 			/* kick all players without the CanAlwaysLogin flag */
 			for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>()) {

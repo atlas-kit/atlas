@@ -2,7 +2,7 @@ do
 	-- load accounts storages
 	local event = Event()
 	
-	event.onServerStartup = function()
+	event.onGameStartup = function()
 		local resultId = db.storeQuery("SELECT `account_id`, `key`, `value` FROM `account_storage`")
 		if not resultId then
 			return true
@@ -26,7 +26,7 @@ do
 	-- save accounts storages
 	local event = Event()
 	
-	event.onServerSave = function()
+	event.onGameSave = function()
 		local success = Game.saveAccountsStorage()
 		if not success then
 			print("Failed to save account-level storage values.")

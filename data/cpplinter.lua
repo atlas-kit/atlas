@@ -991,9 +991,9 @@ Weapon = {}
 
 ---@class Event
 ---@field register fun(self:Event, triggerIndex?:integer):boolean
----@field onServerStartup fun():nil
----@field onServerShutdown fun():nil
----@field onServerSave fun():nil
+---@field onGameStartup fun():nil
+---@field onGameShutdown fun():nil
+---@field onGameSave fun():nil
 ---@field onCreatureChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean
 ---@field onCreatureAreaCombat fun(creature:Creature, tile:Tile, aggresive:boolean): integer
 ---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
