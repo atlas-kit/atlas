@@ -25,11 +25,19 @@ enum class EventInfoId
 
 namespace tfs::events {
 
-bool load();
-bool reload();
+void load();
+void reload();
 int32_t getScriptId(EventInfoId eventInfoId);
 
 } // namespace tfs::events
+
+namespace tfs::events::game {
+
+void onStartup();
+void onShutdown();
+void onSave();
+
+} // namespace tfs::events::game
 
 namespace tfs::events::creature {
 
@@ -41,6 +49,16 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone);
 void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
                      std::optional<int32_t> oldValue, bool isSpawn);
+void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
+                    CombatDamage& damage);
+void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
+                  CombatDamage& damage);
+void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval);
+bool onPrepareDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& killer);
+void onDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& corpse,
+             const std::shared_ptr<Creature>& killer, const std::shared_ptr<Creature>& mostDamageKiller,
+             bool lastHitUnjustified, bool mostDamageUnjustified);
+void onKill(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target);
 
 } // namespace tfs::events::creature
 
@@ -65,8 +83,8 @@ void onLookInBattleList(const std::shared_ptr<Player>& player, const std::shared
                         int32_t lookDistance);
 void onLookInTrade(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& partner,
                    const std::shared_ptr<Item>& item, int32_t lookDistance);
-bool onLookInShop(const std::shared_ptr<Player>& player, const ItemType* itemType, uint8_t count);
-bool onLookInMarket(const std::shared_ptr<Player>& player, const ItemType* itemType);
+void onLookInShop(const std::shared_ptr<Player>& player, const ItemType* itemType, uint8_t count);
+void onLookInMarket(const std::shared_ptr<Player>& player, const ItemType* itemType);
 ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, uint16_t count,
                        const Position& fromPosition, const Position& toPosition,
                        const std::shared_ptr<Thing>& fromThing, const std::shared_ptr<Thing>& toThing);
@@ -97,6 +115,15 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
                        bool equip);
 void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, NetworkMessage_ptr& msg);
 bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell);
+bool onLogin(const std::shared_ptr<Player>& player);
+void onJoin(const std::shared_ptr<Player>& player);
+bool onLogout(const std::shared_ptr<Player>& player);
+void onReconnect(const std::shared_ptr<Player>& player);
+void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel);
+void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId);
+bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, std::string_view text,
+                const uint32_t windowTextId);
+void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std::string_view buffer);
 
 } // namespace tfs::events::player
 

@@ -1,6 +1,6 @@
 local event = Event()
 
-event.onLookInBattleList = function(self, creature, distance)
+event.onPlayerLookInBattleList = function(self, creature, distance)
 	local description = "You see " .. creature:getDescription(distance)
 	if self:getGroup():getAccess() then
 		local str = "%s\nHealth: %d / %d"
@@ -20,7 +20,7 @@ event.onLookInBattleList = function(self, creature, distance)
 			description = string.format("%s\nIP: %s", description, creature:getIp())
 		end
 	end
-	return description
+	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 event:register()

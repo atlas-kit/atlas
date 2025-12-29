@@ -210,7 +210,6 @@ public:
 	size_t getPlayersOnline() const { return players.size(); }
 	size_t getMonstersOnline() const { return monsters.size(); }
 	size_t getNpcsOnline() const { return npcs.size(); }
-	uint32_t getPlayersRecord() const { return playersRecord; }
 
 	ReturnValue internalMoveCreature(const std::shared_ptr<Creature>& creature, Direction direction,
 	                                 uint32_t flags = 0);
@@ -297,9 +296,6 @@ public:
 	bool internalCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClasses type, const std::string& text,
 	                         bool ghostMode, SpectatorVec* spectatorsPtr = nullptr, const Position* pos = nullptr,
 	                         bool echo = false);
-
-	void loadPlayersRecord();
-	void checkPlayersRecord();
 
 	void sendGuildMotd(uint32_t playerId);
 	void kickPlayer(uint32_t playerId, bool displayEffect);
@@ -398,7 +394,7 @@ public:
 	void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
 	void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
 
-	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);
+	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
 	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
@@ -498,6 +494,13 @@ public:
 	auto getHouses() const { return houses | std::views::values; }
 	void payHouses(RentPeriod_t rentPeriod) const;
 
+	const auto& getParties() const { return parties; }
+	void addParty(const std::shared_ptr<Party>& party) { parties.insert(party); }
+	void removeParty(const std::shared_ptr<Party>& party) { parties.erase(party); }
+
+	auto getPlayerRecord() const { return playerRecord; }
+	void setPlayerRecord(uint32_t record) { playerRecord = record; }
+
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
 	void playerWhisper(const std::shared_ptr<Player>& player, const std::string& text);
@@ -534,15 +537,16 @@ private:
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 
+	std::set<std::shared_ptr<Party>> parties;
+
 	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
 
 	GameState_t gameState = GAME_STATE_NORMAL;
 	WorldType_t worldType = WORLD_TYPE_PVP;
 
-	ServiceManager* serviceManager = nullptr;
+	uint32_t playerRecord = 0;
 
-	void updatePlayersRecord() const;
-	uint32_t playersRecord = 0;
+	ServiceManager* serviceManager = nullptr;
 };
 
 #endif // FS_GAME_H

@@ -9,7 +9,6 @@
 #include "bed.h"
 #include "configmanager.h"
 #include "creature.h"
-#include "creatureevent.h"
 #include "databasetasks.h"
 #include "events.h"
 #include "globalevent.h"
@@ -35,7 +34,6 @@
 
 extern Actions* g_actions;
 extern Chat* g_chat;
-extern CreatureEvents* g_creatureEvents;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern GlobalEvents* g_globalEvents;
@@ -98,15 +96,13 @@ void Game::setGameState(GameState_t newState)
 
 			mounts.loadFromXml();
 
-			loadPlayersRecord();
-
-			g_globalEvents->startup();
+			tfs::events::game::onStartup();
 			break;
 		}
 
 		case GAME_STATE_SHUTDOWN: {
-			g_globalEvents->save();
-			g_globalEvents->shutdown();
+			tfs::events::game::onSave();
+			tfs::events::game::onShutdown();
 
 			// kick all players that are still online
 			for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>()) {
@@ -127,7 +123,7 @@ void Game::setGameState(GameState_t newState)
 		}
 
 		case GAME_STATE_CLOSED: {
-			g_globalEvents->save();
+			tfs::events::game::onSave();
 
 			/* kick all players without the CanAlwaysLogin flag */
 			for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>()) {
@@ -2439,11 +2435,9 @@ void Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, std::string
 		return;
 	}
 
-	for (auto creatureEvent : player->getCreatureEvents(CREATURE_EVENT_TEXTEDIT)) {
-		if (!creatureEvent->executeTextEdit(player, writeItem, text, windowTextId)) {
-			player->setWriteItem(nullptr);
-			return;
-		}
+	if (!tfs::events::player::onTextEdit(player, writeItem, text, windowTextId)) {
+		player->setWriteItem(nullptr);
+		return;
 	}
 
 	if (!text.empty()) {
@@ -4086,14 +4080,9 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_HEALTHCHANGE);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeHealthChange(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeHealth(attacker, target, damage);
-			}
+			tfs::events::creature::onChangeHealth(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeHealth(attacker, target, damage);
 		}
 
 		int32_t realHealthChange = target->getHealth();
@@ -4202,17 +4191,13 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		    damage.primary.type != COMBAT_UNDEFINEDDAMAGE) {
 			int32_t manaDamage = std::min<int32_t>(targetPlayer->getMana(), healthChange);
 			if (damage.origin != ORIGIN_NONE) {
-				const auto& events = target->getCreatureEvents(CREATURE_EVENT_MANACHANGE);
-				if (!events.empty()) {
-					for (CreatureEvent* creatureEvent : events) {
-						creatureEvent->executeManaChange(target, attacker, damage);
-					}
-					healthChange = damage.primary.value + damage.secondary.value;
-					if (healthChange == 0) {
-						return true;
-					}
-					manaDamage = std::min<int32_t>(targetPlayer->getMana(), healthChange);
+				tfs::events::creature::onChangeMana(target, attacker, damage);
+				healthChange = damage.primary.value + damage.secondary.value;
+				if (healthChange == 0) {
+					return true;
 				}
+
+				manaDamage = std::min<int32_t>(targetPlayer->getMana(), healthChange);
 			}
 
 			if (getBoolean(ConfigManager::MANASHIELD_BREAKABLE) && targetPlayer) {
@@ -4319,14 +4304,9 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_HEALTHCHANGE);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeHealthChange(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeHealth(attacker, target, damage);
-			}
+			tfs::events::creature::onChangeHealth(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeHealth(attacker, target, damage);
 		}
 
 		int32_t targetHealth = target->getHealth();
@@ -4436,10 +4416,8 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		}
 
 		if (realDamage >= targetHealth) {
-			for (CreatureEvent* creatureEvent : target->getCreatureEvents(CREATURE_EVENT_PREPAREDEATH)) {
-				if (!creatureEvent->executeOnPrepareDeath(target, attacker)) {
-					return false;
-				}
+			if (!tfs::events::creature::onPrepareDeath(target, attacker)) {
+				return false;
 			}
 		}
 
@@ -4469,14 +4447,9 @@ bool Game::combatChangeMana(const std::shared_ptr<Creature>& attacker, const std
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_MANACHANGE);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeManaChange(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeMana(attacker, target, damage);
-			}
+			tfs::events::creature::onChangeMana(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeMana(attacker, target, damage);
 		}
 
 		int32_t realManaChange = targetPlayer->getMana();
@@ -4517,14 +4490,9 @@ bool Game::combatChangeMana(const std::shared_ptr<Creature>& attacker, const std
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_MANACHANGE);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeManaChange(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeMana(attacker, target, damage);
-			}
+			tfs::events::creature::onChangeMana(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeMana(attacker, target, damage);
 		}
 
 		targetPlayer->drainMana(attacker, manaLoss);
@@ -4807,38 +4775,6 @@ void Game::updatePlayerShield(const std::shared_ptr<Player>& player)
 	}
 }
 
-void Game::checkPlayersRecord()
-{
-	const size_t playersOnline = getPlayersOnline();
-	if (playersOnline > playersRecord) {
-		uint32_t previousRecord = playersRecord;
-		playersRecord = playersOnline;
-
-		for (auto&& globalEvent : g_globalEvents->getEventMap(GLOBALEVENT_RECORD) | std::views::values) {
-			globalEvent.executeRecord(playersRecord, previousRecord);
-		}
-		updatePlayersRecord();
-	}
-}
-
-void Game::updatePlayersRecord() const
-{
-	Database& db = Database::getInstance();
-	db.executeQuery(
-	    std::format("UPDATE `server_config` SET `value` = '{:d}' WHERE `config` = 'players_record'", playersRecord));
-}
-
-void Game::loadPlayersRecord()
-{
-	Database& db = Database::getInstance();
-
-	if (const auto& result = db.storeQuery("SELECT `value` FROM `server_config` WHERE `config` = 'players_record'")) {
-		playersRecord = result->getNumber<uint32_t>("value");
-	} else {
-		db.executeQuery("INSERT INTO `server_config` (`config`, `value`) VALUES ('players_record', '0')");
-	}
-}
-
 void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 {
 	if (playerId == invitedId) {
@@ -4865,6 +4801,7 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!party) {
 		party = std::make_shared<Party>();
 		party->setLeader(player);
+		addParty(party);
 
 		g_game.updatePlayerShield(player);
 		player->sendCreatureSkull(player);
@@ -4875,6 +4812,7 @@ void Game::playerInviteToParty(uint32_t playerId, uint32_t invitedId)
 	if (!tfs::events::party::onInvite(party, invitedPlayer)) {
 		if (party->empty()) {
 			player->setParty(nullptr);
+			removeParty(party);
 		}
 		return;
 	}
@@ -5409,12 +5347,10 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 	player->sendMarketAcceptOffer(offer);
 }
 
-void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer)
+void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		for (CreatureEvent* creatureEvent : player->getCreatureEvents(CREATURE_EVENT_EXTENDED_OPCODE)) {
-			creatureEvent->executeExtendedOpcode(player, opcode, buffer);
-		}
+		tfs::events::player::onExtendedOpcode(player, opcode, buffer);
 	}
 }
 
@@ -5533,9 +5469,7 @@ void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, ui
 
 		player->setBedItem(nullptr);
 	} else {
-		for (auto creatureEvent : player->getCreatureEvents(CREATURE_EVENT_MODALWINDOW)) {
-			creatureEvent->executeModalWindow(player, modalWindowId, button, choice);
-		}
+		tfs::events::player::onModalWindow(player, modalWindowId, button, choice);
 	}
 }
 
@@ -5619,13 +5553,9 @@ bool Game::reload(ReloadTypes_t reloadType)
 			return g_chat->load();
 		case RELOAD_TYPE_CONFIG:
 			return ConfigManager::load();
-		case RELOAD_TYPE_CREATURESCRIPTS: {
-			g_creatureEvents->reload();
-			g_creatureEvents->removeInvalidEvents();
-			return true;
-		}
 		case RELOAD_TYPE_EVENTS:
-			return tfs::events::reload();
+			tfs::events::reload();
+			return true;
 		case RELOAD_TYPE_GLOBALEVENTS:
 			return g_globalEvents->reload();
 		case RELOAD_TYPE_ITEMS:
@@ -5663,7 +5593,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 		case RELOAD_TYPE_SCRIPTS: {
 			// commented out stuff is TODO, once we approach further in revscriptsys
 			g_actions->clear(true);
-			g_creatureEvents->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
 			g_globalEvents->clear(true);
@@ -5671,7 +5600,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_weapons->loadDefaults();
 			g_spells->clear(true);
 			g_scripts->loadScripts("scripts", false, true);
-			g_creatureEvents->removeInvalidEvents();
 			/*
 			Npcs::reload();
 			Item::items.reload();
@@ -5694,7 +5622,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 
 			g_actions->reload();
 			ConfigManager::load();
-			g_creatureEvents->reload();
 			g_monsters.reload();
 			g_moveEvents->reload();
 			Npcs::reload();
@@ -5707,13 +5634,11 @@ bool Game::reload(ReloadTypes_t reloadType)
 			tfs::events::reload();
 			g_chat->load();
 			g_actions->clear(true);
-			g_creatureEvents->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
 			g_globalEvents->clear(true);
 			g_spells->clear(true);
 			g_scripts->loadScripts("scripts", false, true);
-			g_creatureEvents->removeInvalidEvents();
 			return true;
 		}
 	}
