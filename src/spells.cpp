@@ -628,7 +628,7 @@ bool Spell::playerSpellCheck(const std::shared_ptr<Player>& player) const
 
 bool Spell::playerInstantSpellCheck(const std::shared_ptr<Player>& player, const Position& toPos)
 {
-	if (toPos.x == 0xFFFF) {
+	if (toPos.isInventoryOrContainer()) {
 		return true;
 	}
 
@@ -670,7 +670,7 @@ bool Spell::playerRuneSpellCheck(const std::shared_ptr<Player>& player, const Po
 		return false;
 	}
 
-	if (toPos.x == 0xFFFF) {
+	if (toPos.isInventoryOrContainer()) {
 		return true;
 	}
 
@@ -1128,7 +1128,7 @@ ReturnValue RuneSpell::canExecuteAction(const std::shared_ptr<const Player>& pla
 		return ret;
 	}
 
-	if (toPos.x == 0xFFFF) {
+	if (toPos.isInventoryOrContainer()) {
 		if (needTarget) {
 			return RETURNVALUE_CANONLYUSETHISRUNEONCREATURES;
 		} else if (!selfTarget) {
