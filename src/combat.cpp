@@ -553,7 +553,7 @@ void Combat::postCombatEffects(const std::shared_ptr<Creature>& caster, const Po
 }
 
 void Combat::addDistanceEffect(const std::shared_ptr<Creature>& caster, const Position& fromPos, const Position& toPos,
-                               uint8_t effect)
+                               uint16_t effect)
 {
 	if (effect == CONST_ANI_WEAPONTYPE) {
 		if (!caster) {

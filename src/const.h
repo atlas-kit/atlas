@@ -13,9 +13,11 @@ enum MagicEffectsType_t : uint8_t
 	MAGIC_EFFECTS_END_LOOP = 0,              // ends the magic effect loop
 	MAGIC_EFFECTS_DELTA = 1,                 // needs uint8_t delta after type to adjust position
 	MAGIC_EFFECTS_DELAY = 2,                 // needs uint16_t delay after type to delay in miliseconds effect display
-	MAGIC_EFFECTS_CREATE_EFFECT = 3,         // needs uint8_t effectid after type
-	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT = 4, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
-	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED = 5, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_EFFECT = 3,         // needs uint16_t effectid after type (changed from uint8_t in 13.20)
+	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT = 4, // needs uint16_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED = 5, // needs uint16_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT = 6,       // needs uint16_t soundId after type (added in 13.00)
+	MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT = 7,  // needs uint8_t and uint16_t after type (added in 13.00)
 };
 
 enum MagicEffectClasses : uint8_t
@@ -292,14 +294,14 @@ enum MessageClasses : uint8_t
 	MESSAGE_PARTY_MANAGEMENT = 34,
 	MESSAGE_PARTY = 35,
 
-	MESSAGE_REPORT = 38,         // White, over player + conosle
+	MESSAGE_REPORT = 38, // White, over player + conosle
 	MESSAGE_HOTKEY_PRESSED = 39, // Green, over player + console
 	// MESSAGE_TUTORIAL_HINT = 40, // not working (?)
 	// MESSAGE_THANK_YOU = 41, // not working (?)
 	MESSAGE_MARKET = 42, // Window "Market Message" + "Ok" button
 	// MESSAGE_MANA = 43, // not working (?)
-	MESSAGE_BEYOND_LAST = 44,     // White, console only
-	MESSAGE_TOURNAMENT_INFO = 45, // Window "Tournament" + "Ok" button
+	MESSAGE_BEYOND_LAST = 44, // White, console only
+	// unused 45, old window "Tournament" + "Ok" button
 	// unused 46?
 	// unused 47?
 	MESSAGE_ATTENTION = 48,        // White, console only

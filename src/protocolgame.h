@@ -167,8 +167,8 @@ private:
 	void sendIcons(uint32_t icons);
 	void sendFYIBox(const std::string& message);
 
-	void sendDistanceShoot(const Position& from, const Position& to, uint8_t type);
-	void sendMagicEffect(const Position& pos, uint8_t type);
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type);
+	void sendMagicEffect(const Position& pos, uint16_t type);
 	void sendCreatureHealth(const std::shared_ptr<const Creature>& creature);
 	void sendSkills();
 	void sendCreatureTurn(const std::shared_ptr<const Creature>& creature, uint32_t stackpos);
@@ -233,7 +233,7 @@ private:
 
 	void sendCreatureSquare(const std::shared_ptr<const Creature>& creature, SquareColor_t color);
 
-	void sendSpellCooldown(uint8_t spellId, uint32_t time);
+	void sendSpellCooldown(uint16_t spellId, uint32_t time);
 	void sendSpellGroupCooldown(SpellGroup_t groupId, uint32_t time);
 	void sendUseItemCooldown(uint32_t time);
 	void sendSupplyUsed(const uint16_t clientId);
@@ -318,6 +318,7 @@ private:
 	uint32_t eventConnect = 0;
 	uint32_t challengeTimestamp = 0;
 	uint16_t version = CLIENT_VERSION_MIN;
+	uint32_t clientVersion = 0;
 
 	uint8_t challengeRandom = 0;
 

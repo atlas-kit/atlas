@@ -1081,15 +1081,15 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	sendItems();
 	sendLight();
 	sendVIPEntries();
-	sendItemClasses();
+	//sendItemClasses();
 
 	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
 		auto slot = static_cast<slots_t>(i);
 		sendInventoryItem(slot, getInventoryItem(slot));
 	}
-	sendInventoryItem(CONST_SLOT_STORE_INBOX, getStoreInbox()->asItem());
+	sendInventoryItem(CONST_SLOT_STORE_INBOX, nullptr);
 
-	openSavedContainers();
+	//openSavedContainers();
 
 	if (magicEffect != CONST_ME_NONE) {
 		sendMagicEffect(magicEffect);

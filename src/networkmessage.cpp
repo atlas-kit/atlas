@@ -110,8 +110,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
-		addByte(0x00); // quiver ammo count
+		addByte(0x00);
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
 	} else if (it.showClientCharges) {
@@ -124,6 +123,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 	if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
+		add<uint16_t>(0); //
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
 		addByte(0x01);    // is visible (bool)
@@ -155,6 +155,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
 		// quiver ammo count
+		/*
 		const auto& container = item->getContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x01);
@@ -162,6 +163,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 		} else {
 			addByte(0x00);
 		}
+		*/
 	}
 
 	// display outfit on the podium
@@ -178,8 +180,11 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 				addByte(outfit.lookLegs);
 				addByte(outfit.lookFeet);
 				addByte(outfit.lookAddons);
+			} else {
+				add<uint16_t>(0);
 			}
 		} else {
+			add<uint16_t>(0);
 			add<uint16_t>(0);
 		}
 

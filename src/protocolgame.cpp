@@ -351,16 +351,11 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	OperatingSystem_t operatingSystem = static_cast<OperatingSystem_t>(msg.get<uint16_t>());
 
 	version = msg.get<uint16_t>(); // U16 client version
-	msg.skipBytes(4);              // U32 client version
+	clientVersion = msg.get<uint32_t>();
+	msg.getString(); // Client version (String)
+	msg.getString(); // Assets hash identifier
 
-	// String client version
-	if (version >= 1240) {
-		if (msg.getRemainingBufferLength() > 132) {
-			msg.getString();
-		}
-	}
-
-	msg.skipBytes(3); // U16 dat revision, U8 preview state
+	msg.skipBytes(1); // U8 game preview state
 
 	// Disconnect if RSA decrypt fails
 	if (!Protocol::RSA_decrypt(msg)) {
@@ -470,8 +465,13 @@ void ProtocolGame::onConnect()
 	// Skip checksum
 	output->skipBytes(sizeof(uint32_t));
 
-	// Packet length & type
-	output->add<uint16_t>(0x0006);
+	// Packet length & type (new 14.00+ format)
+	output->add<uint16_t>(0x0001);
+
+	// Packet padding bytes
+	output->addByte(1);
+
+	// Packet type
 	output->addByte(0x1F);
 
 	// Add timestamp & random number
@@ -481,9 +481,12 @@ void ProtocolGame::onConnect()
 	challengeRandom = randNumber(generator);
 	output->addByte(challengeRandom);
 
+	// Add padding
+	output->addPaddingBytes(1);
+
 	// Go back and write checksum
-	output->skipBytes(-12);
-	output->add<uint32_t>(adlerChecksum(output->getOutputBuffer() + sizeof(uint32_t), 8));
+	output->skipBytes(-14);
+	output->add<uint32_t>(adlerChecksum(output->getOutputBuffer() + sizeof(uint32_t), 10));
 
 	send(output);
 }
@@ -1729,8 +1732,8 @@ void ProtocolGame::sendClientFeatures()
 	msg.addDouble(Creature::speedB, 3);
 	msg.addDouble(Creature::speedC, 3);
 
-	// can report bugs?
-	msg.addByte(player->getAccountType() >= ACCOUNT_TYPE_TUTOR ? 0x01 : 0x00);
+	// removed in 14.00: can report bugs field
+	// removed in 13.14: tournament button field
 
 	msg.addByte(0x00); // can change pvp framing option
 	msg.addByte(0x00); // expert mode button enabled
@@ -1739,7 +1742,6 @@ void ProtocolGame::sendClientFeatures()
 	msg.add<uint16_t>(25);   // premium coin package size
 
 	msg.addByte(0x00); // exiva button enabled (bool)
-	msg.addByte(0x00); // Tournament button (bool)
 
 	writeToOutputBuffer(msg);
 }
@@ -1761,7 +1763,7 @@ void ProtocolGame::sendBasicData()
 
 	// unlock spells on action bar
 	msg.add<uint16_t>(0xFF);
-	for (uint8_t spellId = 0x00; spellId < 0xFF; spellId++) {
+	for (uint16_t spellId = 0x00; spellId < 0xFF; spellId++) {
 		msg.add<uint16_t>(spellId);
 	}
 
@@ -1890,6 +1892,7 @@ void ProtocolGame::sendIcons(uint32_t icons)
 	NetworkMessage msg;
 	msg.addByte(0xA2);
 	msg.add<uint32_t>(icons);
+	msg.addByte(0x00);
 	writeToOutputBuffer(msg);
 }
 
@@ -1928,6 +1931,19 @@ void ProtocolGame::sendContainer(uint8_t cid, const std::shared_ptr<const Contai
 	} else {
 		msg.addByte(0x00);
 	}
+
+	// isStoreInbox
+	msg.addByte(0); // Category type
+	msg.addByte(0); // Categories size
+
+	msg.addByte(0); // Pickupable/Moveable (?)
+
+	if (container->getHoldingPlayer()) {
+		msg.addByte(1);
+	} else {
+		msg.addByte(0);
+	}
+
 	writeToOutputBuffer(msg);
 }
 
@@ -2084,7 +2100,6 @@ void ProtocolGame::sendStoreBalance()
 	msg.add<uint32_t>(0); // total store coins (transferable + non-t)
 	msg.add<uint32_t>(0); // transferable store coins
 	msg.add<uint32_t>(0); // reserved auction coins
-	msg.add<uint32_t>(0); // tournament coins
 	writeToOutputBuffer(msg);
 }
 
@@ -2527,20 +2542,20 @@ void ProtocolGame::sendSkills()
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint8_t type)
+void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint16_t type)
 {
 	NetworkMessage msg;
 	msg.addByte(0x83);
 	msg.addPosition(from);
 	msg.addByte(MAGIC_EFFECTS_CREATE_DISTANCEEFFECT);
-	msg.addByte(type);
+	msg.add<uint16_t>(type);
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.x) - static_cast<int32_t>(from.x))));
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.y) - static_cast<int32_t>(from.y))));
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendMagicEffect(const Position& pos, uint8_t type)
+void ProtocolGame::sendMagicEffect(const Position& pos, uint16_t type)
 {
 	if (!canSee(pos)) {
 		return;
@@ -2550,7 +2565,7 @@ void ProtocolGame::sendMagicEffect(const Position& pos, uint8_t type)
 	msg.addByte(0x83);
 	msg.addPosition(pos);
 	msg.addByte(MAGIC_EFFECTS_CREATE_EFFECT);
-	msg.addByte(type);
+	msg.add<uint16_t>(type);
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
@@ -3308,11 +3323,11 @@ void ProtocolGame::sendItemClasses()
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendSpellCooldown(uint8_t spellId, uint32_t time)
+void ProtocolGame::sendSpellCooldown(uint16_t spellId, uint32_t time)
 {
 	NetworkMessage msg;
 	msg.addByte(0xA4);
-	msg.add<uint16_t>(static_cast<uint16_t>(spellId));
+	msg.add<uint16_t>(spellId);
 	msg.add<uint32_t>(time);
 	writeToOutputBuffer(msg);
 }
@@ -3549,6 +3564,10 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 	}
 
 	for (uint8_t i = SPECIALSKILL_FIRST; i <= SPECIALSKILL_LAST; ++i) {
+		if (i == SPECIALSKILL_LIFELEECHCHANCE || i == SPECIALSKILL_MANALEECHCHANCE) {
+			continue;
+		}
+
 		msg.add<uint16_t>(std::min<int32_t>(10000, player->varSpecialSkills[i])); // base + bonus special skill
 		msg.add<uint16_t>(0);                                                     // base special skill
 	}
@@ -3558,8 +3577,8 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 	// u8 client element id
 	// u16 bonus element ml
 
-	// fatal, dodge, momentum
-	for (int i = 0; i < 3; ++i) {
+	// fatal, dodge, momentum, 
+	for (int i = 0; i < 4; ++i) {
 		msg.add<uint16_t>(0);
 		msg.add<uint16_t>(0);
 	}

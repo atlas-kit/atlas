@@ -746,7 +746,7 @@ public:
 			client->sendCreatureShield(creature);
 		}
 	}
-	void sendSpellCooldown(uint8_t spellId, uint32_t time)
+	void sendSpellCooldown(uint16_t spellId, uint32_t time)
 	{
 		if (client) {
 			client->sendSpellCooldown(spellId, time);
@@ -918,7 +918,7 @@ public:
 			client->sendCreatureHealth(creature);
 		}
 	}
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type) const
 	{
 		if (client) {
 			client->sendDistanceShoot(from, to, type);
@@ -938,13 +938,13 @@ public:
 			client->sendIcons(getClientIcons());
 		}
 	}
-	void sendMagicEffect(uint8_t type) const
+	void sendMagicEffect(uint16_t type) const
 	{
 		if (client) {
 			client->sendMagicEffect(getPosition(), type);
 		}
 	}
-	void sendMagicEffect(const Position& pos, uint8_t type) const
+	void sendMagicEffect(const Position& pos, uint16_t type) const
 	{
 		if (client) {
 			client->sendMagicEffect(pos, type);

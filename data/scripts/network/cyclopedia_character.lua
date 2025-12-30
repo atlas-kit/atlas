@@ -15,7 +15,6 @@ local function sendBasicInfo(self, msg)
 		msg:addU16(outfit.lookTypeEx)
 	end
 
-	msg:addByte(0) -- hide stamina
 	msg:addByte(1) -- enable store summary & character titles
 	msg:addString("") -- character title
 
@@ -94,7 +93,6 @@ local function sendGeneralStats(self, msg)
 	msg:addByte(self:getLevelPercent())
 
 	msg:addU16(self:getClientExpDisplay())
-	msg:addU32(0) -- tournament exp (deprecated)
 	msg:addU16(self:getClientLowLevelBonusDisplay())
 	msg:addU16(0) -- store exp bonus
 	msg:addU16(self:getClientStaminaBonusDisplay())

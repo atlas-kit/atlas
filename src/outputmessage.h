@@ -19,7 +19,13 @@ public:
 
 	uint8_t* getOutputBuffer() { return &buffer[outputBufferStart]; }
 
-	void writeMessageLength() { add_header(info.length); }
+	void writeMessageLength() { add_header(static_cast<uint16_t>((info.length - 4) / 8)); }
+
+	void writePaddingLength()
+	{
+		uint8_t paddingAmount = static_cast<uint8_t>(8 - (info.length % 8) - 1);
+		add_header(paddingAmount);
+	}
 
 	void addCryptoHeader(checksumMode_t mode)
 	{

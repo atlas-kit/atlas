@@ -4566,14 +4566,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const std::shared_p
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4582,7 +4582,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4593,7 +4593,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 }
 
 void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-                             uint8_t effect)
+                             uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
