@@ -2,7 +2,6 @@ local handler = PacketHandler(0xE8)
 
 function handler.onReceive(player, msg)
 	local playerGuid = player:getGuid()
-	local playerName = player:getName()
 
 	if Game.hasDebugAssert(playerGuid) then
 		return
@@ -13,7 +12,7 @@ function handler.onReceive(player, msg)
 	local description = msg:getString()
 	local comment = msg:getString()
 
-	Game.saveDebugAssert(playerName, assertLine, date, description, comment)
+	Game.saveDebugAssert(player, assertLine, date, description, comment)
 end
 
 handler:register()
