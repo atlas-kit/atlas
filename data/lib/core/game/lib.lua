@@ -1,5 +1,4 @@
 dofile('data/lib/core/game/account_storage.lua')
-dofile('data/lib/core/game/debug_assert.lua')
 dofile('data/lib/core/game/global_storage.lua')
 dofile('data/lib/core/game/quest.lua')
 dofile('data/lib/core/game/world_light.lua')
