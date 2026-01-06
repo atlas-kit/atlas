@@ -6,8 +6,6 @@
 
 #include "enums.h"
 
-#include <memory>
-
 class WildcardTreeNode
 {
 public:
