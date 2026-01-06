@@ -7,15 +7,15 @@ local function saveDebugAssert(player, assertLine, date, description, comment)
         return
     end
 
-    file:write(string.format("[%s]\n", date))
-    file:write(string.format("assertLine: %s\n", assertLine))
-    file:write(string.format("description: %s\n", description))
-    file:write(string.format("comment: %s\n\n", comment))
+    file:write(string.format("----- %s - %s (%s) -----\n", os.date("%c"), player:getName(), player:getIp()))
+    file:write(string.format("Date: %s\n", date))
+    file:write(string.format("Line: %s\n", assertLine))
+    file:write(string.format("Description: %s\n", description))
+    file:write(string.format("Comment: %s\n\n", comment))
     file:close()
 end
 
 function handler.onReceive(player, msg)
-
     local assertLine = msg:getString()
     local date = msg:getString()
     local description = msg:getString()
