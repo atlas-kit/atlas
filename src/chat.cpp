@@ -303,7 +303,7 @@ bool Chat::load()
 				}
 			}
 
-			UsersMap tempUserMap = std::move(channel.users);
+			UsersMap tempUserMap = std::exchange(channel.users, {});
 			for (const auto& player : tempUserMap | std::views::values | tfs::views::lock_weak_ptrs) {
 				channel.addUser(player);
 			}
