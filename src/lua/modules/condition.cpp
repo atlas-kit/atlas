@@ -182,7 +182,8 @@ int luaConditionSetFormula(lua_State* L)
 	double maxa = tfs::lua::getNumber<double>(L, 4);
 	double minb = tfs::lua::getNumber<double>(L, 3);
 	double mina = tfs::lua::getNumber<double>(L, 2);
-	ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionSpeed* condition = conditionBase ? conditionBase->getConditionSpeed() : nullptr;
 	if (condition) {
 		condition->setFormulaVars(mina, minb, maxa, maxb);
 		tfs::lua::pushBoolean(L, true);
@@ -210,7 +211,8 @@ int luaConditionSetOutfit(lua_State* L)
 		outfit.lookTypeEx = tfs::lua::getNumber<uint16_t>(L, 2);
 	}
 
-	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionOutfit* condition = conditionBase ? conditionBase->getConditionOutfit() : nullptr;
 	if (condition) {
 		condition->setOutfit(outfit);
 		tfs::lua::pushBoolean(L, true);
@@ -226,7 +228,8 @@ int luaConditionAddDamage(lua_State* L)
 	int32_t value = tfs::lua::getNumber<int32_t>(L, 4);
 	int32_t time = tfs::lua::getNumber<int32_t>(L, 3);
 	int32_t rounds = tfs::lua::getNumber<int32_t>(L, 2);
-	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionDamage* condition = conditionBase ? conditionBase->getConditionDamage() : nullptr;
 	if (condition) {
 		tfs::lua::pushBoolean(L, condition->addDamage(rounds, time, value));
 	} else {

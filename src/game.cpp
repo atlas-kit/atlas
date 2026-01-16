@@ -4201,8 +4201,9 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 			}
 
 			if (getBoolean(ConfigManager::MANASHIELD_BREAKABLE) && targetPlayer) {
-				if (ConditionManaShield* conditionManaShield = dynamic_cast<ConditionManaShield*>(
-				        targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE))) {
+				Condition* condition = targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE);
+				if (ConditionManaShield* conditionManaShield =
+				        condition ? condition->getConditionManaShield() : nullptr) {
 					if (int32_t remainingManaDamage =
 					        conditionManaShield->onDamageTaken(targetPlayer, manaDamage) != 0) {
 						manaDamage -= remainingManaDamage;

@@ -3523,8 +3523,9 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint16_t>(0); // xp boost time (seconds)
 	msg.addByte(0x00);    // enables exp boost in the store
 
+	Condition* condition = player->getCondition(CONDITION_MANASHIELD_BREAKABLE);
 	if (ConditionManaShield* conditionManaShield =
-	        dynamic_cast<ConditionManaShield*>(player->getCondition(CONDITION_MANASHIELD_BREAKABLE))) {
+	        condition ? condition->getConditionManaShield() : nullptr) {
 		msg.add<uint32_t>(conditionManaShield->getManaShield());
 		msg.add<uint32_t>(conditionManaShield->getMaxManaShield());
 	} else {

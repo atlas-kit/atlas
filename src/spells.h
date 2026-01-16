@@ -129,6 +129,10 @@ public:
 	void setEnabled(bool e) { enabled = e; }
 
 	virtual bool isInstant() const = 0;
+	virtual InstantSpell* getInstantSpell() { return nullptr; }
+	virtual const InstantSpell* getInstantSpell() const { return nullptr; }
+	virtual RuneSpell* getRuneSpell() { return nullptr; }
+	virtual const RuneSpell* getRuneSpell() const { return nullptr; }
 	bool isLearnable() const { return learnable; }
 	void setLearnable(bool l) { learnable = l; }
 
@@ -229,6 +233,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var);
 
 	bool isInstant() const override { return true; }
+	InstantSpell* getInstantSpell() override { return this; }
+	const InstantSpell* getInstantSpell() const override { return this; }
 	bool getHasParam() const { return hasParam; }
 	void setHasParam(bool p) { hasParam = p; }
 	bool getHasPlayerNameParam() const { return hasPlayerNameParam; }
@@ -281,6 +287,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var, bool isHotkey);
 
 	bool isInstant() const override { return false; }
+	RuneSpell* getRuneSpell() override { return this; }
+	const RuneSpell* getRuneSpell() const override { return this; }
 	uint16_t getRuneItemId() const { return runeId; }
 	void setRuneItemId(uint16_t i) { runeId = i; }
 	uint32_t getCharges() const { return charges; }
