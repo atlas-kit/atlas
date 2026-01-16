@@ -228,7 +228,7 @@ ReturnValue Container::queryAdd(int32_t index, const std::shared_ptr<const Thing
 	}
 
 	// store items can be only moved into depot chest or store inbox
-	if (item->isStoreItem() && !isDepotChest()) {
+	if (item->isStoreItem() && !(isDepotChest() || getStoreInbox())) {
 		return RETURNVALUE_ITEMCANNOTBEMOVEDTHERE;
 	}
 
