@@ -2133,7 +2133,8 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return;
 	}
 
-	if (pos.isHotkey() && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
+	bool isHotkey = pos.isHotkey();
+	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
 
