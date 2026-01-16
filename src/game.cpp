@@ -2045,7 +2045,8 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return;
 	}
 
-	if (fromPos.isHotkey() && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
+	bool isHotkey = fromPos.isHotkey();
+	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
 
