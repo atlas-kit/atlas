@@ -3525,7 +3525,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 
 	Condition* manaShieldCondition = player->getCondition(CONDITION_MANASHIELD_BREAKABLE);
 	if (ConditionManaShield* conditionManaShield =
-	        condition ? condition->getConditionManaShield() : nullptr) {
+	        manaShieldCondition ? manaShieldCondition->getConditionManaShield() : nullptr) {
 		msg.add<uint32_t>(conditionManaShield->getManaShield());
 		msg.add<uint32_t>(conditionManaShield->getMaxManaShield());
 	} else {
