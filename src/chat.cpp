@@ -266,7 +266,7 @@ bool ChatChannel::executeOnSpeakEvent(const std::shared_ptr<const Player>& playe
 
 Chat::Chat() :
     scriptInterface("Chat Interface"),
-    m_dummyPrivate(std::make_shared<PrivateChatChannel>(CHANNEL_PRIVATE, "Private Chat Channel"))
+    dummyPrivate(std::make_shared<PrivateChatChannel>(CHANNEL_PRIVATE, "Private Chat Channel"))
 {
 	scriptInterface.initState();
 }
@@ -286,8 +286,8 @@ bool Chat::load()
 		bool isPublic = channelNode.attribute("public").as_bool();
 		pugi::xml_attribute scriptAttribute = channelNode.attribute("script");
 
-		auto it = m_normalChannels.find(channelId);
-		if (it != m_normalChannels.end()) {
+		auto it = normalChannels.find(channelId);
+		if (it != normalChannels.end()) {
 			it->second->setPublicChannel(isPublic);
 			it->second->setName(channelName);
 
@@ -326,7 +326,7 @@ bool Chat::load()
 			}
 		}
 
-		m_normalChannels[channel.m_id] = std::make_shared<ChatChannel>(channel);
+		normalChannels[channel.m_id] = std::make_shared<ChatChannel>(channel);
 	}
 	return true;
 }
@@ -340,7 +340,7 @@ std::shared_ptr<ChatChannel> Chat::createChannel(const std::shared_ptr<const Pla
 	switch (channelId) {
 		case CHANNEL_GUILD: {
 			if (const auto& guild = player->getGuild()) {
-				auto ret = m_guildChannels.emplace(
+				auto ret = guildChannels.emplace(
 				    std::make_pair(guild->getId(), std::make_shared<ChatChannel>(channelId, guild->getName())));
 				return ret.first->second;
 			}
@@ -350,7 +350,7 @@ std::shared_ptr<ChatChannel> Chat::createChannel(const std::shared_ptr<const Pla
 		case CHANNEL_PARTY: {
 			if (const auto& party = player->getParty()) {
 				auto ret =
-				    m_partyChannels.emplace(std::make_pair(party, std::make_shared<ChatChannel>(channelId, "Party")));
+				    partyChannels.emplace(std::make_pair(party, std::make_shared<ChatChannel>(channelId, "Party")));
 				return ret.first->second;
 			}
 			break;
@@ -364,7 +364,7 @@ std::shared_ptr<ChatChannel> Chat::createChannel(const std::shared_ptr<const Pla
 
 			// find a free private channel slot
 			for (uint16_t i = 100; i < 10000; ++i) {
-				auto [it, inserted] = m_privateChannels.emplace(
+				auto [it, inserted] = privateChannels.emplace(
 				    std::make_pair(i, std::make_shared<PrivateChatChannel>(i, player->getName() + "'s Channel")));
 				if (inserted) { // second is a bool that indicates that a new channel has been placed in the map
 					it->second->setOwner(player->getGUID());
@@ -385,7 +385,7 @@ bool Chat::deleteChannel(const std::shared_ptr<const Player>& player, uint16_t c
 	switch (channelId) {
 		case CHANNEL_GUILD: {
 			if (const auto& guild = player->getGuild()) {
-				m_guildChannels.erase(guild->getId());
+				guildChannels.erase(guild->getId());
 				return true;
 			}
 			return false;
@@ -393,22 +393,22 @@ bool Chat::deleteChannel(const std::shared_ptr<const Player>& player, uint16_t c
 
 		case CHANNEL_PARTY: {
 			if (const auto& party = player->getParty()) {
-				m_partyChannels.erase(party);
+				partyChannels.erase(party);
 				return true;
 			}
 			return false;
 		}
 
 		default: {
-			auto it = m_privateChannels.find(channelId);
-			if (it == m_privateChannels.end()) {
+			auto it = privateChannels.find(channelId);
+			if (it == privateChannels.end()) {
 				return false;
 			}
 			const auto& channel = it->second;
 			assert(channel);
 			channel->closeChannel();
 
-			m_privateChannels.erase(it);
+			privateChannels.erase(it);
 			break;
 		}
 	}
@@ -439,26 +439,26 @@ bool Chat::removeUserFromChannel(const std::shared_ptr<const Player>& player, ui
 
 void Chat::removeUserFromAllChannels(const std::shared_ptr<const Player>& player)
 {
-	for (auto& channel : m_normalChannels | std::views::values) {
+	for (auto& channel : normalChannels | std::views::values) {
 		channel->removeUser(player);
 	}
 
-	for (auto& channel : m_partyChannels | std::views::values) {
+	for (auto& channel : partyChannels | std::views::values) {
 		channel->removeUser(player);
 	}
 
-	for (auto& channel : m_guildChannels | std::views::values) {
+	for (auto& channel : guildChannels | std::views::values) {
 		channel->removeUser(player);
 	}
 
-	auto it = m_privateChannels.begin();
-	while (it != m_privateChannels.end()) {
+	auto it = privateChannels.begin();
+	while (it != privateChannels.end()) {
 		const auto& privateChannel = it->second;
 		privateChannel->removeInvite(player->getGUID());
 		privateChannel->removeUser(player);
 		if (privateChannel->getOwner() == player->getGUID()) {
 			privateChannel->closeChannel();
-			it = m_privateChannels.erase(it);
+			it = privateChannels.erase(it);
 		} else {
 			++it;
 		}
@@ -518,7 +518,7 @@ ChannelList Chat::getChannelList(const std::shared_ptr<const Player>& player)
 		}
 	}
 
-	for (const auto& [channelId, channelPtr] : m_normalChannels) {
+	for (const auto& [channelId, channelPtr] : normalChannels) {
 		const auto& channel = getChannel(player, channelId);
 		if (channel) {
 			list.push_back(channel);
@@ -526,7 +526,7 @@ ChannelList Chat::getChannelList(const std::shared_ptr<const Player>& player)
 	}
 
 	bool hasPrivate = false;
-	for (auto& [channelId, channelPtr] : m_privateChannels) {
+	for (auto& [channelId, channelPtr] : privateChannels) {
 		uint32_t guid = player->getGUID();
 		if (channelPtr->isInvited(guid)) {
 			list.push_back(channelPtr);
@@ -538,7 +538,7 @@ ChannelList Chat::getChannelList(const std::shared_ptr<const Player>& player)
 	}
 
 	if (!hasPrivate && player->isPremium()) {
-		list.push_front(m_dummyPrivate);
+		list.push_front(dummyPrivate);
 	}
 	return list;
 }
@@ -548,8 +548,8 @@ std::shared_ptr<ChatChannel> Chat::getChannel(const std::shared_ptr<const Player
 	switch (channelId) {
 		case CHANNEL_GUILD: {
 			if (const auto& guild = player->getGuild()) {
-				auto it = m_guildChannels.find(guild->getId());
-				if (it != m_guildChannels.end()) {
+				auto it = guildChannels.find(guild->getId());
+				if (it != guildChannels.end()) {
 					return it->second;
 				}
 			}
@@ -558,8 +558,8 @@ std::shared_ptr<ChatChannel> Chat::getChannel(const std::shared_ptr<const Player
 
 		case CHANNEL_PARTY: {
 			if (const auto& party = player->getParty()) {
-				auto it = m_partyChannels.find(party);
-				if (it != m_partyChannels.end()) {
+				auto it = partyChannels.find(party);
+				if (it != partyChannels.end()) {
 					return it->second;
 				}
 			}
@@ -567,15 +567,15 @@ std::shared_ptr<ChatChannel> Chat::getChannel(const std::shared_ptr<const Player
 		}
 
 		default: {
-			auto normalIt = m_normalChannels.find(channelId);
-			if (normalIt != m_normalChannels.end()) {
+			auto normalIt = normalChannels.find(channelId);
+			if (normalIt != normalChannels.end()) {
 				if (normalIt->second && !normalIt->second->executeCanJoinEvent(player)) {
 					return nullptr;
 				}
 				return normalIt->second;
 			} else {
-				auto privateIt = m_privateChannels.find(channelId);
-				if (privateIt != m_privateChannels.end() && privateIt->second->isInvited(player->getGUID())) {
+				auto privateIt = privateChannels.find(channelId);
+				if (privateIt != privateChannels.end() && privateIt->second->isInvited(player->getGUID())) {
 					return privateIt->second;
 				}
 			}
@@ -587,8 +587,8 @@ std::shared_ptr<ChatChannel> Chat::getChannel(const std::shared_ptr<const Player
 
 std::shared_ptr<ChatChannel> Chat::getGuildChannelById(uint32_t guildId)
 {
-	auto it = m_guildChannels.find(guildId);
-	if (it == m_guildChannels.end()) {
+	auto it = guildChannels.find(guildId);
+	if (it == guildChannels.end()) {
 		return nullptr;
 	}
 	return it->second;
@@ -596,8 +596,8 @@ std::shared_ptr<ChatChannel> Chat::getGuildChannelById(uint32_t guildId)
 
 std::shared_ptr<ChatChannel> Chat::getChannelById(uint16_t channelId)
 {
-	auto it = m_normalChannels.find(channelId);
-	if (it == m_normalChannels.end()) {
+	auto it = normalChannels.find(channelId);
+	if (it == normalChannels.end()) {
 		return nullptr;
 	}
 	return it->second;
@@ -605,7 +605,7 @@ std::shared_ptr<ChatChannel> Chat::getChannelById(uint16_t channelId)
 
 std::shared_ptr<PrivateChatChannel> Chat::getPrivateChannel(const std::shared_ptr<const Player>& player)
 {
-	for (const auto& [_, channel] : m_privateChannels) {
+	for (const auto& [_, channel] : privateChannels) {
 		if (channel->getOwner() == player->getGUID()) {
 			return channel;
 		}

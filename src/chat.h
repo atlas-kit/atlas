@@ -120,14 +120,14 @@ public:
 	LuaScriptInterface* getScriptInterface() { return &scriptInterface; }
 
 private:
-	std::map<uint16_t, std::shared_ptr<ChatChannel>> m_normalChannels;
-	std::map<uint16_t, std::shared_ptr<PrivateChatChannel>> m_privateChannels;
-	std::map<std::weak_ptr<Party>, std::shared_ptr<ChatChannel>, std::owner_less<std::weak_ptr<Party>>> m_partyChannels;
-	std::map<uint32_t, std::shared_ptr<ChatChannel>> m_guildChannels;
+	std::map<uint16_t, std::shared_ptr<ChatChannel>> normalChannels;
+	std::map<uint16_t, std::shared_ptr<PrivateChatChannel>> privateChannels;
+	std::map<std::weak_ptr<Party>, std::shared_ptr<ChatChannel>, std::owner_less<std::weak_ptr<Party>>> partyChannels;
+	std::map<uint32_t, std::shared_ptr<ChatChannel>> guildChannels;
 
 	LuaScriptInterface scriptInterface;
 
-	std::shared_ptr<PrivateChatChannel> m_dummyPrivate;
+	std::shared_ptr<PrivateChatChannel> dummyPrivate;
 };
 
 #endif // FS_CHAT_H
