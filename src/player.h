@@ -630,7 +630,8 @@ public:
 		}
 	}
 
-	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type, uint16_t channel) const
+	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type,
+	                        uint16_t channel) const
 	{
 		if (client) {
 			client->sendChannelMessage(author, text, type, channel);

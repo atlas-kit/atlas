@@ -17,7 +17,7 @@ class ChatChannel
 {
 public:
 	ChatChannel() = default;
-	ChatChannel(uint16_t channelId, std::string channelName) : m_id{channelId}, m_name{std::move(channelName)} {}
+	ChatChannel(uint16_t channelId, std::string channelName) : id{channelId}, name{std::move(channelName)} {}
 
 	virtual ~ChatChannel() = default;
 
@@ -28,16 +28,16 @@ public:
 	bool talk(const std::shared_ptr<const Player>& fromPlayer, SpeakClasses type, const std::string& text);
 	void sendToAll(const std::string& message, SpeakClasses type) const;
 
-	const std::string& getName() const { return m_name; }
-	void setName(const std::string& name) { m_name = name; }
-	uint16_t getId() const { return m_id; }
-	const UsersMap& getUsers() const { return m_users; }
+	const std::string& getName() const { return name; }
+	void setName(const std::string& name) { this->name = name; }
+	uint16_t getId() const { return id; }
+	const UsersMap& getUsers() const { return users; }
 	virtual const InvitedMap* getInvitedUsers() const { return nullptr; }
 
 	virtual uint32_t getOwner() const { return 0; }
 
-	bool isPublicChannel() const { return m_publicChannel; }
-	void setPublicChannel(bool isPrivate) { m_publicChannel = isPrivate; }
+	bool isPublicChannel() const { return publicChannel; }
+	void setPublicChannel(bool isPrivate) { publicChannel = isPrivate; }
 
 	bool executeOnJoinEvent(const std::shared_ptr<const Player>& player);
 	bool executeCanJoinEvent(const std::shared_ptr<const Player>& player);
@@ -46,19 +46,19 @@ public:
 	                         const std::string& message);
 
 protected:
-	UsersMap m_users;
+	UsersMap users;
 
-	uint16_t m_id;
+	uint16_t id;
 
 private:
-	std::string m_name;
+	std::string name;
 
 	int32_t canJoinEvent = -1;
 	int32_t onJoinEvent = -1;
 	int32_t onLeaveEvent = -1;
 	int32_t onSpeakEvent = -1;
 
-	bool m_publicChannel = false;
+	bool publicChannel = false;
 
 	friend class Chat;
 };
@@ -68,8 +68,8 @@ class PrivateChatChannel final : public ChatChannel
 public:
 	PrivateChatChannel(uint16_t channelId, std::string channelName) : ChatChannel(channelId, channelName) {}
 
-	uint32_t getOwner() const override { return m_owner; }
-	void setOwner(uint32_t owner) { m_owner = owner; }
+	uint32_t getOwner() const override { return owner; }
+	void setOwner(uint32_t owner) { this->owner = owner; }
 
 	bool isInvited(uint32_t guid) const;
 
@@ -80,11 +80,11 @@ public:
 
 	void closeChannel() const;
 
-	const InvitedMap* getInvitedUsers() const override { return &m_invites; }
+	const InvitedMap* getInvitedUsers() const override { return &invites; }
 
 private:
-	InvitedMap m_invites;
-	uint32_t m_owner = 0;
+	InvitedMap invites;
+	uint32_t owner = 0;
 };
 
 using ChannelList = std::list<std::shared_ptr<ChatChannel>>;
