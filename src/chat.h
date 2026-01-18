@@ -37,7 +37,7 @@ public:
 	virtual uint32_t getOwner() const { return 0; }
 
 	bool isPublicChannel() const { return publicChannel; }
-	void setPublicChannel(bool isPrivate) { publicChannel = isPrivate; }
+	void setPublicChannel(bool isPublic) { publicChannel = isPublic; }
 
 	bool executeOnJoinEvent(const std::shared_ptr<const Player>& player);
 	bool executeCanJoinEvent(const std::shared_ptr<const Player>& player);
@@ -89,7 +89,7 @@ private:
 
 using ChannelList = std::list<std::shared_ptr<ChatChannel>>;
 
-class Chat : std::enable_shared_from_this<Chat>
+class Chat
 {
 public:
 	Chat();
