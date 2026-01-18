@@ -16,6 +16,8 @@ extern Chat g_chat;
 extern Game g_game;
 extern Scheduler g_scheduler;
 
+static auto dummyPrivate = std::make_shared<PrivateChatChannel>(CHANNEL_PRIVATE, "Private Chat Channel");
+
 bool PrivateChatChannel::isInvited(uint32_t guid) const
 {
 	if (guid == getOwner()) {
@@ -264,12 +266,7 @@ bool ChatChannel::executeOnSpeakEvent(const std::shared_ptr<const Player>& playe
 	return result;
 }
 
-Chat::Chat() :
-    scriptInterface("Chat Interface"),
-    dummyPrivate(std::make_shared<PrivateChatChannel>(CHANNEL_PRIVATE, "Private Chat Channel"))
-{
-	scriptInterface.initState();
-}
+Chat::Chat() : scriptInterface("Chat Interface") { scriptInterface.initState(); }
 
 bool Chat::load()
 {

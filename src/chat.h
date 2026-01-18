@@ -126,8 +126,6 @@ private:
 	std::map<uint32_t, std::shared_ptr<ChatChannel>> guildChannels;
 
 	LuaScriptInterface scriptInterface;
-
-	std::shared_ptr<PrivateChatChannel> dummyPrivate;
 };
 
 #endif // FS_CHAT_H
