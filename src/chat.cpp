@@ -602,7 +602,7 @@ std::shared_ptr<ChatChannel> Chat::getChannelById(uint16_t channelId)
 
 std::shared_ptr<PrivateChatChannel> Chat::getPrivateChannel(const std::shared_ptr<const Player>& player)
 {
-	for (const auto& [_, channel] : privateChannels) {
+	for (const auto& channel : privateChannels | std::views::values) {
 		if (channel->getOwner() == player->getGUID()) {
 			return channel;
 		}
