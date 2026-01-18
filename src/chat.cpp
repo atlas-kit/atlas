@@ -285,25 +285,26 @@ bool Chat::load()
 
 		auto it = normalChannels.find(channelId);
 		if (it != normalChannels.end()) {
-			it->second->setPublicChannel(isPublic);
-			it->second->setName(channelName);
+			const auto& channel = it->second;
+			channel->setPublicChannel(isPublic);
+			channel->setName(channelName);
 
 			if (scriptAttribute) {
 				if (scriptInterface.loadFile("data/chatchannels/scripts/" + std::string(scriptAttribute.as_string())) ==
 				    0) {
-					it->second->onSpeakEvent = scriptInterface.getEvent("onSpeak");
-					it->second->canJoinEvent = scriptInterface.getEvent("canJoin");
-					it->second->onJoinEvent = scriptInterface.getEvent("onJoin");
-					it->second->onLeaveEvent = scriptInterface.getEvent("onLeave");
+					channel->onSpeakEvent = scriptInterface.getEvent("onSpeak");
+					channel->canJoinEvent = scriptInterface.getEvent("canJoin");
+					channel->onJoinEvent = scriptInterface.getEvent("onJoin");
+					channel->onLeaveEvent = scriptInterface.getEvent("onLeave");
 				} else {
 					std::cout << "[Warning - Chat::load] Can not load script: " << scriptAttribute.as_string()
 					          << std::endl;
 				}
 			}
 
-			UsersMap tempUserMap = std::move(it->second->users);
+			UsersMap tempUserMap = std::exchange(channel->users, {});
 			for (const auto& player : tempUserMap | std::views::values | tfs::views::lock_weak_ptrs) {
-				it->second->addUser(player);
+				channel->addUser(player);
 			}
 			continue;
 		}
@@ -364,8 +365,9 @@ std::shared_ptr<ChatChannel> Chat::createChannel(const std::shared_ptr<const Pla
 				auto [it, inserted] = privateChannels.emplace(
 				    std::make_pair(i, std::make_shared<PrivateChatChannel>(i, player->getName() + "'s Channel")));
 				if (inserted) { // second is a bool that indicates that a new channel has been placed in the map
-					it->second->setOwner(player->getGUID());
-					return it->second;
+					const auto& channel = it->second;
+					channel->setOwner(player->getGUID());
+					return channel;
 				}
 			}
 			break;
@@ -401,6 +403,7 @@ bool Chat::deleteChannel(const std::shared_ptr<const Player>& player, uint16_t c
 			if (it == privateChannels.end()) {
 				return false;
 			}
+
 			const auto& channel = it->second;
 			assert(channel);
 			channel->closeChannel();
@@ -564,17 +567,15 @@ std::shared_ptr<ChatChannel> Chat::getChannel(const std::shared_ptr<const Player
 		}
 
 		default: {
-			auto normalIt = normalChannels.find(channelId);
-			if (normalIt != normalChannels.end()) {
-				if (normalIt->second && !normalIt->second->executeCanJoinEvent(player)) {
+			if (auto it = normalChannels.find(channelId); it != normalChannels.end()) {
+				const auto& channel = it->second;
+				if (channel && !channel->executeCanJoinEvent(player)) {
 					return nullptr;
 				}
-				return normalIt->second;
-			} else {
-				auto privateIt = privateChannels.find(channelId);
-				if (privateIt != privateChannels.end() && privateIt->second->isInvited(player->getGUID())) {
-					return privateIt->second;
-				}
+				return channel;
+			} else if (auto it = privateChannels.find(channelId);
+			           it != privateChannels.end() && it->second->isInvited(player->getGUID())) {
+				return it->second;
 			}
 			break;
 		}
