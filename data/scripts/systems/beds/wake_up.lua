@@ -1,4 +1,4 @@
-local event = Event("BedLogin")
+local event = Event()
 
 local function findRelevantBed(player)
     local pos = player:getPosition()
