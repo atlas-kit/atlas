@@ -306,7 +306,7 @@ const Position& Item::getPosition() const
 	if (const auto& tile = getTile()) {
 		return tile->getPosition();
 	}
-	return Tile::nullptrTile->getPosition();
+	return Tile::invalidTile->getPosition();
 }
 
 uint16_t Item::getSubType() const

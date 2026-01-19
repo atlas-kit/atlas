@@ -17,7 +17,7 @@
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
 
-const std::shared_ptr<Tile> Tile::nullptrTile = std::make_shared<StaticTile>(0xFFFF, 0xFFFF, 0xFF);
+const std::shared_ptr<Tile> Tile::invalidTile = std::make_shared<StaticTile>(0xFFFF, 0xFFFF, 0xFF);
 
 bool Tile::hasProperty(ITEMPROPERTY prop) const
 {
@@ -422,15 +422,15 @@ void Tile::onRemoveTileItem(const SpectatorVec& spectators, const std::vector<in
 			return;
 		}
 
-		bool ret = false;
+		bool hasCleanableItems = false;
 		for (const auto& toCheck : *items) {
 			if (toCheck->isCleanable()) {
-				ret = true;
+				hasCleanableItems = true;
 				break;
 			}
 		}
 
-		if (!ret) {
+		if (!hasCleanableItems) {
 			g_game.removeTileToClean(asTile());
 		}
 	}
@@ -497,7 +497,7 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 			}
 
 			const auto& field = getFieldItem();
-			if (!field || field->isBlocking() || field->getDamage() == 0) {
+			if (!field || field->isBlocking() || field->getDamage() <= 0) {
 				return RETURNVALUE_NOERROR;
 			}
 
@@ -506,9 +506,9 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 			// There is 3 options for a monster to enter a magic field
 			// 1) Monster is immune
 			if (!monster->isImmune(combatType)) {
-				// 1) Monster is able to walk over field type
-				// 2) Being attacked while random stepping will make it ignore
-				// field damages
+				// 2) Monster is able to walk over field type
+				// 3) Being attacked while random stepping will make it ignore
+				//    field damages
 				if (hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)) {
 					if (!(monster->canWalkOnFieldType(combatType) || monster->isIgnoringFieldDamage())) {
 						return RETURNVALUE_NOTPOSSIBLE;

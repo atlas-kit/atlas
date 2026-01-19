@@ -116,7 +116,7 @@ inline constexpr size_t TILE_UPDATE_THRESHOLD = 8;
 class Tile : public Thing
 {
 public:
-	static const std::shared_ptr<Tile> nullptrTile;
+	static const std::shared_ptr<Tile> invalidTile;
 	Tile(uint16_t x, uint16_t y, uint8_t z) : tilePos{x, y, z} {}
 	virtual ~Tile() = default;
 
