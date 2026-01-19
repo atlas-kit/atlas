@@ -12,7 +12,7 @@ local conditions = {
 do
 	local event = MoveEvent()
 	
-		function event.onStepIn(creature, item, position, fromPosition)
+	function event.onStepIn(creature, item, position, fromPosition)
 		if not creature:isPlayer() then
 			return false
 		end
@@ -35,7 +35,7 @@ do
 		if not creature:isPlayer() then
 			return false
 		end
-		
+
 		creature:removeCondition(CONDITION_OUTFIT)
 		return true
 	end
