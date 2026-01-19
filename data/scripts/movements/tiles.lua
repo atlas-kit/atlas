@@ -46,7 +46,7 @@ do
 		return true
 	end
 
-	event:id(416, 426, 446, 3216, 3202, 11062)
+	event:id(unpack(table.keys(increasing)))
 	event:register()
 end
 
@@ -71,6 +71,6 @@ do
 		return true
 	end
 
-	event:id(417, 425, 447, 3217, 3215, 11063)
+	event:id(unpack(table.keys(decreasing)))
 	event:register()
 end

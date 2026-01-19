@@ -9,6 +9,8 @@ local conditions = {
 	CONDITION_BLEEDING
 }
 
+local ids = {4620, 4621, 4622, 4623, 4624, 4625, 4820, 4821, 4822, 4823, 4824, 4825}
+
 do
 	local event = MoveEvent()
 	
@@ -24,7 +26,7 @@ do
 		return true
 	end
 
-	event:id(4620, 4621, 4622, 4623, 4624, 4625, 4820, 4821, 4822, 4823, 4824, 4825)
+	event:id(unpack(ids))
 	event:register()
 end
 
@@ -39,6 +41,6 @@ do
 		return true
 	end
 
-	event:id(4620, 4621, 4622, 4623, 4624, 4625, 4820, 4821, 4822, 4823, 4824, 4825)
+	event:id(unpack(ids))
 	event:register()
 end
