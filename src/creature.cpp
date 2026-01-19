@@ -480,7 +480,7 @@ void Creature::onDeath()
 		g_game.removeCreature(asCreature(), false);
 	} else {
 		while (!conditions.empty()) {
-			removeCondition(conditions.front(), true);
+			removeCondition(conditions.back(), true);
 		}
 	}
 }
