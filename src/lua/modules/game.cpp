@@ -611,7 +611,6 @@ int luaGameCreateMonsterType(lua_State* L)
 		monsterType->info.lootItems.clear();
 		monsterType->info.attackSpells.clear();
 		monsterType->info.defenseSpells.clear();
-		monsterType->info.scripts.clear();
 		monsterType->info.thinkEvent = -1;
 		monsterType->info.creatureAppearEvent = -1;
 		monsterType->info.creatureDisappearEvent = -1;
@@ -664,6 +663,21 @@ int luaGameReload(lua_State* L)
 	return 1;
 }
 
+int luaGameGetPlayerRecord(lua_State* L)
+{
+	// Game.getPlayerRecord()
+	tfs::lua::pushNumber(L, g_game.getPlayerRecord());
+	return 1;
+}
+
+int luaGameSetPlayerRecord(lua_State* L)
+{
+	// Game.setPlayerRecord(record)
+	g_game.setPlayerRecord(tfs::lua::getNumber<uint32_t>(L, 1));
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerGame(LuaScriptInterface& lsi)
@@ -677,6 +691,8 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	registerEnum(lsi, GAME_STATE_SHUTDOWN);
 	registerEnum(lsi, GAME_STATE_CLOSING);
 	registerEnum(lsi, GAME_STATE_MAINTAIN);
+
+	registerEnum(lsi, SCHEDULER_MINTICKS);
 
 	registerEnum(lsi, WORLD_TYPE_NO_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP);
@@ -731,4 +747,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "getClientVersion", luaGameGetClientVersion);
 
 	lsi.registerMethod("Game", "reload", luaGameReload);
+
+	lsi.registerMethod("Game", "getPlayerRecord", luaGameGetPlayerRecord);
+	lsi.registerMethod("Game", "setPlayerRecord", luaGameSetPlayerRecord);
 }

@@ -80,6 +80,11 @@ ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType, int
 	return condition;
 }
 
+static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
+{
+	return static_cast<int32_t>(std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
+}
+
 bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, const std::string& description)
 {
 	std::string name;
@@ -222,8 +227,8 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			pugi::xml_attribute attackAttribute, skillAttribute;
 			if ((attackAttribute = node.attribute("attack")) && (skillAttribute = node.attribute("skill"))) {
 				sb.minCombatValue = 0;
-				sb.maxCombatValue = -Weapons::getMaxMeleeDamage(pugi::cast<int32_t>(skillAttribute.value()),
-				                                                pugi::cast<int32_t>(attackAttribute.value()));
+				sb.maxCombatValue = -getMaxMeleeDamage(pugi::cast<int32_t>(skillAttribute.value()),
+				                                       pugi::cast<int32_t>(attackAttribute.value()));
 			}
 
 			ConditionType_t conditionType = CONDITION_NONE;
@@ -636,7 +641,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 
 			if (spell->attack > 0 && spell->skill > 0) {
 				sb.minCombatValue = 0;
-				sb.maxCombatValue = -Weapons::getMaxMeleeDamage(spell->skill, spell->attack);
+				sb.maxCombatValue = -getMaxMeleeDamage(spell->skill, spell->attack);
 			}
 
 			sb.range = 1;
@@ -1444,22 +1449,11 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 		}
 	}
 
-	if ((node = monsterNode.child("script"))) {
-		for (auto eventNode : node.children()) {
-			if ((attr = eventNode.attribute("name"))) {
-				mType->info.scripts.emplace_back(attr.as_string());
-			} else {
-				std::cout << "[Warning - Monsters::loadMonster] Missing name for script event. " << file << std::endl;
-			}
-		}
-	}
-
 	mType->info.summons.shrink_to_fit();
 	mType->info.lootItems.shrink_to_fit();
 	mType->info.attackSpells.shrink_to_fit();
 	mType->info.defenseSpells.shrink_to_fit();
 	mType->info.voiceVector.shrink_to_fit();
-	mType->info.scripts.shrink_to_fit();
 	return mType;
 }
 

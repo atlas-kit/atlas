@@ -1,6 +1,3 @@
-local unpack = unpack
-local pack = table.pack
-
 local EventData, callbacks, updateableParameters, autoID = {}, {}, {}, 0
 -- This metatable creates an auto-configuration mechanism to create new types of Events
 local ec = setmetatable({}, { __newindex = function(self, key, value)
@@ -21,6 +18,10 @@ end})
 
 --@ Definitions of valid Event types to hook according to the given field name
 --@ The fields within the assigned table, allow to save arbitrary information
+-- Game
+ec.onGameStartup = {}
+ec.onGameShutdown = {}
+ec.onGameSave = {}
 -- Creature
 ec.onCreatureChangeOutfit = {}
 ec.onCreatureChangeMount = {}
@@ -29,6 +30,12 @@ ec.onCreatureTargetCombat = {returnValue=true}
 ec.onCreatureHear = {}
 ec.onCreatureChangeZone = {}
 ec.onCreatureUpdateStorage = {}
+ec.onCreatureChangeHealth = {}
+ec.onCreatureChangeMana = {}
+ec.onCreatureThink = {}
+ec.onCreaturePrepareDeath = {}
+ec.onCreatureDeath = {}
+ec.onCreatureKill = {}
 -- Party
 ec.onPartyJoin = {}
 ec.onPartyLeave = {}
@@ -59,6 +66,14 @@ ec.onPlayerGainSkillTries = {[3] = 1}
 ec.onPlayerWrapItem = {}
 ec.onPlayerInventoryUpdate = {}
 ec.onPlayerSpellCheck = {}
+ec.onPlayerLogin = {}
+ec.onPlayerJoin = {}
+ec.onPlayerLogout = {}
+ec.onPlayerReconnect = {}
+ec.onPlayerAdvance = {}
+ec.onPlayerModalWindow = {}
+ec.onPlayerTextEdit = {}
+ec.onPlayerExtendedOpcode = {}
 -- Monster
 ec.onMonsterDropLoot = {}
 ec.onMonsterSpawn = {}
@@ -136,7 +151,7 @@ Event = setmetatable({
 
 		local updateableParams = updateableParameters[callback]
 		return function(...)
-			local results, args, info = {}, pack(...), callbacks[callback]
+			local results, args, info = {}, table.pack(...), callbacks[callback]
 			for index = 1, eventsCount do
 				repeat
 					results = {events[index].callback(unpack(args))}
@@ -169,6 +184,3 @@ Event = setmetatable({
 		end
 	end
 })
-
--- For compatibility with the previous version.
-EventCallback = Event()
