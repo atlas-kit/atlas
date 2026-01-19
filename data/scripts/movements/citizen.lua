@@ -1,4 +1,6 @@
-function onStepIn(creature, item, position, fromPosition)
+local event = MoveEvent()
+
+function event.onStepIn(creature, item, position, fromPosition)
 	if item.actionid > actionIds.citizenship and item.actionid < actionIds.citizenshipLast then
 		if not creature:isPlayer() then
 			return false
@@ -12,3 +14,6 @@ function onStepIn(creature, item, position, fromPosition)
 	end
 	return true
 end
+
+event:id(1387)
+event:register()
