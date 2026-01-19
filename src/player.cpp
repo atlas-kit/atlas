@@ -5,7 +5,6 @@
 
 #include "player.h"
 
-#include "bed.h"
 #include "chat.h"
 #include "combat.h"
 #include "configmanager.h"
@@ -21,7 +20,7 @@
 #include "tools.h"
 #include "weapons.h"
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
@@ -1044,10 +1043,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		IOLoginData::updateOnlineStatus(guid, true);
 
-		if (const auto& bed = g_game.getBedBySleeper(guid)) {
-			bed->wakeUp(asPlayer());
-		}
-
 		if (const auto& guild = getGuild()) {
 			guild->addMember(asPlayer());
 		}
@@ -1194,7 +1189,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 			party->leaveParty(asPlayer(), true);
 		}
 
-		g_chat->removeUserFromAllChannels(asPlayer());
+		g_chat.removeUserFromAllChannels(asPlayer());
 
 		if (const auto& guild = getGuild()) {
 			guild->removeMember(asPlayer());
@@ -4524,10 +4519,10 @@ void Player::sendModalWindow(const ModalWindow& modalWindow)
 
 void Player::clearModalWindows() { modalWindows.clear(); }
 
-void Player::sendClosePrivate(uint16_t channelId)
+void Player::sendClosePrivate(uint16_t channelId) const
 {
 	if (channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY) {
-		g_chat->removeUserFromChannel(asPlayer(), channelId);
+		g_chat.removeUserFromChannel(asPlayer(), channelId);
 	}
 
 	if (client) {

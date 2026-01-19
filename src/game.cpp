@@ -6,7 +6,6 @@
 #include "game.h"
 
 #include "actions.h"
-#include "bed.h"
 #include "configmanager.h"
 #include "creature.h"
 #include "databasetasks.h"
@@ -33,7 +32,7 @@
 #include <fstream>
 
 extern Actions* g_actions;
-extern Chat* g_chat;
+extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern GlobalEvents* g_globalEvents;
@@ -47,20 +46,6 @@ extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 
 Game g_game;
-
-Game::Game()
-{
-	offlineTrainingWindow.defaultEnterButton = 0;
-	offlineTrainingWindow.defaultEscapeButton = 1;
-	offlineTrainingWindow.choices.emplace_back("Sword Fighting and Shielding", SKILL_SWORD);
-	offlineTrainingWindow.choices.emplace_back("Axe Fighting and Shielding", SKILL_AXE);
-	offlineTrainingWindow.choices.emplace_back("Club Fighting and Shielding", SKILL_CLUB);
-	offlineTrainingWindow.choices.emplace_back("Distance Fighting and Shielding", SKILL_DISTANCE);
-	offlineTrainingWindow.choices.emplace_back("Magic Level and Shielding", SKILL_MAGLEVEL);
-	offlineTrainingWindow.buttons.emplace_back("Okay", offlineTrainingWindow.defaultEnterButton);
-	offlineTrainingWindow.buttons.emplace_back("Cancel", offlineTrainingWindow.defaultEscapeButton);
-	offlineTrainingWindow.priority = true;
-}
 
 void Game::start(ServiceManager* manager)
 {
@@ -90,7 +75,7 @@ void Game::setGameState(GameState_t newState)
 	switch (newState) {
 		case GAME_STATE_INIT: {
 			groups.load();
-			g_chat->load();
+			g_chat.load();
 
 			map.spawns.startup();
 
@@ -1901,7 +1886,7 @@ void Game::playerCreatePrivateChannel(uint32_t playerId)
 		return;
 	}
 
-	ChatChannel* channel = g_chat->createChannel(player, CHANNEL_PRIVATE);
+	const auto& channel = g_chat.createChannel(player, CHANNEL_PRIVATE);
 	if (!channel || !channel->addUser(player)) {
 		return;
 	}
@@ -1916,7 +1901,7 @@ void Game::playerChannelInvite(uint32_t playerId, const std::string& name)
 		return;
 	}
 
-	PrivateChatChannel* channel = g_chat->getPrivateChannel(player);
+	const auto& channel = g_chat.getPrivateChannel(player);
 	if (!channel) {
 		return;
 	}
@@ -1935,7 +1920,7 @@ void Game::playerChannelExclude(uint32_t playerId, const std::string& name)
 		return;
 	}
 
-	PrivateChatChannel* channel = g_chat->getPrivateChannel(player);
+	const auto& channel = g_chat.getPrivateChannel(player);
 	if (!channel) {
 		return;
 	}
@@ -1961,7 +1946,7 @@ void Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return;
 	}
 
-	ChatChannel* channel = g_chat->addUserToChannel(player, channelId);
+	const auto& channel = g_chat.addUserToChannel(player, channelId);
 	if (!channel) {
 		return;
 	}
@@ -1980,7 +1965,7 @@ void Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 void Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		g_chat->removeUserFromChannel(player, channelId);
+		g_chat.removeUserFromChannel(player, channelId);
 	}
 }
 
@@ -3494,7 +3479,7 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		case TALKTYPE_CHANNEL_O:
 		case TALKTYPE_CHANNEL_Y:
 		case TALKTYPE_CHANNEL_R1:
-			g_chat->talkToChannel(player, type, text, channelId);
+			g_chat.talkToChannel(player, type, text, channelId);
 			break;
 
 		case TALKTYPE_BROADCAST:
@@ -5417,17 +5402,6 @@ void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)
 	}
 }
 
-void Game::sendOfflineTrainingDialog(const std::shared_ptr<Player>& player)
-{
-	if (!player) {
-		return;
-	}
-
-	if (!player->hasModalWindowOpen(offlineTrainingWindow.id)) {
-		player->sendModalWindow(offlineTrainingWindow);
-	}
-}
-
 void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, uint8_t button, uint8_t choice)
 {
 	const auto& player = getPlayerByID(playerId);
@@ -5441,26 +5415,7 @@ void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, ui
 
 	player->onModalWindowHandled(modalWindowId);
 
-	// offline training, hard-coded
-	if (modalWindowId == std::numeric_limits<uint32_t>::max()) {
-		if (button == offlineTrainingWindow.defaultEnterButton) {
-			if (choice == SKILL_SWORD || choice == SKILL_AXE || choice == SKILL_CLUB || choice == SKILL_DISTANCE ||
-			    choice == SKILL_MAGLEVEL) {
-				if (const auto& bedItem = player->getBedItem()) {
-					if (bedItem->hasParent() && bedItem->sleep(player)) {
-						player->setOfflineTrainingSkill(choice);
-						return;
-					}
-				}
-			}
-		} else {
-			player->sendTextMessage(MESSAGE_EVENT_ADVANCE, "Offline training aborted.");
-		}
-
-		player->setBedItem(nullptr);
-	} else {
-		tfs::events::player::onModalWindow(player, modalWindowId, button, choice);
-	}
+	tfs::events::player::onModalWindow(player, modalWindowId, button, choice);
 }
 
 std::shared_ptr<Guild> Game::getGuild(uint32_t id) const
@@ -5489,15 +5444,6 @@ void Game::internalRemoveItems(const std::vector<std::shared_ptr<Item>>& itemLis
 			internalRemoveItem(item);
 		}
 	}
-}
-
-std::shared_ptr<BedItem> Game::getBedBySleeper(uint32_t guid) const
-{
-	auto it = bedSleepersMap.find(guid);
-	if (it == bedSleepersMap.end()) {
-		return nullptr;
-	}
-	return it->second;
 }
 
 void Game::updatePodium(const std::shared_ptr<Podium>& podium)
@@ -5540,7 +5486,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 		case RELOAD_TYPE_ACTIONS:
 			return g_actions->reload();
 		case RELOAD_TYPE_CHAT:
-			return g_chat->load();
+			return g_chat.load();
 		case RELOAD_TYPE_CONFIG:
 			return ConfigManager::load();
 		case RELOAD_TYPE_EVENTS:
@@ -5596,7 +5542,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 			mounts.reload();
 			ConfigManager::reload();
 			tfs::events::load();
-			g_chat->load();
+			g_chat.load();
 			*/
 			return true;
 		}
@@ -5622,7 +5568,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 			mounts.reload();
 			g_globalEvents->reload();
 			tfs::events::reload();
-			g_chat->load();
+			g_chat.load();
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
