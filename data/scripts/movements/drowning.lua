@@ -21,30 +21,30 @@ local ids = {
 }
 
 do
-    local event = MoveEvent()
+	local event = MoveEvent()
 
-    function event.onStepIn(creature, item, position, fromPosition)
-        if creature:isPlayer() then
-            creature:addCondition(condition)
-            creature:addAchievementProgress("Deep Sea Diver", 1000000)
-        end
-        return true
-    end
+	function event.onStepIn(creature, item, position, fromPosition)
+		if creature:isPlayer() then
+			creature:addCondition(condition)
+			creature:addAchievementProgress("Deep Sea Diver", 1000000)
+		end
+		return true
+	end
 
-    event:id(unpack(ids))
-    event:register()
+	event:id(unpack(ids))
+	event:register()
 end
 
 do
-    local event = MoveEvent()
+	local event = MoveEvent()
 
-    function event.onStepOut(creature, item, position, fromPosition)
-        if creature:isPlayer() then
-            creature:removeCondition(CONDITION_DROWN)
-        end
-        return true
-    end
+	function event.onStepOut(creature, item, position, fromPosition)
+		if creature:isPlayer() then
+			creature:removeCondition(CONDITION_DROWN)
+		end
+		return true
+	end
 
-    event:id(unpack(ids))
-    event:register()
+	event:id(unpack(ids))
+	event:register()
 end

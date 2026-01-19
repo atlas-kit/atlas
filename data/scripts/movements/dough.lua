@@ -11,6 +11,6 @@ function event.onAddItem(moveitem, tileitem, position)
 	return true
 end
 
-event:id(2693, 6277)
+event:id(1786, 1788, 1790, 1792)
 event:tileItem(true)
 event:register()

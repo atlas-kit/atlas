@@ -35,7 +35,6 @@ do
 		if not creature:isPlayer() then
 			return false
 		end
-
 		creature:removeCondition(CONDITION_OUTFIT)
 		return true
 	end
