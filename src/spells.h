@@ -15,9 +15,6 @@ class InstantSpell;
 class RuneSpell;
 class Spell;
 
-using InstantSpell_ptr = std::unique_ptr<InstantSpell>;
-using RuneSpell_ptr = std::unique_ptr<RuneSpell>;
-
 class Spells final : public BaseEvents
 {
 public:

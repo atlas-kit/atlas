@@ -144,8 +144,7 @@ bool Spells::registerEvent(Event_ptr event, const pugi::xml_node&)
 
 bool Spells::registerInstantLuaEvent(InstantSpell* event)
 {
-	InstantSpell_ptr instant{event};
-	if (instant) {
+	if (const auto instant{event}) {
 		std::string words = instant->getWords();
 		auto result = instants.emplace(instant->getWords(), std::move(*instant));
 		if (!result.second) {
@@ -160,8 +159,7 @@ bool Spells::registerInstantLuaEvent(InstantSpell* event)
 
 bool Spells::registerRuneLuaEvent(RuneSpell* event)
 {
-	RuneSpell_ptr rune{event};
-	if (rune) {
+	if (const auto rune{event}) {
 		uint16_t id = rune->getRuneItemId();
 		auto result = runes.emplace(rune->getRuneItemId(), std::move(*rune));
 		if (!result.second) {
