@@ -73,7 +73,7 @@ public:
 class CombatSpell final : public Event, public BaseSpell
 {
 public:
-	CombatSpell(Combat_ptr combat, bool needTarget, bool needDirection);
+	CombatSpell(std::shared_ptr<Combat> combat, bool needTarget, bool needDirection);
 
 	// non-copyable
 	CombatSpell(const CombatSpell&) = delete;
@@ -87,12 +87,12 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var);
 
 	bool loadScriptCombat();
-	Combat_ptr getCombat() { return combat; }
+	std::shared_ptr<Combat> getCombat() { return combat; }
 
 private:
 	std::string_view getScriptEventName() const override { return "onCastSpell"; }
 
-	Combat_ptr combat;
+	std::shared_ptr<Combat> combat;
 
 	bool needDirection;
 	bool needTarget;

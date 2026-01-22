@@ -257,8 +257,8 @@ Position Spells::getCasterPosition(const std::shared_ptr<Creature>& creature, Di
 	return getNextPosition(dir, creature->getPosition());
 }
 
-CombatSpell::CombatSpell(Combat_ptr combat, bool needTarget, bool needDirection) :
-    Event(&g_spells->getScriptInterface()), combat(combat), needDirection(needDirection), needTarget(needTarget)
+CombatSpell::CombatSpell(std::shared_ptr<Combat> combat, bool needTarget, bool needDirection) :
+    Event(&g_spells->getScriptInterface()), combat(std::move(combat)), needDirection(needDirection), needTarget(needTarget)
 {}
 
 bool CombatSpell::loadScriptCombat()

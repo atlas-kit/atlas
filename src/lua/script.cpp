@@ -971,7 +971,7 @@ LuaScriptInterface* LuaEnvironment::getTestInterface()
 	return testInterface;
 }
 
-Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
+std::shared_ptr<Combat> LuaEnvironment::getCombatObject(uint32_t id) const
 {
 	auto it = combatMap.find(id);
 	if (it == combatMap.end()) {
@@ -980,9 +980,9 @@ Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
 	return it->second;
 }
 
-Combat_ptr LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
+std::shared_ptr<Combat> LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
 {
-	Combat_ptr combat = std::make_shared<Combat>();
+	const auto combat = std::make_shared<Combat>();
 	combatMap[++lastCombatId] = combat;
 	combatIdMap[interface].push_back(lastCombatId);
 	return combat;

@@ -28,7 +28,7 @@ int luaCombatCreate(lua_State* L)
 int luaCombatSetParameter(lua_State* L)
 {
 	// combat:setParameter(key, value)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -50,7 +50,7 @@ int luaCombatSetParameter(lua_State* L)
 int luaCombatGetParameter(lua_State* L)
 {
 	// combat:getParameter(key)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -70,7 +70,7 @@ int luaCombatGetParameter(lua_State* L)
 int luaCombatSetFormula(lua_State* L)
 {
 	// combat:setFormula(type, mina, minb, maxa, maxb)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -103,7 +103,7 @@ int luaCombatSetArea(lua_State* L)
 		return 1;
 	}
 
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -118,7 +118,7 @@ int luaCombatSetArea(lua_State* L)
 int luaCombatAddCondition(lua_State* L)
 {
 	// combat:addCondition(condition)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -138,7 +138,7 @@ int luaCombatAddCondition(lua_State* L)
 int luaCombatClearConditions(lua_State* L)
 {
 	// combat:clearConditions()
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -153,7 +153,7 @@ int luaCombatClearConditions(lua_State* L)
 int luaCombatSetCallback(lua_State* L)
 {
 	// combat:setCallback(key, function)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -180,7 +180,7 @@ int luaCombatSetCallback(lua_State* L)
 int luaCombatSetOrigin(lua_State* L)
 {
 	// combat:setOrigin(origin)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
@@ -195,7 +195,7 @@ int luaCombatSetOrigin(lua_State* L)
 int luaCombatExecute(lua_State* L)
 {
 	// combat:execute(creature, variant)
-	const Combat_ptr& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
+	const auto& combat = tfs::lua::getSharedPtr<Combat>(L, 1);
 	if (!combat) {
 		tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_COMBAT_NOT_FOUND));
 		lua_pushnil(L);
