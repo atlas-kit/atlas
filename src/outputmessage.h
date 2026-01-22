@@ -69,8 +69,8 @@ private:
 namespace tfs::net {
 
 OutputMessage_ptr make_output_message();
-void insert_protocol_to_autosend(const Protocol_ptr& protocol);
-void remove_protocol_from_autosend(const Protocol_ptr& protocol);
+void insert_protocol_to_autosend(const std::shared_ptr<Protocol>& protocol);
+void remove_protocol_from_autosend(const std::shared_ptr<Protocol>& protocol);
 
 } // namespace tfs::net
 

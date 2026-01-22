@@ -17,7 +17,7 @@ public:
 	virtual uint8_t get_protocol_identifier() const = 0;
 	virtual const char* get_protocol_name() const = 0;
 
-	virtual Protocol_ptr make_protocol(const Connection_ptr& c) const = 0;
+	virtual std::shared_ptr<Protocol> make_protocol(const Connection_ptr& c) const = 0;
 };
 
 template <typename ProtocolType>
@@ -29,7 +29,7 @@ public:
 	uint8_t get_protocol_identifier() const override { return ProtocolType::protocol_identifier; }
 	const char* get_protocol_name() const override { return ProtocolType::protocol_name(); }
 
-	Protocol_ptr make_protocol(const Connection_ptr& c) const override { return std::make_shared<ProtocolType>(c); }
+	std::shared_ptr<Protocol> make_protocol(const Connection_ptr& c) const override { return std::make_shared<ProtocolType>(c); }
 };
 
 class ServicePort : public std::enable_shared_from_this<ServicePort>
@@ -48,7 +48,7 @@ public:
 	std::string get_protocol_names() const;
 
 	bool add_service(const Service_ptr& new_svc);
-	Protocol_ptr make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const;
+	std::shared_ptr<Protocol> make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const;
 
 	void onStopServer();
 	void onAccept(Connection_ptr connection, const boost::system::error_code& error);

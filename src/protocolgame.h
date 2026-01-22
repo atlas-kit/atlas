@@ -23,8 +23,6 @@ enum SessionEndTypes_t : uint8_t
 	SESSION_END_UNKNOWN2 = 3, // unknown, no difference from logout
 };
 
-using ProtocolGame_ptr = std::shared_ptr<ProtocolGame>;
-
 struct TextMessage
 {
 	MessageClasses type = MESSAGE_STATUS_DEFAULT;
@@ -68,7 +66,7 @@ public:
 	uint16_t getVersion() const { return version; }
 
 private:
-	ProtocolGame_ptr getThis() { return std::static_pointer_cast<ProtocolGame>(shared_from_this()); }
+	std::shared_ptr<ProtocolGame> getThis() { return std::static_pointer_cast<ProtocolGame>(shared_from_this()); }
 	void connect(uint32_t playerId, OperatingSystem_t operatingSystem);
 	void disconnectClient(const std::string& message) const;
 	void writeToOutputBuffer(const NetworkMessage& msg);

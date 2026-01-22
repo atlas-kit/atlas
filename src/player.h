@@ -95,7 +95,7 @@ public:
 	static uint32_t playerAutoID;
 	static uint32_t playerIDLimit;
 
-	explicit Player(ProtocolGame_ptr p);
+	explicit Player(std::shared_ptr<ProtocolGame> protocol);
 	~Player() = default;
 
 	// non-copyable
@@ -1293,7 +1293,7 @@ private:
 	int64_t lastToggleMount = 0;
 	int64_t nextAction = 0;
 
-	ProtocolGame_ptr client;
+	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;

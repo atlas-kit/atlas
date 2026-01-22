@@ -26,7 +26,6 @@ static constexpr int32_t CONNECTION_WRITE_TIMEOUT = 30;
 static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
 class Protocol;
-using Protocol_ptr = std::shared_ptr<Protocol>;
 class OutputMessage;
 using OutputMessage_ptr = std::shared_ptr<OutputMessage>;
 class Connection;
@@ -78,7 +77,7 @@ public:
 
 	void close(bool force = false);
 	// Used by protocols that require server to send first
-	void accept(Protocol_ptr protocol);
+	void accept(std::shared_ptr<Protocol> protocol);
 	void accept();
 
 	void send(const OutputMessage_ptr& msg);
@@ -109,7 +108,7 @@ private:
 	std::list<OutputMessage_ptr> messageQueue;
 
 	ConstServicePort_ptr service_port;
-	Protocol_ptr protocol;
+	std::shared_ptr<Protocol> protocol;
 
 	boost::asio::ip::tcp::socket socket;
 	Address remoteAddress;

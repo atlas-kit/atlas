@@ -98,7 +98,7 @@ void Connection::closeSocket()
 
 Connection::~Connection() { closeSocket(); }
 
-void Connection::accept(Protocol_ptr protocol)
+void Connection::accept(std::shared_ptr<Protocol> protocol)
 {
 	this->protocol = protocol;
 	g_dispatcher.addTask([=]() { protocol->onConnect(); });

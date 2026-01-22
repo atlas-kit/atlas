@@ -170,7 +170,7 @@ void ServicePort::onAccept(Connection_ptr connection, const boost::system::error
 	}
 }
 
-Protocol_ptr ServicePort::make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const
+std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const
 {
 	uint8_t protocolID = msg.getByte();
 	for (auto& service : services) {
