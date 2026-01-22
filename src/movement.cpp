@@ -73,7 +73,8 @@ std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
 
 bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node)
 {
-	const auto moveEvent{static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
+	std::unique_ptr<MoveEvent> moveEvent{
+	    static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
