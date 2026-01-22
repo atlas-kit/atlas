@@ -107,7 +107,7 @@ void Spells::clear(bool fromLua)
 
 LuaScriptInterface& Spells::getScriptInterface() { return scriptInterface; }
 
-Event_ptr Spells::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> Spells::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "rune")) {
 		return std::make_unique<RuneSpell>(&scriptInterface);
@@ -117,7 +117,7 @@ Event_ptr Spells::getEvent(const std::string& nodeName)
 	return nullptr;
 }
 
-bool Spells::registerEvent(Event_ptr event, const pugi::xml_node&)
+bool Spells::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
 	InstantSpell* instant = dynamic_cast<InstantSpell*>(event.get());
 	if (instant) {

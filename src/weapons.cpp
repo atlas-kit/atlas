@@ -85,7 +85,7 @@ void Weapons::loadDefaults()
 	}
 }
 
-Event_ptr Weapons::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> Weapons::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "melee")) {
 		return std::make_unique<WeaponMelee>(&scriptInterface);
@@ -97,7 +97,7 @@ Event_ptr Weapons::getEvent(const std::string& nodeName)
 	return nullptr;
 }
 
-bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
+bool Weapons::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
 	const auto weapon{static_cast<Weapon*>(event.release())};
 	uint16_t weaponId = weapon->getID();

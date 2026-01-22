@@ -41,15 +41,15 @@ void GlobalEvents::clear(bool fromLua)
 	reInitState(fromLua);
 }
 
-Event_ptr GlobalEvents::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> GlobalEvents::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "globalevent")) {
 		return nullptr;
 	}
-	return Event_ptr(new GlobalEvent(&scriptInterface));
+	return std::unique_ptr<Event>(new GlobalEvent(&scriptInterface));
 }
 
-bool GlobalEvents::registerEvent(Event_ptr event, const pugi::xml_node&)
+bool GlobalEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
 	const auto globalEvent{static_cast<GlobalEvent*>(event.release())}; // event is guaranteed to be a GlobalEvent
 	if (globalEvent->getEventType() == GLOBALEVENT_TIMER) {

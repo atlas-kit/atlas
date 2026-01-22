@@ -63,15 +63,15 @@ void MoveEvents::clear(bool fromLua)
 
 LuaScriptInterface& MoveEvents::getScriptInterface() { return scriptInterface; }
 
-Event_ptr MoveEvents::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "movevent")) {
 		return nullptr;
 	}
-	return Event_ptr(new MoveEvent(&scriptInterface));
+	return std::unique_ptr<Event>(new MoveEvent(&scriptInterface));
 }
 
-bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
+bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node)
 {
 	const auto moveEvent{static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
 
