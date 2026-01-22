@@ -26,8 +26,6 @@ enum MoveEvent_t
 	MOVE_EVENT_NONE
 };
 
-using MoveEvent_ptr = std::unique_ptr<MoveEvent>;
-
 struct MoveEventList
 {
 	std::list<MoveEvent> moveEvent[MOVE_EVENT_LAST];

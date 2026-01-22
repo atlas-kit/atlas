@@ -73,7 +73,7 @@ Event_ptr MoveEvents::getEvent(const std::string& nodeName)
 
 bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
 {
-	MoveEvent_ptr moveEvent{static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
+	const auto moveEvent{static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
@@ -175,7 +175,7 @@ bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
 
 bool MoveEvents::registerLuaFunction(MoveEvent* event)
 {
-	MoveEvent_ptr moveEvent{event};
+	const auto moveEvent{event};
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
@@ -213,7 +213,7 @@ bool MoveEvents::registerLuaFunction(MoveEvent* event)
 
 bool MoveEvents::registerLuaEvent(MoveEvent* event)
 {
-	MoveEvent_ptr moveEvent{event};
+	const auto moveEvent{event};
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
