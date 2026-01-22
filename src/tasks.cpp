@@ -14,7 +14,10 @@ Dispatcher g_dispatcher;
 
 std::unique_ptr<Task> createTask(TaskFunc&& f) { return std::make_unique<Task>(std::move(f)); }
 
-std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f) { return std::make_unique<Task>(expiration, std::move(f)); }
+std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f)
+{
+	return std::make_unique<Task>(expiration, std::move(f));
+}
 
 void Dispatcher::threadMain()
 {

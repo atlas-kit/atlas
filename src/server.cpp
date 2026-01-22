@@ -170,7 +170,8 @@ void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::
 	}
 }
 
-std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg, const std::shared_ptr<Connection>& connection) const
+std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg,
+                                                     const std::shared_ptr<Connection>& connection) const
 {
 	uint8_t protocolID = msg.getByte();
 	for (auto& service : services) {

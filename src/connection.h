@@ -39,7 +39,8 @@ public:
 		return instance;
 	}
 
-	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> servicePort);
+	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context,
+	                                             std::shared_ptr<const ServicePort> servicePort);
 	void releaseConnection(const std::shared_ptr<Connection>& connection);
 	void closeAll();
 
