@@ -8,9 +8,6 @@
 #include "const.h"
 #include "lua/script.h"
 
-class TalkAction;
-using TalkAction_ptr = std::unique_ptr<TalkAction>;
-
 enum TalkActionResult_t
 {
 	TALKACTION_CONTINUE,
