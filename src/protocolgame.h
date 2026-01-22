@@ -57,7 +57,7 @@ public:
 	};
 	static const char* protocol_name() { return "gameworld protocol"; }
 
-	explicit ProtocolGame(Connection_ptr connection) : Protocol(connection) {}
+	explicit ProtocolGame(std::shared_ptr<Connection> connection) : Protocol(connection) {}
 
 	void login(uint32_t characterId, uint32_t accountId, OperatingSystem_t operatingSystem);
 	void forceLogout(bool displayEffect);

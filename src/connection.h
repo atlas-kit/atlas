@@ -28,8 +28,6 @@ static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 class Protocol;
 class OutputMessage;
 class Connection;
-using Connection_ptr = std::shared_ptr<Connection>;
-using ConnectionWeak_ptr = std::weak_ptr<Connection>;
 class ServiceBase;
 using Service_ptr = std::shared_ptr<ServiceBase>;
 class ServicePort;
@@ -45,14 +43,14 @@ public:
 		return instance;
 	}
 
-	Connection_ptr createConnection(boost::asio::io_context& io_context, ConstServicePort_ptr servicePort);
-	void releaseConnection(const Connection_ptr& connection);
+	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context, ConstServicePort_ptr servicePort);
+	void releaseConnection(const std::shared_ptr<Connection>& connection);
 	void closeAll();
 
 private:
 	ConnectionManager() = default;
 
-	std::unordered_set<Connection_ptr> connections;
+	std::unordered_set<std::shared_ptr<Connection>> connections;
 	std::mutex connectionManagerLock;
 };
 
@@ -89,7 +87,7 @@ private:
 
 	void onWriteOperation(const boost::system::error_code& error);
 
-	static void handleTimeout(ConnectionWeak_ptr connectionWeak, const boost::system::error_code& error);
+	static void handleTimeout(std::weak_ptr<Connection> connectionWeak, const boost::system::error_code& error);
 
 	void closeSocket();
 	void internalSend(const std::shared_ptr<OutputMessage>& msg);

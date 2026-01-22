@@ -138,7 +138,7 @@ void ServicePort::accept()
 	                       });
 }
 
-void ServicePort::onAccept(Connection_ptr connection, const boost::system::error_code& error)
+void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::system::error_code& error)
 {
 	if (!error) {
 		if (services.empty()) {
@@ -170,7 +170,7 @@ void ServicePort::onAccept(Connection_ptr connection, const boost::system::error
 	}
 }
 
-std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const
+std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg, const std::shared_ptr<Connection>& connection) const
 {
 	uint8_t protocolID = msg.getByte();
 	for (auto& service : services) {

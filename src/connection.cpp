@@ -15,8 +15,8 @@
 
 extern Dispatcher g_dispatcher;
 
-Connection_ptr ConnectionManager::createConnection(boost::asio::io_context& io_context,
-                                                   ConstServicePort_ptr servicePort)
+std::shared_ptr<Connection> ConnectionManager::createConnection(boost::asio::io_context& io_context,
+                                                                ConstServicePort_ptr servicePort)
 {
 	std::lock_guard<std::mutex> lockClass(connectionManagerLock);
 
@@ -25,7 +25,7 @@ Connection_ptr ConnectionManager::createConnection(boost::asio::io_context& io_c
 	return connection;
 }
 
-void ConnectionManager::releaseConnection(const Connection_ptr& connection)
+void ConnectionManager::releaseConnection(const std::shared_ptr<Connection>& connection)
 {
 	std::lock_guard<std::mutex> lockClass(connectionManagerLock);
 
@@ -337,7 +337,7 @@ void Connection::onWriteOperation(const boost::system::error_code& error)
 	}
 }
 
-void Connection::handleTimeout(ConnectionWeak_ptr connectionWeak, const boost::system::error_code& error)
+void Connection::handleTimeout(std::weak_ptr<Connection> connectionWeak, const boost::system::error_code& error)
 {
 	if (error == boost::asio::error::operation_aborted) {
 		// The timer has been cancelled manually

@@ -12,7 +12,7 @@
 class Protocol : public std::enable_shared_from_this<Protocol>
 {
 public:
-	explicit Protocol(Connection_ptr connection) : connection(connection)
+	explicit Protocol(std::shared_ptr<Connection> connection) : connection(connection)
 	{
 		if (deflateInit2(&zstream, 6, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
 			std::cout << "ZLIB initialization error: " << (zstream.msg ? zstream.msg : "unknown") << std::endl;
@@ -33,7 +33,7 @@ public:
 
 	bool isConnectionExpired() const { return connection.expired(); }
 
-	Connection_ptr getConnection() const { return connection.lock(); }
+	std::shared_ptr<Connection> getConnection() const { return connection.lock(); }
 
 	Connection::Address getIP() const;
 
@@ -85,7 +85,7 @@ private:
 
 	std::shared_ptr<OutputMessage> outputBuffer;
 
-	const ConnectionWeak_ptr connection;
+	const std::weak_ptr<Connection> connection;
 	xtea::round_keys key;
 	uint32_t sequenceNumber = 0;
 	bool encryptionEnabled = false;
