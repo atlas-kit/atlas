@@ -8,8 +8,6 @@
 #include "enums.h"
 #include "lua/script.h"
 
-class Action;
-using Action_ptr = std::unique_ptr<Action>;
 using ActionFunction = std::function<bool(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item,
                                           const Position& fromPosition, const std::shared_ptr<Thing>& target,
                                           const Position& toPosition, bool isHotkey)>;
