@@ -99,7 +99,7 @@ Event_ptr Weapons::getEvent(const std::string& nodeName)
 
 bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
 {
-	Weapon_ptr weapon{static_cast<Weapon*>(event.release())};
+	const auto weapon{static_cast<Weapon*>(event.release())};
 	uint16_t weaponId = weapon->getID();
 
 	auto result = weapons.emplace(weaponId, std::move(weapon));
@@ -109,7 +109,7 @@ bool Weapons::registerEvent(Event_ptr event, const pugi::xml_node&)
 	return result.second;
 }
 
-bool Weapons::registerLuaEvent(Weapon_ptr weapon)
+bool Weapons::registerLuaEvent(std::shared_ptr<Weapon> weapon)
 {
 	auto weaponId = weapon->getID();
 	weapons[weaponId] = std::move(weapon);
