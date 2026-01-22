@@ -16,7 +16,7 @@
 extern Dispatcher g_dispatcher;
 
 std::shared_ptr<Connection> ConnectionManager::createConnection(boost::asio::io_context& io_context,
-                                                                ConstServicePort_ptr servicePort)
+                                                                std::shared_ptr<const ServicePort> servicePort)
 {
 	std::lock_guard<std::mutex> lockClass(connectionManagerLock);
 
@@ -53,7 +53,7 @@ void ConnectionManager::closeAll()
 
 // Connection
 
-Connection::Connection(boost::asio::io_context& io_context, ConstServicePort_ptr service_port) :
+Connection::Connection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> service_port) :
     readTimer(io_context),
     writeTimer(io_context),
     service_port(std::move(service_port)),

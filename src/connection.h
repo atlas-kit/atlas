@@ -28,11 +28,7 @@ static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 class Protocol;
 class OutputMessage;
 class Connection;
-class ServiceBase;
-using Service_ptr = std::shared_ptr<ServiceBase>;
 class ServicePort;
-using ServicePort_ptr = std::shared_ptr<ServicePort>;
-using ConstServicePort_ptr = std::shared_ptr<const ServicePort>;
 
 class ConnectionManager
 {
@@ -43,7 +39,7 @@ public:
 		return instance;
 	}
 
-	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context, ConstServicePort_ptr servicePort);
+	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> servicePort);
 	void releaseConnection(const std::shared_ptr<Connection>& connection);
 	void closeAll();
 
@@ -67,7 +63,7 @@ public:
 		FORCE_CLOSE = true
 	};
 
-	Connection(boost::asio::io_context& io_context, ConstServicePort_ptr service_port);
+	Connection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> service_port);
 	~Connection();
 
 	friend class ConnectionManager;
@@ -104,7 +100,7 @@ private:
 
 	std::list<std::shared_ptr<OutputMessage>> messageQueue;
 
-	ConstServicePort_ptr service_port;
+	std::shared_ptr<const ServicePort> service_port;
 	std::shared_ptr<Protocol> protocol;
 
 	boost::asio::ip::tcp::socket socket;

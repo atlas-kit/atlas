@@ -50,7 +50,7 @@ public:
 	bool is_single_socket() const;
 	std::string get_protocol_names() const;
 
-	bool add_service(const Service_ptr& service);
+	bool add_service(const std::shared_ptr<ServiceBase>& service);
 	std::shared_ptr<Protocol> make_protocol(NetworkMessage& msg, const std::shared_ptr<Connection>& connection) const;
 
 	void onStopServer();
@@ -61,7 +61,7 @@ private:
 
 	boost::asio::io_context& io_context;
 	std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
-	std::vector<Service_ptr> services;
+	std::vector<std::shared_ptr<ServiceBase>> services;
 
 	uint16_t serverPort = 0;
 	bool pendingStart = false;
@@ -88,7 +88,7 @@ public:
 private:
 	void die();
 
-	std::unordered_map<uint16_t, ServicePort_ptr> acceptors;
+	std::unordered_map<uint16_t, std::shared_ptr<ServicePort>> acceptors;
 
 	boost::asio::io_context io_context;
 	Signals signals{io_context};
@@ -105,7 +105,7 @@ bool ServiceManager::add(uint16_t port)
 		return false;
 	}
 
-	ServicePort_ptr service_port;
+	std::shared_ptr<ServicePort> service_port;
 
 	auto foundServicePort = acceptors.find(port);
 
