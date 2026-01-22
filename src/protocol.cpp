@@ -53,7 +53,7 @@ Protocol::~Protocol()
 	}
 }
 
-void Protocol::onSendMessage(const OutputMessage_ptr& msg)
+void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 {
 	if (!rawMessages) {
 		if (encryptionEnabled && checksumMode == CHECKSUM_SEQUENCE) {
@@ -83,7 +83,7 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 	parsePacket(msg);
 }
 
-OutputMessage_ptr Protocol::getOutputBuffer(int32_t size)
+std::shared_ptr<OutputMessage> Protocol::getOutputBuffer(int32_t size)
 {
 	// dispatcher thread
 	if (!outputBuffer) {

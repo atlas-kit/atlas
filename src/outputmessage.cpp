@@ -43,7 +43,7 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 
 } // namespace
 
-OutputMessage_ptr tfs::net::make_output_message()
+std::shared_ptr<OutputMessage> tfs::net::make_output_message()
 {
 	// LockfreePoolingAllocator<void,...> will leave (void* allocate) ill-formed because of sizeof(T), so this
 	// guarantees that only one list will be initialized

@@ -27,7 +27,6 @@ static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
 class Protocol;
 class OutputMessage;
-using OutputMessage_ptr = std::shared_ptr<OutputMessage>;
 class Connection;
 using Connection_ptr = std::shared_ptr<Connection>;
 using ConnectionWeak_ptr = std::weak_ptr<Connection>;
@@ -80,7 +79,7 @@ public:
 	void accept(std::shared_ptr<Protocol> protocol);
 	void accept();
 
-	void send(const OutputMessage_ptr& msg);
+	void send(const std::shared_ptr<OutputMessage>& msg);
 
 	const Address& getIP() const { return remoteAddress; };
 
@@ -93,7 +92,7 @@ private:
 	static void handleTimeout(ConnectionWeak_ptr connectionWeak, const boost::system::error_code& error);
 
 	void closeSocket();
-	void internalSend(const OutputMessage_ptr& msg);
+	void internalSend(const std::shared_ptr<OutputMessage>& msg);
 
 	boost::asio::ip::tcp::socket& getSocket() { return socket; }
 	friend class ServicePort;
@@ -105,7 +104,7 @@ private:
 
 	std::recursive_mutex connectionLock;
 
-	std::list<OutputMessage_ptr> messageQueue;
+	std::list<std::shared_ptr<OutputMessage>> messageQueue;
 
 	ConstServicePort_ptr service_port;
 	std::shared_ptr<Protocol> protocol;

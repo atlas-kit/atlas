@@ -26,7 +26,7 @@ public:
 
 	virtual void parsePacket(NetworkMessage&) {}
 
-	virtual void onSendMessage(const OutputMessage_ptr& msg);
+	virtual void onSendMessage(const std::shared_ptr<OutputMessage>& msg);
 	void onRecvMessage(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
 	virtual void onConnect() {}
@@ -38,11 +38,11 @@ public:
 	Connection::Address getIP() const;
 
 	// Use this function for autosend messages only
-	OutputMessage_ptr getOutputBuffer(int32_t size);
+	std::shared_ptr<OutputMessage> getOutputBuffer(int32_t size);
 
-	OutputMessage_ptr& getCurrentBuffer() { return outputBuffer; }
+	std::shared_ptr<OutputMessage>& getCurrentBuffer() { return outputBuffer; }
 
-	void send(OutputMessage_ptr msg) const
+	void send(std::shared_ptr<OutputMessage> msg) const
 	{
 		if (auto connection = getConnection()) {
 			connection->send(msg);
@@ -83,7 +83,7 @@ protected:
 private:
 	friend class Connection;
 
-	OutputMessage_ptr outputBuffer;
+	std::shared_ptr<OutputMessage> outputBuffer;
 
 	const ConnectionWeak_ptr connection;
 	xtea::round_keys key;

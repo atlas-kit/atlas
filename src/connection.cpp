@@ -276,7 +276,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 }
 
-void Connection::send(const OutputMessage_ptr& msg)
+void Connection::send(const std::shared_ptr<OutputMessage>& msg)
 {
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	if (connectionState == CONNECTION_STATE_DISCONNECTED) {
@@ -297,7 +297,7 @@ void Connection::send(const OutputMessage_ptr& msg)
 	}
 }
 
-void Connection::internalSend(const OutputMessage_ptr& msg)
+void Connection::internalSend(const std::shared_ptr<OutputMessage>& msg)
 {
 	protocol->onSendMessage(msg);
 	try {
