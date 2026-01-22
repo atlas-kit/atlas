@@ -40,15 +40,13 @@ private:
 	TaskFunc func;
 };
 
-using Task_ptr = std::unique_ptr<Task>;
-
-Task_ptr createTask(TaskFunc&& f);
-Task_ptr createTask(uint32_t expiration, TaskFunc&& f);
+std::unique_ptr<Task> createTask(TaskFunc&& f);
+std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f);
 
 class Dispatcher : public ThreadHolder<Dispatcher>
 {
 public:
-	void addTask(Task_ptr&& task);
+	void addTask(std::unique_ptr<Task>&& task);
 
 	void addTask(TaskFunc&& f) { addTask(std::make_unique<Task>(std::move(f))); }
 
@@ -64,7 +62,7 @@ private:
 	std::mutex taskLock;
 	std::condition_variable taskSignal;
 
-	std::vector<Task_ptr> taskList;
+	std::vector<std::unique_ptr<Task>> taskList;
 	uint64_t dispatcherCycle = 0;
 };
 

@@ -1171,8 +1171,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask_ptr task);
-	void setNextActionTask(SchedulerTask_ptr task);
+	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
 	void setNextAction(int64_t time)
 	{
@@ -1306,7 +1306,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask_ptr walkTask;
+	std::unique_ptr<SchedulerTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;
