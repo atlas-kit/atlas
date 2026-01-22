@@ -8,7 +8,6 @@
 #include "lua/script.h"
 
 class GlobalEvent;
-using GlobalEvent_ptr = std::unique_ptr<GlobalEvent>;
 using GlobalEventMap = std::map<std::string, GlobalEvent>;
 
 enum GlobalEvent_t
