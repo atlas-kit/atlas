@@ -9,9 +9,6 @@
 class Item;
 struct Position;
 
-class NetworkMessage;
-using NetworkMessage_ptr = std::unique_ptr<NetworkMessage>;
-
 class NetworkMessage
 {
 public:
