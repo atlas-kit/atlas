@@ -9,6 +9,8 @@
 #include "spawn.h"
 #include "town.h"
 
+#include <unordered_map>
+
 class Creature;
 class Tile;
 
@@ -58,7 +60,7 @@ private:
 	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
 };
 
-using SpectatorCache = std::map<Position, SpectatorVec>;
+using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;
 
 static constexpr int32_t FLOOR_BITS = 3;
 static constexpr int32_t FLOOR_SIZE = (1 << FLOOR_BITS);
