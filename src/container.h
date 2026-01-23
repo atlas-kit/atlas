@@ -57,8 +57,8 @@ public:
 	virtual std::shared_ptr<DepotLocker> asDepotLocker() { return nullptr; }
 	virtual std::shared_ptr<const DepotLocker> asDepotLocker() const { return nullptr; }
 
-	virtual std::shared_ptr<StoreInbox> getStoreInbox() { return nullptr; }
-	virtual std::shared_ptr<const StoreInbox> getStoreInbox() const { return nullptr; }
+	virtual std::shared_ptr<StoreInbox> asStoreInbox() { return nullptr; }
+	virtual std::shared_ptr<const StoreInbox> asStoreInbox() const { return nullptr; }
 
 	bool hasContainerParent() const;
 
