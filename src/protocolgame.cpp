@@ -153,7 +153,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 	// dispatcher thread
 	const auto& foundPlayer = g_game.getPlayerByGUID(characterId);
 	if (!foundPlayer || getBoolean(ConfigManager::ALLOW_CLONES)) {
-		player = std::make_shared<Player>(getThis());
+		player = std::make_shared<Player>(std::static_pointer_cast<ProtocolGame>(shared_from_this()));
 
 		player->setID();
 		player->setGUID(characterId);
@@ -239,10 +239,9 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 		if (foundPlayer->client) {
 			foundPlayer->disconnect();
 
-			eventConnect = g_scheduler.addEvent(
-			    createSchedulerTask(1000, [=, thisPtr = getThis(), playerID = foundPlayer->getID()]() {
-				    thisPtr->connect(playerID, operatingSystem);
-			    }));
+			eventConnect = g_scheduler.addEvent(createSchedulerTask(
+			    1000, [=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
+			           playerID = foundPlayer->getID()]() { self->connect(playerID, operatingSystem); }));
 		} else {
 			connect(foundPlayer->getID(), operatingSystem);
 		}
@@ -274,7 +273,7 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 	player->clearModalWindows();
 	player->setOperatingSystem(operatingSystem);
 
-	player->client = getThis();
+	player->client = std::static_pointer_cast<ProtocolGame>(shared_from_this());
 	player->onCreatureAppear(player, false, CONST_ME_NONE);
 	player->lastIP = player->getIP();
 	player->lastLoginSaved = std::max<time_t>(time(nullptr), player->lastLoginSaved + 1);
@@ -455,8 +454,9 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		disconnectClient("Your game session is already locked to a different IP. Please log in again.");
 	}
 
-	g_dispatcher.addTask([=, thisPtr = getThis(), characterId = result->getNumber<uint32_t>("character_id")]() {
-		thisPtr->login(characterId, accountId, operatingSystem);
+	g_dispatcher.addTask([=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
+	                      characterId = result->getNumber<uint32_t>("character_id")]() {
+		self->login(characterId, accountId, operatingSystem);
 	});
 }
 
@@ -534,7 +534,8 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 
 	switch (recvbyte) {
 		case 0x14:
-			g_dispatcher.addTask([thisPtr = getThis()]() { thisPtr->logout(true); });
+			g_dispatcher.addTask(
+			    [self = std::static_pointer_cast<ProtocolGame>(shared_from_this())]() { self->logout(true); });
 			break;
 		// case 0x2A: break; // bestiary tracker
 		// case 0x2C: break; // team finder (leader)
@@ -1497,10 +1498,11 @@ void ProtocolGame::parseMarketCreateOffer(NetworkMessage& msg)
 	uint64_t price = msg.get<uint64_t>();
 	bool anonymous = (msg.getByte() != 0);
 
-	g_dispatcher.addTask([=, playerID = player->getID(), thisPtr = getThis()]() {
-		thisPtr->sendStoreBalance();
-		g_game.playerCreateMarketOffer(playerID, type, spriteId, amount, price, anonymous);
-	});
+	g_dispatcher.addTask(
+	    [=, playerID = player->getID(), self = std::static_pointer_cast<ProtocolGame>(shared_from_this())]() {
+		    self->sendStoreBalance();
+		    g_game.playerCreateMarketOffer(playerID, type, spriteId, amount, price, anonymous);
+	    });
 }
 
 void ProtocolGame::parseMarketCancelOffer(NetworkMessage& msg)
@@ -1508,10 +1510,11 @@ void ProtocolGame::parseMarketCancelOffer(NetworkMessage& msg)
 	uint32_t timestamp = msg.get<uint32_t>();
 	uint16_t counter = msg.get<uint16_t>();
 
-	g_dispatcher.addTask([=, playerID = player->getID(), thisPtr = getThis()]() {
-		thisPtr->sendStoreBalance();
-		g_game.playerCancelMarketOffer(playerID, timestamp, counter);
-	});
+	g_dispatcher.addTask(
+	    [=, playerID = player->getID(), self = std::static_pointer_cast<ProtocolGame>(shared_from_this())]() {
+		    self->sendStoreBalance();
+		    g_game.playerCancelMarketOffer(playerID, timestamp, counter);
+	    });
 }
 
 void ProtocolGame::parseMarketAcceptOffer(NetworkMessage& msg)

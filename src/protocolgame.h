@@ -66,7 +66,6 @@ public:
 	uint16_t getVersion() const { return version; }
 
 private:
-	std::shared_ptr<ProtocolGame> getThis() { return std::static_pointer_cast<ProtocolGame>(shared_from_this()); }
 	void connect(uint32_t playerId, OperatingSystem_t operatingSystem);
 	void disconnectClient(const std::string& message) const;
 	void writeToOutputBuffer(const NetworkMessage& msg);
