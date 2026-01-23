@@ -4,6 +4,10 @@
 #ifndef FS_POSITION_H
 #define FS_POSITION_H
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+
 enum Direction : uint8_t
 {
 	DIRECTION_NORTH = 0,
@@ -61,6 +65,18 @@ struct Position
 	constexpr int32_t getX() const { return x; }
 	constexpr int32_t getY() const { return y; }
 	constexpr int16_t getZ() const { return z; }
+};
+
+struct PositionHash
+{
+	size_t operator()(const Position& position) const noexcept
+	{
+		const uint64_t x = static_cast<uint64_t>(position.x);
+		const uint64_t y = static_cast<uint64_t>(position.y);
+		const uint64_t z = static_cast<uint64_t>(position.z);
+		const uint64_t packed = (x << 24) | (y << 8) | z;
+		return std::hash<uint64_t>{}(packed);
+	}
 };
 
 std::ostream& operator<<(std::ostream&, const Position&);
