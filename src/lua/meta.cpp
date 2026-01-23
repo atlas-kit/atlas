@@ -52,7 +52,7 @@ void setItemMetatable(lua_State* L, int32_t index, const std::shared_ptr<const I
 {
 	if (item->getContainer()) {
 		luaL_getmetatable(L, "Container");
-	} else if (item->getTeleport()) {
+	} else if (item->asTeleport()) {
 		luaL_getmetatable(L, "Teleport");
 	} else if (item->asPodium()) {
 		luaL_getmetatable(L, "Podium");
