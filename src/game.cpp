@@ -2382,7 +2382,7 @@ void Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return;
 	}
 
-	if (const auto& podium = item->getPodium()) {
+	if (const auto& podium = item->asPodium()) {
 		podium->setDirection(static_cast<Direction>((podium->getDirection() + 1) % 4));
 		updatePodium(podium);
 	} else {

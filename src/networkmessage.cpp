@@ -166,7 +166,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 	// display outfit on the podium
 	if (it.isPodium()) {
-		const auto& podium = item->getPodium();
+		const auto& podium = item->asPodium();
 		const Outfit_t& outfit = podium->getOutfit();
 
 		// add outfit
