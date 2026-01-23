@@ -412,7 +412,7 @@ std::shared_ptr<Thing> Container::queryDestination(int32_t& index, const std::sh
 
 	if (index != INDEX_WHEREEVER) {
 		if (const auto& itemFromIndex = getItemByIndex(index)) {
-			if (const auto& receiver = itemFromIndex->getReceiver()) {
+			if (const auto& receiver = itemFromIndex->asReceiver()) {
 				index = INDEX_WHEREEVER;
 				destItem = nullptr;
 				return receiver;

@@ -124,8 +124,8 @@ public:
 	Tile(const Tile&) = delete;
 	Tile& operator=(const Tile&) = delete;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Tile> getTile() override final { return std::static_pointer_cast<Tile>(shared_from_this()); }
 	std::shared_ptr<const Tile> getTile() const override final

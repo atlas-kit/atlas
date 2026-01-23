@@ -11,8 +11,8 @@ class Teleport final : public Item
 public:
 	explicit Teleport(uint16_t type) : Item{type} {};
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Teleport> asTeleport() override { return std::static_pointer_cast<Teleport>(shared_from_this()); }
 	std::shared_ptr<const Teleport> asTeleport() const override

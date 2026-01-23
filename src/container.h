@@ -42,8 +42,8 @@ public:
 
 	std::shared_ptr<Item> clone() const override final;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Container> asContainer() override final
 	{

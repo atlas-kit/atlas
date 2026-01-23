@@ -2817,7 +2817,7 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 		return asPlayer();
 	}
 
-	const auto& receiver = item->getReceiver();
+	const auto& receiver = item->asReceiver();
 	if (!receiver) {
 		destItem = item;
 		return asPlayer();
