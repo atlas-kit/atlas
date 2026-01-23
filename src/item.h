@@ -475,8 +475,8 @@ public:
 	virtual std::shared_ptr<const Mailbox> getMailbox() const { return nullptr; }
 	virtual std::shared_ptr<Door> getDoor() { return nullptr; }
 	virtual std::shared_ptr<const Door> getDoor() const { return nullptr; }
-	virtual std::shared_ptr<MagicField> getMagicField() { return nullptr; }
-	virtual std::shared_ptr<const MagicField> getMagicField() const { return nullptr; }
+	virtual std::shared_ptr<MagicField> asMagicField() { return nullptr; }
+	virtual std::shared_ptr<const MagicField> asMagicField() const { return nullptr; }
 	virtual std::shared_ptr<Podium> asPodium() { return nullptr; }
 	virtual std::shared_ptr<const Podium> asPodium() const { return nullptr; }
 

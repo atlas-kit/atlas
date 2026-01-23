@@ -136,14 +136,14 @@ std::shared_ptr<MagicField> Tile::getFieldItem() const
 		return nullptr;
 	}
 
-	if (ground && ground->getMagicField()) {
-		return ground->getMagicField();
+	if (ground && ground->asMagicField()) {
+		return ground->asMagicField();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getMagicField()) {
-				return (*it)->getMagicField();
+			if ((*it)->asMagicField()) {
+				return (*it)->asMagicField();
 			}
 		}
 	}
@@ -870,7 +870,7 @@ void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 				if (items) {
 					// remove old field item if exists
 					for (auto it = items->getBeginDownItem(), end = items->getEndDownItem(); it != end; ++it) {
-						if (const auto oldField = (*it)->getMagicField()) {
+						if (const auto oldField = (*it)->asMagicField()) {
 							if (oldField->isReplaceable()) {
 								removeThing(oldField, 1);
 								assert(oldField->getParent() == nullptr);
@@ -1404,7 +1404,7 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_TELEPORT);
 	}
 
-	if (item->getMagicField()) {
+	if (item->asMagicField()) {
 		setFlag(TILESTATE_MAGICFIELD);
 	}
 
@@ -1467,7 +1467,7 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 		resetFlag(TILESTATE_TELEPORT);
 	}
 
-	if (item->getMagicField()) {
+	if (item->asMagicField()) {
 		resetFlag(TILESTATE_MAGICFIELD);
 	}
 
