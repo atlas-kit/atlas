@@ -25,7 +25,7 @@ int luaGetDepotId(lua_State* L)
 		return 1;
 	}
 
-	const auto& depotLocker = container->getDepotLocker();
+	const auto& depotLocker = container->asDepotLocker();
 	if (!depotLocker) {
 		tfs::lua::reportError(L, "Depot not found");
 		tfs::lua::pushBoolean(L, false);
@@ -40,7 +40,7 @@ int luaIsDepot(lua_State* L)
 {
 	// isDepot(uid)
 	const auto& container = tfs::lua::getScriptEnv()->getContainerByUID(tfs::lua::getNumber<uint32_t>(L, -1));
-	tfs::lua::pushBoolean(L, container && container->getDepotLocker());
+	tfs::lua::pushBoolean(L, container && container->asDepotLocker());
 	return 1;
 }
 

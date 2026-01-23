@@ -54,8 +54,8 @@ public:
 		return std::static_pointer_cast<const Container>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<DepotLocker> getDepotLocker() { return nullptr; }
-	virtual std::shared_ptr<const DepotLocker> getDepotLocker() const { return nullptr; }
+	virtual std::shared_ptr<DepotLocker> asDepotLocker() { return nullptr; }
+	virtual std::shared_ptr<const DepotLocker> asDepotLocker() const { return nullptr; }
 
 	virtual std::shared_ptr<StoreInbox> getStoreInbox() { return nullptr; }
 	virtual std::shared_ptr<const StoreInbox> getStoreInbox() const { return nullptr; }

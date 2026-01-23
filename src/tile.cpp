@@ -1415,7 +1415,7 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 	}
 
 	if (const auto& container = item->asContainer()) {
-		if (container->getDepotLocker()) {
+		if (container->asDepotLocker()) {
 			setFlag(TILESTATE_DEPOT);
 		}
 	}
@@ -1474,7 +1474,7 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 	}
 
 	if (const auto& container = item->asContainer()) {
-		if (container->getDepotLocker()) {
+		if (container->asDepotLocker()) {
 			resetFlag(TILESTATE_DEPOT);
 		}
 	}
