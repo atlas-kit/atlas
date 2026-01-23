@@ -68,7 +68,7 @@ std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
 	if (!boost::iequals(nodeName, "movevent")) {
 		return nullptr;
 	}
-	return std::unique_ptr<Event>(new MoveEvent(&scriptInterface));
+	return std::make_unique<MoveEvent>(&scriptInterface);
 }
 
 bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node)

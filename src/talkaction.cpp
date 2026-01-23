@@ -33,7 +33,7 @@ std::unique_ptr<Event> TalkActions::getEvent(const std::string& nodeName)
 	if (!boost::iequals(nodeName, "talkaction")) {
 		return nullptr;
 	}
-	return std::unique_ptr<Event>(new TalkAction(&scriptInterface));
+	return std::make_unique<TalkAction>(&scriptInterface);
 }
 
 bool TalkActions::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)

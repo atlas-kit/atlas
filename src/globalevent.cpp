@@ -46,7 +46,7 @@ std::unique_ptr<Event> GlobalEvents::getEvent(const std::string& nodeName)
 	if (!boost::iequals(nodeName, "globalevent")) {
 		return nullptr;
 	}
-	return std::unique_ptr<Event>(new GlobalEvent(&scriptInterface));
+	return std::make_unique<GlobalEvent>(&scriptInterface);
 }
 
 bool GlobalEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)

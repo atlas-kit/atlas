@@ -47,7 +47,7 @@ std::unique_ptr<Event> Actions::getEvent(const std::string& nodeName)
 	if (!boost::iequals(nodeName, "action")) {
 		return nullptr;
 	}
-	return std::unique_ptr<Event>(new Action(&scriptInterface));
+	return std::make_unique<Action>(&scriptInterface);
 }
 
 bool Actions::registerLuaEvent(Action* event)
