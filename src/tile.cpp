@@ -323,7 +323,7 @@ std::shared_ptr<Thing> Tile::getTopVisibleThing(const std::shared_ptr<const Crea
 
 void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 {
-	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->getContainer()) {
+	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			it->second->addItemBack(item);
@@ -354,7 +354,7 @@ void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType& oldType,
                             const std::shared_ptr<Item>& newItem, const ItemType& newType)
 {
-	if (newItem->hasProperty(CONST_PROP_MOVEABLE) || newItem->getContainer()) {
+	if (newItem->hasProperty(CONST_PROP_MOVEABLE) || newItem->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			int32_t index = it->second->getThingIndex(oldItem);
@@ -363,7 +363,7 @@ void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType
 				newItem->setParent(it->second);
 			}
 		}
-	} else if (oldItem->hasProperty(CONST_PROP_MOVEABLE) || oldItem->getContainer()) {
+	} else if (oldItem->hasProperty(CONST_PROP_MOVEABLE) || oldItem->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			const auto& oldParent = oldItem->getParent();
@@ -391,7 +391,7 @@ void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType
 void Tile::onRemoveTileItem(const SpectatorVec& spectators, const std::vector<int32_t>& oldStackPosVector,
                             const std::shared_ptr<Item>& item)
 {
-	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->getContainer()) {
+	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			it->second->removeThing(item, item->getItemCount());
@@ -1414,7 +1414,7 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_BLOCKSOLID);
 	}
 
-	if (const auto& container = item->getContainer()) {
+	if (const auto& container = item->asContainer()) {
 		if (container->getDepotLocker()) {
 			setFlag(TILESTATE_DEPOT);
 		}
@@ -1473,7 +1473,7 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 		resetFlag(TILESTATE_TRASHHOLDER);
 	}
 
-	if (const auto& container = item->getContainer()) {
+	if (const auto& container = item->asContainer()) {
 		if (container->getDepotLocker()) {
 			resetFlag(TILESTATE_DEPOT);
 		}

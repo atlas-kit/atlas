@@ -465,8 +465,8 @@ public:
 		return std::static_pointer_cast<const Item>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<Container> getContainer() { return nullptr; }
-	virtual std::shared_ptr<const Container> getContainer() const { return nullptr; }
+	virtual std::shared_ptr<Container> asContainer() { return nullptr; }
+	virtual std::shared_ptr<const Container> asContainer() const { return nullptr; }
 	virtual std::shared_ptr<Teleport> asTeleport() { return nullptr; }
 	virtual std::shared_ptr<const Teleport> asTeleport() const { return nullptr; }
 	virtual std::shared_ptr<TrashHolder> asTrashHolder() { return nullptr; }

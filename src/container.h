@@ -45,11 +45,11 @@ public:
 	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
 	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
 
-	std::shared_ptr<Container> getContainer() override final
+	std::shared_ptr<Container> asContainer() override final
 	{
 		return std::static_pointer_cast<Container>(shared_from_this());
 	}
-	std::shared_ptr<const Container> getContainer() const override final
+	std::shared_ptr<const Container> asContainer() const override final
 	{
 		return std::static_pointer_cast<const Container>(shared_from_this());
 	}

@@ -93,7 +93,7 @@ int luaContainerGetEmptySlots(lua_State* L)
 	bool recursive = tfs::lua::getBoolean(L, 2, false);
 	if (recursive) {
 		for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
-			if (const auto& tmpContainer = (*it)->getContainer()) {
+			if (const auto& tmpContainer = (*it)->asContainer()) {
 				slots += tmpContainer->capacity() - tmpContainer->size();
 			}
 		}

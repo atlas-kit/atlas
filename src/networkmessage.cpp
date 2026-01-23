@@ -155,7 +155,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
 		// quiver ammo count
-		const auto& container = item->getContainer();
+		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x01);
 			add<uint32_t>(container->getAmmoCount());

@@ -24,7 +24,7 @@ ReturnValue DepotChest::queryAdd(int32_t index, const std::shared_ptr<const Thin
 		}
 
 		if (item->getTopParent().get() != this) {
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				addCount = container->getItemHoldingCount() + 1;
 			} else {
 				addCount = 1;

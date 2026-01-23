@@ -216,7 +216,7 @@ bool House::transferToDepot(const std::shared_ptr<Player>& player) const
 			for (const auto& item : *items) {
 				if (item->isPickupable()) {
 					moveItemList.push_back(item);
-				} else if (const auto& container = item->getContainer()) {
+				} else if (const auto& container = item->asContainer()) {
 					for (const auto& containerItem : container->getItemList()) {
 						moveItemList.push_back(containerItem);
 					}
