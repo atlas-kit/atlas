@@ -12,7 +12,7 @@
 class Protocol : public std::enable_shared_from_this<Protocol>
 {
 public:
-	explicit Protocol(std::shared_ptr<Connection> connection) : connection(connection)
+	explicit Protocol(std::shared_ptr<Connection> connection) : connection(std::move(connection))
 	{
 		if (deflateInit2(&zstream, 6, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
 			std::cout << "ZLIB initialization error: " << (zstream.msg ? zstream.msg : "unknown") << std::endl;
