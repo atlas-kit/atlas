@@ -156,14 +156,14 @@ std::shared_ptr<TrashHolder> Tile::getTrashHolder() const
 		return nullptr;
 	}
 
-	if (ground && ground->getTrashHolder()) {
-		return ground->getTrashHolder();
+	if (ground && ground->asTrashHolder()) {
+		return ground->asTrashHolder();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getTrashHolder()) {
-				return (*it)->getTrashHolder();
+			if ((*it)->asTrashHolder()) {
+				return (*it)->asTrashHolder();
 			}
 		}
 	}
@@ -1406,7 +1406,7 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_MAILBOX);
 	}
 
-	if (item->getTrashHolder()) {
+	if (item->asTrashHolder()) {
 		setFlag(TILESTATE_TRASHHOLDER);
 	}
 
@@ -1469,7 +1469,7 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 		resetFlag(TILESTATE_MAILBOX);
 	}
 
-	if (item->getTrashHolder()) {
+	if (item->asTrashHolder()) {
 		resetFlag(TILESTATE_TRASHHOLDER);
 	}
 
