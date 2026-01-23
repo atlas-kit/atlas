@@ -176,14 +176,14 @@ std::shared_ptr<Mailbox> Tile::getMailbox() const
 		return nullptr;
 	}
 
-	if (ground && ground->getMailbox()) {
-		return ground->getMailbox();
+	if (ground && ground->asMailbox()) {
+		return ground->asMailbox();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getMailbox()) {
-				return (*it)->getMailbox();
+			if ((*it)->asMailbox()) {
+				return (*it)->asMailbox();
 			}
 		}
 	}
@@ -1275,18 +1275,12 @@ void Tile::postAddNotification(const std::shared_ptr<Thing>& thing, const std::s
 	}
 
 	if (link == LINK_OWNER) {
-		if (hasFlag(TILESTATE_TELEPORT)) {
-			if (const auto& teleport = getTeleportItem()) {
-				teleport->addThing(thing);
-			}
-		} else if (hasFlag(TILESTATE_TRASHHOLDER)) {
-			if (const auto& trashholder = getTrashHolder()) {
-				trashholder->addThing(thing);
-			}
-		} else if (hasFlag(TILESTATE_MAILBOX)) {
-			if (const auto& mailbox = getMailbox()) {
-				mailbox->addThing(thing);
-			}
+		if (const auto& teleport = getTeleportItem()) {
+			teleport->addThing(thing);
+		} else if (const auto& trashholder = getTrashHolder()) {
+			trashholder->addThing(thing);
+		} else if (const auto& mailbox = getMailbox()) {
+			mailbox->addThing(thing);
 		}
 
 		// calling movement scripts
@@ -1408,7 +1402,7 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_MAGICFIELD);
 	}
 
-	if (item->getMailbox()) {
+	if (item->asMailbox()) {
 		setFlag(TILESTATE_MAILBOX);
 	}
 
@@ -1471,7 +1465,7 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 		resetFlag(TILESTATE_MAGICFIELD);
 	}
 
-	if (item->getMailbox()) {
+	if (item->asMailbox()) {
 		resetFlag(TILESTATE_MAILBOX);
 	}
 
