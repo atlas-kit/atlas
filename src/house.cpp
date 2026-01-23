@@ -134,7 +134,7 @@ bool House::kickPlayer(const std::shared_ptr<Player>& player, const std::shared_
 		return false;
 	}
 
-	const auto& houseTile = tile->getHouseTile();
+	const auto& houseTile = tile->asHouseTile();
 	if (!houseTile) {
 		return false;
 	}

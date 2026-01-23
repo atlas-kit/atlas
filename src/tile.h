@@ -139,8 +139,8 @@ public:
 		return std::static_pointer_cast<const Tile>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<HouseTile> getHouseTile() { return nullptr; }
-	virtual std::shared_ptr<const HouseTile> getHouseTile() const { return nullptr; }
+	virtual std::shared_ptr<HouseTile> asHouseTile() { return nullptr; }
+	virtual std::shared_ptr<const HouseTile> asHouseTile() const { return nullptr; }
 
 	virtual TileItemVector* getItemList() = 0;
 	virtual const TileItemVector* getItemList() const = 0;

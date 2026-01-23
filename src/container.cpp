@@ -272,7 +272,7 @@ ReturnValue Container::queryAdd(int32_t index, const std::shared_ptr<const Thing
 	const auto& topParent = getTopParent();
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = topParent->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->asPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}
@@ -361,7 +361,7 @@ ReturnValue Container::queryRemove(const std::shared_ptr<const Thing>& thing, ui
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		const auto& topParent = getTopParent();
 		if (const auto& tile = topParent->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->asPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}

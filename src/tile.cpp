@@ -345,7 +345,7 @@ void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 
 	if ((!hasFlag(TILESTATE_PROTECTIONZONE) || getBoolean(ConfigManager::CLEAN_PROTECTION_ZONES)) &&
 	    item->isCleanable()) {
-		if (!getHouseTile()) {
+		if (!asHouseTile()) {
 			g_game.addTileToClean(asTile());
 		}
 	}
