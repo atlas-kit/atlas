@@ -1515,7 +1515,7 @@ std::shared_ptr<Item> Tile::getUseItem(int32_t index) const
 
 	// try getting door
 	for (const auto& item : *items | std::views::reverse) {
-		if (item->getDoor()) {
+		if (item->asDoor()) {
 			return item;
 		}
 	}

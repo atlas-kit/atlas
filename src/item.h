@@ -473,8 +473,8 @@ public:
 	virtual std::shared_ptr<const TrashHolder> getTrashHolder() const { return nullptr; }
 	virtual std::shared_ptr<Mailbox> getMailbox() { return nullptr; }
 	virtual std::shared_ptr<const Mailbox> getMailbox() const { return nullptr; }
-	virtual std::shared_ptr<Door> getDoor() { return nullptr; }
-	virtual std::shared_ptr<const Door> getDoor() const { return nullptr; }
+	virtual std::shared_ptr<Door> asDoor() { return nullptr; }
+	virtual std::shared_ptr<const Door> asDoor() const { return nullptr; }
 	virtual std::shared_ptr<MagicField> asMagicField() { return nullptr; }
 	virtual std::shared_ptr<const MagicField> asMagicField() const { return nullptr; }
 	virtual std::shared_ptr<Podium> asPodium() { return nullptr; }

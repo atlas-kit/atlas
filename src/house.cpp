@@ -524,6 +524,6 @@ void Door::onRemoved()
 	Item::onRemoved();
 
 	if (const auto& house = getHouse()) {
-		house->removeDoor(getDoor());
+		house->removeDoor(asDoor());
 	}
 }

@@ -45,7 +45,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 				if (findItem->getID() == id) {
 					item = findItem;
 					break;
-				} else if (iType.isDoor() && findItem->getDoor()) {
+				} else if (iType.isDoor() && findItem->asDoor()) {
 					item = findItem;
 					break;
 				}
@@ -199,7 +199,7 @@ void IOMapSerialize::saveTile(PropWriteStream& stream, const std::shared_ptr<con
 		const ItemType& it = Item::items[item->getID()];
 
 		// Note that these are NEGATED, ie. these are the items that will be saved.
-		if (!(it.moveable || it.forceSerialize || item->getDoor() ||
+		if (!(it.moveable || it.forceSerialize || item->asDoor() ||
 		      (item->getContainer() && !item->getContainer()->empty()) || it.canWriteText)) {
 			continue;
 		}
