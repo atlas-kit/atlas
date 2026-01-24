@@ -389,8 +389,7 @@ void AccessList::parseList(std::string_view list)
 			}
 		} else if (line == "*") {
 			allowEveryone = true;
-		} else if (line.find("!") != std::string::npos || line.find("*") != std::string::npos ||
-		           line.find("?") != std::string::npos) {
+		} else if (line.find_first_of("!*?") != std::string::npos) {
 			continue; // regexp no longer supported
 		} else {
 			addPlayer(line);

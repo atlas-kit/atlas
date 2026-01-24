@@ -1113,12 +1113,15 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 	// check if we can add this item
 	ReturnValue ret = toThing->queryAdd(index, item, count, flags, actor);
 	if (ret == RETURNVALUE_NEEDEXCHANGE) {
+		// cache toItem count to avoid repeated method calls
+		const uint32_t toItemCount = toItem->getItemCount();
+
 		// check if we can add it to source thing
-		ret = fromThing->queryAdd(fromThing->getThingIndex(item), toItem, toItem->getItemCount(), 0);
+		ret = fromThing->queryAdd(fromThing->getThingIndex(item), toItem, toItemCount, 0);
 		if (ret == RETURNVALUE_NOERROR) {
 			if (actorPlayer && fromPos && toPos) {
 				const ReturnValue eventRet = tfs::events::player::onMoveItem(
-				    actorPlayer, toItem, toItem->getItemCount(), *toPos, *fromPos, toThing, fromThing);
+				    actorPlayer, toItem, toItemCount, *toPos, *fromPos, toThing, fromThing);
 				if (eventRet != RETURNVALUE_NOERROR) {
 					return eventRet;
 				}
@@ -1127,15 +1130,15 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 			// check how much we can move
 			uint32_t maxExchangeQueryCount = 0;
 			ReturnValue retExchangeMaxCount =
-			    fromThing->queryMaxCount(INDEX_WHEREEVER, toItem, toItem->getItemCount(), maxExchangeQueryCount, 0);
+			    fromThing->queryMaxCount(INDEX_WHEREEVER, toItem, toItemCount, maxExchangeQueryCount, 0);
 
 			if (retExchangeMaxCount != RETURNVALUE_NOERROR && maxExchangeQueryCount == 0) {
 				return retExchangeMaxCount;
 			}
 
-			if (toThing->queryRemove(toItem, toItem->getItemCount(), flags, actor) == RETURNVALUE_NOERROR) {
+			if (toThing->queryRemove(toItem, toItemCount, flags, actor) == RETURNVALUE_NOERROR) {
 				int32_t oldToItemIndex = toThing->getThingIndex(toItem);
-				toThing->removeThing(toItem, toItem->getItemCount());
+				toThing->removeThing(toItem, toItemCount);
 				fromThing->addThing(toItem);
 
 				if (oldToItemIndex != -1) {
@@ -1150,7 +1153,7 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 				ret = toThing->queryAdd(index, item, count, flags);
 
 				if (actorPlayer && fromPos && toPos && !toItem->isRemoved()) {
-					tfs::events::player::onItemMoved(actorPlayer, toItem, toItem->getItemCount(), *toPos, *fromPos,
+					tfs::events::player::onItemMoved(actorPlayer, toItem, toItemCount, *toPos, *fromPos,
 					                                 toThing, fromThing);
 				}
 
@@ -1329,10 +1332,11 @@ ReturnValue Game::internalAddItem(const std::shared_ptr<Thing>& toThing, const s
 	}
 
 	if (item->isStackable() && toItem && *item == *toItem) {
+		const uint32_t toItemCount = toItem->getItemCount();
 		uint32_t m = std::min<uint32_t>(item->getItemCount(), maxQueryCount);
-		uint32_t n = std::min<uint32_t>(ITEM_STACK_SIZE - toItem->getItemCount(), m);
+		uint32_t n = std::min<uint32_t>(ITEM_STACK_SIZE - toItemCount, m);
 
-		destThing->updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
+		destThing->updateThing(toItem, toItem->getID(), toItemCount + n);
 
 		int32_t count = m - n;
 		if (count > 0) {
@@ -2768,37 +2772,36 @@ void Game::playerAcceptTrade(uint32_t playerId)
 		player->setTradeState(TRADE_TRANSFER);
 		tradePartner->setTradeState(TRADE_TRANSFER);
 
-		auto it = tradeItems.find(playerTradeItem);
-		if (it != tradeItems.end()) {
-			tradeItems.erase(it);
-		}
-
-		it = tradeItems.find(partnerTradeItem);
-		if (it != tradeItems.end()) {
-			tradeItems.erase(it);
-		}
+		// erase by key directly - more efficient than find() + erase(iterator)
+		tradeItems.erase(playerTradeItem);
+		tradeItems.erase(partnerTradeItem);
 
 		bool isSuccess = false;
 
 		ReturnValue tradePartnerRet = RETURNVALUE_NOERROR;
 		ReturnValue playerRet = RETURNVALUE_NOERROR;
 
+		// cache backpack slot lookups to avoid repeated calls
+		const auto playerBackpack = player->getInventoryItem(CONST_SLOT_BACKPACK);
+		const auto partnerBackpack = tradePartner->getInventoryItem(CONST_SLOT_BACKPACK);
+		const bool playerTradingBackpack = (playerBackpack == playerTradeItem);
+		const bool partnerTradingBackpack = (partnerBackpack == partnerTradeItem);
+
 		// if player is trying to trade its own backpack
-		if (tradePartner->getInventoryItem(CONST_SLOT_BACKPACK) == partnerTradeItem) {
+		if (partnerTradingBackpack) {
 			tradePartnerRet = (tradePartner->getInventoryItem(getSlotType(Item::items[playerTradeItem->getID()]))
 			                       ? RETURNVALUE_NOTENOUGHROOM
 			                       : RETURNVALUE_NOERROR);
 		}
 
-		if (player->getInventoryItem(CONST_SLOT_BACKPACK) == playerTradeItem) {
+		if (playerTradingBackpack) {
 			playerRet = (player->getInventoryItem(getSlotType(Item::items[partnerTradeItem->getID()]))
 			                 ? RETURNVALUE_NOTENOUGHROOM
 			                 : RETURNVALUE_NOERROR);
 		}
 
 		// both players try to trade equipped backpacks
-		if (player->getInventoryItem(CONST_SLOT_BACKPACK) == playerTradeItem &&
-		    tradePartner->getInventoryItem(CONST_SLOT_BACKPACK) == partnerTradeItem) {
+		if (playerTradingBackpack && partnerTradingBackpack) {
 			playerRet = RETURNVALUE_NOTENOUGHROOM;
 		}
 

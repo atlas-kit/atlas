@@ -2623,12 +2623,14 @@ ReturnValue Player::queryMaxCount(int32_t index, const std::shared_ptr<const Thi
 							n += queryCount;
 						}
 					}
-				} else if (inventoryItem->isStackable() && *item == *inventoryItem &&
-				           inventoryItem->getItemCount() < ITEM_STACK_SIZE) {
-					uint32_t remainder = (100 - inventoryItem->getItemCount());
+				} else if (inventoryItem->isStackable() && *item == *inventoryItem) {
+					const uint32_t invItemCount = inventoryItem->getItemCount();
+					if (invItemCount < ITEM_STACK_SIZE) {
+						uint32_t remainder = (100 - invItemCount);
 
-					if (queryAdd(slotIndex, item, remainder, flags) == RETURNVALUE_NOERROR) {
-						n += remainder;
+						if (queryAdd(slotIndex, item, remainder, flags) == RETURNVALUE_NOERROR) {
+							n += remainder;
+						}
 					}
 				}
 			} else if (queryAdd(slotIndex, item, item->getItemCount(), flags) == RETURNVALUE_NOERROR) { // empty slot
@@ -2649,8 +2651,13 @@ ReturnValue Player::queryMaxCount(int32_t index, const std::shared_ptr<const Thi
 		}
 
 		if (destItem) {
-			if (destItem->isStackable() && *item == *destItem && destItem->getItemCount() < ITEM_STACK_SIZE) {
-				maxQueryCount = 100 - destItem->getItemCount();
+			if (destItem->isStackable() && *item == *destItem) {
+				const uint32_t destItemCount = destItem->getItemCount();
+				if (destItemCount < ITEM_STACK_SIZE) {
+					maxQueryCount = 100 - destItemCount;
+				} else {
+					maxQueryCount = 0;
+				}
 			} else {
 				maxQueryCount = 0;
 			}
@@ -2749,12 +2756,14 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 			const auto tmpContainer = containers[i++];
 			if (!autoStack || !isStackable) {
 				// we need to find first empty container as fast as we can for non-stackable items
-				uint32_t n = tmpContainer->capacity() -
-				             std::min(tmpContainer->capacity(), static_cast<uint32_t>(tmpContainer->size()));
+				// cache capacity to avoid repeated virtual calls in loop
+				const uint32_t containerCapacity = tmpContainer->capacity();
+				uint32_t n = containerCapacity -
+				             std::min(containerCapacity, static_cast<uint32_t>(tmpContainer->size()));
 				while (n) {
-					if (tmpContainer->queryAdd(tmpContainer->capacity() - n, item, item->getItemCount(), flags) ==
+					if (tmpContainer->queryAdd(containerCapacity - n, item, item->getItemCount(), flags) ==
 					    RETURNVALUE_NOERROR) {
-						index = tmpContainer->capacity() - n;
+						index = containerCapacity - n;
 						destItem = nullptr;
 						return tmpContainer;
 					}
