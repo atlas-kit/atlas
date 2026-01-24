@@ -1,6 +1,6 @@
 local event = Event()
 
-event.onLook = function(self, thing, position, distance, description)
+event.onPlayerLook = function(self, thing, position, distance, description)
 	local description = "You see " .. thing:getDescription(distance)
 	if self:getGroup():getAccess() then
 		if thing:isItem() then
@@ -51,7 +51,7 @@ event.onLook = function(self, thing, position, distance, description)
 			end
 		end
 	end
-	return description
+	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 event:register()

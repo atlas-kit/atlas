@@ -16,26 +16,23 @@
 #include "weapons.h"
 
 Actions* g_actions = nullptr;
-CreatureEvents* g_creatureEvents = nullptr;
-Chat* g_chat = nullptr;
+Chat g_chat;
 GlobalEvents* g_globalEvents = nullptr;
 Spells* g_spells = nullptr;
 TalkActions* g_talkActions = nullptr;
 MoveEvents* g_moveEvents = nullptr;
-Weapons* g_weapons = nullptr;
+std::unique_ptr<Weapons> g_weapons = nullptr;
 Scripts* g_scripts = nullptr;
 
 extern LuaEnvironment g_luaEnvironment;
 
 ScriptingManager::~ScriptingManager()
 {
-	delete g_weapons;
+	g_weapons.reset();
 	delete g_spells;
 	delete g_actions;
 	delete g_talkActions;
 	delete g_moveEvents;
-	delete g_chat;
-	delete g_creatureEvents;
 	delete g_globalEvents;
 	delete g_scripts;
 }
@@ -53,9 +50,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 
-	g_chat = new Chat();
-
-	g_weapons = new Weapons();
+	g_weapons = std::make_unique<Weapons>();
 	g_weapons->loadDefaults();
 
 	g_spells = new Spells();
@@ -73,22 +68,12 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 
-	g_creatureEvents = new CreatureEvents();
-	if (!g_creatureEvents->loadFromXml()) {
-		std::cout << "> ERROR: Unable to load creature events!" << std::endl;
-		return false;
-	}
-
 	g_globalEvents = new GlobalEvents();
 	if (!g_globalEvents->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load global events!" << std::endl;
 		return false;
 	}
 
-	if (!tfs::events::load()) {
-		std::cout << "> ERROR: Unable to load events!" << std::endl;
-		return false;
-	}
-
+	tfs::events::load();
 	return true;
 }

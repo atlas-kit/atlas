@@ -124,7 +124,6 @@
     <ClCompile Include="..\src\ban.cpp" />
     <ClCompile Include="..\src\base64.cpp" />
     <ClCompile Include="..\src\baseevents.cpp" />
-    <ClCompile Include="..\src\bed.cpp" />
     <ClCompile Include="..\src\chat.cpp" />
     <ClCompile Include="..\src\combat.cpp" />
     <ClCompile Include="..\src\condition.cpp" />
@@ -132,7 +131,6 @@
     <ClCompile Include="..\src\connection.cpp" />
     <ClCompile Include="..\src\container.cpp" />
     <ClCompile Include="..\src\creature.cpp" />
-    <ClCompile Include="..\src\creatureevent.cpp" />
     <ClCompile Include="..\src\database.cpp" />
     <ClCompile Include="..\src\databasemanager.cpp" />
     <ClCompile Include="..\src\databasetasks.cpp" />
@@ -172,7 +170,6 @@
     <ClCompile Include="..\src\lua\modules\configmanager.cpp" />
     <ClCompile Include="..\src\lua\modules\container.cpp" />
     <ClCompile Include="..\src\lua\modules\creature.cpp" />
-    <ClCompile Include="..\src\lua\modules\creatureevent.cpp" />
     <ClCompile Include="..\src\lua\modules\database.cpp" />
     <ClCompile Include="..\src\lua\modules\game.cpp" />
     <ClCompile Include="..\src\lua\modules\globalevent.cpp" />
@@ -253,7 +250,6 @@
     <ClInclude Include="..\src\ban.h" />
     <ClInclude Include="..\src\base64.h" />
     <ClInclude Include="..\src\baseevents.h" />
-    <ClInclude Include="..\src\bed.h" />
     <ClInclude Include="..\src\chat.h" />
     <ClInclude Include="..\src\combat.h" />
     <ClInclude Include="..\src\condition.h" />
@@ -262,7 +258,6 @@
     <ClInclude Include="..\src\const.h" />
     <ClInclude Include="..\src\container.h" />
     <ClInclude Include="..\src\creature.h" />
-    <ClInclude Include="..\src\creatureevent.h" />
     <ClInclude Include="..\src\database.h" />
     <ClInclude Include="..\src\databasemanager.h" />
     <ClInclude Include="..\src\databasetasks.h" />

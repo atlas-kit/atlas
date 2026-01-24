@@ -101,9 +101,6 @@
     <ClCompile Include="..\src\baseevents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\bed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\chat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\creature.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\creatureevent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\database.cpp">
@@ -296,9 +290,6 @@
     <ClCompile Include="..\src\lua\modules\moveevent.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lua\modules\creatureevent.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lua\modules\talkaction.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
@@ -451,9 +442,6 @@
     <ClInclude Include="..\src\baseevents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\bed.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\chat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -476,9 +464,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\creature.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\creatureevent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\database.h">

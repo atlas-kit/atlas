@@ -31,11 +31,10 @@ extern Monsters g_monsters;
 extern TalkActions* g_talkActions;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 extern Game g_game;
-extern CreatureEvents* g_creatureEvents;
 extern GlobalEvents* g_globalEvents;
-extern Chat* g_chat;
+extern Chat g_chat;
 extern LuaEnvironment g_luaEnvironment;
 
 namespace {
@@ -45,7 +44,7 @@ void sigusr1Handler()
 {
 	// Dispatcher thread
 	std::cout << "SIGUSR1 received, saving the game state..." << std::endl;
-	g_globalEvents->save();
+	tfs::events::game::onSave();
 	g_game.saveGameState();
 }
 
@@ -59,9 +58,6 @@ void sighupHandler()
 
 	ConfigManager::load();
 	std::cout << "Reloaded config." << std::endl;
-
-	g_creatureEvents->reload();
-	std::cout << "Reloaded creature scripts." << std::endl;
 
 	g_moveEvents->reload();
 	std::cout << "Reloaded movements." << std::endl;
@@ -93,7 +89,7 @@ void sighupHandler()
 	tfs::events::reload();
 	std::cout << "Reloaded events." << std::endl;
 
-	g_chat->load();
+	g_chat.load();
 	std::cout << "Reloaded chatchannels." << std::endl;
 
 	g_luaEnvironment.loadFile("data/global.lua");

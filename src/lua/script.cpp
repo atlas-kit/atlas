@@ -2,7 +2,6 @@
 
 #include "../script.h"
 
-#include "../bed.h"
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
@@ -24,7 +23,7 @@
 
 #include <string>
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Game g_game;
 extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
@@ -33,16 +32,11 @@ extern Spells* g_spells;
 extern Actions* g_actions;
 extern TalkActions* g_talkActions;
 extern Scheduler g_scheduler;
-extern CreatureEvents* g_creatureEvents;
 extern Scripts* g_scripts;
-extern Weapons* g_weapons;
 
 LuaEnvironment g_luaEnvironment;
 
 namespace {
-
-std::unordered_map<uint32_t, LuaTimerEventDesc> timerEvents;
-uint32_t lastEventTimerId = 1;
 
 bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 {
@@ -237,7 +231,7 @@ int luaDoChallengeCreature(lua_State* L)
 
 int luaSaveServer(lua_State* L)
 {
-	g_globalEvents->save();
+	tfs::events::game::onSave();
 	g_game.saveGameState();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
@@ -288,7 +282,7 @@ int luaSendChannelMessage(lua_State* L)
 {
 	// sendChannelMessage(channelId, type, message)
 	uint32_t channelId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getChannelById(channelId);
+	const auto& channel = g_chat.getChannelById(channelId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -305,7 +299,7 @@ int luaSendGuildChannelMessage(lua_State* L)
 {
 	// sendGuildChannelMessage(guildId, type, message)
 	uint32_t guildId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getGuildChannelById(guildId);
+	const auto& channel = g_chat.getGuildChannelById(guildId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -441,11 +435,11 @@ int luaAddEvent(lua_State* L)
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
 	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
 
-	auto& lastTimerEventId = lastEventTimerId;
+	auto& lastTimerEventId = g_luaEnvironment.lastEventTimerId;
 	eventDesc.eventId = g_scheduler.addEvent(
 	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
 
-	timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
+	g_luaEnvironment.timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
 	tfs::lua::pushNumber(L, lastTimerEventId++);
 	return 1;
 }
@@ -455,7 +449,7 @@ int luaStopEvent(lua_State* L)
 	// stopEvent(eventid)
 	uint32_t eventId = tfs::lua::getNumber<uint32_t>(L, 1);
 
-	auto& events = timerEvents;
+	auto& events = g_luaEnvironment.timerEvents;
 	auto it = events.find(eventId);
 	if (it == events.end()) {
 		tfs::lua::pushBoolean(L, false);
@@ -525,7 +519,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_
 	// execute it
 	ret = tfs::lua::protectedCall(L, 0, 0);
 	if (ret != 0) {
-		tfs::lua::reportError(tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 		tfs::lua::resetScriptEnv();
 		return -1;
 	}
@@ -676,14 +670,14 @@ bool LuaScriptInterface::callFunction(int params)
 	bool result = false;
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 1) != 0) {
-		tfs::lua::reportError(tfs::lua::getString(L, -1));
+		tfs::lua::reportError(L, tfs::lua::getString(L, -1), true);
 	} else {
 		result = tfs::lua::getBoolean(L, -1);
 	}
 
 	lua_pop(L, 1);
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError("Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -694,11 +688,11 @@ void LuaScriptInterface::callVoidFunction(int params)
 {
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 0) != 0) {
-		tfs::lua::reportError(tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 	}
 
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError("Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();

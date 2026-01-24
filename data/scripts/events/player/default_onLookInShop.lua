@@ -1,6 +1,6 @@
 local event = Event()
 
-event.onLookInShop = function(self, itemType, count, description)
+event.onPlayerLookInShop = function(self, itemType, count)
 	local description = "You see " .. itemType:getItemDescription()
 	if self:getGroup():getAccess() then
 		description = string.format("%s\nItem ID: %d", description, itemType:getId())
@@ -19,7 +19,7 @@ event.onLookInShop = function(self, itemType, count, description)
 			description = string.format("%s\nDecays to: %d", description, decayId)
 		end
 	end
-	return description
+	self:sendTextMessage(MESSAGE_INFO_DESCR, description)
 end
 
 event:register()

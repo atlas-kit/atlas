@@ -5,11 +5,9 @@
 
 #include "player.h"
 
-#include "bed.h"
 #include "chat.h"
 #include "combat.h"
 #include "configmanager.h"
-#include "creatureevent.h"
 #include "depotchest.h"
 #include "events.h"
 #include "game.h"
@@ -22,14 +20,13 @@
 #include "tools.h"
 #include "weapons.h"
 
-extern Chat* g_chat;
-extern CreatureEvents* g_creatureEvents;
+extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 MuteCountMap Player::muteCountMap;
 
@@ -188,37 +185,39 @@ std::shared_ptr<Item> Player::getWeapon(slots_t slot, bool ignoreAmmo) const
 		return nullptr;
 	}
 
-	if (!ignoreAmmo && weaponType == WEAPON_DISTANCE) {
-		const ItemType& itemType = Item::items[item->getID()];
-		if (itemType.ammoType != AMMO_NONE) {
-			const auto& ammoItem = inventory[CONST_SLOT_AMMO];
-			if (!ammoItem || ammoItem->getAmmoType() != itemType.ammoType) {
-				// no ammo item was found, search for quiver instead
-				const auto& quiver =
-				    inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
-				if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
-					// no quiver equipped
-					return nullptr;
-				}
+	if (ignoreAmmo || weaponType != WEAPON_DISTANCE) {
+		return item;
+	}
 
-				for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext();
-				     containerItem.advance()) {
-					if (itemType.ammoType == (*containerItem)->getAmmoType()) {
-						if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
-							if (weapon->ammoCheck(asPlayer())) {
-								return *containerItem;
-							}
-						}
-					}
-				}
+	const ItemType& itemType = Item::items[item->getID()];
+	if (itemType.ammoType == AMMO_NONE) {
+		return item;
+	}
 
-				// no valid ammo was found in quiver
-				return nullptr;
+	const auto& ammoItem = inventory[CONST_SLOT_AMMO];
+	if (ammoItem && ammoItem->getAmmoType() == itemType.ammoType) {
+		return ammoItem;
+	}
+
+	// no ammo item was found, search for quiver instead
+	const auto& quiver = inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
+	if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
+		// no quiver equipped
+		return nullptr;
+	}
+
+	for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext(); containerItem.advance()) {
+		if (itemType.ammoType == (*containerItem)->getAmmoType()) {
+			if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
+				if (weapon->ammoCheck(asPlayer())) {
+					return *containerItem;
+				}
 			}
-			item = ammoItem;
 		}
 	}
-	return item;
+
+	// no valid ammo was found in quiver
+	return nullptr;
 }
 
 std::shared_ptr<Item> Player::getWeapon(bool ignoreAmmo /* = false*/) const
@@ -460,7 +459,7 @@ void Player::addSkillAdvance(skills_t skill, uint64_t count)
 		sendTextMessage(MESSAGE_EVENT_ADVANCE,
 		                std::format("You advanced to {:s} level {:d}.", getSkillName(skill), skills[skill].level));
 
-		g_creatureEvents->playerAdvance(asPlayer(), skill, (skills[skill].level - 1), skills[skill].level);
+		tfs::events::player::onAdvance(asPlayer(), skill, (skills[skill].level - 1), skills[skill].level);
 
 		sendUpdateSkills = true;
 		currReqTries = nextReqTries;
@@ -1042,13 +1041,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 			}
 		}
 
-		g_game.checkPlayersRecord();
-
 		IOLoginData::updateOnlineStatus(guid, true);
-
-		if (const auto& bed = g_game.getBedBySleeper(guid)) {
-			bed->wakeUp(asPlayer());
-		}
 
 		if (const auto& guild = getGuild()) {
 			guild->addMember(asPlayer());
@@ -1068,24 +1061,24 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 			}
 		}
 
-		if (!g_creatureEvents->playerLogin(asPlayer())) {
+		if (!tfs::events::player::onLogin(asPlayer())) {
 			kickPlayer(true);
 			return;
 		}
 	}
 
-	sendStats();
-	sendSkills();
-	sendIcons();
-	sendLight();
-	sendVIPEntries();
-	sendItemClasses();
 	sendClientFeatures();
-	sendBasicData();
-	sendItems();
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
+	sendStats();
+	sendSkills();
+	sendIcons();
+	sendBasicData();
+	sendItems();
+	sendLight();
+	sendVIPEntries();
+	sendItemClasses();
 
 	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
 		auto slot = static_cast<slots_t>(i);
@@ -1098,6 +1091,8 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	if (magicEffect != CONST_ME_NONE) {
 		sendMagicEffect(magicEffect);
 	}
+
+	tfs::events::player::onJoin(asPlayer());
 }
 
 void Player::onAttackedCreatureDisappear(bool isLogout)
@@ -1194,7 +1189,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 			party->leaveParty(asPlayer(), true);
 		}
 
-		g_chat->removeUserFromAllChannels(asPlayer());
+		g_chat.removeUserFromAllChannels(asPlayer());
 
 		if (const auto& guild = getGuild()) {
 			guild->removeMember(asPlayer());
@@ -1505,7 +1500,7 @@ void Player::onAttacking(uint32_t)
 	uint32_t delay = getAttackSpeed();
 	bool classicSpeed = getBoolean(ConfigManager::CLASSIC_ATTACK_SPEED);
 
-	if (const Weapon* weapon = g_weapons->getWeapon(tool)) {
+	if (const auto& weapon = g_weapons->getWeapon(tool)) {
 		if (!weapon->interruptSwing()) {
 			result = weapon->useWeapon(asPlayer(), tool, getAttackedCreature());
 		} else if (!classicSpeed && !canDoAction()) {
@@ -1624,7 +1619,7 @@ void Player::addManaSpent(uint64_t amount)
 
 		sendTextMessage(MESSAGE_EVENT_ADVANCE, std::format("You advanced to magic level {:d}.", magLevel));
 
-		g_creatureEvents->playerAdvance(asPlayer(), SKILL_MAGLEVEL, magLevel - 1, magLevel);
+		tfs::events::player::onAdvance(asPlayer(), SKILL_MAGLEVEL, magLevel - 1, magLevel);
 
 		sendUpdateStats = true;
 		currReqMana = nextReqMana;
@@ -1746,7 +1741,7 @@ void Player::addExperience(const std::shared_ptr<Creature>& source, uint64_t exp
 			party->updateSharedExperience();
 		}
 
-		g_creatureEvents->playerAdvance(asPlayer(), SKILL_LEVEL, prevLevel, level);
+		tfs::events::player::onAdvance(asPlayer(), SKILL_LEVEL, prevLevel, level);
 
 		sendTextMessage(MESSAGE_EVENT_ADVANCE,
 		                std::format("You advanced from Level {:d} to Level {:d}.", prevLevel, level));
@@ -2228,9 +2223,10 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 
 void Player::kickPlayer(bool displayEffect)
 {
-	g_creatureEvents->playerLogout(asPlayer());
+	tfs::events::player::onLogout(asPlayer());
+
 	if (client) {
-		client->logout(displayEffect, true);
+		client->forceLogout(displayEffect);
 	} else {
 		g_game.removeCreature(asPlayer());
 	}
@@ -4116,7 +4112,7 @@ PartyShields_t Player::getPartyShield(const std::shared_ptr<const Player>& playe
 		return SHIELD_WHITEYELLOW;
 	}
 
-	if (player->party) {
+	if (player->getParty()) {
 		return SHIELD_GRAY;
 	}
 
@@ -4402,7 +4398,7 @@ bool Player::addOfflineTrainingTries(skills_t skill, uint64_t tries)
 			magLevel++;
 			manaSpent = 0;
 
-			g_creatureEvents->playerAdvance(asPlayer(), SKILL_MAGLEVEL, magLevel - 1, magLevel);
+			tfs::events::player::onAdvance(asPlayer(), SKILL_MAGLEVEL, magLevel - 1, magLevel);
 
 			sendUpdate = true;
 			currReqMana = nextReqMana;
@@ -4455,7 +4451,7 @@ bool Player::addOfflineTrainingTries(skills_t skill, uint64_t tries)
 			skills[skill].tries = 0;
 			skills[skill].percent = 0;
 
-			g_creatureEvents->playerAdvance(asPlayer(), skill, (skills[skill].level - 1), skills[skill].level);
+			tfs::events::player::onAdvance(asPlayer(), skill, (skills[skill].level - 1), skills[skill].level);
 
 			sendUpdate = true;
 			currReqTries = nextReqTries;
@@ -4523,10 +4519,10 @@ void Player::sendModalWindow(const ModalWindow& modalWindow)
 
 void Player::clearModalWindows() { modalWindows.clear(); }
 
-void Player::sendClosePrivate(uint16_t channelId)
+void Player::sendClosePrivate(uint16_t channelId) const
 {
 	if (channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY) {
-		g_chat->removeUserFromChannel(asPlayer(), channelId);
+		g_chat.removeUserFromChannel(asPlayer(), channelId);
 	}
 
 	if (client) {

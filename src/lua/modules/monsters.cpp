@@ -656,6 +656,18 @@ int luaMonsterTypeNameDescription(lua_State* L)
 	return 1;
 }
 
+int32_t luaMonsterTypeMonsterName(lua_State* L)
+{
+	// monsterType:monsterName()
+	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
+	if (monsterType) {
+		tfs::lua::pushString(L, monsterType->monsterName);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int luaMonsterTypeHealth(lua_State* L)
 {
 	// get: monsterType:health() set: monsterType:health(health)
@@ -1056,37 +1068,6 @@ int luaMonsterTypeAddLoot(lua_State* L)
 		} else {
 			lua_pushnil(L);
 		}
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaMonsterTypeGetCreatureEvents(lua_State* L)
-{
-	// monsterType:getCreatureEvents()
-	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
-	if (!monsterType) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	int index = 0;
-	lua_createtable(L, monsterType->info.scripts.size(), 0);
-	for (const std::string& creatureEvent : monsterType->info.scripts) {
-		tfs::lua::pushString(L, creatureEvent);
-		lua_rawseti(L, -2, ++index);
-	}
-	return 1;
-}
-
-int luaMonsterTypeRegisterEvent(lua_State* L)
-{
-	// monsterType:registerEvent(name)
-	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
-	if (monsterType) {
-		monsterType->info.scripts.push_back(tfs::lua::getString(L, 2));
-		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
 	}
@@ -1694,6 +1675,7 @@ void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("MonsterType", "name", luaMonsterTypeName);
 	lsi.registerMethod("MonsterType", "nameDescription", luaMonsterTypeNameDescription);
+	lsi.registerMethod("MonsterType", "monsterName", luaMonsterTypeMonsterName);
 
 	lsi.registerMethod("MonsterType", "health", luaMonsterTypeHealth);
 	lsi.registerMethod("MonsterType", "maxHealth", luaMonsterTypeMaxHealth);
@@ -1718,9 +1700,6 @@ void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("MonsterType", "getLoot", luaMonsterTypeGetLoot);
 	lsi.registerMethod("MonsterType", "addLoot", luaMonsterTypeAddLoot);
-
-	lsi.registerMethod("MonsterType", "getCreatureEvents", luaMonsterTypeGetCreatureEvents);
-	lsi.registerMethod("MonsterType", "registerEvent", luaMonsterTypeRegisterEvent);
 
 	lsi.registerMethod("MonsterType", "eventType", luaMonsterTypeEventType);
 	lsi.registerMethod("MonsterType", "onThink", luaMonsterTypeEventOnCallback);

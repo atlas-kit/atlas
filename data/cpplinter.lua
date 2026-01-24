@@ -64,6 +64,7 @@ configManager = {}
 ---@field getCurrencyItems fun(): table
 ---@field getItemTypeByClientId fun(clientId: number): ItemType
 ---@field getMountIdByLookType fun(lookType: number): number
+---@field getParties fun(): table
 ---@field getTowns fun(): table
 ---@field getHouses fun(): table
 ---@field getOutfits fun(sex: number): table
@@ -84,6 +85,8 @@ configManager = {}
 ---@field startEvent fun(eventName: string): boolean
 ---@field getClientVersion fun(): string
 ---@field reload fun(reloadType: number): boolean
+---@field getPlayerRecord fun(): integer
+---@field setPlayerRecord fun(record: integer): boolean
 Game = {}
 
 ---@class Variant
@@ -219,6 +222,7 @@ ModalWindow = {}
 ---@field transform fun(self: Item, newItem: number|string, count?: number)
 ---@field decay fun(self: Item)
 ---@field getSpecialDescription fun(self: Item): string
+---@field setSpecialDescription fun(self: Item, description: string)
 ---@field hasProperty fun(self: Item, property: number): boolean
 ---@field isLoadedFromMap fun(self: Item): boolean
 ---@field setStoreItem fun(self: Item, store: boolean)
@@ -261,8 +265,6 @@ Podium = {}
 ---@field create fun(): Creature
 ---@field __eq fun(self: Creature, other: Creature): boolean
 ---@field getEvents fun(self: Creature): table
----@field registerEvent fun(self: Creature, eventName: string, callback: function)
----@field unregisterEvent fun(self: Creature, eventName: string)
 ---@field isRemoved fun(self: Creature): boolean
 ---@field isCreature fun(self: Creature): boolean
 ---@field isInGhostMode fun(self: Creature): boolean
@@ -740,6 +742,7 @@ Outfit = {}
 ---@field canWalkOnPoison fun(self: MonsterType): boolean
 ---@field name fun(self: MonsterType): string
 ---@field nameDescription fun(self: MonsterType): string
+---@field monsterName fun(self: MonsterType): string
 ---@field health fun(self: MonsterType): number
 ---@field maxHealth fun(self: MonsterType): number
 ---@field runHealth fun(self: MonsterType): number
@@ -757,8 +760,6 @@ Outfit = {}
 ---@field addVoice fun(self: MonsterType, voice: table)
 ---@field getLoot fun(self: MonsterType): table
 ---@field addLoot fun(self: MonsterType, loot: table)
----@field getCreatureEvents fun(self: MonsterType): table
----@field registerEvent fun(self: MonsterType, event: string)
 ---@field eventType fun(self: MonsterType): string
 ---@field onThink fun(self: MonsterType, callback: function)
 ---@field onAppear fun(self: MonsterType, callback: function)
@@ -919,26 +920,6 @@ Action = {}
 ---@overload fun(...:string):TalkAction
 TalkAction = {}
 
--- MARK: CreatureEvemt
----@class CreatureEvent
----@field type fun(self:CreatureEvent, callback:string):boolean
----@field register fun(self:CreatureEvent):boolean
----@field onLogin fun(player:Player):boolean
----@field onLogout fun(player:Player):boolean
----@field onReconnect fun(player:Player)
----@field onThink fun(creature:Creature, interval:integer):boolean
----@field onPrepareDeath fun(creature:Creature, killer:Creature):boolean
----@field onDeath fun(creature:Creature, corpse:Item, killer:Creature, mostDamageKiller:Creature, lastHitUnjustified:boolean, mostDamageUnjustified:boolean):boolean
----@field onAdvance fun(player:Player, skill:integer, oldLevel:integer, newLevel:integer):boolean
----@field onKill fun(player:Player, target:Creature):boolean
----@field onTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
----@field onHealthChange fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
----@field onManaChange fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
----@field onModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
----@field onExtendedOpcode fun(player:Player, opcode:integer, buffer:string):boolean
----@operator call(string):CreatureEvent
-CreatureEvent = {}
-
 -- MARK: MoveEvent
 ---@class MoveEvent
 ---@field type fun(self:MoveEvent, callback:string):boolean
@@ -970,9 +951,6 @@ MoveEvent = {}
 ---
 ---@field time fun(self:GlobalEvent, time:string):boolean -- "hh:mm:ss"
 ---@field interval fun(self:GlobalEvent, interval:integer):boolean
----@field onStartup fun():boolean
----@field onShutdown fun():boolean
----@field onRecord fun(current:integer, old:integer):boolean
 ---@field onThink fun(interval:integer):boolean
 ---@field onTime fun(interval:integer):boolean
 ---@operator call(string):GlobalEvent
@@ -1016,82 +994,61 @@ Weapon = {}
 
 ---@class Event
 ---@field register fun(self:Event, triggerIndex?:integer):boolean
----@field onChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean
----@field onAreaCombat fun(creature:Creature, tile:Tile, aggresive:boolean): integer
----@field onTargetCombat fun(creature:Creature, target:Creature): integer
----@field onHear fun(creature:Creature, speaker:Creature, words:string, type:integer):nil
----@field onChangeZone fun(creature:Creature, fromZone:integer, toZone:integer):nil
----@field onUpdateStorage fun(creature:Creature, key:integer, value?:integer, oldValue?:integer, isSpawn?:boolean):nil
----@field onJoin fun(party:Party, player:Player):boolean
----@field onLeave fun(party:Party, player:Player):boolean
----@field onDisband fun(party:Party):boolean
----@field onShareExperience fun(party:Party, exp:integer, rawExp:integer):integer
----@field onInvite fun(party:Party, player:Player):boolean
----@field onRevokeInvitation fun(party:Party, player:Player):boolean
----@field onPassLeadership fun(party:Party, player:Player):boolean
----@field onLook fun(player:Player, thing:Thing, position:Position, distance:integer, description?:string):string
----@field onLookInBattleList fun(player:Player, creature:Creature, distance:integer, description?:string):string
----@field onLookInTrade fun(player:Player, partner:Player, item:Item, distance:integer, description?:string):string
----@field onLookInShop fun(player:Player, itemType:ItemType, count:integer, description?:string):string
----@field onMoveItem fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):integer
----@field onItemMoved fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):nil
----@field onMoveCreature fun(player:Player, creature:Creature, fromPosition:Position, toPosition:Position):boolean
----@field onReportRuleViolation fun(player:Player, targetName:string, reportType:integer, reportReason:integer, comment:string, translation:string):nil
----@field onTurn fun(player:Player, direction:integer):boolean
----@field onTradeRequest fun(player:Player, target:Player, item:Item):boolean
----@field onTradeAccept fun(player:Player, target:Player, item:Item, targetItem:Item):boolean
----@field onTradeCompleted fun(player:Player, target:Player, item:Item, targetItem:Item, isSuccess:boolean):nil
----@field onGainExperience fun(player:Player, source?:Creature, exp:integer, rawExp:integer, sendText:boolean):integer
----@field onLoseExperience fun(player:Player, exp:integer):integer
----@field onGainSkillTries fun(player:Player, skill:integer, tries:integer, artificial?:boolean):integer
----@field onNetworkMessage fun(player:Player, recvByte:integer, msg:NetworkMessage):nil
----@field onUpdateInventory fun(player:Player, item:Item, slot:integer, equip?:boolean):nil
----@field onRotateItem fun(player:Player, item:Item)
----@field onSpellCheck fun(player:Player, spell:Spell):boolean
----@field onDropLoot fun(monster:Monster, corpse?:Container):nil
----@field onSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
----@field onReload fun(player:Player, reloadType:integer):nil
+---@field onGameStartup fun():nil
+---@field onGameShutdown fun():nil
+---@field onGameSave fun():nil
+---@field onCreatureChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean
+---@field onCreatureAreaCombat fun(creature:Creature, tile:Tile, aggresive:boolean): integer
+---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
+---@field onCreatureHear fun(creature:Creature, speaker:Creature, words:string, type:integer):nil
+---@field onCreatureChangeZone fun(creature:Creature, fromZone:integer, toZone:integer):nil
+---@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
+---@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
+---@field onCreatureUpdateStorage fun(creature:Creature, key:integer, value?:integer, oldValue?:integer, isSpawn?:boolean):nil
+---@field onCreatureThink fun(creature:Creature, interval:integer):nil
+---@field onCreaturePrepareDeath fun(creature:Creature, killer:Creature):boolean
+---@field onCreatureDeath fun(creature:Creature, corpse?:Container, killer?:Creature, mostDamageKiller?:Creature, lastHitUnjustified:boolean, mostDamageUnjustified:boolean):nil
+---@field onCreatureKill fun(creature:Creature, target:Creature):nil
+---@field onPartyJoin fun(party:Party, player:Player):boolean
+---@field onPartyLeave fun(party:Party, player:Player):boolean
+---@field onPartyDisband fun(party:Party):boolean
+---@field onPartyShareExperience fun(party:Party, exp:integer, rawExp:integer):integer
+---@field onPartyInvite fun(party:Party, player:Player):boolean
+---@field onPartyRevokeInvitation fun(party:Party, player:Player):boolean
+---@field onPartyPassLeadership fun(party:Party, player:Player):boolean
+---@field onPlayerLook fun(player:Player, thing:Thing, position:Position, distance:integer):nil
+---@field onPlayerLookInBattleList fun(player:Player, creature:Creature, distance:integer):nil
+---@field onPlayerLookInTrade fun(player:Player, partner:Player, item:Item, distance:integer):nil
+---@field onPlayerLookInShop fun(player:Player, itemType:ItemType, count:integer):nil
+---@field onPlayerMoveItem fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):integer
+---@field onPlayerItemMoved fun(player:Player, item:Item, count:integer, fromPosition:Position, toPosition:Position, fromThing?:Thing, toThing?:Thing):nil
+---@field onPlayerMoveCreature fun(player:Player, creature:Creature, fromPosition:Position, toPosition:Position):boolean
+---@field onPlayerReportRuleViolation fun(player:Player, targetName:string, reportType:integer, reportReason:integer, comment:string, translation:string):nil
+---@field onPlayerTurn fun(player:Player, direction:integer):boolean
+---@field onPlayerTradeRequest fun(player:Player, target:Player, item:Item):boolean
+---@field onPlayerTradeAccept fun(player:Player, target:Player, item:Item, targetItem:Item):boolean
+---@field onPlayerTradeCompleted fun(player:Player, target:Player, item:Item, targetItem:Item, isSuccess:boolean):nil
+---@field onPlayerPodiumRequest fun(player:Player, item:Item):nil
+---@field onPlayerPodiumEdit fun(player:Player, item:Item, outfit:Outfit, direction:integer, isVisible:boolean):nil
+---@field onPlayerGainExperience fun(player:Player, source?:Creature, exp:integer, rawExp:integer, sendText:boolean):integer
+---@field onPlayerLoseExperience fun(player:Player, exp:integer):integer
+---@field onPlayerGainSkillTries fun(player:Player, skill:integer, tries:integer, artificial?:boolean):integer
+---@field onPlayerNetworkMessage fun(player:Player, recvByte:integer, msg:NetworkMessage):nil
+---@field onPlayerUpdateInventory fun(player:Player, item:Item, slot:integer, equip?:boolean):nil
+---@field onPlayerRotateItem fun(player:Player, item:Item):nil
+---@field onPlayerSpellCheck fun(player:Player, spell:Spell):boolean
+---@field onPlayerLogin fun(player:Player):boolean
+---@field onPlayerJoin fun(player:Player):nil
+---@field onPlayerLogout fun(player:Player):boolean
+---@field onPlayerReconnect fun(player:Player):nil
+---@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):nil
+---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
+---@field onPlayerTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
+---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil
+---@field onMonsterDropLoot fun(monster:Monster, corpse?:Container):nil
+---@field onMonsterSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
 ---@operator call():Event
 Event = {}
-EventCallback = Event()
-
----@class hasEvent
----@field onChangeOutfit boolean
----@field onAreaCombat boolean
----@field onTargetCombat boolean
----@field onHear boolean
----@field onChangeZone boolean
----@field onUpdateStorage boolean
----@field onJoin boolean
----@field onLeave boolean
----@field onDisband boolean
----@field onShareExperience boolean
----@field onInvite boolean
----@field onRevokeInvitation boolean
----@field onPassLeadership boolean
----@field onLook boolean
----@field onLookInBattleList boolean
----@field onLookInTrade boolean
----@field onLookInShop boolean
----@field onMoveItem boolean
----@field onItemMoved boolean
----@field onMoveCreature boolean
----@field onReportRuleViolation boolean
----@field onTurn boolean
----@field onTradeRequest boolean
----@field onTradeAccept boolean
----@field onTradeCompleted boolean
----@field onGainExperience boolean
----@field onLoseExperience boolean
----@field onGainSkillTries boolean
----@field onNetworkMessage boolean
----@field onUpdateInventory boolean
----@field onRotateItem boolean
----@field onSpellCheck boolean
----@field onDropLoot boolean
----@field onSpawn boolean
----@field onReload boolean
-hasEvent = {}
 
 -- MARK: Thing
 ---@class Thing
@@ -1893,20 +1850,19 @@ RELOAD_TYPE_ALL = 0
 RELOAD_TYPE_ACTIONS = 1
 RELOAD_TYPE_CHAT = 2
 RELOAD_TYPE_CONFIG = 3
-RELOAD_TYPE_CREATURESCRIPTS = 4
-RELOAD_TYPE_EVENTS = 5
-RELOAD_TYPE_GLOBAL = 6
-RELOAD_TYPE_GLOBALEVENTS = 7
-RELOAD_TYPE_ITEMS = 8
-RELOAD_TYPE_MONSTERS = 9
-RELOAD_TYPE_MOUNTS = 10
-RELOAD_TYPE_MOVEMENTS = 11
-RELOAD_TYPE_NPCS = 12
-RELOAD_TYPE_QUESTS = 13
-RELOAD_TYPE_SCRIPTS = 14
-RELOAD_TYPE_SPELLS = 15
-RELOAD_TYPE_TALKACTIONS = 16
-RELOAD_TYPE_WEAPONS = 17
+RELOAD_TYPE_EVENTS = 4
+RELOAD_TYPE_GLOBAL = 5
+RELOAD_TYPE_GLOBALEVENTS = 6
+RELOAD_TYPE_ITEMS = 7
+RELOAD_TYPE_MONSTERS = 8
+RELOAD_TYPE_MOUNTS = 9
+RELOAD_TYPE_MOVEMENTS = 10
+RELOAD_TYPE_NPCS = 11
+RELOAD_TYPE_QUESTS = 12
+RELOAD_TYPE_SCRIPTS = 13
+RELOAD_TYPE_SPELLS = 14
+RELOAD_TYPE_TALKACTIONS = 15
+RELOAD_TYPE_WEAPONS = 16
 
 PlayerFlag_CannotUseCombat = 1 * 2 ^ 0
 PlayerFlag_CannotAttackPlayer = 1 * 2 ^ 1
@@ -2352,6 +2308,8 @@ GAME_STATE_MAINTAIN = 6
 REPORT_TYPE_NAME = 0
 REPORT_TYPE_STATEMENT = 1
 REPORT_TYPE_BOT = 2
+
+SCHEDULER_MINTICKS = 50
 
 TEXTCOLOR_BLUE = 5
 TEXTCOLOR_LIGHTGREEN = 30

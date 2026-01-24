@@ -72,7 +72,7 @@ static constexpr uint8_t ITEM_STACK_SIZE = 100;
 class Game
 {
 public:
-	Game();
+	Game() = default;
 
 	// non-copyable
 	Game(const Game&) = delete;
@@ -210,7 +210,6 @@ public:
 	size_t getPlayersOnline() const { return players.size(); }
 	size_t getMonstersOnline() const { return monsters.size(); }
 	size_t getNpcsOnline() const { return npcs.size(); }
-	uint32_t getPlayersRecord() const { return playersRecord; }
 
 	ReturnValue internalMoveCreature(const std::shared_ptr<Creature>& creature, Direction direction,
 	                                 uint32_t flags = 0);
@@ -298,13 +297,8 @@ public:
 	                         bool ghostMode, SpectatorVec* spectatorsPtr = nullptr, const Position* pos = nullptr,
 	                         bool echo = false);
 
-	void loadPlayersRecord();
-	void checkPlayersRecord();
-
 	void sendGuildMotd(uint32_t playerId);
 	void kickPlayer(uint32_t playerId, bool displayEffect);
-	void playerDebugAssert(uint32_t playerId, const std::string& assertLine, const std::string& date,
-	                       const std::string& description, const std::string& comment);
 	void playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, uint8_t button, uint8_t choice);
 	void playerReportRuleViolation(uint32_t playerId, const std::string& targetName, uint8_t reportType,
 	                               uint8_t reportReason, const std::string& comment, const std::string& translation);
@@ -398,7 +392,7 @@ public:
 	void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
 	void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
 
-	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const std::string& buffer);
+	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
 	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
@@ -454,8 +448,6 @@ public:
 
 	void startDecay(const std::shared_ptr<Item>& item);
 
-	void sendOfflineTrainingDialog(const std::shared_ptr<Player>& player);
-
 	auto getPlayers() const { return players | std::views::values; }
 	auto getNpcs() const { return npcs | std::views::values; }
 	auto getMonsters() const { return monsters | std::views::values; }
@@ -467,10 +459,6 @@ public:
 	std::unordered_map<Tile*, std::shared_ptr<Container>> browseFields;
 
 	void internalRemoveItems(const std::vector<std::shared_ptr<Item>>& itemList, uint32_t amount, bool stackable);
-
-	std::shared_ptr<BedItem> getBedBySleeper(uint32_t guid) const;
-	void setBedSleeper(std::shared_ptr<BedItem> bed, uint32_t guid) { bedSleepersMap[guid] = std::move(bed); }
-	void removeBedSleeper(uint32_t guid) { bedSleepersMap.erase(guid); }
 
 	void updatePodium(const std::shared_ptr<Podium>& podium);
 
@@ -497,6 +485,13 @@ public:
 	std::shared_ptr<House> getHouseByPlayerId(uint32_t playerId);
 	auto getHouses() const { return houses | std::views::values; }
 	void payHouses(RentPeriod_t rentPeriod) const;
+
+	const auto& getParties() const { return parties; }
+	void addParty(const std::shared_ptr<Party>& party) { parties.insert(party); }
+	void removeParty(const std::shared_ptr<Party>& party) { parties.erase(party); }
+
+	auto getPlayerRecord() const { return playerRecord; }
+	void setPlayerRecord(uint32_t record) { playerRecord = record; }
 
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
@@ -530,19 +525,16 @@ private:
 	// list of items that are in trading state, mapped to the player holding them
 	std::map<std::shared_ptr<Item>, uint32_t> tradeItems;
 
-	std::map<uint32_t, std::shared_ptr<BedItem>> bedSleepersMap;
-
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 
-	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
+	std::set<std::shared_ptr<Party>> parties;
 
 	GameState_t gameState = GAME_STATE_NORMAL;
 	WorldType_t worldType = WORLD_TYPE_PVP;
 
-	ServiceManager* serviceManager = nullptr;
+	uint32_t playerRecord = 0;
 
-	void updatePlayersRecord() const;
-	uint32_t playersRecord = 0;
+	ServiceManager* serviceManager = nullptr;
 };
 
 #endif // FS_GAME_H
