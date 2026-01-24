@@ -19,7 +19,7 @@
 #include "podium.h"
 #include "scheduler.h"
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Scheduler g_scheduler;
@@ -270,7 +270,7 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 
 	player = foundPlayer;
 
-	g_chat->removeUserFromAllChannels(player);
+	g_chat.removeUserFromAllChannels(player);
 	player->clearModalWindows();
 	player->setOperatingSystem(operatingSystem);
 
@@ -754,9 +754,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		// case 0xE6: break // parse bug report
 		case 0xE7: /* thank you */
 			break;
-		case 0xE8:
-			parseDebugAssert(msg);
-			break;
 		// case 0xEF: break; // request store coins transfer
 		case 0xF2:
 			parseRuleViolationReport(msg);
@@ -982,14 +979,14 @@ void ProtocolGame::parseChannelInvite(NetworkMessage& msg)
 {
 	auto name = msg.getString();
 	g_dispatcher.addTask(
-	    [playerID = player->getID(), name = std::string{name}]() { g_game.playerChannelInvite(playerID, name); });
+	    [playerID = player->getID(), name = std::move(name)]() { g_game.playerChannelInvite(playerID, name); });
 }
 
 void ProtocolGame::parseChannelExclude(NetworkMessage& msg)
 {
 	auto name = msg.getString();
 	g_dispatcher.addTask(
-	    [=, playerID = player->getID(), name = std::string{name}]() { g_game.playerChannelExclude(playerID, name); });
+	    [playerID = player->getID(), name = std::move(name)]() { g_game.playerChannelExclude(playerID, name); });
 }
 
 void ProtocolGame::parseOpenChannel(NetworkMessage& msg)
@@ -1007,7 +1004,7 @@ void ProtocolGame::parseCloseChannel(NetworkMessage& msg)
 void ProtocolGame::parseOpenPrivateChannel(NetworkMessage& msg)
 {
 	auto receiver = msg.getString();
-	g_dispatcher.addTask([playerID = player->getID(), receiver = std::string{receiver}]() {
+	g_dispatcher.addTask([playerID = player->getID(), receiver = std::move(receiver)]() {
 		g_game.playerOpenPrivateChannel(playerID, receiver);
 	});
 }
@@ -1252,7 +1249,7 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 		return;
 	}
 
-	g_dispatcher.addTask([=, playerID = player->getID(), receiver = std::string{receiver}, text = std::string{text}]() {
+	g_dispatcher.addTask([=, playerID = player->getID(), receiver = std::move(receiver), text = std::move(text)]() {
 		g_game.playerSay(playerID, channelId, type, receiver, text);
 	});
 }
@@ -1316,7 +1313,7 @@ void ProtocolGame::parseHouseWindow(NetworkMessage& msg)
 	uint8_t doorId = msg.getByte();
 	uint32_t id = msg.get<uint32_t>();
 	auto text = msg.getString();
-	g_dispatcher.addTask([=, playerID = player->getID(), text = std::string{text}]() {
+	g_dispatcher.addTask([=, playerID = player->getID(), text = std::move(text)]() {
 		g_game.playerUpdateHouseWindow(playerID, doorId, id, text);
 	});
 }
@@ -1385,7 +1382,7 @@ void ProtocolGame::parseAddVip(NetworkMessage& msg)
 {
 	auto name = msg.getString();
 	g_dispatcher.addTask(
-	    [playerID = player->getID(), name = std::string{name}]() { g_game.playerRequestAddVip(playerID, name); });
+	    [playerID = player->getID(), name = std::move(name)]() { g_game.playerRequestAddVip(playerID, name); });
 }
 
 void ProtocolGame::parseRemoveVip(NetworkMessage& msg)
@@ -1400,7 +1397,7 @@ void ProtocolGame::parseEditVip(NetworkMessage& msg)
 	auto description = msg.getString();
 	uint32_t icon = std::min<uint32_t>(10, msg.get<uint32_t>()); // 10 is max icon in 9.63
 	bool notify = msg.getByte() != 0;
-	g_dispatcher.addTask([=, playerID = player->getID(), description = std::string{description}]() {
+	g_dispatcher.addTask([=, playerID = player->getID(), description = std::move(description)]() {
 		g_game.playerRequestEditVip(playerID, guid, description, icon, notify);
 	});
 }
@@ -1429,27 +1426,9 @@ void ProtocolGame::parseRuleViolationReport(NetworkMessage& msg)
 		msg.get<uint32_t>(); // statement id, used to get whatever player have said, we don't log that.
 	}
 
-	g_dispatcher.addTask([=, playerID = player->getID(), targetName = std::string{targetName},
-	                      comment = std::string{comment}, translation = std::string{translation}]() {
+	g_dispatcher.addTask([=, playerID = player->getID(), targetName = std::move(targetName),
+	                      comment = std::move(comment), translation = std::move(translation)]() {
 		g_game.playerReportRuleViolation(playerID, targetName, reportType, reportReason, comment, translation);
-	});
-}
-
-void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
-{
-	if (debugAssertSent) {
-		return;
-	}
-
-	debugAssertSent = true;
-
-	auto assertLine = msg.getString();
-	auto date = msg.getString();
-	auto description = msg.getString();
-	auto comment = msg.getString();
-	g_dispatcher.addTask([playerID = player->getID(), assertLine = std::string{assertLine}, date = std::string{date},
-	                      description = std::string{description}, comment = std::string{comment}]() {
-		g_game.playerDebugAssert(playerID, assertLine, date, description, comment);
 	});
 }
 
@@ -1832,9 +1811,9 @@ void ProtocolGame::sendChannelsDialog()
 	NetworkMessage msg;
 	msg.addByte(0xAB);
 
-	const ChannelList& list = g_chat->getChannelList(player);
+	const auto& list = g_chat.getChannelList(player);
 	msg.addByte(list.size());
-	for (ChatChannel* channel : list) {
+	for (const auto& channel : list) {
 		msg.add<uint16_t>(channel->getId());
 		msg.addString(channel->getName());
 	}
@@ -1852,8 +1831,10 @@ void ProtocolGame::sendChannel(uint16_t channelId, const std::string& channelNam
 	msg.addString(channelName);
 
 	if (channelUsers) {
-		msg.add<uint16_t>(channelUsers->size());
-		for (const auto& user : *channelUsers | std::views::values | tfs::views::lock_weak_ptrs) {
+		const auto& filteredChannelUsers =
+		    *channelUsers | std::views::values | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+		msg.add<uint16_t>(filteredChannelUsers.size());
+		for (auto&& user : filteredChannelUsers) {
 			msg.addString(user->getName());
 		}
 	} else {
@@ -1861,8 +1842,10 @@ void ProtocolGame::sendChannel(uint16_t channelId, const std::string& channelNam
 	}
 
 	if (invitedUsers) {
-		msg.add<uint16_t>(invitedUsers->size());
-		for (const auto& user : *invitedUsers | std::views::values | tfs::views::lock_weak_ptrs) {
+		const auto& filteredInvitedUsers =
+		    *invitedUsers | std::views::values | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
+		msg.add<uint16_t>(filteredInvitedUsers.size());
+		for (auto&& user : filteredInvitedUsers) {
 			msg.addString(user->getName());
 		}
 	} else {
@@ -3740,7 +3723,7 @@ void ProtocolGame::parseExtendedOpcode(NetworkMessage& msg)
 	auto buffer = msg.getString();
 
 	// process additional opcodes via lua script event
-	g_dispatcher.addTask([=, playerID = player->getID(), buffer = std::string{buffer}]() {
+	g_dispatcher.addTask([=, playerID = player->getID(), buffer = std::move(buffer)]() {
 		g_game.parsePlayerExtendedOpcode(playerID, opcode, buffer);
 	});
 }

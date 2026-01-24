@@ -249,9 +249,6 @@ public:
 
 	bool hasFlag(PlayerFlags value) const { return (group->flags & value) != 0; }
 
-	std::shared_ptr<BedItem> getBedItem() const { return bedItem.lock(); }
-	void setBedItem(const std::shared_ptr<BedItem>& bedItem) { this->bedItem = bedItem; }
-
 	void addBlessing(uint8_t blessing) { blessings.set(blessing); }
 	void removeBlessing(uint8_t blessing) { blessings.reset(blessing); }
 	bool hasBlessing(uint8_t blessing) const { return blessings.test(blessing); }
@@ -633,13 +630,14 @@ public:
 		}
 	}
 
-	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type, uint16_t channel)
+	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type,
+	                        uint16_t channel) const
 	{
 		if (client) {
 			client->sendChannelMessage(author, text, type, channel);
 		}
 	}
-	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent)
+	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent) const
 	{
 		if (client) {
 			client->sendChannelEvent(channelId, playerName, channelEvent);
@@ -931,7 +929,7 @@ public:
 			client->sendCreatePrivateChannel(channelId, channelName);
 		}
 	}
-	void sendClosePrivate(uint16_t channelId);
+	void sendClosePrivate(uint16_t channelId) const;
 	void sendIcons() const
 	{
 		if (client) {
@@ -1297,7 +1295,6 @@ private:
 
 	ProtocolGame_ptr client;
 	Connection::Address lastIP = {};
-	std::weak_ptr<BedItem> bedItem;
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
 	Group* group = nullptr;
