@@ -58,14 +58,14 @@ MarketOfferList getOwnOffers(MarketAction_t action, uint32_t playerId)
 {
 	MarketOfferList offerList;
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
-
 	const auto& result = Database::getInstance().storeQuery(std::format(
 	    "SELECT `id`, `amount`, `price`, `created`, `itemtype` FROM `market_offers` WHERE `player_id` = {:d} AND `sale` = {:d}",
 	    playerId, std::to_underlying(action)));
 	if (!result) {
 		return offerList;
 	}
+
+	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
 
 	do {
 		MarketOffer offer;
@@ -270,8 +270,6 @@ void appendHistory(uint32_t playerId, MarketAction_t action, uint16_t itemId, ui
 
 bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state)
 {
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
-
 	Database& db = Database::getInstance();
 
 	const auto& result = db.storeQuery(std::format(
@@ -285,6 +283,7 @@ bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state)
 		return false;
 	}
 
+	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
 	appendHistory(
 	    result->getNumber<uint32_t>("player_id"), static_cast<MarketAction_t>(result->getNumber<uint16_t>("sale")),
 	    result->getNumber<uint16_t>("itemtype"), result->getNumber<uint16_t>("amount"),

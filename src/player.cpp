@@ -137,8 +137,12 @@ std::string Player::getDescription(int32_t lookDistance) const
 	}
 
 	const auto& guild = getGuild();
+	if (!guild) {
+		return s.str();
+	}
+
 	const auto& guildRank = getGuildRank();
-	if (!guild || !guildRank) {
+	if (!guildRank) {
 		return s.str();
 	}
 
@@ -4030,8 +4034,12 @@ bool Player::hasLearnedInstantSpell(const std::string& spellName) const
 
 bool Player::isInWar(const std::shared_ptr<const Player>& player) const
 {
+	if (!player) {
+		return false;
+	}
+
 	const auto& guild = getGuild();
-	if (!player || !guild) {
+	if (!guild) {
 		return false;
 	}
 

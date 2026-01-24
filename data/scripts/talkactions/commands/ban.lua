@@ -9,7 +9,6 @@ function ban.onSay(player, words, param)
 
 	local targetName = params[1]:trim()
 	local banDuration = tonumber(params[2]:trim())
-	local banReason = params[3]:trim()
 
 	if not banDuration or banDuration <= 0 then
 		player:sendCancelMessage("Ban duration must be a positive number.")
@@ -26,6 +25,8 @@ function ban.onSay(player, words, param)
 		result.free(resultId)
 		return true
 	end
+
+	local banReason = params[3]:trim()
 
 	local currentTime = os.time()
 	local expirationTime = currentTime + (banDuration * 24 * 60 * 60)
@@ -60,12 +61,13 @@ function ipban.onSay(player, words, param)
 
 	local targetName = params[1]:trim()
 	local ipBanDuration = tonumber(params[2]:trim())
-	local ipBanReason = params[3]:trim()
 
 	if not ipBanDuration or ipBanDuration <= 0 then
 		player:sendCancelMessage("Ban duration must be a positive number.")
 		return true
 	end
+
+	local ipBanReason = params[3]:trim()
 
 	local resultId = db.storeQuery("SELECT `name`, `lastip` FROM `players` WHERE `name` = " .. db.escapeString(targetName))
 	if not resultId then

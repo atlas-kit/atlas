@@ -360,8 +360,12 @@ const char* getSharedExpReturnMessage(SharedExpStatus_t value)
 
 bool Party::setSharedExperience(const std::shared_ptr<Player>& player, bool sharedExpActive)
 {
+	if (!player) {
+		return false;
+	}
+
 	const auto& leader = getLeader();
-	if (!player || leader != player) {
+	if (leader != player) {
 		return false;
 	}
 

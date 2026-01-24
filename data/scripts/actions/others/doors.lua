@@ -141,7 +141,6 @@ local door = Action()
 
 function door.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	local itemId = item:getId()
-	local transformTo = 0
 	if table.contains(closedQuestDoors, itemId) then
 		if player:getStorageValue(item.actionid) ~= -1 or player:getGroup():getAccess() then
 			item:transform(itemId + 1)
@@ -177,6 +176,7 @@ function door.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "The key does not match.")
 			return true
 		end
+		local transformTo = 0
 		if lockedOddDoors[target.itemid] then
 			transformTo = lockedOddDoors[target.itemid].open
 		else

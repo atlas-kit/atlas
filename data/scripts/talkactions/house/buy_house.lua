@@ -6,11 +6,6 @@ local config = {
 local talkaction = TalkAction("!buyhouse")
 
 function talkaction.onSay(player, words, param)
-	local housePrice = configManager.getNumber(configKeys.HOUSE_PRICE)
-	if housePrice == -1 then
-		return true
-	end
-
 	if player:getLevel() < config.level then
 		player:sendCancelMessage("You need level " .. config.level .. " or higher to buy a house.")
 		return false
@@ -19,6 +14,11 @@ function talkaction.onSay(player, words, param)
 	if config.onlyPremium and not player:isPremium() then
 		player:sendCancelMessage("You need a premium account.")
 		return false
+	end
+
+	local housePrice = configManager.getNumber(configKeys.HOUSE_PRICE)
+	if housePrice == -1 then
+		return true
 	end
 
 	local position = player:getPosition()
