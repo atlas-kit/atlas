@@ -1120,8 +1120,8 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 		ret = fromThing->queryAdd(fromThing->getThingIndex(item), toItem, toItemCount, 0);
 		if (ret == RETURNVALUE_NOERROR) {
 			if (actorPlayer && fromPos && toPos) {
-				const ReturnValue eventRet = tfs::events::player::onMoveItem(
-				    actorPlayer, toItem, toItemCount, *toPos, *fromPos, toThing, fromThing);
+				const ReturnValue eventRet = tfs::events::player::onMoveItem(actorPlayer, toItem, toItemCount, *toPos,
+				                                                             *fromPos, toThing, fromThing);
 				if (eventRet != RETURNVALUE_NOERROR) {
 					return eventRet;
 				}
@@ -1153,8 +1153,8 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 				ret = toThing->queryAdd(index, item, count, flags);
 
 				if (actorPlayer && fromPos && toPos && !toItem->isRemoved()) {
-					tfs::events::player::onItemMoved(actorPlayer, toItem, toItemCount, *toPos, *fromPos,
-					                                 toThing, fromThing);
+					tfs::events::player::onItemMoved(actorPlayer, toItem, toItemCount, *toPos, *fromPos, toThing,
+					                                 fromThing);
 				}
 
 				toItem = nullptr;

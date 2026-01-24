@@ -2758,8 +2758,8 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 				// we need to find first empty container as fast as we can for non-stackable items
 				// cache capacity to avoid repeated virtual calls in loop
 				const uint32_t containerCapacity = tmpContainer->capacity();
-				uint32_t n = containerCapacity -
-				             std::min(containerCapacity, static_cast<uint32_t>(tmpContainer->size()));
+				uint32_t n =
+				    containerCapacity - std::min(containerCapacity, static_cast<uint32_t>(tmpContainer->size()));
 				while (n) {
 					if (tmpContainer->queryAdd(containerCapacity - n, item, item->getItemCount(), flags) ==
 					    RETURNVALUE_NOERROR) {
