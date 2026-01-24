@@ -719,8 +719,7 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->manaShield) {
-		auto condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
+		auto condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
 		player->addCondition(std::move(condition));
 	}
 
@@ -734,8 +733,7 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->regeneration) {
-		auto condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
+		auto condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
 
 		if (it.abilities->healthGain != 0) {
 			condition->setParam(CONDITION_PARAM_HEALTHGAIN, it.abilities->healthGain);

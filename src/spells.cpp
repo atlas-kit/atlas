@@ -741,8 +741,8 @@ void Spell::postCastSpell(const std::shared_ptr<Player>& player, bool finishedCa
 	if (finishedCast) {
 		if (!player->hasFlag(PlayerFlag_HasNoExhaustion)) {
 			if (cooldown > 0) {
-				auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLCOOLDOWN,
-				                                            cooldown, 0, false, spellId);
+				auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLCOOLDOWN, cooldown, 0,
+				                                            false, spellId);
 				player->addCondition(std::move(condition));
 			}
 
@@ -871,15 +871,14 @@ bool InstantSpell::playerCastInstant(const std::shared_ptr<Player>& player, std:
 					}
 
 					if (groupCooldown > 0) {
-						auto condition = Condition::createCondition(
-						    CONDITIONID_DEFAULT, CONDITION_SPELLGROUPCOOLDOWN, groupCooldown, 0, false, group);
+						auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLGROUPCOOLDOWN,
+						                                            groupCooldown, 0, false, group);
 						player->addCondition(std::move(condition));
 					}
 
 					if (secondaryGroupCooldown > 0) {
-						auto condition =
-						    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLGROUPCOOLDOWN,
-						                               secondaryGroupCooldown, 0, false, secondaryGroup);
+						auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLGROUPCOOLDOWN,
+						                                            secondaryGroupCooldown, 0, false, secondaryGroup);
 						player->addCondition(std::move(condition));
 					}
 
@@ -929,8 +928,8 @@ bool InstantSpell::playerCastInstant(const std::shared_ptr<Player>& player, std:
 
 			if (ret != RETURNVALUE_NOERROR) {
 				if (cooldown > 0) {
-					auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLCOOLDOWN,
-					                                            cooldown, 0, false, spellId);
+					auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SPELLCOOLDOWN, cooldown,
+					                                            0, false, spellId);
 					player->addCondition(std::move(condition));
 				}
 

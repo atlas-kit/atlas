@@ -974,8 +974,8 @@ bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* 
 	if (!force && condition->getType() == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)) {
 		int64_t walkDelay = getWalkDelay();
 		if (walkDelay > 0) {
-			g_scheduler.addEvent(createSchedulerTask(
-			    walkDelay, [id = getID(), condition = std::move(condition)]() mutable {
+			g_scheduler.addEvent(
+			    createSchedulerTask(walkDelay, [id = getID(), condition = std::move(condition)]() mutable {
 				    if (condition) {
 					    g_game.forceAddCondition(id, std::move(condition));
 				    }
@@ -1331,7 +1331,7 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 
 bool Creature::isInvisible() const
 {
-	return std::find_if(conditions.begin(), conditions.end(), [](const Condition* condition) {
+	return std::find_if(conditions.begin(), conditions.end(), [](const std::unique_ptr<Condition>& condition) {
 		       return condition->getType() == CONDITION_INVISIBLE;
 	       }) != conditions.end();
 }
