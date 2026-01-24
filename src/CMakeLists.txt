@@ -3,7 +3,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/ban.cpp
 	${CMAKE_CURRENT_LIST_DIR}/base64.cpp
 	${CMAKE_CURRENT_LIST_DIR}/baseevents.cpp
-	${CMAKE_CURRENT_LIST_DIR}/bed.cpp
 	${CMAKE_CURRENT_LIST_DIR}/chat.cpp
 	${CMAKE_CURRENT_LIST_DIR}/combat.cpp
 	${CMAKE_CURRENT_LIST_DIR}/condition.cpp
@@ -76,7 +75,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/ban.h
 	${CMAKE_CURRENT_LIST_DIR}/base64.h
 	${CMAKE_CURRENT_LIST_DIR}/baseevents.h
-	${CMAKE_CURRENT_LIST_DIR}/bed.h
 	${CMAKE_CURRENT_LIST_DIR}/chat.h
 	${CMAKE_CURRENT_LIST_DIR}/combat.h
 	${CMAKE_CURRENT_LIST_DIR}/condition.h
@@ -158,7 +156,6 @@ set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 add_library(tfslib ${tfs_SRC})
 target_link_libraries(tfslib PRIVATE
 	Boost::iostreams
-	Boost::system
 	OpenSSL::Crypto
 	pugixml::pugixml
 	simdutf::simdutf
