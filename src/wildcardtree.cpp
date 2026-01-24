@@ -13,7 +13,7 @@ std::optional<std::reference_wrapper<WildcardTreeNode>> WildcardTreeNode::getChi
 	if (it == children.end()) {
 		return std::nullopt;
 	}
-	return it->second;
+	return *it->second;
 }
 
 std::optional<std::reference_wrapper<const WildcardTreeNode>> WildcardTreeNode::getChild(char ch) const
@@ -22,12 +22,11 @@ std::optional<std::reference_wrapper<const WildcardTreeNode>> WildcardTreeNode::
 	if (it == children.end()) {
 		return std::nullopt;
 	}
-	return it->second;
+	return *it->second;
 }
 
 WildcardTreeNode& WildcardTreeNode::addChild(char ch, bool breakpoint)
 {
-	;
 	if (const auto& node = getChild(ch)) {
 		if (breakpoint && !node->get().breakpoint) {
 			node->get().breakpoint = true;
@@ -35,8 +34,10 @@ WildcardTreeNode& WildcardTreeNode::addChild(char ch, bool breakpoint)
 		return *node;
 	}
 
-	auto&& [it, _] = children.emplace(ch, WildcardTreeNode(breakpoint));
-	return it->second;
+	auto newChild = std::make_unique<WildcardTreeNode>(breakpoint);
+	auto& childRef = *newChild;
+	children.emplace(ch, std::move(newChild));
+	return childRef;
 }
 
 void WildcardTreeNode::insert(const std::string& str)
@@ -108,6 +109,6 @@ ReturnValue WildcardTreeNode::findOne(const std::string& query, std::string& res
 
 		auto&& [ch, node] = *cur->children.begin();
 		result += ch;
-		cur = &node;
+		cur = node.get();
 	} while (true);
 }
