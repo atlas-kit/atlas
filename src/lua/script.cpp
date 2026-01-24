@@ -2,7 +2,6 @@
 
 #include "../script.h"
 
-#include "../bed.h"
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
@@ -24,7 +23,7 @@
 
 #include <string>
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Game g_game;
 extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
@@ -34,7 +33,6 @@ extern Actions* g_actions;
 extern TalkActions* g_talkActions;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
-extern Weapons* g_weapons;
 
 LuaEnvironment g_luaEnvironment;
 
@@ -284,7 +282,7 @@ int luaSendChannelMessage(lua_State* L)
 {
 	// sendChannelMessage(channelId, type, message)
 	uint32_t channelId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getChannelById(channelId);
+	const auto& channel = g_chat.getChannelById(channelId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -301,7 +299,7 @@ int luaSendGuildChannelMessage(lua_State* L)
 {
 	// sendGuildChannelMessage(guildId, type, message)
 	uint32_t guildId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getGuildChannelById(guildId);
+	const auto& channel = g_chat.getGuildChannelById(guildId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -521,7 +519,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_
 	// execute it
 	ret = tfs::lua::protectedCall(L, 0, 0);
 	if (ret != 0) {
-		tfs::lua::reportError(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 		tfs::lua::resetScriptEnv();
 		return -1;
 	}
@@ -672,14 +670,14 @@ bool LuaScriptInterface::callFunction(int params)
 	bool result = false;
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 1) != 0) {
-		tfs::lua::reportError(L, tfs::lua::getString(L, -1));
+		tfs::lua::reportError(L, tfs::lua::getString(L, -1), true);
 	} else {
 		result = tfs::lua::getBoolean(L, -1);
 	}
 
 	lua_pop(L, 1);
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -690,11 +688,11 @@ void LuaScriptInterface::callVoidFunction(int params)
 {
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 0) != 0) {
-		tfs::lua::reportError(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 	}
 
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();

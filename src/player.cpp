@@ -5,7 +5,6 @@
 
 #include "player.h"
 
-#include "bed.h"
 #include "chat.h"
 #include "combat.h"
 #include "configmanager.h"
@@ -21,13 +20,13 @@
 #include "tools.h"
 #include "weapons.h"
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 MuteCountMap Player::muteCountMap;
 
@@ -186,37 +185,39 @@ std::shared_ptr<Item> Player::getWeapon(slots_t slot, bool ignoreAmmo) const
 		return nullptr;
 	}
 
-	if (!ignoreAmmo && weaponType == WEAPON_DISTANCE) {
-		const ItemType& itemType = Item::items[item->getID()];
-		if (itemType.ammoType != AMMO_NONE) {
-			const auto& ammoItem = inventory[CONST_SLOT_AMMO];
-			if (!ammoItem || ammoItem->getAmmoType() != itemType.ammoType) {
-				// no ammo item was found, search for quiver instead
-				const auto& quiver =
-				    inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
-				if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
-					// no quiver equipped
-					return nullptr;
-				}
+	if (ignoreAmmo || weaponType != WEAPON_DISTANCE) {
+		return item;
+	}
 
-				for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext();
-				     containerItem.advance()) {
-					if (itemType.ammoType == (*containerItem)->getAmmoType()) {
-						if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
-							if (weapon->ammoCheck(asPlayer())) {
-								return *containerItem;
-							}
-						}
-					}
-				}
+	const ItemType& itemType = Item::items[item->getID()];
+	if (itemType.ammoType == AMMO_NONE) {
+		return item;
+	}
 
-				// no valid ammo was found in quiver
-				return nullptr;
+	const auto& ammoItem = inventory[CONST_SLOT_AMMO];
+	if (ammoItem && ammoItem->getAmmoType() == itemType.ammoType) {
+		return ammoItem;
+	}
+
+	// no ammo item was found, search for quiver instead
+	const auto& quiver = inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
+	if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
+		// no quiver equipped
+		return nullptr;
+	}
+
+	for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext(); containerItem.advance()) {
+		if (itemType.ammoType == (*containerItem)->getAmmoType()) {
+			if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
+				if (weapon->ammoCheck(asPlayer())) {
+					return *containerItem;
+				}
 			}
-			item = ammoItem;
 		}
 	}
-	return item;
+
+	// no valid ammo was found in quiver
+	return nullptr;
 }
 
 std::shared_ptr<Item> Player::getWeapon(bool ignoreAmmo /* = false*/) const
@@ -1042,10 +1043,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		IOLoginData::updateOnlineStatus(guid, true);
 
-		if (const auto& bed = g_game.getBedBySleeper(guid)) {
-			bed->wakeUp(asPlayer());
-		}
-
 		if (const auto& guild = getGuild()) {
 			guild->addMember(asPlayer());
 		}
@@ -1192,7 +1189,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 			party->leaveParty(asPlayer(), true);
 		}
 
-		g_chat->removeUserFromAllChannels(asPlayer());
+		g_chat.removeUserFromAllChannels(asPlayer());
 
 		if (const auto& guild = getGuild()) {
 			guild->removeMember(asPlayer());
@@ -1503,7 +1500,7 @@ void Player::onAttacking(uint32_t)
 	uint32_t delay = getAttackSpeed();
 	bool classicSpeed = getBoolean(ConfigManager::CLASSIC_ATTACK_SPEED);
 
-	if (const Weapon* weapon = g_weapons->getWeapon(tool)) {
+	if (const auto& weapon = g_weapons->getWeapon(tool)) {
 		if (!weapon->interruptSwing()) {
 			result = weapon->useWeapon(asPlayer(), tool, getAttackedCreature());
 		} else if (!classicSpeed && !canDoAction()) {
@@ -4522,10 +4519,10 @@ void Player::sendModalWindow(const ModalWindow& modalWindow)
 
 void Player::clearModalWindows() { modalWindows.clear(); }
 
-void Player::sendClosePrivate(uint16_t channelId)
+void Player::sendClosePrivate(uint16_t channelId) const
 {
 	if (channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY) {
-		g_chat->removeUserFromChannel(asPlayer(), channelId);
+		g_chat.removeUserFromChannel(asPlayer(), channelId);
 	}
 
 	if (client) {

@@ -9,7 +9,6 @@
 #include "enums.h"
 #include "position.h"
 
-class BedItem;
 class House;
 class HouseTile;
 class Player;
@@ -124,7 +123,7 @@ public:
 	void setEntryPos(Position pos) { posEntry = pos; }
 	const Position& getEntryPosition() const { return posEntry; }
 
-	void setName(std::string houseName) { this->houseName = houseName; }
+	void setName(std::string houseName) { this->houseName = std::move(houseName); }
 	const std::string& getName() const { return houseName; }
 
 	const std::string& getOwnerName() const { return ownerName; }
@@ -158,11 +157,8 @@ public:
 	const auto& getTiles() const { return tiles; }
 	const auto& getDoors() const { return doors; }
 
-	void addBed(const std::shared_ptr<BedItem>& bed);
-	const auto& getBeds() const { return beds; }
-
-	// each bed takes 2 sqms of space, ceil is just for bad maps
-	auto getBedCount() const { return (beds.size() + 1) / 2; }
+	auto getMaxBeds() const { return maxBeds; }
+	auto setMaxBeds(uint8_t beds) { maxBeds = beds; }
 
 private:
 	bool transferToDepot() const;
@@ -175,7 +171,6 @@ private:
 
 	boost::container::flat_set<std::weak_ptr<HouseTile>, std::owner_less<std::weak_ptr<HouseTile>>> tiles;
 	boost::container::flat_set<std::weak_ptr<Door>, std::owner_less<std::weak_ptr<Door>>> doors;
-	boost::container::flat_set<std::weak_ptr<BedItem>, std::owner_less<std::weak_ptr<BedItem>>> beds;
 
 	std::string houseName;
 	std::string ownerName;
@@ -190,6 +185,7 @@ private:
 	uint32_t rentWarnings = 0;
 	uint32_t rent = 0;
 	uint32_t townId = 0;
+	uint8_t maxBeds = 0xFF;
 
 	Position posEntry = {};
 
