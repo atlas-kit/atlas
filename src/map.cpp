@@ -454,12 +454,11 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 		if (onlyPlayers) {
 			auto it = playersSpectatorCache.find(centerPos);
 			if (it != playersSpectatorCache.end()) {
-				if (!spectators.empty()) {
-					spectators.insert(it->second.begin(), it->second.end());
-				} else {
+				if (spectators.empty()) {
 					spectators = it->second;
+				} else {
+					spectators.insert(it->second.begin(), it->second.end());
 				}
-
 				foundCache = true;
 			}
 		}
@@ -468,11 +467,10 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 			auto it = spectatorCache.find(centerPos);
 			if (it != spectatorCache.end()) {
 				if (!onlyPlayers) {
-					if (!spectators.empty()) {
-						const SpectatorVec& cachedSpectators = it->second;
-						spectators.insert(cachedSpectators.begin(), cachedSpectators.end());
-					} else {
+					if (spectators.empty()) {
 						spectators = it->second;
+					} else {
+						spectators.insert(it->second.begin(), it->second.end());
 					}
 				} else {
 					const SpectatorVec& cachedSpectators = it->second;

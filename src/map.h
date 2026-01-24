@@ -9,8 +9,6 @@
 #include "spawn.h"
 #include "town.h"
 
-#include <unordered_map>
-
 class Creature;
 class Tile;
 
@@ -20,6 +18,18 @@ static constexpr uint16_t MAP_NORMALWALKCOST = 10;
 static constexpr uint16_t MAP_DIAGONALWALKCOST = 25;
 
 using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::owner_less<std::shared_ptr<Creature>>>;
+
+struct PositionHash
+{
+	size_t operator()(const Position& position) const noexcept
+	{
+		const uint64_t x = static_cast<uint64_t>(position.x);
+		const uint64_t y = static_cast<uint64_t>(position.y);
+		const uint64_t z = static_cast<uint64_t>(position.z);
+		const uint64_t packed = (x << 24) | (y << 8) | z;
+		return std::hash<uint64_t>{}(packed);
+	}
+};
 
 struct FindPathParams;
 struct AStarNode
