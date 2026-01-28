@@ -13,7 +13,7 @@ local ids = {4620, 4621, 4622, 4623, 4624, 4625, 4820, 4821, 4822, 4823, 4824, 4
 
 do
 	local event = MoveEvent()
-	
+
 	function event.onStepIn(creature, item, position, fromPosition)
 		if not creature:isPlayer() then
 			return false
