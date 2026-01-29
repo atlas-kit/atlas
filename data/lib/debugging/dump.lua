@@ -27,7 +27,7 @@ function dumpLevel(input, level)
 				valueStr = tostring(v)
 			end
 
-    		table.insert(lines, indent .. '    [' .. keyStr .. '] = ' .. valueStr)
+			table.insert(lines, indent .. '    [' .. keyStr .. '] = ' .. valueStr)
 		end
 		return str .. table.concat(lines, ',\n') .. '\n' .. indent .. '}'
 	end
