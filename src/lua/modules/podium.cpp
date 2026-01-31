@@ -19,7 +19,7 @@ int luaPodiumCreate(lua_State* L)
 	uint32_t id = tfs::lua::getNumber<uint32_t>(L, 2);
 
 	const auto& item = tfs::lua::getScriptEnv()->getItemByUID(id);
-	if (item && item->getPodium()) {
+	if (item && item->asPodium()) {
 		tfs::lua::pushSharedPtr(L, item);
 		tfs::lua::setMetatable(L, -1, "Podium");
 	} else {

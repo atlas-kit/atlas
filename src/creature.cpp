@@ -528,7 +528,7 @@ bool Creature::dropCorpse(const std::shared_ptr<Creature>& lastHitCreature,
 		                               mostDamageUnjustified);
 
 		if (corpse) {
-			dropLoot(corpse->getContainer(), lastHitCreature);
+			dropLoot(corpse->asContainer(), lastHitCreature);
 		}
 	}
 

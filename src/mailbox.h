@@ -11,11 +11,11 @@ class Mailbox final : public Item
 public:
 	explicit Mailbox(uint16_t itemId) : Item{itemId} {}
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
-	std::shared_ptr<Mailbox> getMailbox() override { return std::static_pointer_cast<Mailbox>(shared_from_this()); }
-	std::shared_ptr<const Mailbox> getMailbox() const override
+	std::shared_ptr<Mailbox> asMailbox() override { return std::static_pointer_cast<Mailbox>(shared_from_this()); }
+	std::shared_ptr<const Mailbox> asMailbox() const override
 	{
 		return std::static_pointer_cast<const Mailbox>(shared_from_this());
 	}
