@@ -213,8 +213,7 @@ bool MoveEvents::registerLuaFunction(MoveEvent* event)
 
 bool MoveEvents::registerLuaEvent(MoveEvent* event)
 {
-	const auto moveEvent{event};
-
+	const std::unique_ptr<MoveEvent> moveEvent{event};
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
 		if (moveEvent->getTileItem()) {

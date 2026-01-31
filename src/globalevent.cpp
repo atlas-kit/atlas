@@ -77,7 +77,7 @@ bool GlobalEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_n
 
 bool GlobalEvents::registerLuaEvent(GlobalEvent* event)
 {
-	const auto globalEvent{event};
+	const std::unique_ptr<GlobalEvent> globalEvent{event};
 	if (globalEvent->getEventType() == GLOBALEVENT_TIMER) {
 		auto result = timerMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {

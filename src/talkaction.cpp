@@ -54,7 +54,7 @@ bool TalkActions::registerEvent(std::unique_ptr<Event> event, const pugi::xml_no
 
 bool TalkActions::registerLuaEvent(TalkAction* event)
 {
-	const auto talkAction{event};
+	const std::unique_ptr<TalkAction> talkAction{event};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {
