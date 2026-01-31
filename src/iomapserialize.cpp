@@ -89,7 +89,7 @@ void loadContainer(OTB::iterator& first, const OTB::iterator& last, const std::s
 
 void IOMapSerialize::loadHouseItems(Map* map)
 {
-	auto start = OTSYS_TIME();
+	auto start = std::chrono::system_clock::now();
 
 	const auto& result = Database::getInstance().storeQuery("SELECT `data` FROM `tile_store`");
 	if (!result) {
@@ -121,12 +121,13 @@ void IOMapSerialize::loadHouseItems(Map* map)
 		}
 	} while (result->next());
 	std::cout << "> Loaded house items in: "
-	          << duration_cast<std::chrono::milliseconds>(OTSYS_TIME() - start).count() / 1000. << " s" << std::endl;
+	          << duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count() / 1000.
+	          << " s" << std::endl;
 }
 
 bool IOMapSerialize::saveHouseItems()
 {
-	auto start = OTSYS_TIME();
+	auto start = std::chrono::system_clock::now();
 	Database& db = Database::getInstance();
 
 	// Start the transaction
@@ -164,7 +165,8 @@ bool IOMapSerialize::saveHouseItems()
 	// End the transaction
 	bool success = transaction.commit();
 	std::cout << "> Saved house items in: "
-	          << duration_cast<std::chrono::milliseconds>(OTSYS_TIME() - start).count() / 1000. << " s" << std::endl;
+	          << duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count() / 1000.
+	          << " s" << std::endl;
 	return success;
 }
 

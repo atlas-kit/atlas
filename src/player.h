@@ -497,7 +497,7 @@ public:
 	bool hasExtraSwing() override
 	{
 		return lastAttack > std::chrono::system_clock::time_point{} &&
-		       ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());
+		       ((std::chrono::system_clock::now() - lastAttack) >= getAttackSpeed());
 	}
 
 	uint16_t getSpecialSkill(uint8_t skill) const { return std::max<uint16_t>(0, varSpecialSkills[skill]); }
@@ -1182,7 +1182,7 @@ public:
 	void setNextActionTask(SchedulerTask_ptr task);
 
 	void setNextAction(std::chrono::system_clock::time_point time) { nextAction = std::max(nextAction, time); }
-	bool canDoAction() const { return nextAction <= OTSYS_TIME(); }
+	bool canDoAction() const { return nextAction <= std::chrono::system_clock::now(); }
 	std::chrono::milliseconds getNextActionTime() const;
 
 	std::shared_ptr<Item> getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen);

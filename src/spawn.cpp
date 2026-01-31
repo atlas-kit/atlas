@@ -322,7 +322,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 	monster->setMasterPos(pos);
 
 	spawnedMap.insert({spawnId, monster});
-	spawnMap[spawnId].lastSpawn = OTSYS_TIME();
+	spawnMap[spawnId].lastSpawn = std::chrono::system_clock::now();
 	return true;
 }
 
@@ -346,9 +346,9 @@ void Spawn::checkSpawn()
 			continue;
 		}
 
-		if (OTSYS_TIME() >= sb.lastSpawn + sb.interval) {
+		if (std::chrono::system_clock::now() >= sb.lastSpawn + sb.interval) {
 			if (!spawnMonster(spawnId, sb)) {
-				sb.lastSpawn = OTSYS_TIME();
+				sb.lastSpawn = std::chrono::system_clock::now();
 				continue;
 			}
 

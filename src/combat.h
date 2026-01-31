@@ -148,7 +148,7 @@ private:
 class MagicField final : public Item
 {
 public:
-	explicit MagicField(uint16_t type) : Item{type}, createTime{OTSYS_TIME()} {}
+	explicit MagicField(uint16_t type) : Item{type}, createTime{std::chrono::system_clock::now()} {}
 
 	std::shared_ptr<MagicField> asMagicField() override
 	{

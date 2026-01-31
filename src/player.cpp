@@ -384,9 +384,9 @@ float Player::getDefenseFactor() const
 {
 	switch (fightMode) {
 		case FIGHTMODE_ATTACK:
-			return (OTSYS_TIME() - lastAttack) < getAttackSpeed() ? 0.5f : 1.0f;
+			return (std::chrono::system_clock::now() - lastAttack) < getAttackSpeed() ? 0.5f : 1.0f;
 		case FIGHTMODE_BALANCED:
-			return (OTSYS_TIME() - lastAttack) < getAttackSpeed() ? 0.75f : 1.0f;
+			return (std::chrono::system_clock::now() - lastAttack) < getAttackSpeed() ? 0.75f : 1.0f;
 		case FIGHTMODE_DEFENSE:
 			return 1.0f;
 		default:
@@ -692,8 +692,8 @@ bool Player::canWalkthrough(const std::shared_ptr<const Creature>& creature) con
 	}
 
 	const auto& thisPlayer = const_cast<Player*>(this);
-	if ((OTSYS_TIME() - lastWalkthroughAttempt) > 2s) {
-		thisPlayer->setLastWalkthroughAttempt(OTSYS_TIME());
+	if ((std::chrono::system_clock::now() - lastWalkthroughAttempt) > 2s) {
+		thisPlayer->setLastWalkthroughAttempt(std::chrono::system_clock::now());
 		return false;
 	}
 
@@ -1261,7 +1261,7 @@ void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
 	setNextActionTask(nullptr);
-	setNextAction(OTSYS_TIME() + getStepDuration(dir));
+	setNextAction(std::chrono::system_clock::now() + getStepDuration(dir));
 }
 
 void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
@@ -1452,7 +1452,8 @@ void Player::setNextActionTask(SchedulerTask_ptr task)
 
 std::chrono::milliseconds Player::getNextActionTime() const
 {
-	return std::max(SCHEDULER_MINTICKS, duration_cast<std::chrono::milliseconds>(nextAction - OTSYS_TIME()));
+	return std::max(SCHEDULER_MINTICKS,
+	                duration_cast<std::chrono::milliseconds>(nextAction - std::chrono::system_clock::now()));
 }
 
 void Player::onThink(std::chrono::milliseconds interval)
@@ -1489,10 +1490,10 @@ void Player::onAttacking(std::chrono::milliseconds)
 	}
 
 	if (lastAttack == std::chrono::system_clock::time_point::min()) {
-		lastAttack = OTSYS_TIME() - getAttackSpeed() - 1ms;
+		lastAttack = std::chrono::system_clock::now() - getAttackSpeed() - 1ms;
 	}
 
-	if ((OTSYS_TIME() - lastAttack) < getAttackSpeed()) {
+	if ((std::chrono::system_clock::now() - lastAttack) < getAttackSpeed()) {
 		return;
 	}
 
@@ -1528,7 +1529,7 @@ void Player::onAttacking(std::chrono::milliseconds)
 	}
 
 	if (result) {
-		lastAttack = OTSYS_TIME();
+		lastAttack = std::chrono::system_clock::now();
 	}
 }
 
@@ -2025,7 +2026,7 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 			uint32_t sumLevels = 0;
 			auto inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)};
 			for (auto&& [id, cb] : getDamageMap()) {
-				if ((OTSYS_TIME() - cb.ticks) <= inFightTicks) {
+				if ((std::chrono::system_clock::now() - cb.ticks) <= inFightTicks) {
 					if (const auto& damageDealer = g_game.getPlayerByID(id)) {
 						sumLevels += damageDealer->getLevel();
 					}
@@ -2172,7 +2173,7 @@ std::shared_ptr<Item> Player::getCorpse(const std::shared_ptr<Creature>& lastHit
 	if (corpse && corpse->asContainer()) {
 		auto killers = std::ranges::count_if(
 		    getDamageMap(),
-		    [this, now = OTSYS_TIME(),
+		    [this, now = std::chrono::system_clock::now(),
 		     inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}](const auto& pair) {
 			    const auto& attacker = g_game.getCreatureByID(pair.first);
 			    return attacker && attacker.get() != this && (now - pair.second.ticks <= inFightTicks);
@@ -3309,7 +3310,7 @@ void Player::goToFollowCreature()
 		return;
 	}
 
-	if ((OTSYS_TIME() - lastFailedFollow) < 2s) {
+	if ((std::chrono::system_clock::now() - lastFailedFollow) < 2s) {
 		return;
 	}
 
@@ -3318,7 +3319,7 @@ void Player::goToFollowCreature()
 	updateFollowCreaturePath(fpp);
 
 	if (!hasFollowPath) {
-		lastFailedFollow = OTSYS_TIME();
+		lastFailedFollow = std::chrono::system_clock::now();
 	}
 }
 
@@ -4242,7 +4243,7 @@ void Player::setCurrentMount(uint16_t mountId) { currentMount = mountId; }
 
 bool Player::toggleMount(bool mount)
 {
-	if ((OTSYS_TIME() - lastToggleMount) < 3s && !wasMounted_) {
+	if ((std::chrono::system_clock::now() - lastToggleMount) < 3s && !wasMounted_) {
 		sendCancelMessage(RETURNVALUE_YOUAREEXHAUSTED);
 		return false;
 	}
@@ -4307,7 +4308,7 @@ bool Player::toggleMount(bool mount)
 	}
 
 	g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-	lastToggleMount = OTSYS_TIME();
+	lastToggleMount = std::chrono::system_clock::now();
 	return true;
 }
 

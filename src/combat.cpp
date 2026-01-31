@@ -1355,7 +1355,8 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 				}
 			}
 
-			if (!harmfulField || (OTSYS_TIME() - createTime <= 5s) || creature->hasBeenAttacked(ownerId)) {
+			if (!harmfulField || (std::chrono::system_clock::now() - createTime <= 5s) ||
+			    creature->hasBeenAttacked(ownerId)) {
 				conditionCopy->setParam(CONDITION_PARAM_OWNER, ownerId);
 			}
 		}

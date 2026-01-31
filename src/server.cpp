@@ -25,7 +25,7 @@ bool acceptConnection(const Connection::Address& clientIP)
 	static std::recursive_mutex mu;
 	std::lock_guard lock{mu};
 
-	auto currentTime = OTSYS_TIME();
+	auto currentTime = std::chrono::system_clock::now();
 
 	static std::map<Connection::Address, ConnectBlock> ipConnectMap;
 	auto it = ipConnectMap.find(clientIP);

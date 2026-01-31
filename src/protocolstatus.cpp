@@ -36,13 +36,14 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	if (!ip.is_loopback() && ip != acceptorAddress) {
 		if (auto it = ipConnectMap.find(ip);
 		    it != ipConnectMap.end() &&
-		    (OTSYS_TIME() < (it->second + std::chrono::seconds{getNumber(ConfigManager::STATUSQUERY_TIMEOUT)}))) {
+		    (std::chrono::system_clock::now() <
+		     (it->second + std::chrono::seconds{getNumber(ConfigManager::STATUSQUERY_TIMEOUT)}))) {
 			disconnect();
 			return;
 		}
 	}
 
-	ipConnectMap[ip] = OTSYS_TIME();
+	ipConnectMap[ip] = std::chrono::system_clock::now();
 
 	switch (msg.getByte()) {
 		// XML info protocol

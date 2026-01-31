@@ -808,7 +808,7 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 				spellBlock.spell->castSpell(asMonster(), attackedCreature);
 
 				if (spellBlock.isMelee) {
-					lastMeleeAttack = OTSYS_TIME();
+					lastMeleeAttack = std::chrono::system_clock::now();
 				}
 			}
 		}
@@ -850,7 +850,7 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 	inRange = true;
 
 	if (sb.isMelee) {
-		if (isFleeing() || (OTSYS_TIME() - lastMeleeAttack) < sb.speed) {
+		if (isFleeing() || (std::chrono::system_clock::now() - lastMeleeAttack) < sb.speed) {
 			return false;
 		}
 	} else {

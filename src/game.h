@@ -494,7 +494,7 @@ public:
 	auto getPlayerRecord() const { return playerRecord; }
 	void setPlayerRecord(uint32_t record) { playerRecord = record; }
 
-	auto getWorldUptime() const { return OTSYS_TIME() - worldStart; }
+	auto getWorldUptime() const { return std::chrono::system_clock::now() - worldStart; }
 
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);

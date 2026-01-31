@@ -245,7 +245,7 @@ bool Actions::useItem(const std::shared_ptr<Player>& player, const Position& pos
                       const std::shared_ptr<Item>& item, bool isHotkey)
 {
 	auto cooldown = std::chrono::milliseconds(getNumber(ConfigManager::ACTIONS_DELAY_INTERVAL));
-	player->setNextAction(OTSYS_TIME() + cooldown);
+	player->setNextAction(std::chrono::system_clock::now() + cooldown);
 	player->sendUseItemCooldown(cooldown);
 	if (item->isSupply()) {
 		player->sendSupplyUsed(item->getClientID());
@@ -287,7 +287,7 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
                         const std::shared_ptr<Creature>& creature /* = nullptr*/)
 {
 	auto cooldown = std::chrono::milliseconds(getNumber(ConfigManager::EX_ACTIONS_DELAY_INTERVAL));
-	player->setNextAction(OTSYS_TIME() + cooldown);
+	player->setNextAction(std::chrono::system_clock::now() + cooldown);
 	player->sendUseItemCooldown(cooldown);
 
 	Action* action = getAction(item);

@@ -430,7 +430,7 @@ SharedExpStatus_t Party::getMemberSharedExperienceStatus(const std::shared_ptr<c
 			return SHAREDEXP_MEMBERINACTIVE;
 		}
 
-		auto timeDiff = OTSYS_TIME() - it->second;
+		auto timeDiff = std::chrono::system_clock::now() - it->second;
 		if (timeDiff > std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}) {
 			return SHAREDEXP_MEMBERINACTIVE;
 		}
@@ -457,7 +457,7 @@ SharedExpStatus_t Party::getSharedExperienceStatus()
 void Party::updatePlayerTicks(const std::shared_ptr<Player>& player, uint32_t points)
 {
 	if (points != 0 && !player->hasFlag(PlayerFlag_NotGainInFight)) {
-		ticksMap[player->getID()] = OTSYS_TIME();
+		ticksMap[player->getID()] = std::chrono::system_clock::now();
 		updateSharedExperience();
 	}
 }

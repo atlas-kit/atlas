@@ -60,8 +60,6 @@ itemAttrTypes stringToItemAttribute(const std::string& str);
 
 const char* getReturnMessage(ReturnValue value);
 
-std::chrono::system_clock::time_point OTSYS_TIME();
-
 SpellGroup_t stringToSpellGroup(const std::string& value);
 
 std::array<Direction, 4> getShuffleDirections();

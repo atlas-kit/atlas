@@ -66,7 +66,7 @@ std::size_t clientLogin(const Player& player)
 		return 0;
 	}
 
-	auto time = OTSYS_TIME();
+	auto time = std::chrono::system_clock::now();
 
 	auto it = waitList.begin();
 	while (it != waitList.end()) {

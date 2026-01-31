@@ -267,7 +267,8 @@ void appendHistory(uint32_t playerId, MarketAction_t action, uint16_t itemId, ui
 	    "INSERT INTO `market_history` (`player_id`, `sale`, `itemtype`, `amount`, `price`, `expires_at`, `inserted`, `state`) VALUES ({:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d})",
 	    playerId, std::to_underlying(action), itemId, amount, price,
 	    duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count(),
-	    duration_cast<std::chrono::seconds>(OTSYS_TIME().time_since_epoch()).count(), std::to_underlying(state)));
+	    duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(),
+	    std::to_underlying(state)));
 }
 
 bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state)

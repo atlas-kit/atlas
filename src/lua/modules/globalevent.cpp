@@ -132,7 +132,7 @@ int luaGlobalEventTime(lua_State* L)
 			}
 		}
 
-		auto timeNow = OTSYS_TIME();
+		auto timeNow = std::chrono::system_clock::now();
 
 		auto interval = std::chrono::days{1};
 		auto nextExecution = floor<std::chrono::days>(timeNow + std::chrono::hours{hour} + std::chrono::minutes{min} +
@@ -156,7 +156,8 @@ int luaGlobalEventInterval(lua_State* L)
 	GlobalEvent* globalevent = tfs::lua::getUserdata<GlobalEvent>(L, 1);
 	if (globalevent) {
 		globalevent->setInterval(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
-		globalevent->setNextExecution(OTSYS_TIME() + std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
+		globalevent->setNextExecution(std::chrono::system_clock::now() +
+		                              std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);

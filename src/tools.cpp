@@ -1053,8 +1053,6 @@ const char* getReturnMessage(ReturnValue value)
 	}
 }
 
-std::chrono::system_clock::time_point OTSYS_TIME() { return std::chrono::system_clock::now(); }
-
 SpellGroup_t stringToSpellGroup(const std::string& value)
 {
 	std::string tmpStr = boost::algorithm::to_lower_copy(value);
