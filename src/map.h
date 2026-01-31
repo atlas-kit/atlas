@@ -9,6 +9,8 @@
 #include "spawn.h"
 #include "town.h"
 
+#include <boost/container_hash/hash.hpp>
+
 class Creature;
 class Tile;
 
@@ -21,13 +23,13 @@ using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::
 
 struct PositionHash
 {
-	size_t operator()(const Position& position) const noexcept
+	[[nodiscard]] size_t operator()(const Position& position) const noexcept
 	{
-		const uint64_t x = static_cast<uint64_t>(position.x);
-		const uint64_t y = static_cast<uint64_t>(position.y);
-		const uint64_t z = static_cast<uint64_t>(position.z);
-		const uint64_t packed = (x << 24) | (y << 8) | z;
-		return std::hash<uint64_t>{}(packed);
+		size_t seed = 0;
+		boost::hash_combine(seed, position.x);
+		boost::hash_combine(seed, position.y);
+		boost::hash_combine(seed, position.z);
+		return seed;
 	}
 };
 

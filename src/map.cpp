@@ -473,6 +473,7 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 						spectators.insert(it->second.begin(), it->second.end());
 					}
 				} else {
+					// Filter players from cached spectators
 					const SpectatorVec& cachedSpectators = it->second;
 					for (const auto& spectator : cachedSpectators) {
 						if (spectator->asPlayer()) {
@@ -480,7 +481,6 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 						}
 					}
 				}
-
 				foundCache = true;
 			} else {
 				cacheResult = true;
