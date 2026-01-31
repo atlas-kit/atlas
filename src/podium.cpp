@@ -34,7 +34,7 @@ void Podium::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterato
 		           .lookMountLegs = OTB::read<uint8_t>(first, last),
 		           .lookMountFeet = OTB::read<uint8_t>(first, last)});
 
-		g_game.updatePodium(getPodium());
+		g_game.updatePodium(asPodium());
 		return;
 	}
 

@@ -240,7 +240,7 @@ void Item::setID(uint16_t newid)
 std::shared_ptr<Thing> Item::getTopParent()
 {
 	auto parent = getParent();
-	auto receiver = getReceiver();
+	auto receiver = asReceiver();
 	if (!parent) {
 		return receiver;
 	}
@@ -259,7 +259,7 @@ std::shared_ptr<Thing> Item::getTopParent()
 std::shared_ptr<const Thing> Item::getTopParent() const
 {
 	auto parent = getParent();
-	auto receiver = getReceiver();
+	auto receiver = asReceiver();
 	if (!parent) {
 		return receiver;
 	}
@@ -306,7 +306,7 @@ const Position& Item::getPosition() const
 	if (const auto& tile = getTile()) {
 		return tile->getPosition();
 	}
-	return Tile::nullptrTile->getPosition();
+	return Tile::invalidTile->getPosition();
 }
 
 uint16_t Item::getSubType() const
@@ -352,10 +352,15 @@ void Item::setSubType(uint16_t n)
 void Item::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator& last)
 {
 	switch (attr) {
-		case ATTR_CHARGES:
 		case ATTR_COUNT:
 		case ATTR_RUNE_CHARGES: {
 			auto count = OTB::read<uint8_t>(first, last);
+			setSubType(count);
+			break;
+		}
+
+		case ATTR_CHARGES: {
+			auto count = OTB::read<uint16_t>(first, last);
 			setSubType(count);
 			break;
 		}

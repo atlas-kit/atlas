@@ -30,7 +30,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 		// create a new item
 		if (const auto& item = Item::CreateItem(id)) {
 			item->unserializeAttr(first, last);
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				loadContainer(first, last, container);
 			}
 
@@ -45,7 +45,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 				if (findItem->getID() == id) {
 					item = findItem;
 					break;
-				} else if (iType.isDoor() && findItem->getDoor()) {
+				} else if (iType.isDoor() && findItem->asDoor()) {
 					item = findItem;
 					break;
 				}
@@ -55,7 +55,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 		if (item) {
 			item->unserializeAttr(first, last);
 
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				loadContainer(first, last, container);
 			}
 
@@ -64,7 +64,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 			// The map changed since the last save, just read the attributes
 			if (const auto& dummy = Item::CreateItem(id)) {
 				dummy->unserializeAttr(first, last);
-				if (const auto& container = dummy->getContainer()) {
+				if (const auto& container = dummy->asContainer()) {
 					loadContainer(first, last, container);
 				}
 			}
@@ -168,7 +168,7 @@ bool IOMapSerialize::saveHouseItems()
 
 void IOMapSerialize::saveItem(PropWriteStream& stream, const std::shared_ptr<const Item>& item)
 {
-	const auto& container = item->getContainer();
+	const auto& container = item->asContainer();
 
 	// Write ID & props
 	stream.write<uint16_t>(item->getID());
@@ -199,8 +199,8 @@ void IOMapSerialize::saveTile(PropWriteStream& stream, const std::shared_ptr<con
 		const ItemType& it = Item::items[item->getID()];
 
 		// Note that these are NEGATED, ie. these are the items that will be saved.
-		if (!(it.moveable || it.forceSerialize || item->getDoor() ||
-		      (item->getContainer() && !item->getContainer()->empty()) || it.canWriteText)) {
+		if (!(it.moveable || it.forceSerialize || item->asDoor() ||
+		      (item->asContainer() && !item->asContainer()->empty()) || it.canWriteText)) {
 			continue;
 		}
 

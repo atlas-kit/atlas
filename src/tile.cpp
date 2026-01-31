@@ -17,7 +17,7 @@
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
 
-const std::shared_ptr<Tile> Tile::nullptrTile = std::make_shared<StaticTile>(0xFFFF, 0xFFFF, 0xFF);
+const std::shared_ptr<Tile> Tile::invalidTile = std::make_shared<StaticTile>(0xFFFF, 0xFFFF, 0xFF);
 
 bool Tile::hasProperty(ITEMPROPERTY prop) const
 {
@@ -122,8 +122,8 @@ std::shared_ptr<Teleport> Tile::getTeleportItem() const
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getTeleport()) {
-				return (*it)->getTeleport();
+			if ((*it)->asTeleport()) {
+				return (*it)->asTeleport();
 			}
 		}
 	}
@@ -136,14 +136,14 @@ std::shared_ptr<MagicField> Tile::getFieldItem() const
 		return nullptr;
 	}
 
-	if (ground && ground->getMagicField()) {
-		return ground->getMagicField();
+	if (ground && ground->asMagicField()) {
+		return ground->asMagicField();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getMagicField()) {
-				return (*it)->getMagicField();
+			if ((*it)->asMagicField()) {
+				return (*it)->asMagicField();
 			}
 		}
 	}
@@ -156,14 +156,14 @@ std::shared_ptr<TrashHolder> Tile::getTrashHolder() const
 		return nullptr;
 	}
 
-	if (ground && ground->getTrashHolder()) {
-		return ground->getTrashHolder();
+	if (ground && ground->asTrashHolder()) {
+		return ground->asTrashHolder();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getTrashHolder()) {
-				return (*it)->getTrashHolder();
+			if ((*it)->asTrashHolder()) {
+				return (*it)->asTrashHolder();
 			}
 		}
 	}
@@ -176,14 +176,14 @@ std::shared_ptr<Mailbox> Tile::getMailbox() const
 		return nullptr;
 	}
 
-	if (ground && ground->getMailbox()) {
-		return ground->getMailbox();
+	if (ground && ground->asMailbox()) {
+		return ground->asMailbox();
 	}
 
 	if (const TileItemVector* items = getItemList()) {
 		for (auto it = items->rbegin(), end = items->rend(); it != end; ++it) {
-			if ((*it)->getMailbox()) {
-				return (*it)->getMailbox();
+			if ((*it)->asMailbox()) {
+				return (*it)->asMailbox();
 			}
 		}
 	}
@@ -323,7 +323,7 @@ std::shared_ptr<Thing> Tile::getTopVisibleThing(const std::shared_ptr<const Crea
 
 void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 {
-	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->getContainer()) {
+	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			it->second->addItemBack(item);
@@ -345,7 +345,7 @@ void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 
 	if ((!hasFlag(TILESTATE_PROTECTIONZONE) || getBoolean(ConfigManager::CLEAN_PROTECTION_ZONES)) &&
 	    item->isCleanable()) {
-		if (!getHouseTile()) {
+		if (!asHouseTile()) {
 			g_game.addTileToClean(asTile());
 		}
 	}
@@ -354,7 +354,7 @@ void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType& oldType,
                             const std::shared_ptr<Item>& newItem, const ItemType& newType)
 {
-	if (newItem->hasProperty(CONST_PROP_MOVEABLE) || newItem->getContainer()) {
+	if (newItem->hasProperty(CONST_PROP_MOVEABLE) || newItem->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			int32_t index = it->second->getThingIndex(oldItem);
@@ -363,7 +363,7 @@ void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType
 				newItem->setParent(it->second);
 			}
 		}
-	} else if (oldItem->hasProperty(CONST_PROP_MOVEABLE) || oldItem->getContainer()) {
+	} else if (oldItem->hasProperty(CONST_PROP_MOVEABLE) || oldItem->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			const auto& oldParent = oldItem->getParent();
@@ -391,7 +391,7 @@ void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType
 void Tile::onRemoveTileItem(const SpectatorVec& spectators, const std::vector<int32_t>& oldStackPosVector,
                             const std::shared_ptr<Item>& item)
 {
-	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->getContainer()) {
+	if (item->hasProperty(CONST_PROP_MOVEABLE) || item->asContainer()) {
 		auto it = g_game.browseFields.find(asTile().get());
 		if (it != g_game.browseFields.end()) {
 			it->second->removeThing(item, item->getItemCount());
@@ -422,15 +422,15 @@ void Tile::onRemoveTileItem(const SpectatorVec& spectators, const std::vector<in
 			return;
 		}
 
-		bool ret = false;
+		bool hasCleanableItems = false;
 		for (const auto& toCheck : *items) {
 			if (toCheck->isCleanable()) {
-				ret = true;
+				hasCleanableItems = true;
 				break;
 			}
 		}
 
-		if (!ret) {
+		if (!hasCleanableItems) {
 			g_game.removeTileToClean(asTile());
 		}
 	}
@@ -497,7 +497,7 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 			}
 
 			const auto& field = getFieldItem();
-			if (!field || field->isBlocking() || field->getDamage() == 0) {
+			if (!field || field->isBlocking() || field->getDamage() <= 0) {
 				return RETURNVALUE_NOERROR;
 			}
 
@@ -506,9 +506,9 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 			// There is 3 options for a monster to enter a magic field
 			// 1) Monster is immune
 			if (!monster->isImmune(combatType)) {
-				// 1) Monster is able to walk over field type
-				// 2) Being attacked while random stepping will make it ignore
-				// field damages
+				// 2) Monster is able to walk over field type
+				// 3) Being attacked while random stepping will make it ignore
+				//    field damages
 				if (hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)) {
 					if (!(monster->canWalkOnFieldType(combatType) || monster->isIgnoringFieldDamage())) {
 						return RETURNVALUE_NOTPOSSIBLE;
@@ -870,7 +870,7 @@ void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 				if (items) {
 					// remove old field item if exists
 					for (auto it = items->getBeginDownItem(), end = items->getEndDownItem(); it != end; ++it) {
-						if (const auto oldField = (*it)->getMagicField()) {
+						if (const auto oldField = (*it)->asMagicField()) {
 							if (oldField->isReplaceable()) {
 								removeThing(oldField, 1);
 								assert(oldField->getParent() == nullptr);
@@ -1275,18 +1275,12 @@ void Tile::postAddNotification(const std::shared_ptr<Thing>& thing, const std::s
 	}
 
 	if (link == LINK_OWNER) {
-		if (hasFlag(TILESTATE_TELEPORT)) {
-			if (const auto& teleport = getTeleportItem()) {
-				teleport->addThing(thing);
-			}
-		} else if (hasFlag(TILESTATE_TRASHHOLDER)) {
-			if (const auto& trashholder = getTrashHolder()) {
-				trashholder->addThing(thing);
-			}
-		} else if (hasFlag(TILESTATE_MAILBOX)) {
-			if (const auto& mailbox = getMailbox()) {
-				mailbox->addThing(thing);
-			}
+		if (const auto& teleport = getTeleportItem()) {
+			teleport->addThing(thing);
+		} else if (const auto& trashholder = getTrashHolder()) {
+			trashholder->addThing(thing);
+		} else if (const auto& mailbox = getMailbox()) {
+			mailbox->addThing(thing);
 		}
 
 		// calling movement scripts
@@ -1400,19 +1394,19 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 	}
 
-	if (item->getTeleport()) {
+	if (item->asTeleport()) {
 		setFlag(TILESTATE_TELEPORT);
 	}
 
-	if (item->getMagicField()) {
+	if (item->asMagicField()) {
 		setFlag(TILESTATE_MAGICFIELD);
 	}
 
-	if (item->getMailbox()) {
+	if (item->asMailbox()) {
 		setFlag(TILESTATE_MAILBOX);
 	}
 
-	if (item->getTrashHolder()) {
+	if (item->asTrashHolder()) {
 		setFlag(TILESTATE_TRASHHOLDER);
 	}
 
@@ -1420,8 +1414,8 @@ void Tile::setTileFlags(const std::shared_ptr<const Item>& item)
 		setFlag(TILESTATE_BLOCKSOLID);
 	}
 
-	if (const auto& container = item->getContainer()) {
-		if (container->getDepotLocker()) {
+	if (const auto& container = item->asContainer()) {
+		if (container->asDepotLocker()) {
 			setFlag(TILESTATE_DEPOT);
 		}
 	}
@@ -1463,24 +1457,24 @@ void Tile::resetTileFlags(const std::shared_ptr<const Item>& item)
 		resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
 	}
 
-	if (item->getTeleport()) {
+	if (item->asTeleport()) {
 		resetFlag(TILESTATE_TELEPORT);
 	}
 
-	if (item->getMagicField()) {
+	if (item->asMagicField()) {
 		resetFlag(TILESTATE_MAGICFIELD);
 	}
 
-	if (item->getMailbox()) {
+	if (item->asMailbox()) {
 		resetFlag(TILESTATE_MAILBOX);
 	}
 
-	if (item->getTrashHolder()) {
+	if (item->asTrashHolder()) {
 		resetFlag(TILESTATE_TRASHHOLDER);
 	}
 
-	if (const auto& container = item->getContainer()) {
-		if (container->getDepotLocker()) {
+	if (const auto& container = item->asContainer()) {
+		if (container->asDepotLocker()) {
 			resetFlag(TILESTATE_DEPOT);
 		}
 	}
@@ -1515,7 +1509,7 @@ std::shared_ptr<Item> Tile::getUseItem(int32_t index) const
 
 	// try getting door
 	for (const auto& item : *items | std::views::reverse) {
-		if (item->getDoor()) {
+		if (item->asDoor()) {
 			return item;
 		}
 	}

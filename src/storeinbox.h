@@ -11,11 +11,11 @@ class StoreInbox final : public Container
 public:
 	explicit StoreInbox(uint16_t type) : Container{type, 20, true, true} {}
 
-	std::shared_ptr<StoreInbox> getStoreInbox() override
+	std::shared_ptr<StoreInbox> asStoreInbox() override
 	{
 		return std::static_pointer_cast<StoreInbox>(shared_from_this());
 	}
-	std::shared_ptr<const StoreInbox> getStoreInbox() const override
+	std::shared_ptr<const StoreInbox> asStoreInbox() const override
 	{
 		return std::static_pointer_cast<const StoreInbox>(shared_from_this());
 	}

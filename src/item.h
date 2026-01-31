@@ -465,20 +465,20 @@ public:
 		return std::static_pointer_cast<const Item>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<Container> getContainer() { return nullptr; }
-	virtual std::shared_ptr<const Container> getContainer() const { return nullptr; }
-	virtual std::shared_ptr<Teleport> getTeleport() { return nullptr; }
-	virtual std::shared_ptr<const Teleport> getTeleport() const { return nullptr; }
-	virtual std::shared_ptr<TrashHolder> getTrashHolder() { return nullptr; }
-	virtual std::shared_ptr<const TrashHolder> getTrashHolder() const { return nullptr; }
-	virtual std::shared_ptr<Mailbox> getMailbox() { return nullptr; }
-	virtual std::shared_ptr<const Mailbox> getMailbox() const { return nullptr; }
-	virtual std::shared_ptr<Door> getDoor() { return nullptr; }
-	virtual std::shared_ptr<const Door> getDoor() const { return nullptr; }
-	virtual std::shared_ptr<MagicField> getMagicField() { return nullptr; }
-	virtual std::shared_ptr<const MagicField> getMagicField() const { return nullptr; }
-	virtual std::shared_ptr<Podium> getPodium() { return nullptr; }
-	virtual std::shared_ptr<const Podium> getPodium() const { return nullptr; }
+	virtual std::shared_ptr<Container> asContainer() { return nullptr; }
+	virtual std::shared_ptr<const Container> asContainer() const { return nullptr; }
+	virtual std::shared_ptr<Teleport> asTeleport() { return nullptr; }
+	virtual std::shared_ptr<const Teleport> asTeleport() const { return nullptr; }
+	virtual std::shared_ptr<TrashHolder> asTrashHolder() { return nullptr; }
+	virtual std::shared_ptr<const TrashHolder> asTrashHolder() const { return nullptr; }
+	virtual std::shared_ptr<Mailbox> asMailbox() { return nullptr; }
+	virtual std::shared_ptr<const Mailbox> asMailbox() const { return nullptr; }
+	virtual std::shared_ptr<Door> asDoor() { return nullptr; }
+	virtual std::shared_ptr<const Door> asDoor() const { return nullptr; }
+	virtual std::shared_ptr<MagicField> asMagicField() { return nullptr; }
+	virtual std::shared_ptr<const MagicField> asMagicField() const { return nullptr; }
+	virtual std::shared_ptr<Podium> asPodium() { return nullptr; }
+	virtual std::shared_ptr<const Podium> asPodium() const { return nullptr; }
 
 	const std::string& getStrAttr(itemAttrTypes type) const
 	{

@@ -143,7 +143,7 @@ std::shared_ptr<Container> ScriptEnvironment::getContainerByUID(uint32_t uid)
 	if (!item) {
 		return nullptr;
 	}
-	return item->getContainer();
+	return item->asContainer();
 }
 
 void ScriptEnvironment::removeItemByUID(uint32_t uid)

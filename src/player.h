@@ -102,8 +102,8 @@ public:
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Player> asPlayer() override { return std::static_pointer_cast<Player>(shared_from_this()); }
 	std::shared_ptr<const Player> asPlayer() const override

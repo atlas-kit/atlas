@@ -2094,7 +2094,7 @@ void ProtocolGame::sendMarketEnter()
 		containerList.pop_back();
 
 		for (const auto& item : container->getItemList()) {
-			const auto& c = item->getContainer();
+			const auto& c = item->asContainer();
 			if (c && !c->empty()) {
 				containerList.push_back(c);
 				continue;
@@ -2334,7 +2334,7 @@ void ProtocolGame::sendTradeItemRequest(const std::string& traderName, const std
 
 	msg.addString(traderName);
 
-	if (const auto& tradeContainer = item->getContainer()) {
+	if (const auto& tradeContainer = item->asContainer()) {
 		auto containerList = std::deque{tradeContainer};
 		auto itemList = std::deque{std::static_pointer_cast<const Item>(tradeContainer)};
 		while (!containerList.empty()) {
@@ -2342,7 +2342,7 @@ void ProtocolGame::sendTradeItemRequest(const std::string& traderName, const std
 			containerList.pop_front();
 
 			for (const auto& containerItem : container->getItemList()) {
-				if (const auto& childContainer = containerItem->getContainer()) {
+				if (const auto& childContainer = containerItem->asContainer()) {
 					containerList.push_back(childContainer);
 				}
 				itemList.push_back(containerItem);
@@ -3096,7 +3096,7 @@ void ProtocolGame::sendPodiumWindow(const std::shared_ptr<const Item>& item)
 		return;
 	}
 
-	const auto& podium = item->getPodium();
+	const auto& podium = item->asPodium();
 	if (!podium) {
 		return;
 	}

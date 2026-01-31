@@ -19,7 +19,7 @@ bool canSend(const std::shared_ptr<const Item>& item)
 
 std::string getReceiverName(const std::shared_ptr<Item>& item)
 {
-	if (const auto& container = item->getContainer()) {
+	if (const auto& container = item->asContainer()) {
 		for (const auto& containerItem : container->getItemList()) {
 			if (containerItem->getID() == ITEM_LABEL) {
 				return getReceiverName(containerItem);

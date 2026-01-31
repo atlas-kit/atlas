@@ -50,11 +50,11 @@ void setWeakMetatable(lua_State* L, int32_t index, const std::string& name)
 
 void setItemMetatable(lua_State* L, int32_t index, const std::shared_ptr<const Item>& item)
 {
-	if (item->getContainer()) {
+	if (item->asContainer()) {
 		luaL_getmetatable(L, "Container");
-	} else if (item->getTeleport()) {
+	} else if (item->asTeleport()) {
 		luaL_getmetatable(L, "Teleport");
-	} else if (item->getPodium()) {
+	} else if (item->asPodium()) {
 		luaL_getmetatable(L, "Podium");
 	} else {
 		luaL_getmetatable(L, "Item");

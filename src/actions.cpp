@@ -165,7 +165,7 @@ Action* Actions::getAction(const std::shared_ptr<const Item>& item)
 ReturnValue Actions::internalUseItem(const std::shared_ptr<Player>& player, const Position& pos, uint8_t index,
                                      const std::shared_ptr<Item>& item, bool isHotkey)
 {
-	if (const auto& door = item->getDoor()) {
+	if (const auto& door = item->asDoor()) {
 		if (!door->canUse(player)) {
 			return RETURNVALUE_NOTPOSSIBLE;
 		}
@@ -186,14 +186,14 @@ ReturnValue Actions::internalUseItem(const std::shared_ptr<Player>& player, cons
 		}
 	}
 
-	if (auto container = item->getContainer()) {
+	if (auto container = item->asContainer()) {
 		uint32_t corpseOwner = container->getCorpseOwner();
 		if (corpseOwner != 0 && !player->canOpenCorpse(corpseOwner)) {
 			return RETURNVALUE_YOUARENOTTHEOWNER;
 		}
 
 		// depot container
-		if (const auto& depot = container->getDepotLocker()) {
+		if (const auto& depot = container->asDepotLocker()) {
 			container = player->getDepotLocker();
 			container->setParent(depot->getParent()->getTile());
 		}
@@ -259,7 +259,7 @@ bool Actions::useItem(const std::shared_ptr<Player>& player, const Position& pos
 
 	if (getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = item->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!item->getTopParent()->asCreature() && !houseTile->getHouse()->isInvited(player)) {
 					player->sendCancelMessage(RETURNVALUE_PLAYERISNOTINVITED);
 					return false;
@@ -310,7 +310,7 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
 
 	if (getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = item->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!item->getTopParent()->asCreature() && !houseTile->getHouse()->isInvited(player)) {
 					player->sendCancelMessage(RETURNVALUE_PLAYERISNOTINVITED);
 					return false;
