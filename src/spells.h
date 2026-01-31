@@ -42,8 +42,8 @@ public:
 
 	void clearMaps(bool fromLua);
 	void clear(bool fromLua) override final;
-	bool registerInstantLuaEvent(InstantSpell* event);
-	bool registerRuneLuaEvent(RuneSpell* event);
+	bool registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant);
+	bool registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune);
 
 private:
 	LuaScriptInterface& getScriptInterface() override;

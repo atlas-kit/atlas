@@ -142,34 +142,35 @@ bool Spells::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 	return false;
 }
 
-bool Spells::registerInstantLuaEvent(InstantSpell* event)
+bool Spells::registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant)
 {
-	if (const auto instant{event}) {
-		std::string words = instant->getWords();
-		auto result = instants.emplace(instant->getWords(), std::move(*instant));
-		if (!result.second) {
-			std::cout << "[Warning - Spells::registerInstantLuaEvent] Duplicate registered instant spell with words: "
-			          << words << std::endl;
-		}
-		return result.second;
+	if (!instant) {
+		return false;
 	}
 
-	return false;
+	const auto words = instant->getWords();
+	auto result = instants.emplace(instant->getWords(), std::move(*instant));
+	if (!result.second) {
+		std::cout << "[Warning - Spells::registerInstantLuaEvent] Duplicate registered instant spell with words: "
+		          << words << std::endl;
+	}
+
+	return result.second;
 }
 
-bool Spells::registerRuneLuaEvent(RuneSpell* event)
+bool Spells::registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune)
 {
-	if (const auto rune{event}) {
-		uint16_t id = rune->getRuneItemId();
-		auto result = runes.emplace(rune->getRuneItemId(), std::move(*rune));
-		if (!result.second) {
-			std::cout << "[Warning - Spells::registerRuneLuaEvent] Duplicate registered rune with id: " << id
-			          << std::endl;
-		}
-		return result.second;
+	if (!rune) {
+		return false;
 	}
 
-	return false;
+	const auto id = rune->getRuneItemId();
+	auto result = runes.emplace(rune->getRuneItemId(), std::move(*rune));
+	if (!result.second) {
+		std::cout << "[Warning - Spells::registerRuneLuaEvent] Duplicate registered rune with id: " << id << std::endl;
+	}
+
+	return result.second;
 }
 
 Spell* Spells::getSpellByName(const std::string& name)
