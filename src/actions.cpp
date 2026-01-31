@@ -52,7 +52,7 @@ std::unique_ptr<Event> Actions::getEvent(const std::string& nodeName)
 
 bool Actions::registerLuaEvent(Action* event)
 {
-	const auto action{event};
+	const std::unique_ptr<Action> action{event};
 	if (isValid(ids, event)) {
 		const auto& range = getItemIdRange(event);
 		for (auto& id : range) {
