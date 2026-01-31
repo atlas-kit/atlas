@@ -563,7 +563,7 @@ struct ShopInfo
 struct MarketOffer
 {
 	uint64_t price;
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint16_t amount;
 	uint16_t counter;
 	uint16_t itemId;
@@ -587,7 +587,7 @@ struct MarketOfferEx
 
 	uint32_t id;
 	uint32_t playerId;
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint64_t price;
 	uint16_t amount;
 	uint16_t counter;
@@ -598,7 +598,7 @@ struct MarketOfferEx
 
 struct HistoryMarketOffer
 {
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint64_t price;
 	uint16_t itemId;
 	uint16_t amount;

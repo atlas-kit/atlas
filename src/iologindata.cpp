@@ -85,7 +85,7 @@ bool IOLoginData::preloadPlayer(const std::shared_ptr<Player>& player)
 	player->setGroup(group);
 	player->accountNumber = result->getNumber<uint32_t>("account_id");
 	player->accountType = static_cast<AccountType_t>(result->getNumber<uint16_t>("type"));
-	player->premiumEndsAt = result->getNumber<time_t>("premium_ends_at");
+	player->premiumEndsAt = result->getDateTime("premium_ends_at");
 	return true;
 }
 
@@ -147,7 +147,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	}
 
 	player->accountType = static_cast<AccountType_t>(account->getNumber<int32_t>("type"));
-	player->premiumEndsAt = account->getNumber<time_t>("premium_ends_at");
+	player->premiumEndsAt = account->getDateTime("premium_ends_at");
 
 	player->setGUID(result->getNumber<uint32_t>("id"));
 	player->name = result->getString("name");
@@ -240,10 +240,11 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	player->randomizeMount = result->getNumber<uint8_t>("randomizemount") != 0;
 
 	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
-		const time_t skullSeconds = result->getNumber<time_t>("skulltime") - time(nullptr);
-		if (skullSeconds > 0) {
+		const auto skullSeconds =
+		    duration_cast<std::chrono::seconds>(result->getDateTime("skulltime") - std::chrono::system_clock::now());
+		if (skullSeconds.count() > 0) {
 			// ensure that we round up the number of ticks
-			player->skullTicks = (skullSeconds + 2);
+			player->skullTicks = skullSeconds + 2s;
 
 			uint16_t skull = result->getNumber<uint16_t>("skull");
 			if (skull == SKULL_RED) {
@@ -257,10 +258,10 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	player->setLoginPosition(
 	    {result->getNumber<uint16_t>("posx"), result->getNumber<uint16_t>("posy"), result->getNumber<uint8_t>("posz")});
 
-	player->lastLoginSaved = result->getNumber<time_t>("lastlogin");
-	player->lastLogout = result->getNumber<time_t>("lastlogout");
+	player->lastLoginSaved = result->getDateTime("lastlogin");
+	player->lastLogout = result->getDateTime("lastlogout");
 
-	player->offlineTrainingTime = result->getNumber<int32_t>("offlinetraining_time") * 1000;
+	player->offlineTrainingTime = std::chrono::seconds{result->getNumber<int32_t>("offlinetraining_time")};
 	player->offlineTrainingSkill = result->getNumber<int32_t>("offlinetraining_skill");
 
 	const Town* town = g_game.map.towns.getTown(result->getNumber<uint32_t>("town_id"));
@@ -597,7 +598,8 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	if (result->getNumber<uint16_t>("save") == 0) {
 		return db.executeQuery(
 		    std::format("UPDATE `players` SET `lastlogin` = {:d}, `lastip` = INET6_ATON('{:s}') WHERE `id` = {:d}",
-		                player->lastLoginSaved, player->lastIP.to_string(), player->getGUID()));
+		                duration_cast<std::chrono::seconds>(player->lastLoginSaved.time_since_epoch()).count(),
+		                player->lastIP.to_string(), player->getGUID()));
 	}
 
 	// serialize conditions
@@ -646,8 +648,9 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	query << "`cap` = " << (player->capacity / 100) << ',';
 	query << "`sex` = " << static_cast<uint16_t>(player->sex) << ',';
 
-	if (player->lastLoginSaved != 0) {
-		query << "`lastlogin` = " << player->lastLoginSaved << ',';
+	if (player->lastLoginSaved != std::chrono::system_clock::time_point{}) {
+		query << "`lastlogin` = "
+		      << duration_cast<std::chrono::seconds>(player->lastLoginSaved.time_since_epoch()).count() << ',';
 	}
 
 	if (!player->lastIP.is_unspecified()) {
@@ -657,10 +660,11 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	query << "`conditions` = " << db.escapeString(propWriteStream.getStream()) << ',';
 
 	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
-		int64_t skullTime = 0;
+		auto skullTime = std::chrono::seconds::zero();
 
-		if (player->skullTicks > 0) {
-			skullTime = time(nullptr) + player->skullTicks;
+		if (player->skullTicks.count() > 0) {
+			skullTime = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch() +
+			                                                player->skullTicks);
 		}
 		query << "`skulltime` = " << skullTime << ',';
 
@@ -673,7 +677,8 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 		query << "`skull` = " << static_cast<int64_t>(skull) << ',';
 	}
 
-	query << "`lastlogout` = " << player->getLastLogout() << ',';
+	query << "`lastlogout` = "
+	      << duration_cast<std::chrono::seconds>(player->getLastLogout().time_since_epoch()).count() << ',';
 	query << "`balance` = " << player->bankBalance << ',';
 	query << "`offlinetraining_time` = " << player->getOfflineTrainingTime() / 1000 << ',';
 	query << "`offlinetraining_skill` = " << player->getOfflineTrainingSkill() << ',';
@@ -696,7 +701,9 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	query << "`direction` = " << static_cast<uint16_t>(player->getDirection()) << ',';
 
 	if (!player->isOffline()) {
-		query << "`onlinetime` = `onlinetime` + " << (time(nullptr) - player->lastLoginSaved) << ',';
+		query << "`onlinetime` = `onlinetime` + "
+		      << duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - player->lastLoginSaved).count()
+		      << ',';
 	}
 	query << "`blessings` = " << player->blessings.to_ulong();
 	query << " WHERE `id` = " << player->getGUID();
@@ -946,17 +953,17 @@ bool IOLoginData::hasBiddedOnHouse(uint32_t guid)
 	return db.storeQuery(std::format("SELECT `id` FROM `houses` WHERE `highest_bidder` = {:d} LIMIT 1", guid)).get();
 }
 
-std::forward_list<VIPEntry> IOLoginData::getVIPEntries(uint32_t accountId)
+std::vector<VIPEntry> IOLoginData::getVIPEntries(uint32_t accountId)
 {
-	std::forward_list<VIPEntry> entries;
+	std::vector<VIPEntry> entries;
 
 	if (const auto& result = Database::getInstance().storeQuery(std::format(
 	        "SELECT `player_id`, (SELECT `name` FROM `players` WHERE `id` = `player_id`) AS `name`, `description`, `icon`, `notify` FROM `account_viplist` WHERE `account_id` = {:d}",
 	        accountId))) {
 		do {
-			entries.emplace_front(result->getNumber<uint32_t>("player_id"), result->getString("name"),
-			                      result->getString("description"), result->getNumber<uint32_t>("icon"),
-			                      result->getNumber<uint16_t>("notify") != 0);
+			entries.emplace_back(result->getNumber<uint32_t>("player_id"), result->getString("name"),
+			                     result->getString("description"), result->getNumber<uint32_t>("icon"),
+			                     result->getNumber<uint16_t>("notify") != 0);
 		} while (result->next());
 	}
 	return entries;
@@ -986,8 +993,9 @@ void IOLoginData::removeVIPEntry(uint32_t accountId, uint32_t guid)
 	    std::format("DELETE FROM `account_viplist` WHERE `account_id` = {:d} AND `player_id` = {:d}", accountId, guid));
 }
 
-void IOLoginData::updatePremiumTime(uint32_t accountId, time_t endTime)
+void IOLoginData::updatePremiumTime(uint32_t accountId, std::chrono::system_clock::time_point endTime)
 {
 	Database::getInstance().executeQuery(
-	    std::format("UPDATE `accounts` SET `premium_ends_at` = {:d} WHERE `id` = {:d}", endTime, accountId));
+	    std::format("UPDATE `accounts` SET `premium_ends_at` = {:d} WHERE `id` = {:d}",
+	                duration_cast<std::chrono::seconds>(endTime.time_since_epoch()).count(), accountId));
 }

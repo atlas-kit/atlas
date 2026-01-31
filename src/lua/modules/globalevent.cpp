@@ -63,7 +63,8 @@ int luaGlobalEventRegister(lua_State* L)
 			return 1;
 		}
 
-		if (globalevent->getEventType() == GLOBALEVENT_NONE && globalevent->getInterval() == 0) {
+		if (globalevent->getEventType() == GLOBALEVENT_NONE &&
+		    globalevent->getInterval() == std::chrono::milliseconds::zero()) {
 			std::cout << "[Error - luaGlobalEventRegister] No interval for globalevent with name "
 			          << globalevent->getName() << '\n';
 			tfs::lua::pushBoolean(L, false);
@@ -109,8 +110,6 @@ int luaGlobalEventTime(lua_State* L)
 			return 1;
 		}
 
-		globalevent->setInterval(hour << 16);
-
 		int32_t min = 0;
 		int32_t sec = 0;
 		if (params.size() > 1) {
@@ -133,18 +132,16 @@ int luaGlobalEventTime(lua_State* L)
 			}
 		}
 
-		time_t current_time = time(nullptr);
-		tm* timeinfo = localtime(&current_time);
-		timeinfo->tm_hour = hour;
-		timeinfo->tm_min = min;
-		timeinfo->tm_sec = sec;
+		auto timeNow = OTSYS_TIME();
 
-		time_t difference = static_cast<time_t>(difftime(mktime(timeinfo), current_time));
-		if (difference < 0) {
-			difference += 86400;
+		auto interval = std::chrono::days{1};
+		auto nextExecution = floor<std::chrono::days>(timeNow + std::chrono::hours{hour} + std::chrono::minutes{min} +
+		                                              std::chrono::seconds{sec});
+		if (nextExecution < timeNow) {
+			nextExecution += interval;
 		}
-
-		globalevent->setNextExecution((current_time + difference) * 1000);
+		globalevent->setInterval(interval);
+		globalevent->setNextExecution(nextExecution);
 		globalevent->setEventType(GLOBALEVENT_TIMER);
 		tfs::lua::pushBoolean(L, true);
 	} else {
@@ -158,8 +155,8 @@ int luaGlobalEventInterval(lua_State* L)
 	// globalevent:interval(interval)
 	GlobalEvent* globalevent = tfs::lua::getUserdata<GlobalEvent>(L, 1);
 	if (globalevent) {
-		globalevent->setInterval(tfs::lua::getNumber<uint32_t>(L, 2));
-		globalevent->setNextExecution(OTSYS_TIME() + tfs::lua::getNumber<uint32_t>(L, 2));
+		globalevent->setInterval(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
+		globalevent->setNextExecution(OTSYS_TIME() + std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);

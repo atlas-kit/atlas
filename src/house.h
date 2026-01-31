@@ -131,8 +131,8 @@ public:
 	void setOwner(uint32_t guid, bool updateDatabase = true, const std::shared_ptr<Player>& player = nullptr);
 	uint32_t getOwner() const { return owner; }
 
-	void setPaidUntil(time_t paid) { paidUntil = paid; }
-	time_t getPaidUntil() const { return paidUntil; }
+	void setPaidUntil(std::chrono::system_clock::time_point paid) { paidUntil = paid; }
+	std::chrono::system_clock::time_point getPaidUntil() const { return paidUntil; }
 
 	void setRent(uint32_t rent) { this->rent = rent; }
 	uint32_t getRent() const { return rent; }
@@ -177,7 +177,7 @@ private:
 
 	std::shared_ptr<HouseTransferItem> transferItem = nullptr;
 
-	time_t paidUntil = 0;
+	std::chrono::system_clock::time_point paidUntil = std::chrono::system_clock::time_point{};
 
 	uint32_t id;
 	uint32_t owner = 0;

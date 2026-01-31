@@ -255,9 +255,9 @@ int luaSpellCooldown(lua_State* L)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, spell->getCooldown());
+			tfs::lua::pushNumber(L, spell->getCooldown().count());
 		} else {
-			spell->setCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
+			spell->setCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {
@@ -272,15 +272,15 @@ int luaSpellGroupCooldown(lua_State* L)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, spell->getGroupCooldown());
-			tfs::lua::pushNumber(L, spell->getSecondaryCooldown());
+			tfs::lua::pushNumber(L, spell->getGroupCooldown().count());
+			tfs::lua::pushNumber(L, spell->getSecondaryCooldown().count());
 			return 2;
 		} else if (lua_gettop(L) == 2) {
-			spell->setGroupCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
+			spell->setGroupCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 			tfs::lua::pushBoolean(L, true);
 		} else {
-			spell->setGroupCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
-			spell->setSecondaryCooldown(tfs::lua::getNumber<uint32_t>(L, 3));
+			spell->setGroupCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
+			spell->setSecondaryCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 3)});
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {

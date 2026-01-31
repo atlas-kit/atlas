@@ -118,7 +118,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 		add<uint32_t>(it.charges);
 		addByte(0x00); // boolean (is brand new)
 	} else if (it.showClientDuration) {
-		add<uint32_t>(it.decayTimeMin);
+		add<uint32_t>(floor<std::chrono::seconds>(it.decayTimeMin).count());
 		addByte(0x00); // boolean (is brand new)
 	}
 
@@ -148,7 +148,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 		add<uint32_t>(item->getCharges());
 		addByte(0); // boolean (is brand new)
 	} else if (it.showClientDuration) {
-		add<uint32_t>(item->getDuration() / 1000);
+		add<uint32_t>(floor<std::chrono::seconds>(item->getDuration()).count());
 		addByte(0); // boolean (is brand new)
 	}
 

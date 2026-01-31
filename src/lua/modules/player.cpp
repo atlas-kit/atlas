@@ -180,7 +180,8 @@ int luaPlayerGetLastLoginSaved(lua_State* L)
 {
 	// player:getLastLoginSaved()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getLastLoginSaved());
+		tfs::lua::pushNumber(
+		    L, duration_cast<std::chrono::seconds>(player->getLastLoginSaved().time_since_epoch()).count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -191,7 +192,8 @@ int luaPlayerGetLastLogout(lua_State* L)
 {
 	// player:getLastLogout()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getLastLogout());
+		tfs::lua::pushNumber(L,
+		                     duration_cast<std::chrono::seconds>(player->getLastLogout().time_since_epoch()).count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -299,7 +301,7 @@ int luaPlayerGetSkullTime(lua_State* L)
 {
 	// player:getSkullTime()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getSkullTicks());
+		tfs::lua::pushNumber(L, player->getSkullTicks().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -310,7 +312,7 @@ int luaPlayerSetSkullTime(lua_State* L)
 {
 	// player:setSkullTime(skullTime)
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		player->setSkullTicks(tfs::lua::getNumber<int64_t>(L, 2));
+		player->setSkullTicks(std::chrono::seconds{tfs::lua::getNumber<int64_t>(L, 2)});
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -671,7 +673,7 @@ int luaPlayerAddOfflineTrainingTime(lua_State* L)
 {
 	// player:addOfflineTrainingTime(time)
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		int32_t time = tfs::lua::getNumber<int32_t>(L, 2);
+		auto time = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 2)};
 		player->addOfflineTrainingTime(time);
 		player->sendStats();
 		tfs::lua::pushBoolean(L, true);
@@ -685,7 +687,7 @@ int luaPlayerGetOfflineTrainingTime(lua_State* L)
 {
 	// player:getOfflineTrainingTime()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getOfflineTrainingTime());
+		tfs::lua::pushNumber(L, player->getOfflineTrainingTime().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -696,7 +698,7 @@ int luaPlayerRemoveOfflineTrainingTime(lua_State* L)
 {
 	// player:removeOfflineTrainingTime(time)
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		int32_t time = tfs::lua::getNumber<int32_t>(L, 2);
+		auto time = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 2)};
 		player->removeOfflineTrainingTime(time);
 		player->sendStats();
 		tfs::lua::pushBoolean(L, true);
@@ -1730,7 +1732,8 @@ int luaPlayerGetPremiumEndsAt(lua_State* L)
 {
 	// player:getPremiumEndsAt()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getPremiumEndsAt());
+		tfs::lua::pushNumber(
+		    L, duration_cast<std::chrono::seconds>(player->getPremiumEndsAt().time_since_epoch()).count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -1746,7 +1749,7 @@ int luaPlayerSetPremiumEndsAt(lua_State* L)
 		return 1;
 	}
 
-	time_t timestamp = tfs::lua::getNumber<time_t>(L, 2);
+	auto timestamp = std::chrono::system_clock::from_time_t(tfs::lua::getNumber<time_t>(L, 2));
 
 	player->setPremiumTime(timestamp);
 	IOLoginData::updatePremiumTime(player->getAccount(), timestamp);

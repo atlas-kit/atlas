@@ -430,8 +430,8 @@ SharedExpStatus_t Party::getMemberSharedExperienceStatus(const std::shared_ptr<c
 			return SHAREDEXP_MEMBERINACTIVE;
 		}
 
-		uint64_t timeDiff = OTSYS_TIME() - it->second;
-		if (timeDiff > static_cast<uint64_t>(getNumber(ConfigManager::PZ_LOCKED))) {
+		auto timeDiff = OTSYS_TIME() - it->second;
+		if (timeDiff > std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}) {
 			return SHAREDEXP_MEMBERINACTIVE;
 		}
 	}

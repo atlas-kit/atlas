@@ -86,7 +86,7 @@ bool ChatChannel::addUser(const std::shared_ptr<Player>& player)
 	if (id == CHANNEL_GUILD) {
 		if (const auto& guild = player->getGuild(); !guild->getMotd().empty()) {
 			g_scheduler.addEvent(
-			    createSchedulerTask(150, [playerID = player->getID()]() { g_game.sendGuildMotd(playerID); }));
+			    createSchedulerTask(150ms, [playerID = player->getID()]() { g_game.sendGuildMotd(playerID); }));
 		}
 	}
 

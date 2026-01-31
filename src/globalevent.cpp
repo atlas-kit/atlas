@@ -105,16 +105,16 @@ void GlobalEvents::timer()
 {
 	auto now = OTSYS_TIME();
 
-	int64_t nextScheduledTime = std::numeric_limits<int64_t>::max();
+	auto nextScheduledTime = std::chrono::milliseconds::max();
 
 	auto it = timerMap.begin();
 	while (it != timerMap.end()) {
 		GlobalEvent& globalEvent = it->second;
 
-		int64_t nextExecutionTime = globalEvent.getNextExecution() - now;
-		if (nextExecutionTime > 0) {
+		auto nextExecutionTime = globalEvent.getNextExecution() - now;
+		if (nextExecutionTime > std::chrono::milliseconds::zero()) {
 			if (nextExecutionTime < nextScheduledTime) {
-				nextScheduledTime = nextExecutionTime;
+				nextScheduledTime = duration_cast<std::chrono::milliseconds>(nextExecutionTime);
 			}
 
 			++it;
@@ -126,27 +126,27 @@ void GlobalEvents::timer()
 			continue;
 		}
 
-		nextScheduledTime = std::min<int64_t>(nextScheduledTime, globalEvent.getInterval());
+		nextScheduledTime = std::min(nextScheduledTime, globalEvent.getInterval());
 		globalEvent.setNextExecution(now + globalEvent.getInterval());
 
 		++it;
 	}
 
-	if (nextScheduledTime != std::numeric_limits<int64_t>::max()) {
+	if (nextScheduledTime != std::chrono::milliseconds::max()) {
 		timerEventId = g_scheduler.addEvent(createSchedulerTask(nextScheduledTime, [this]() { timer(); }));
 	}
 }
 
 void GlobalEvents::think()
 {
-	int64_t now = OTSYS_TIME();
+	auto now = OTSYS_TIME();
 
-	int64_t nextScheduledTime = std::numeric_limits<int64_t>::max();
+	auto nextScheduledTime = std::chrono::milliseconds::max();
 	for (auto&& globalEvent : thinkMap | std::views::values) {
-		int64_t nextExecutionTime = globalEvent.getNextExecution() - now;
-		if (nextExecutionTime > 0) {
+		auto nextExecutionTime = globalEvent.getNextExecution() - now;
+		if (nextExecutionTime > std::chrono::milliseconds::zero()) {
 			if (nextExecutionTime < nextScheduledTime) {
-				nextScheduledTime = nextExecutionTime;
+				nextScheduledTime = duration_cast<std::chrono::milliseconds>(nextExecutionTime);
 			}
 			continue;
 		}
@@ -158,13 +158,13 @@ void GlobalEvents::think()
 
 		nextExecutionTime = globalEvent.getInterval();
 		if (nextExecutionTime < nextScheduledTime) {
-			nextScheduledTime = nextExecutionTime;
+			nextScheduledTime = duration_cast<std::chrono::milliseconds>(nextExecutionTime);
 		}
 
 		globalEvent.setNextExecution(globalEvent.getNextExecution() + nextExecutionTime);
 	}
 
-	if (nextScheduledTime != std::numeric_limits<int64_t>::max()) {
+	if (nextScheduledTime != std::chrono::milliseconds::max()) {
 		thinkEventId = g_scheduler.addEvent(createSchedulerTask(nextScheduledTime, [this]() { think(); }));
 	}
 }
@@ -206,8 +206,6 @@ bool GlobalEvent::configureEvent(const pugi::xml_node& node)
 			return false;
 		}
 
-		interval |= hour << 16;
-
 		int32_t min = 0;
 		int32_t sec = 0;
 		if (params.size() > 1) {
@@ -228,21 +226,17 @@ bool GlobalEvent::configureEvent(const pugi::xml_node& node)
 			}
 		}
 
-		time_t current_time = time(nullptr);
-		tm* timeinfo = localtime(&current_time);
-		timeinfo->tm_hour = hour;
-		timeinfo->tm_min = min;
-		timeinfo->tm_sec = sec;
+		auto timeNow = OTSYS_TIME();
 
-		time_t difference = static_cast<time_t>(difftime(mktime(timeinfo), current_time));
-		if (difference < 0) {
-			difference += 86400;
+		interval = std::chrono::days{1};
+		nextExecution = floor<std::chrono::days>(timeNow + std::chrono::hours{hour} + std::chrono::minutes{min} +
+		                                         std::chrono::seconds{sec});
+		if (nextExecution < timeNow) {
+			nextExecution += interval;
 		}
-
-		nextExecution = (current_time + difference) * 1000;
 		eventType = GLOBALEVENT_TIMER;
 	} else if ((attr = node.attribute("interval"))) {
-		interval = std::max<int32_t>(SCHEDULER_MINTICKS, pugi::cast<int32_t>(attr.value()));
+		interval = std::max(SCHEDULER_MINTICKS, std::chrono::milliseconds{pugi::cast<int32_t>(attr.value())});
 		nextExecution = OTSYS_TIME() + interval;
 	} else {
 		std::cout << "[Error - GlobalEvent::configureEvent] No interval for globalevent with name " << name
@@ -276,7 +270,7 @@ bool GlobalEvent::executeEvent() const
 
 	int32_t params = 0;
 	if (eventType == GLOBALEVENT_NONE || eventType == GLOBALEVENT_TIMER) {
-		tfs::lua::pushNumber(L, interval);
+		tfs::lua::pushNumber(L, interval.count());
 		params = 1;
 	}
 

@@ -19,7 +19,7 @@ static tfs::detail::Mysql_ptr connectToDatabase(const bool retryIfError)
 
 retry:
 	if (!isFirstAttemptToConnect) {
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(1s);
 	}
 	isFirstAttemptToConnect = false;
 
@@ -197,6 +197,12 @@ DBResult::DBResult(tfs::detail::MysqlResult_ptr&& res) : handle{std::move(res)}
 	}
 
 	row = mysql_fetch_row(handle.get());
+}
+
+std::chrono::system_clock::time_point DBResult::getDateTime(std::string_view column) const
+{
+	time_t ctime = getNumber<time_t>(column);
+	return std::chrono::system_clock::from_time_t(ctime);
 }
 
 std::string_view DBResult::getString(std::string_view column) const

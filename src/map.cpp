@@ -1068,7 +1068,7 @@ Floor* QTreeLeafNode::createFloor(uint32_t z)
 
 uint32_t Map::clean() const
 {
-	uint64_t start = OTSYS_TIME();
+	auto start = OTSYS_TIME();
 	size_t tiles = 0;
 
 	if (g_game.getGameState() == GAME_STATE_NORMAL) {
@@ -1101,6 +1101,7 @@ uint32_t Map::clean() const
 	}
 
 	std::cout << "> CLEAN: Removed " << count << " item" << (count != 1 ? "s" : "") << " from " << tiles << " tile"
-	          << (tiles != 1 ? "s" : "") << " in " << (OTSYS_TIME() - start) / (1000.) << " seconds." << std::endl;
+	          << (tiles != 1 ? "s" : "") << " in " << duration_cast<std::chrono::seconds>(OTSYS_TIME() - start).count()
+	          << " seconds." << std::endl;
 	return count;
 }

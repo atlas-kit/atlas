@@ -49,9 +49,9 @@ struct FindPathParams
 	int32_t maxTargetDist = -1;
 };
 
-static constexpr int32_t EVENT_CREATURECOUNT = 10;
-static constexpr int32_t EVENT_CREATURE_THINK_INTERVAL = 1000;
-static constexpr int32_t EVENT_CHECK_CREATURE_INTERVAL = (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT);
+inline constexpr int32_t EVENT_CREATURECOUNT = 10;
+inline constexpr auto EVENT_CREATURE_THINK_INTERVAL = 1000ms;
+inline constexpr auto EVENT_CHECK_CREATURE_INTERVAL = EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT;
 
 static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
 static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();
@@ -130,20 +130,20 @@ public:
 	void setHiddenHealth(bool b) { hiddenHealth = b; }
 
 	int32_t getThrowRange() const { return 1; }
-	virtual bool isPushable() const { return getWalkDelay() <= 0; }
+	virtual bool isPushable() const { return getWalkDelay() <= std::chrono::milliseconds::zero(); }
 
 	bool isRemoved() const override final { return isInternalRemoved; }
 	virtual bool canSeeInvisibility() const { return false; }
 	virtual bool isInGhostMode() const { return false; }
 	virtual bool canSeeGhostMode(const std::shared_ptr<const Creature>&) const { return false; }
 
-	int32_t getWalkDelay(Direction dir) const;
-	int32_t getWalkDelay() const;
-	int64_t getTimeSinceLastMove() const;
+	std::chrono::milliseconds getWalkDelay(Direction dir) const;
+	std::chrono::milliseconds getWalkDelay() const;
+	std::chrono::milliseconds getTimeSinceLastMove() const;
 
-	int64_t getEventStepTicks(bool onlyDelay = false) const;
-	int64_t getStepDuration(Direction dir) const;
-	int64_t getStepDuration() const;
+	std::chrono::milliseconds getEventStepTicks(bool onlyDelay = false) const;
+	std::chrono::milliseconds getStepDuration(Direction dir) const;
+	std::chrono::milliseconds getStepDuration() const;
 	virtual int32_t getStepSpeed() const { return getSpeed(); }
 	int32_t getSpeed() const { return baseSpeed + varSpeed; }
 	void setSpeed(int32_t varSpeedDelta)
@@ -271,7 +271,7 @@ public:
 	Condition* getCondition(ConditionType_t type) const;
 	Condition* getCondition(ConditionType_t type, ConditionId_t conditionId, uint32_t subId = 0) const;
 	const auto& getConditions() const { return conditions; }
-	void executeConditions(uint32_t interval);
+	void executeConditions(std::chrono::milliseconds interval);
 	bool hasCondition(ConditionType_t type, uint32_t subId = 0) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(CombatType_t type) const;
@@ -314,8 +314,8 @@ public:
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo lightInfo);
 
-	virtual void onThink(uint32_t interval);
-	virtual void onAttacking(uint32_t) {}
+	virtual void onThink(std::chrono::milliseconds interval);
+	virtual void onAttacking(std::chrono::milliseconds) {}
 
 	virtual void forceUpdatePath();
 	virtual void onWalk();
@@ -384,7 +384,7 @@ protected:
 	struct CountBlock_t
 	{
 		int32_t total;
-		int64_t ticks;
+		std::chrono::system_clock::time_point ticks;
 	};
 
 	std::vector<Condition*> conditions;
@@ -392,15 +392,15 @@ protected:
 
 	std::vector<Direction> listWalkDir;
 
-	uint64_t lastStep = 0;
-	int64_t lastPathUpdate = 0;
+	std::chrono::system_clock::time_point lastStep = {};
+	std::chrono::system_clock::time_point lastPathUpdate = {};
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
 	uint32_t walkUpdateTicks = 0;
 	uint32_t lastHitCreatureId = 0;
 	uint32_t blockCount = 0;
-	uint32_t blockTicks = 0;
+	std::chrono::milliseconds blockTicks = std::chrono::milliseconds::zero();
 	uint32_t lastStepCost = 1;
 	uint32_t baseSpeed = 220;
 	int32_t varSpeed = 0;

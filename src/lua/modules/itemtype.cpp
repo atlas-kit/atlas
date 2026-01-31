@@ -711,7 +711,7 @@ int luaItemTypeGetDurationMin(lua_State* L)
 	// itemType:getDurationMin()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		tfs::lua::pushNumber(L, itemType->decayTimeMin);
+		tfs::lua::pushNumber(L, itemType->decayTimeMin.count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -723,7 +723,7 @@ int luaItemTypeGetDurationMax(lua_State* L)
 	// itemType:getDurationMax()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		tfs::lua::pushNumber(L, itemType->decayTimeMax);
+		tfs::lua::pushNumber(L, itemType->decayTimeMax.count());
 	} else {
 		lua_pushnil(L);
 	}

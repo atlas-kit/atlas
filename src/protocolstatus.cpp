@@ -13,8 +13,7 @@
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 
-std::map<Connection::Address, int64_t> ProtocolStatus::ipConnectMap;
-const uint64_t ProtocolStatus::start = OTSYS_TIME();
+std::map<Connection::Address, std::chrono::system_clock::time_point> ipConnectMap = {};
 
 enum RequestedInfo_t : uint16_t
 {
@@ -36,7 +35,8 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 
 	if (!ip.is_loopback() && ip != acceptorAddress) {
 		if (auto it = ipConnectMap.find(ip);
-		    it != ipConnectMap.end() && (OTSYS_TIME() < (it->second + getNumber(ConfigManager::STATUSQUERY_TIMEOUT)))) {
+		    it != ipConnectMap.end() &&
+		    (OTSYS_TIME() < (it->second + std::chrono::seconds{getNumber(ConfigManager::STATUSQUERY_TIMEOUT)}))) {
 			disconnect();
 			return;
 		}
@@ -90,7 +90,7 @@ void ProtocolStatus::sendStatusString()
 	tsqp.append_attribute("version") = "1.0";
 
 	pugi::xml_node serverinfo = tsqp.append_child("serverinfo");
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	uint64_t uptime = std::chrono::duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count();
 	serverinfo.append_attribute("uptime") = std::to_string(uptime).c_str();
 	serverinfo.append_attribute("ip") = getString(ConfigManager::IP).c_str();
 	serverinfo.append_attribute("servername") = getString(ConfigManager::SERVER_NAME).c_str();
@@ -184,7 +184,7 @@ void ProtocolStatus::sendInfo(uint16_t requestedInfo, const std::string& charact
 		output->addString("N/A"); // MOTD
 		output->addString(getString(ConfigManager::LOCATION));
 		output->addString(getString(ConfigManager::URL));
-		output->add<uint64_t>((OTSYS_TIME() - ProtocolStatus::start) / 1000);
+		output->add<uint64_t>(floor<std::chrono::seconds>(g_game.getWorldUptime()).count());
 	}
 
 	if (requestedInfo & REQUEST_PLAYERS_INFO) {

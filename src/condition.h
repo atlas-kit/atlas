@@ -52,29 +52,30 @@ enum ConditionAttr_t
 
 struct IntervalInfo
 {
-	int32_t timeLeft;
+	std::chrono::milliseconds timeLeft;
 	int32_t value;
-	int32_t interval;
+	std::chrono::milliseconds interval;
 };
 
 class Condition
 {
 public:
 	Condition() = default;
-	Condition(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	          bool aggressive = false) :
-	    endTime(ticks == -1 ? std::numeric_limits<int64_t>::max() : 0),
-	    subId(subId),
-	    ticks(ticks),
-	    conditionType(type),
-	    isBuff(buff),
-	    aggressive(aggressive),
-	    id(id)
+	Condition(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	          uint32_t subId = 0, bool aggressive = false) :
+	    endTime{ticks < std::chrono::milliseconds::zero() ? std::chrono::system_clock::time_point::max()
+	                                                      : std::chrono::system_clock::time_point::min()},
+	    subId{subId},
+	    ticks{ticks},
+	    conditionType{type},
+	    isBuff{buff},
+	    aggressive{aggressive},
+	    id{id}
 	{}
 	virtual ~Condition() = default;
 
 	virtual bool startCondition(const std::shared_ptr<Creature>& creature);
-	virtual bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval);
+	virtual bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval);
 	virtual void endCondition(const std::shared_ptr<Creature>& creature) = 0;
 	virtual void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) = 0;
 	virtual uint32_t getIcons() const;
@@ -84,13 +85,14 @@ public:
 	virtual Condition* clone() const = 0;
 
 	ConditionType_t getType() const { return conditionType; }
-	int64_t getEndTime() const { return endTime; }
-	int32_t getTicks() const { return ticks; }
-	void setTicks(int32_t newTicks);
+	std::chrono::system_clock::time_point getEndTime() const { return endTime; }
+	std::chrono::milliseconds getTicks() const { return ticks; }
+	void setTicks(std::chrono::milliseconds newTicks);
 	bool isAggressive() const { return aggressive; }
 
-	static Condition* createCondition(ConditionId_t id, ConditionType_t type, int32_t ticks, int32_t param = 0,
-	                                  bool buff = false, uint32_t subId = 0, bool aggressive = false);
+	static Condition* createCondition(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks,
+	                                  int32_t param = 0, bool buff = false, uint32_t subId = 0,
+	                                  bool aggressive = false);
 	static Condition* createCondition(PropStream& propStream);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
@@ -106,9 +108,9 @@ public:
 protected:
 	virtual bool updateCondition(const Condition* addCondition);
 
-	int64_t endTime;
+	std::chrono::system_clock::time_point endTime;
 	uint32_t subId;
-	int32_t ticks;
+	std::chrono::milliseconds ticks;
 	ConditionType_t conditionType;
 	bool isBuff;
 	bool aggressive;
@@ -120,13 +122,13 @@ private:
 class ConditionGeneric : public Condition
 {
 public:
-	ConditionGeneric(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                 bool aggressive = false) :
-	    Condition(id, type, ticks, buff, subId, aggressive)
+	ConditionGeneric(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                 uint32_t subId = 0, bool aggressive = false) :
+	    Condition{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 	uint32_t getIcons() const override;
@@ -137,13 +139,13 @@ public:
 class ConditionAttributes final : public ConditionGeneric
 {
 public:
-	ConditionAttributes(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                    bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionAttributes(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                    uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 
@@ -177,13 +179,13 @@ private:
 class ConditionRegeneration final : public ConditionGeneric
 {
 public:
-	ConditionRegeneration(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                      bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionRegeneration(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                      uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 
 	bool setParam(ConditionParam_t param, int32_t value) override;
 	int32_t getParam(ConditionParam_t param) override;
@@ -195,11 +197,11 @@ public:
 	bool unserializeProp(ConditionAttr_t attr, PropStream& propStream) override;
 
 private:
-	uint32_t internalHealthTicks = 0;
-	uint32_t internalManaTicks = 0;
+	std::chrono::milliseconds internalHealthTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds internalManaTicks = std::chrono::milliseconds::zero();
 
-	uint32_t healthTicks = 1000;
-	uint32_t manaTicks = 1000;
+	std::chrono::milliseconds healthTicks = 1s;
+	std::chrono::milliseconds manaTicks = 1s;
 	uint32_t healthGain = 0;
 	uint32_t manaGain = 0;
 };
@@ -207,13 +209,13 @@ private:
 class ConditionSoul final : public ConditionGeneric
 {
 public:
-	ConditionSoul(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	              bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionSoul(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	              uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 
 	bool setParam(ConditionParam_t param, int32_t value) override;
 	int32_t getParam(ConditionParam_t param) override;
@@ -225,17 +227,17 @@ public:
 	bool unserializeProp(ConditionAttr_t attr, PropStream& propStream) override;
 
 private:
-	uint32_t internalSoulTicks = 0;
-	uint32_t soulTicks = 0;
+	std::chrono::milliseconds internalSoulTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds soulTicks = std::chrono::milliseconds::zero();
 	uint32_t soulGain = 0;
 };
 
 class ConditionInvisible final : public ConditionGeneric
 {
 public:
-	ConditionInvisible(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                   bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionInvisible(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                   uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
@@ -250,13 +252,13 @@ public:
 	ConditionDamage() = default;
 	ConditionDamage(ConditionId_t id, ConditionType_t type, bool buff = false, uint32_t subId = 0,
 	                bool aggressive = true) :
-	    Condition(id, type, 0, buff, subId, aggressive)
+	    Condition{id, type, std::chrono::milliseconds::zero(), buff, subId, aggressive}
 	{}
 
 	static void generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list);
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 	uint32_t getIcons() const override;
@@ -266,7 +268,7 @@ public:
 	bool setParam(ConditionParam_t param, int32_t value) override;
 	int32_t getParam(ConditionParam_t param) override;
 
-	bool addDamage(int32_t rounds, int32_t time, int32_t value);
+	bool addDamage(int32_t rounds, std::chrono::milliseconds time, int32_t value);
 	bool doForceUpdate() const { return forceUpdate; }
 	int32_t getTotalDamage() const;
 
@@ -281,8 +283,8 @@ private:
 	int32_t minDamage = 0;
 	int32_t startDamage = 0;
 	int32_t periodDamage = 0;
-	int32_t periodDamageTick = 0;
-	int32_t tickInterval = 2000;
+	std::chrono::milliseconds periodDamageTick = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds tickInterval = 2s;
 	int32_t initDamage = 0;
 
 	bool forceUpdate = false;
@@ -303,13 +305,13 @@ private:
 class ConditionSpeed final : public Condition
 {
 public:
-	ConditionSpeed(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff, uint32_t subId,
+	ConditionSpeed(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff, uint32_t subId,
 	               int32_t changeSpeed, bool aggressive = false) :
-	    Condition(id, type, ticks, buff, subId, aggressive), speedDelta(changeSpeed)
+	    Condition{id, type, ticks, buff, subId, aggressive}, speedDelta{changeSpeed}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 	uint32_t getIcons() const override;
@@ -338,13 +340,13 @@ private:
 class ConditionOutfit final : public Condition
 {
 public:
-	ConditionOutfit(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                bool aggressive = false) :
-	    Condition(id, type, ticks, buff, subId, aggressive)
+	ConditionOutfit(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                uint32_t subId = 0, bool aggressive = false) :
+	    Condition{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 
@@ -363,13 +365,13 @@ private:
 class ConditionLight final : public Condition
 {
 public:
-	ConditionLight(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff, uint32_t subId, uint8_t lightlevel,
-	               uint8_t lightcolor, bool aggressive = false) :
+	ConditionLight(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff, uint32_t subId,
+	               uint8_t lightlevel, uint8_t lightcolor, bool aggressive = false) :
 	    Condition{id, type, ticks, buff, subId, aggressive}, lightInfo{.level = lightlevel, .color = lightcolor}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
-	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
+	bool executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
 
@@ -383,17 +385,17 @@ public:
 	bool unserializeProp(ConditionAttr_t attr, PropStream& propStream) override;
 
 private:
-	LightInfo lightInfo{1};
-	uint32_t internalLightTicks = 0;
-	uint32_t lightChangeInterval = 0;
+	LightInfo lightInfo{.level = 1};
+	std::chrono::milliseconds internalLightTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds lightChangeInterval = std::chrono::milliseconds::zero();
 };
 
 class ConditionSpellCooldown final : public ConditionGeneric
 {
 public:
-	ConditionSpellCooldown(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false, uint32_t subId = 0,
-	                       bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionSpellCooldown(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
+	                       uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
@@ -405,9 +407,9 @@ public:
 class ConditionSpellGroupCooldown final : public ConditionGeneric
 {
 public:
-	ConditionSpellGroupCooldown(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff = false,
-	                            uint32_t subId = 0, bool aggressive = false) :
-	    ConditionGeneric(id, type, ticks, buff, subId, aggressive)
+	ConditionSpellGroupCooldown(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks,
+	                            bool buff = false, uint32_t subId = 0, bool aggressive = false) :
+	    ConditionGeneric{id, type, ticks, buff, subId, aggressive}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
@@ -419,9 +421,9 @@ public:
 class ConditionDrunk final : public Condition
 {
 public:
-	ConditionDrunk(ConditionId_t id, ConditionType_t type, int32_t ticks, bool buff, uint32_t subId,
+	ConditionDrunk(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff, uint32_t subId,
 	               uint8_t drunkenness, bool aggressive = false) :
-	    Condition(id, type, ticks, buff, subId, aggressive)
+	    Condition{id, type, ticks, buff, subId, aggressive}
 	{
 		if (drunkenness != 0) {
 			this->drunkenness = drunkenness;
@@ -445,9 +447,9 @@ private:
 class ConditionManaShield final : public Condition
 {
 public:
-	ConditionManaShield(ConditionId_t initId, ConditionType_t initType, int32_t iniTicks, bool initBuff = false,
-	                    uint32_t initSubId = 0) :
-	    Condition(initId, initType, iniTicks, initBuff, initSubId)
+	ConditionManaShield(ConditionId_t initId, ConditionType_t initType, std::chrono::milliseconds initTicks,
+	                    bool initBuff = false, uint32_t initSubId = 0) :
+	    Condition{initId, initType, initTicks, initBuff, initSubId}
 	{}
 
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;

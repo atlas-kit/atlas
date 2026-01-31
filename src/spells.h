@@ -145,12 +145,12 @@ public:
 	SpellGroup_t getSecondaryGroup() const { return secondaryGroup; }
 	void setSecondaryGroup(SpellGroup_t g) { secondaryGroup = g; }
 
-	uint32_t getCooldown() const { return cooldown; }
-	void setCooldown(uint32_t cd) { cooldown = cd; }
-	uint32_t getSecondaryCooldown() const { return secondaryGroupCooldown; }
-	void setSecondaryCooldown(uint32_t cd) { secondaryGroupCooldown = cd; }
-	uint32_t getGroupCooldown() const { return groupCooldown; }
-	void setGroupCooldown(uint32_t cd) { groupCooldown = cd; }
+	auto getCooldown() const { return cooldown; }
+	void setCooldown(std::chrono::milliseconds cd) { cooldown = cd; }
+	auto getSecondaryCooldown() const { return secondaryGroupCooldown; }
+	void setSecondaryCooldown(std::chrono::milliseconds cd) { secondaryGroupCooldown = cd; }
+	auto getGroupCooldown() const { return groupCooldown; }
+	void setGroupCooldown(std::chrono::milliseconds cd) { groupCooldown = cd; }
 
 	int32_t getRange() const { return range; }
 	void setRange(int32_t r) { range = r; }
@@ -184,9 +184,9 @@ protected:
 	SpellGroup_t group = SPELLGROUP_NONE;
 	SpellGroup_t secondaryGroup = SPELLGROUP_NONE;
 
-	uint32_t cooldown = 1000;
-	uint32_t groupCooldown = 1000;
-	uint32_t secondaryGroupCooldown = 0;
+	std::chrono::milliseconds cooldown = 1000ms;
+	std::chrono::milliseconds groupCooldown = 1000ms;
+	std::chrono::milliseconds secondaryGroupCooldown = std::chrono::milliseconds::zero();
 	uint32_t level = 0;
 	uint32_t magLevel = 0;
 	int32_t range = -1;

@@ -232,9 +232,9 @@ private:
 
 	void sendCreatureSquare(const std::shared_ptr<const Creature>& creature, SquareColor_t color);
 
-	void sendSpellCooldown(uint8_t spellId, uint32_t time);
-	void sendSpellGroupCooldown(SpellGroup_t groupId, uint32_t time);
-	void sendUseItemCooldown(uint32_t time);
+	void sendSpellCooldown(uint8_t spellId, std::chrono::milliseconds time);
+	void sendSpellGroupCooldown(SpellGroup_t groupId, std::chrono::milliseconds time);
+	void sendUseItemCooldown(std::chrono::milliseconds time);
 	void sendSupplyUsed(const uint16_t clientId);
 
 	// tiles
@@ -315,7 +315,7 @@ private:
 	std::shared_ptr<Player> player = nullptr;
 
 	uint32_t eventConnect = 0;
-	uint32_t challengeTimestamp = 0;
+	std::chrono::system_clock::time_point challengeTimestamp = {};
 	uint16_t version = CLIENT_VERSION_MIN;
 
 	uint8_t challengeRandom = 0;

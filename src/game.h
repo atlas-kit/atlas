@@ -44,25 +44,25 @@ enum GameState_t
 	GAME_STATE_MAINTAIN,
 };
 
-static constexpr int32_t PLAYER_NAME_LENGTH = 25;
+inline constexpr int32_t PLAYER_NAME_LENGTH = 25;
 
-static constexpr int32_t EVENT_DECAYINTERVAL = 250;
-static constexpr int32_t EVENT_DECAY_BUCKETS = 4;
+inline constexpr auto EVENT_DECAYINTERVAL = 250ms;
+inline constexpr int32_t EVENT_DECAY_BUCKETS = 4;
 
-static constexpr int32_t MOVE_CREATURE_INTERVAL = 1000;
-static constexpr int32_t RANGE_MOVE_CREATURE_INTERVAL = 1500;
-static constexpr int32_t RANGE_MOVE_ITEM_INTERVAL = 400;
-static constexpr int32_t RANGE_USE_ITEM_INTERVAL = 400;
-static constexpr int32_t RANGE_USE_ITEM_EX_INTERVAL = 400;
-static constexpr int32_t RANGE_USE_WITH_CREATURE_INTERVAL = 400;
-static constexpr int32_t RANGE_ROTATE_ITEM_INTERVAL = 400;
-static constexpr int32_t RANGE_BROWSE_FIELD_INTERVAL = 400;
-static constexpr int32_t RANGE_WRAP_ITEM_INTERVAL = 400;
-static constexpr int32_t RANGE_REQUEST_TRADE_INTERVAL = 400;
+inline constexpr auto MOVE_CREATURE_INTERVAL = 1000ms;
+inline constexpr auto RANGE_MOVE_CREATURE_INTERVAL = 1500ms;
+inline constexpr auto RANGE_MOVE_ITEM_INTERVAL = 400ms;
+inline constexpr auto RANGE_USE_ITEM_INTERVAL = 400ms;
+inline constexpr auto RANGE_USE_ITEM_EX_INTERVAL = 400ms;
+inline constexpr auto RANGE_USE_WITH_CREATURE_INTERVAL = 400ms;
+inline constexpr auto RANGE_ROTATE_ITEM_INTERVAL = 400ms;
+inline constexpr auto RANGE_BROWSE_FIELD_INTERVAL = 400ms;
+inline constexpr auto RANGE_WRAP_ITEM_INTERVAL = 400ms;
+inline constexpr auto RANGE_REQUEST_TRADE_INTERVAL = 400ms;
 
-static constexpr int32_t MAX_STACKPOS = 10;
+inline constexpr int32_t MAX_STACKPOS = 10;
 
-static constexpr uint8_t ITEM_STACK_SIZE = 100;
+inline constexpr uint8_t ITEM_STACK_SIZE = 100;
 
 /**
  * Main Game class.
@@ -389,8 +389,9 @@ public:
 	void playerBrowseMarketOwnHistory(uint32_t playerId);
 	void playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spriteId, uint16_t amount, uint64_t price,
 	                             bool anonymous);
-	void playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
-	void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
+	void playerCancelMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter);
+	void playerAcceptMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter,
+	                             uint16_t amount);
 
 	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
 	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
@@ -493,6 +494,8 @@ public:
 	auto getPlayerRecord() const { return playerRecord; }
 	void setPlayerRecord(uint32_t record) { playerRecord = record; }
 
+	auto getWorldUptime() const { return OTSYS_TIME() - worldStart; }
+
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
 	void playerWhisper(const std::shared_ptr<Player>& player, const std::string& text);
@@ -503,6 +506,8 @@ private:
 
 	void checkDecay();
 	void internalDecayItem(const std::shared_ptr<Item>& item);
+
+	std::chrono::system_clock::time_point worldStart = std::chrono::system_clock::now();
 
 	std::unordered_map<uint32_t, std::weak_ptr<Player>> players;
 	std::unordered_map<std::string, std::weak_ptr<Player>> mappedPlayerNames;

@@ -8,7 +8,6 @@
 
 using TaskFunc = std::move_only_function<void(void)>;
 const int DISPATCHER_TASK_EXPIRATION = 2000;
-const auto SYSTEM_TIME_ZERO = std::chrono::system_clock::time_point(std::chrono::milliseconds(0));
 
 class Task
 {
@@ -21,18 +20,18 @@ public:
 	virtual ~Task() = default;
 	void operator()() { func(); }
 
-	void setDontExpire() { expiration = SYSTEM_TIME_ZERO; }
+	void setDontExpire() { expiration = std::chrono::system_clock::time_point::min(); }
 
 	bool hasExpired() const
 	{
-		if (expiration == SYSTEM_TIME_ZERO) {
+		if (expiration == std::chrono::system_clock::time_point::min()) {
 			return false;
 		}
 		return expiration < std::chrono::system_clock::now();
 	}
 
 protected:
-	std::chrono::system_clock::time_point expiration = SYSTEM_TIME_ZERO;
+	std::chrono::system_clock::time_point expiration = std::chrono::system_clock::time_point::min();
 
 private:
 	// Expiration has another meaning for scheduler tasks, then it is the time the task should be added to the

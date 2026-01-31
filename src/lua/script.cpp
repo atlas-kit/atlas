@@ -69,10 +69,12 @@ int luaDebugPrint(lua_State* L)
 	return 0;
 }
 
+auto start = OTSYS_TIME();
+
 int luaGetWorldUpTime(lua_State* L)
 {
 	// getWorldUpTime()
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	uint64_t uptime = duration_cast<std::chrono::seconds>(OTSYS_TIME() - start).count();
 	tfs::lua::pushNumber(L, uptime);
 	return 1;
 }
@@ -429,7 +431,7 @@ int luaAddEvent(lua_State* L)
 		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 
-	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
+	auto delay = std::chrono::milliseconds{std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2))};
 	lua_pop(L, 1);
 
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);

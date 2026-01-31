@@ -61,7 +61,7 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			} else if (boost::iequals(attrName, "manamultiplier")) {
 				voc.manaMultiplier = pugi::cast<float>(attrNode.value());
 			} else if (boost::iequals(attrName, "attackspeed")) {
-				voc.attackSpeed = pugi::cast<uint32_t>(attrNode.value());
+				voc.attackSpeed = std::chrono::milliseconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "basespeed")) {
 				voc.baseSpeed = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "soulmax")) {

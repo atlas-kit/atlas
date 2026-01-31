@@ -79,7 +79,7 @@ int luaMonsterSpellSetInterval(lua_State* L)
 	// monsterSpell:setInterval(interval)
 	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
 	if (spell) {
-		spell->interval = tfs::lua::getNumber<uint16_t>(L, 2);
+		spell->interval = std::chrono::milliseconds{tfs::lua::getNumber<uint16_t>(L, 2)};
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -266,7 +266,7 @@ int luaMonsterSpellSetConditionDuration(lua_State* L)
 	// monsterSpell:setConditionDuration(duration)
 	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
 	if (spell) {
-		spell->duration = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->duration = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 2)};
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -292,7 +292,7 @@ int luaMonsterSpellSetConditionTickInterval(lua_State* L)
 	// monsterSpell:setConditionTickInterval(interval)
 	MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 1);
 	if (spell) {
-		spell->tickInterval = tfs::lua::getNumber<int32_t>(L, 2);
+		spell->tickInterval = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 2)};
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -889,7 +889,7 @@ int luaMonsterTypeGetAttackList(lua_State* L)
 		tfs::lua::setField(L, "minCombatValue", spellBlock.minCombatValue);
 		tfs::lua::setField(L, "maxCombatValue", spellBlock.maxCombatValue);
 		tfs::lua::setField(L, "range", spellBlock.range);
-		tfs::lua::setField(L, "speed", spellBlock.speed);
+		tfs::lua::setField(L, "speed", spellBlock.speed.count());
 		tfs::lua::pushUserdata(L, static_cast<CombatSpell*>(spellBlock.spell));
 		lua_setfield(L, -2, "spell");
 
@@ -942,7 +942,7 @@ int luaMonsterTypeGetDefenseList(lua_State* L)
 		tfs::lua::setField(L, "minCombatValue", spellBlock.minCombatValue);
 		tfs::lua::setField(L, "maxCombatValue", spellBlock.maxCombatValue);
 		tfs::lua::setField(L, "range", spellBlock.range);
-		tfs::lua::setField(L, "speed", spellBlock.speed);
+		tfs::lua::setField(L, "speed", spellBlock.speed.count());
 		tfs::lua::pushUserdata(L, static_cast<CombatSpell*>(spellBlock.spell));
 		lua_setfield(L, -2, "spell");
 
@@ -1032,7 +1032,7 @@ int luaMonsterTypeAddVoice(lua_State* L)
 	if (monsterType) {
 		voiceBlock_t voice;
 		voice.text = tfs::lua::getString(L, 2);
-		monsterType->info.yellSpeedTicks = tfs::lua::getNumber<uint32_t>(L, 3);
+		monsterType->info.yellSpeedTicks = std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 3)};
 		monsterType->info.yellChance = tfs::lua::getNumber<uint32_t>(L, 4);
 		voice.yellText = tfs::lua::getBoolean(L, 5);
 		monsterType->info.voiceVector.push_back(voice);
@@ -1121,7 +1121,7 @@ int luaMonsterTypeGetSummonList(lua_State* L)
 	for (const auto& summonBlock : monsterType->info.summons) {
 		lua_createtable(L, 0, 6);
 		tfs::lua::setField(L, "name", summonBlock.name);
-		tfs::lua::setField(L, "speed", summonBlock.speed);
+		tfs::lua::setField(L, "speed", summonBlock.speed.count());
 		tfs::lua::setField(L, "chance", summonBlock.chance);
 		tfs::lua::setField(L, "max", summonBlock.max);
 		tfs::lua::setField(L, "effect", summonBlock.effect);
@@ -1139,7 +1139,7 @@ int luaMonsterTypeAddSummon(lua_State* L)
 	if (monsterType) {
 		summonBlock_t summon;
 		summon.name = tfs::lua::getString(L, 2);
-		summon.speed = tfs::lua::getNumber<int32_t>(L, 3);
+		summon.speed = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)};
 		summon.chance = tfs::lua::getNumber<int32_t>(L, 4);
 		summon.max = tfs::lua::getNumber<int32_t>(L, 5, -1);
 		summon.effect = tfs::lua::getNumber<MagicEffectClasses>(L, 6, CONST_ME_TELEPORT);
@@ -1380,9 +1380,9 @@ int luaMonsterTypeYellSpeedTicks(lua_State* L)
 	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, monsterType->info.yellSpeedTicks);
+			tfs::lua::pushNumber(L, monsterType->info.yellSpeedTicks.count());
 		} else {
-			monsterType->info.yellSpeedTicks = tfs::lua::getNumber<uint32_t>(L, 2);
+			monsterType->info.yellSpeedTicks = std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)};
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {
@@ -1414,9 +1414,9 @@ int luaMonsterTypeChangeTargetSpeed(lua_State* L)
 	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, monsterType->info.changeTargetSpeed);
+			tfs::lua::pushNumber(L, monsterType->info.changeTargetSpeed.count());
 		} else {
-			monsterType->info.changeTargetSpeed = tfs::lua::getNumber<uint32_t>(L, 2);
+			monsterType->info.changeTargetSpeed = std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)};
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {

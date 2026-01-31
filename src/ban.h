@@ -12,7 +12,7 @@ struct BanInfo
 {
 	std::string bannedBy;
 	std::string reason;
-	time_t expiresAt;
+	std::chrono::system_clock::time_point expiresAt;
 };
 
 const std::optional<BanInfo> getAccountBanInfo(uint32_t accountId);

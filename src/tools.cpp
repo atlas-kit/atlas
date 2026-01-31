@@ -202,10 +202,7 @@ std::string randomBytes(size_t length)
 	return bytes;
 }
 
-std::string formatDateShort(time_t time)
-{
-	return std::format("{:%d %b %Y}", std::chrono::system_clock::from_time_t(time));
-}
+std::string formatDateShort(std::chrono::system_clock::time_point time) { return std::format("{:%d %b %Y}", time); }
 
 Position getNextPosition(Direction direction, Position pos)
 {
@@ -1056,10 +1053,7 @@ const char* getReturnMessage(ReturnValue value)
 	}
 }
 
-int64_t OTSYS_TIME()
-{
-	return duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-}
+std::chrono::system_clock::time_point OTSYS_TIME() { return std::chrono::system_clock::now(); }
 
 SpellGroup_t stringToSpellGroup(const std::string& value)
 {

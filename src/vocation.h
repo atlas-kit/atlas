@@ -33,7 +33,7 @@ public:
 	uint8_t getSoulMax() const { return soulMax; }
 	uint16_t getSoulGainTicks() const { return gainSoulTicks; }
 
-	uint32_t getAttackSpeed() const { return attackSpeed; }
+	std::chrono::milliseconds getAttackSpeed() const { return attackSpeed; }
 	uint32_t getBaseSpeed() const { return baseSpeed; }
 
 	uint32_t getFromVocation() const { return fromVocation; }
@@ -72,7 +72,7 @@ private:
 	uint32_t gainMana = 5;
 	uint32_t gainHP = 5;
 	uint32_t fromVocation = VOCATION_NONE;
-	uint32_t attackSpeed = 1500;
+	std::chrono::milliseconds attackSpeed = 1500ms;
 	uint32_t baseSpeed = 220;
 	uint32_t noPongKickTime = 60000;
 

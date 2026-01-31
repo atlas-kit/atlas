@@ -356,10 +356,10 @@ int32_t Player::getDefense() const
 	return (defenseSkill / 4. + 2.23) * defenseValue * 0.15 * getDefenseFactor() * vocation->defenseMultiplier;
 }
 
-uint32_t Player::getAttackSpeed() const
+std::chrono::milliseconds Player::getAttackSpeed() const
 {
 	if (const auto& weapon = getWeapon(true)) {
-		if (weapon->getAttackSpeed() != 0) {
+		if (weapon->getAttackSpeed() != std::chrono::milliseconds::zero()) {
 			return weapon->getAttackSpeed();
 		}
 	}
@@ -692,7 +692,7 @@ bool Player::canWalkthrough(const std::shared_ptr<const Creature>& creature) con
 	}
 
 	const auto& thisPlayer = const_cast<Player*>(this);
-	if ((OTSYS_TIME() - lastWalkthroughAttempt) > 2000) {
+	if ((OTSYS_TIME() - lastWalkthroughAttempt) > 2s) {
 		thisPlayer->setLastWalkthroughAttempt(OTSYS_TIME());
 		return false;
 	}
@@ -792,7 +792,7 @@ void Player::sendStats()
 {
 	if (client) {
 		client->sendStats();
-		lastStatsTrainingTime = getOfflineTrainingTime() / 60 / 1000;
+		lastStatsTrainingTime = floor<std::chrono::minutes>(getOfflineTrainingTime());
 	}
 }
 
@@ -1012,15 +1012,18 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 		storedConditionList.clear();
 
-		int32_t offlineTime = 0;
-		if (getLastLogout() != 0) {
+		auto offlineTime = std::chrono::seconds::zero();
+		if (getLastLogout() != std::chrono::system_clock::time_point{}) {
 			// Cap offline time to 21 days to avoid integer overflow when converting to milliseconds
-			offlineTime = std::min<int32_t>(time(nullptr) - getLastLogout(), 86400 * 21);
+			offlineTime =
+			    std::min(duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - getLastLogout()),
+			             duration_cast<std::chrono::seconds>(std::chrono::days{21}));
 		}
 
 		for (Condition* condition : getMuteConditions()) {
-			condition->setTicks(condition->getTicks() - (offlineTime * 1000));
-			if (condition->getTicks() <= 0) {
+			auto newTicks = condition->getTicks() - offlineTime;
+			condition->setTicks(newTicks);
+			if (condition->getTicks() <= std::chrono::milliseconds::zero()) {
 				removeCondition(condition);
 			}
 		}
@@ -1171,7 +1174,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 			loginPosition = getPosition();
 		}
 
-		lastLogout = time(nullptr);
+		lastLogout = std::chrono::system_clock::now();
 
 		if (eventWalk != 0) {
 			removeFollowCreature();
@@ -1311,8 +1314,8 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 	}
 
 	if (teleport || oldPos.z != newPos.z) {
-		int32_t ticks = getNumber(ConfigManager::STAIRHOP_DELAY);
-		if (ticks > 0) {
+		auto ticks = std::chrono::milliseconds{getNumber(ConfigManager::STAIRHOP_DELAY)};
+		if (ticks > std::chrono::milliseconds::zero()) {
 			if (Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, ticks, 0)) {
 				addCondition(condition);
 			}
@@ -1447,25 +1450,28 @@ void Player::setNextActionTask(SchedulerTask_ptr task)
 	}
 }
 
-uint32_t Player::getNextActionTime() const { return std::max<int64_t>(SCHEDULER_MINTICKS, nextAction - OTSYS_TIME()); }
+std::chrono::milliseconds Player::getNextActionTime() const
+{
+	return std::max(SCHEDULER_MINTICKS, duration_cast<std::chrono::milliseconds>(nextAction - OTSYS_TIME()));
+}
 
-void Player::onThink(uint32_t interval)
+void Player::onThink(std::chrono::milliseconds interval)
 {
 	Creature::onThink(interval);
 
-	MessageBufferTicks += interval;
-	if (MessageBufferTicks >= 1500) {
-		MessageBufferTicks = 0;
+	messageBufferTicks += interval;
+	if (messageBufferTicks >= 1500ms) {
+		messageBufferTicks = std::chrono::milliseconds::zero();
 		addMessageBuffer();
 	}
 
 	addOfflineTrainingTime(interval);
-	if (lastStatsTrainingTime != getOfflineTrainingTime() / 60 / 1000) {
+	if (lastStatsTrainingTime != floor<std::chrono::minutes>(getOfflineTrainingTime())) {
 		sendStats();
 	}
 }
 
-void Player::onAttacking(uint32_t)
+void Player::onAttacking(std::chrono::milliseconds)
 {
 	const auto& attackedCreature = getAttackedCreature();
 	if (!attackedCreature) {
@@ -1482,8 +1488,8 @@ void Player::onAttacking(uint32_t)
 		return;
 	}
 
-	if (lastAttack == 0) {
-		lastAttack = OTSYS_TIME() - getAttackSpeed() - 1;
+	if (lastAttack == std::chrono::system_clock::time_point::min()) {
+		lastAttack = OTSYS_TIME() - getAttackSpeed() - 1ms;
 	}
 
 	if ((OTSYS_TIME() - lastAttack) < getAttackSpeed()) {
@@ -1497,7 +1503,7 @@ void Player::onAttacking(uint32_t)
 	bool result = false;
 
 	const auto& tool = getWeapon();
-	uint32_t delay = getAttackSpeed();
+	auto delay = getAttackSpeed();
 	bool classicSpeed = getBoolean(ConfigManager::CLASSIC_ATTACK_SPEED);
 
 	if (const auto& weapon = g_weapons->getWeapon(tool)) {
@@ -1512,8 +1518,8 @@ void Player::onAttacking(uint32_t)
 		result = Weapon::useFist(asPlayer(), getAttackedCreature());
 	}
 
-	auto task = createSchedulerTask(std::max<uint32_t>(SCHEDULER_MINTICKS, delay),
-	                                [id = getID()]() { g_game.checkCreatureAttack(id); });
+	auto task =
+	    createSchedulerTask(std::max(SCHEDULER_MINTICKS, delay), [id = getID()]() { g_game.checkCreatureAttack(id); });
 	if (!classicSpeed) {
 		setNextActionTask(std::move(task));
 	} else {
@@ -1526,19 +1532,19 @@ void Player::onAttacking(uint32_t)
 	}
 }
 
-uint32_t Player::isMuted() const
+std::chrono::seconds Player::isMuted() const
 {
 	if (hasFlag(PlayerFlag_CannotBeMuted)) {
-		return 0;
+		return std::chrono::seconds::zero();
 	}
 
-	int32_t muteTicks = 0;
+	auto muteTicks = std::chrono::milliseconds::zero();
 	for (Condition* condition : conditions) {
 		if (condition->getType() == CONDITION_MUTED && condition->getTicks() > muteTicks) {
 			muteTicks = condition->getTicks();
 		}
 	}
-	return static_cast<uint32_t>(muteTicks) / 1000;
+	return duration_cast<std::chrono::seconds>(muteTicks);
 }
 
 void Player::addMessageBuffer()
@@ -1564,12 +1570,12 @@ void Player::removeMessageBuffer()
 				muteCount = it->second;
 			}
 
-			uint32_t muteTime = 5 * muteCount * muteCount;
+			auto muteTime = 5s * muteCount * muteCount;
 			muteCountMap[guid] = muteCount + 1;
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime, 0);
 			addCondition(condition);
 
-			sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are muted for {:d} seconds.", muteTime));
+			sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are muted for {:d} seconds.", muteTime.count()));
 		}
 	}
 }
@@ -2017,7 +2023,7 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		if (lastHitPlayer) {
 			uint32_t sumLevels = 0;
-			uint32_t inFightTicks = getNumber(ConfigManager::PZ_LOCKED);
+			auto inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)};
 			for (auto&& [id, cb] : getDamageMap()) {
 				if ((OTSYS_TIME() - cb.ticks) <= inFightTicks) {
 					if (const auto& damageDealer = g_game.getPlayerByID(id)) {
@@ -2166,7 +2172,8 @@ std::shared_ptr<Item> Player::getCorpse(const std::shared_ptr<Creature>& lastHit
 	if (corpse && corpse->asContainer()) {
 		auto killers = std::ranges::count_if(
 		    getDamageMap(),
-		    [this, now = OTSYS_TIME(), inFightTicks = getNumber(ConfigManager::PZ_LOCKED)](const auto& pair) {
+		    [this, now = OTSYS_TIME(),
+		     inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}](const auto& pair) {
 			    const auto& attacker = g_game.getCreatureByID(pair.first);
 			    return attacker && attacker.get() != this && (now - pair.second.ticks <= inFightTicks);
 		    });
@@ -2216,8 +2223,8 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 		pzLocked = true;
 	}
 
-	Condition* condition =
-	    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, getNumber(ConfigManager::PZ_LOCKED), 0);
+	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+	                                                  std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
 	addCondition(condition);
 }
 
@@ -3302,7 +3309,7 @@ void Player::goToFollowCreature()
 		return;
 	}
 
-	if ((OTSYS_TIME() - lastFailedFollow) < 2000) {
+	if ((OTSYS_TIME() - lastFailedFollow) < 2s) {
 		return;
 	}
 
@@ -3495,9 +3502,9 @@ void Player::onCombatRemoveCondition(Condition* condition)
 		}
 	} else {
 		if (!canDoAction()) {
-			const uint32_t delay = getNextActionTime();
-			const int32_t ticks = delay - (delay % EVENT_CREATURE_THINK_INTERVAL);
-			if (ticks < 0) {
+			const auto delay = getNextActionTime();
+			const auto ticks = std::chrono::milliseconds{delay - (delay % EVENT_CREATURE_THINK_INTERVAL)};
+			if (ticks < std::chrono::milliseconds::zero()) {
 				removeCondition(condition);
 			} else {
 				condition->setTicks(ticks);
@@ -3651,8 +3658,9 @@ bool Player::onKilledCreature(const std::shared_ptr<Creature>& target, bool last
 
 			if (lastHit && hasCondition(CONDITION_INFIGHT)) {
 				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-				                                                  getNumber(ConfigManager::WHITE_SKULL_TIME) * 1000, 0);
+				Condition* condition =
+				    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+				                               std::chrono::seconds{getNumber(ConfigManager::WHITE_SKULL_TIME)}, 0);
 				addCondition(condition);
 			}
 		}
@@ -3949,16 +3957,16 @@ void Player::addUnjustifiedDead(const std::shared_ptr<const Player>& attacked)
 
 	sendTextMessage(MESSAGE_EVENT_ADVANCE, "Warning! The murder of " + attacked->getName() + " was not justified.");
 
-	skullTicks += getNumber(ConfigManager::FRAG_TIME);
+	skullTicks += std::chrono::seconds{getNumber(ConfigManager::FRAG_TIME)};
 
 	if (getSkull() != SKULL_BLACK) {
-		if (getNumber(ConfigManager::KILLS_TO_BLACK) != 0 &&
-		    skullTicks > (getNumber(ConfigManager::KILLS_TO_BLACK) - 1) *
-		                     static_cast<int64_t>(getNumber(ConfigManager::FRAG_TIME))) {
+		const auto fragTime = std::chrono::seconds{getNumber(ConfigManager::FRAG_TIME)};
+		if (auto killsToBlack = getNumber(ConfigManager::KILLS_TO_BLACK);
+		    killsToBlack != 0 && skullTicks > (killsToBlack - 1) * fragTime) {
 			setSkull(SKULL_BLACK);
-		} else if (getSkull() != SKULL_RED && getNumber(ConfigManager::KILLS_TO_RED) != 0 &&
-		           skullTicks > (getNumber(ConfigManager::KILLS_TO_RED) - 1) *
-		                            static_cast<int64_t>(getNumber(ConfigManager::FRAG_TIME))) {
+		} else if (auto killsToRed = getNumber(ConfigManager::KILLS_TO_RED);
+		           getSkull() != SKULL_RED && killsToRed != 0 &&
+		           skullTicks > (killsToRed - 1) * std::chrono::seconds{getNumber(ConfigManager::FRAG_TIME)}) {
 			setSkull(SKULL_RED);
 		}
 
@@ -4054,10 +4062,10 @@ bool Player::isPremium() const
 		return true;
 	}
 
-	return premiumEndsAt > time(nullptr);
+	return premiumEndsAt > std::chrono::system_clock::now();
 }
 
-void Player::setPremiumTime(time_t premiumEndsAt)
+void Player::setPremiumTime(std::chrono::system_clock::time_point premiumEndsAt)
 {
 	this->premiumEndsAt = premiumEndsAt;
 	sendBasicData();
@@ -4234,7 +4242,7 @@ void Player::setCurrentMount(uint16_t mountId) { currentMount = mountId; }
 
 bool Player::toggleMount(bool mount)
 {
-	if ((OTSYS_TIME() - lastToggleMount) < 3000 && !wasMounted_) {
+	if ((OTSYS_TIME() - lastToggleMount) < 3s && !wasMounted_) {
 		sendCancelMessage(RETURNVALUE_YOUAREEXHAUSTED);
 		return false;
 	}
@@ -4584,7 +4592,7 @@ std::forward_list<Condition*> Player::getMuteConditions() const
 {
 	std::forward_list<Condition*> muteConditions;
 	for (Condition* condition : conditions) {
-		if (condition->getTicks() <= 0) {
+		if (condition->getTicks() <= std::chrono::milliseconds::zero()) {
 			continue;
 		}
 

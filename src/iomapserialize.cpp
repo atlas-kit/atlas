@@ -89,7 +89,7 @@ void loadContainer(OTB::iterator& first, const OTB::iterator& last, const std::s
 
 void IOMapSerialize::loadHouseItems(Map* map)
 {
-	int64_t start = OTSYS_TIME();
+	auto start = OTSYS_TIME();
 
 	const auto& result = Database::getInstance().storeQuery("SELECT `data` FROM `tile_store`");
 	if (!result) {
@@ -120,12 +120,13 @@ void IOMapSerialize::loadHouseItems(Map* map)
 			continue;
 		}
 	} while (result->next());
-	std::cout << "> Loaded house items in: " << (OTSYS_TIME() - start) / (1000.) << " s" << std::endl;
+	std::cout << "> Loaded house items in: "
+	          << duration_cast<std::chrono::milliseconds>(OTSYS_TIME() - start).count() / 1000. << " s" << std::endl;
 }
 
 bool IOMapSerialize::saveHouseItems()
 {
-	int64_t start = OTSYS_TIME();
+	auto start = OTSYS_TIME();
 	Database& db = Database::getInstance();
 
 	// Start the transaction
@@ -162,7 +163,8 @@ bool IOMapSerialize::saveHouseItems()
 
 	// End the transaction
 	bool success = transaction.commit();
-	std::cout << "> Saved house items in: " << (OTSYS_TIME() - start) / (1000.) << " s" << std::endl;
+	std::cout << "> Saved house items in: "
+	          << duration_cast<std::chrono::milliseconds>(OTSYS_TIME() - start).count() / 1000. << " s" << std::endl;
 	return success;
 }
 
@@ -233,7 +235,7 @@ bool IOMapSerialize::loadHouseInfo()
 	do {
 		if (const auto& house = g_game.getHouseById(result->getNumber<uint32_t>("id"))) {
 			house->setOwner(result->getNumber<uint32_t>("owner"), false);
-			house->setPaidUntil(result->getNumber<time_t>("paid"));
+			house->setPaidUntil(result->getDateTime("paid"));
 			house->setPayRentWarnings(result->getNumber<uint32_t>("warnings"));
 		}
 	} while (result->next());
@@ -266,15 +268,17 @@ bool IOMapSerialize::saveHouseInfo()
 		        db.storeQuery(std::format("SELECT `id` FROM `houses` WHERE `id` = {:d}", house->getId()))) {
 			db.executeQuery(std::format(
 			    "UPDATE `houses` SET `owner` = {:d}, `paid` = {:d}, `warnings` = {:d}, `name` = {:s}, `town_id` = {:d}, `rent` = {:d}, `size` = {:d}, `beds` = {:d} WHERE `id` = {:d}",
-			    house->getOwner(), house->getPaidUntil(), house->getPayRentWarnings(),
-			    db.escapeString(house->getName()), house->getTownId(), house->getRent(), house->getTiles().size(),
-			    house->getMaxBeds(), house->getId()));
+			    house->getOwner(),
+			    duration_cast<std::chrono::seconds>(house->getPaidUntil().time_since_epoch()).count(),
+			    house->getPayRentWarnings(), db.escapeString(house->getName()), house->getTownId(), house->getRent(),
+			    house->getTiles().size(), house->getMaxBeds(), house->getId()));
 		} else {
 			db.executeQuery(std::format(
 			    "INSERT INTO `houses` (`id`, `owner`, `paid`, `warnings`, `name`, `town_id`, `rent`, `size`, `beds`) VALUES ({:d}, {:d}, {:d}, {:d}, {:s}, {:d}, {:d}, {:d}, {:d})",
-			    house->getId(), house->getOwner(), house->getPaidUntil(), house->getPayRentWarnings(),
-			    db.escapeString(house->getName()), house->getTownId(), house->getRent(), house->getTiles().size(),
-			    house->getMaxBeds()));
+			    house->getId(), house->getOwner(),
+			    duration_cast<std::chrono::seconds>(house->getPaidUntil().time_since_epoch()).count(),
+			    house->getPayRentWarnings(), db.escapeString(house->getName()), house->getTownId(), house->getRent(),
+			    house->getTiles().size(), house->getMaxBeds()));
 		}
 	}
 

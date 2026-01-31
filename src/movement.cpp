@@ -714,13 +714,14 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->invisible) {
-		Condition* condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1, 0);
+		Condition* condition =
+		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1ms, 0);
 		player->addCondition(condition);
 	}
 
 	if (it.abilities->manaShield) {
 		Condition* condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
+		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1ms, 0);
 		player->addCondition(condition);
 	}
 
@@ -735,7 +736,7 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 
 	if (it.abilities->regeneration) {
 		Condition* condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
+		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1ms, 0);
 
 		if (it.abilities->healthGain != 0) {
 			condition->setParam(CONDITION_PARAM_HEALTHGAIN, it.abilities->healthGain);

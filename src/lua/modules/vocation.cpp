@@ -219,7 +219,7 @@ int luaVocationGetAttackSpeed(lua_State* L)
 	// vocation:getAttackSpeed()
 	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
 	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getAttackSpeed());
+		tfs::lua::pushNumber(L, vocation->getAttackSpeed().count());
 	} else {
 		lua_pushnil(L);
 	}

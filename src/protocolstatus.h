@@ -30,11 +30,6 @@ public:
 
 	void sendStatusString();
 	void sendInfo(uint16_t requestedInfo, const std::string& characterName);
-
-	static const uint64_t start;
-
-private:
-	static std::map<Connection::Address, int64_t> ipConnectMap;
 };
 
 #endif // FS_PROTOCOLSTATUS_H

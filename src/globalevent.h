@@ -64,11 +64,11 @@ public:
 	const std::string& getName() const { return name; }
 	void setName(std::string eventName) { name = std::move(eventName); }
 
-	uint32_t getInterval() const { return interval; }
-	void setInterval(uint32_t eventInterval) { interval |= eventInterval; }
+	auto getInterval() const { return interval; }
+	void setInterval(std::chrono::milliseconds eventInterval) { interval = eventInterval; }
 
-	int64_t getNextExecution() const { return nextExecution; }
-	void setNextExecution(int64_t time) { nextExecution = time; }
+	auto getNextExecution() const { return nextExecution; }
+	void setNextExecution(std::chrono::system_clock::time_point time) { nextExecution = time; }
 
 private:
 	GlobalEvent_t eventType = GLOBALEVENT_NONE;
@@ -76,8 +76,8 @@ private:
 	std::string_view getScriptEventName() const override;
 
 	std::string name;
-	int64_t nextExecution = 0;
-	uint32_t interval = 0;
+	std::chrono::system_clock::time_point nextExecution = std::chrono::system_clock::time_point::min();
+	std::chrono::milliseconds interval = std::chrono::milliseconds::zero();
 };
 
 #endif // FS_GLOBALEVENT_H

@@ -143,7 +143,7 @@ std::shared_ptr<Item> Item::clone() const
 	const auto item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
-		if (item->getDuration() > 0) {
+		if (item->getDuration() > std::chrono::milliseconds::zero()) {
 			item->setDecaying(DECAYING_TRUE);
 			g_game.toDecayItems.push_back(item);
 		}
@@ -222,16 +222,16 @@ void Item::setID(uint16_t newid)
 	id = newid;
 
 	const ItemType& it = Item::items[newid];
-	uint32_t newDuration = normal_random(it.decayTimeMin, it.decayTimeMax) * 1000;
+	auto newDuration = std::chrono::seconds{normal_random(it.decayTimeMin.count(), it.decayTimeMax.count())};
 
-	if (newDuration == 0 && !it.stopTime && it.decayTo < 0) {
+	if (newDuration == std::chrono::seconds::zero() && !it.stopTime && it.decayTo < 0) {
 		removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
 		removeAttribute(ITEM_ATTRIBUTE_DURATION);
 	}
 
 	removeAttribute(ITEM_ATTRIBUTE_CORPSEOWNER);
 
-	if (newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ITEM_ATTRIBUTE_DURATION))) {
+	if (newDuration > std::chrono::seconds::zero() && (!prevIt.stopTime || !hasAttribute(ITEM_ATTRIBUTE_DURATION))) {
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
 	}
@@ -384,7 +384,7 @@ void Item::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator&
 		}
 
 		case ATTR_WRITTENDATE: {
-			auto writtenDate = OTB::read<uint32_t>(first, last);
+			auto writtenDate = std::chrono::system_clock::from_time_t(OTB::read<uint32_t>(first, last));
 			setDate(writtenDate);
 			break;
 		}
@@ -402,8 +402,8 @@ void Item::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator&
 		}
 
 		case ATTR_DURATION: {
-			auto duration = OTB::read<int32_t>(first, last);
-			setDuration(std::max<int32_t>(0, duration));
+			auto duration = std::chrono::seconds{OTB::read<int32_t>(first, last)};
+			setDuration(std::max(std::chrono::seconds::zero(), duration));
 			break;
 		}
 
@@ -609,10 +609,10 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 		propWriteStream.writeString(text);
 	}
 
-	const time_t writtenDate = getDate();
-	if (writtenDate != 0) {
+	const auto writtenDate = getDate();
+	if (writtenDate != std::chrono::system_clock::time_point{}) {
 		propWriteStream.write<uint8_t>(ATTR_WRITTENDATE);
-		propWriteStream.write<uint32_t>(writtenDate);
+		propWriteStream.write<uint32_t>(std::chrono::system_clock::to_time_t(writtenDate));
 	}
 
 	const std::string& writer = getWriter();
@@ -887,12 +887,12 @@ void Item::setUniqueId(uint16_t n)
 
 void Item::setDefaultDuration()
 {
-	uint32_t duration = getDefaultDurationMin();
-	if (uint32_t durationMax = getDefaultDurationMax()) {
-		duration = normal_random(duration, durationMax);
+	auto duration = getDefaultDurationMin();
+	if (auto durationMax = getDefaultDurationMax(); durationMax != duration) {
+		duration = std::chrono::seconds{normal_random(duration.count(), durationMax.count())};
 	}
 
-	if (duration != 0) {
+	if (duration != std::chrono::seconds::zero()) {
 		setDuration(duration);
 	}
 }
@@ -903,7 +903,8 @@ bool Item::canDecay() const
 		return false;
 	}
 
-	if (getDecayTo() < 0 || (getDecayTimeMin() == 0 && getDecayTimeMax() == 0)) {
+	if (getDecayTo() < 0 ||
+	    (getDecayTimeMin() == std::chrono::seconds::zero() && getDecayTimeMax() == std::chrono::seconds::zero())) {
 		return false;
 	}
 
@@ -1093,7 +1094,7 @@ bool Item::hasMarketAttributes() const
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			uint32_t duration = static_cast<uint32_t>(attr.value.integer);
+			auto duration = std::chrono::seconds{static_cast<uint32_t>(attr.value.integer)};
 			if (duration <= getDefaultDurationMin()) {
 				return false;
 			}

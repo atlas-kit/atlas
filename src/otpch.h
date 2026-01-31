@@ -66,4 +66,6 @@
 #include <mysql/mysql.h>
 #endif
 
+using namespace std::chrono_literals;
+
 #endif // FS_OTPCH_H
