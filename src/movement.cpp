@@ -175,7 +175,7 @@ bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_nod
 
 bool MoveEvents::registerLuaFunction(MoveEvent* event)
 {
-	const auto moveEvent{event};
+	const std::unique_ptr<MoveEvent> moveEvent{event};
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {

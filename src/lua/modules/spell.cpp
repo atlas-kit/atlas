@@ -121,6 +121,7 @@ int luaSpellRegister(lua_State* L)
 		lua_pushnil(L);
 		return 1;
 	}
+
 	if (spell->spellType == SPELL_INSTANT) {
 		auto instant = std::unique_ptr<InstantSpell>{dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1))};
 		if (!instant->isScripted()) {
