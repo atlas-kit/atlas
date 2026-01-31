@@ -38,7 +38,7 @@ std::unique_ptr<Event> TalkActions::getEvent(const std::string& nodeName)
 
 bool TalkActions::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
-	const auto talkAction{static_cast<TalkAction*>(event.release())}; // event is guaranteed to be a TalkAction
+	std::unique_ptr<TalkAction> talkAction{static_cast<TalkAction*>(event.release())};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {

@@ -99,7 +99,7 @@ std::unique_ptr<Event> Weapons::getEvent(const std::string& nodeName)
 
 bool Weapons::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
-	const auto weapon{static_cast<Weapon*>(event.release())};
+	std::unique_ptr<Weapon> weapon{static_cast<Weapon*>(event.release())};
 	uint16_t weaponId = weapon->getID();
 
 	auto result = weapons.emplace(weaponId, std::move(weapon));

@@ -51,7 +51,7 @@ std::unique_ptr<Event> GlobalEvents::getEvent(const std::string& nodeName)
 
 bool GlobalEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
-	const auto globalEvent{static_cast<GlobalEvent*>(event.release())}; // event is guaranteed to be a GlobalEvent
+	std::unique_ptr<GlobalEvent> globalEvent{static_cast<GlobalEvent*>(event.release())};
 	if (globalEvent->getEventType() == GLOBALEVENT_TIMER) {
 		auto result = timerMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {
