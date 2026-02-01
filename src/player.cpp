@@ -384,9 +384,9 @@ float Player::getDefenseFactor() const
 {
 	switch (fightMode) {
 		case FIGHTMODE_ATTACK:
-			return (std::chrono::system_clock::now() - lastAttack) < getAttackSpeed() ? 0.5f : 1.0f;
+			return (std::chrono::steady_clock::now() - lastAttack) < getAttackSpeed() ? 0.5f : 1.0f;
 		case FIGHTMODE_BALANCED:
-			return (std::chrono::system_clock::now() - lastAttack) < getAttackSpeed() ? 0.75f : 1.0f;
+			return (std::chrono::steady_clock::now() - lastAttack) < getAttackSpeed() ? 0.75f : 1.0f;
 		case FIGHTMODE_DEFENSE:
 			return 1.0f;
 		default:
@@ -692,8 +692,8 @@ bool Player::canWalkthrough(const std::shared_ptr<const Creature>& creature) con
 	}
 
 	const auto& thisPlayer = const_cast<Player*>(this);
-	if ((std::chrono::system_clock::now() - lastWalkthroughAttempt) > 2s) {
-		thisPlayer->setLastWalkthroughAttempt(std::chrono::system_clock::now());
+	if ((std::chrono::steady_clock::now() - lastWalkthroughAttempt) > 2s) {
+		thisPlayer->setLastWalkthroughAttempt(std::chrono::steady_clock::now());
 		return false;
 	}
 
@@ -1013,7 +1013,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		storedConditionList.clear();
 
 		auto offlineTime = std::chrono::seconds::zero();
-		if (getLastLogout() != std::chrono::system_clock::time_point{}) {
+		if (getLastLogout() != std::chrono::system_clock::time_point::min()) {
 			// Cap offline time to 21 days to avoid integer overflow when converting to milliseconds
 			offlineTime =
 			    std::min(duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - getLastLogout()),
@@ -1261,7 +1261,7 @@ void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
 	setNextActionTask(nullptr);
-	setNextAction(std::chrono::system_clock::now() + getStepDuration(dir));
+	setNextAction(std::chrono::steady_clock::now() + getStepDuration(dir));
 }
 
 void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
@@ -1453,7 +1453,7 @@ void Player::setNextActionTask(SchedulerTask_ptr task)
 std::chrono::milliseconds Player::getNextActionTime() const
 {
 	return std::max(SCHEDULER_MINTICKS,
-	                duration_cast<std::chrono::milliseconds>(nextAction - std::chrono::system_clock::now()));
+	                duration_cast<std::chrono::milliseconds>(nextAction - std::chrono::steady_clock::now()));
 }
 
 void Player::onThink(std::chrono::milliseconds interval)
@@ -1489,11 +1489,11 @@ void Player::onAttacking(std::chrono::milliseconds)
 		return;
 	}
 
-	if (lastAttack == std::chrono::system_clock::time_point::min()) {
-		lastAttack = std::chrono::system_clock::now() - getAttackSpeed() - 1ms;
+	if (lastAttack == std::chrono::steady_clock::time_point::min()) {
+		lastAttack = std::chrono::steady_clock::now() - getAttackSpeed() - 1ms;
 	}
 
-	if ((std::chrono::system_clock::now() - lastAttack) < getAttackSpeed()) {
+	if ((std::chrono::steady_clock::now() - lastAttack) < getAttackSpeed()) {
 		return;
 	}
 
@@ -1529,7 +1529,7 @@ void Player::onAttacking(std::chrono::milliseconds)
 	}
 
 	if (result) {
-		lastAttack = std::chrono::system_clock::now();
+		lastAttack = std::chrono::steady_clock::now();
 	}
 }
 
@@ -2024,9 +2024,9 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		if (lastHitPlayer) {
 			uint32_t sumLevels = 0;
-			auto inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)};
+			auto inFightTicks = std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
 			for (auto&& [id, cb] : getDamageMap()) {
-				if ((std::chrono::system_clock::now() - cb.ticks) <= inFightTicks) {
+				if ((std::chrono::steady_clock::now() - cb.ticks) <= inFightTicks) {
 					if (const auto& damageDealer = g_game.getPlayerByID(id)) {
 						sumLevels += damageDealer->getLevel();
 					}
@@ -2173,8 +2173,8 @@ std::shared_ptr<Item> Player::getCorpse(const std::shared_ptr<Creature>& lastHit
 	if (corpse && corpse->asContainer()) {
 		auto killers = std::ranges::count_if(
 		    getDamageMap(),
-		    [this, now = std::chrono::system_clock::now(),
-		     inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}](const auto& pair) {
+		    [this, now = std::chrono::steady_clock::now(),
+		     inFightTicks = std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)}](const auto& pair) {
 			    const auto& attacker = g_game.getCreatureByID(pair.first);
 			    return attacker && attacker.get() != this && (now - pair.second.ticks <= inFightTicks);
 		    });
@@ -2224,8 +2224,8 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 		pzLocked = true;
 	}
 
-	Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-	                                                  std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
+	Condition* condition = Condition::createCondition(
+	    CONDITIONID_DEFAULT, CONDITION_INFIGHT, std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
 	addCondition(condition);
 }
 
@@ -3310,7 +3310,7 @@ void Player::goToFollowCreature()
 		return;
 	}
 
-	if ((std::chrono::system_clock::now() - lastFailedFollow) < 2s) {
+	if ((std::chrono::steady_clock::now() - lastFailedFollow) < 2s) {
 		return;
 	}
 
@@ -3319,7 +3319,7 @@ void Player::goToFollowCreature()
 	updateFollowCreaturePath(fpp);
 
 	if (!hasFollowPath) {
-		lastFailedFollow = std::chrono::system_clock::now();
+		lastFailedFollow = std::chrono::steady_clock::now();
 	}
 }
 
@@ -4243,7 +4243,7 @@ void Player::setCurrentMount(uint16_t mountId) { currentMount = mountId; }
 
 bool Player::toggleMount(bool mount)
 {
-	if ((std::chrono::system_clock::now() - lastToggleMount) < 3s && !wasMounted_) {
+	if ((std::chrono::steady_clock::now() - lastToggleMount) < 3s && !wasMounted_) {
 		sendCancelMessage(RETURNVALUE_YOUAREEXHAUSTED);
 		return false;
 	}
@@ -4308,7 +4308,7 @@ bool Player::toggleMount(bool mount)
 	}
 
 	g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-	lastToggleMount = std::chrono::system_clock::now();
+	lastToggleMount = std::chrono::steady_clock::now();
 	return true;
 }
 

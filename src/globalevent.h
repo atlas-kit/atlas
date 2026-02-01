@@ -68,7 +68,7 @@ public:
 	void setInterval(std::chrono::milliseconds eventInterval) { interval = eventInterval; }
 
 	auto getNextExecution() const { return nextExecution; }
-	void setNextExecution(std::chrono::system_clock::time_point time) { nextExecution = time; }
+	void setNextExecution(std::chrono::steady_clock::time_point time) { nextExecution = time; }
 
 private:
 	GlobalEvent_t eventType = GLOBALEVENT_NONE;
@@ -76,7 +76,7 @@ private:
 	std::string_view getScriptEventName() const override;
 
 	std::string name;
-	std::chrono::system_clock::time_point nextExecution = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point nextExecution = std::chrono::steady_clock::time_point::min();
 	std::chrono::milliseconds interval = std::chrono::milliseconds::zero();
 };
 

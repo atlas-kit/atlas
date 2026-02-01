@@ -76,19 +76,19 @@ bool Creature::canSeeCreature(const std::shared_ptr<const Creature>& creature) c
 
 std::chrono::milliseconds Creature::getTimeSinceLastMove() const
 {
-	if (lastStep != std::chrono::system_clock::time_point{}) {
-		return duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastStep);
+	if (lastStep != std::chrono::steady_clock::time_point{}) {
+		return duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - lastStep);
 	}
 	return std::numeric_limits<std::chrono::milliseconds>::max();
 }
 
 std::chrono::milliseconds Creature::getWalkDelay(Direction dir) const
 {
-	if (lastStep == std::chrono::system_clock::time_point{}) {
+	if (lastStep == std::chrono::steady_clock::time_point{}) {
 		return std::chrono::milliseconds::zero();
 	}
 
-	auto ct = std::chrono::system_clock::now();
+	auto ct = std::chrono::steady_clock::now();
 	auto stepDuration = getStepDuration(dir);
 	return duration_cast<std::chrono::milliseconds>(stepDuration - (ct - lastStep));
 }
@@ -96,11 +96,11 @@ std::chrono::milliseconds Creature::getWalkDelay(Direction dir) const
 std::chrono::milliseconds Creature::getWalkDelay() const
 {
 	// Used for auto-walking
-	if (lastStep == std::chrono::system_clock::time_point{}) {
+	if (lastStep == std::chrono::steady_clock::time_point{}) {
 		return std::chrono::milliseconds::zero();
 	}
 
-	auto ct = std::chrono::system_clock::now();
+	auto ct = std::chrono::steady_clock::now();
 	auto stepDuration = getStepDuration() * lastStepCost;
 	return duration_cast<std::chrono::milliseconds>(stepDuration - (ct - lastStep));
 }
@@ -133,7 +133,7 @@ void Creature::forceUpdatePath()
 	}
 
 	lastPathUpdate =
-	    std::chrono::system_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
@@ -181,9 +181,9 @@ void Creature::onWalk()
 	}
 
 	if (!attackedCreature.expired() || !followCreature.expired()) {
-		if (lastPathUpdate < std::chrono::system_clock::now()) {
+		if (lastPathUpdate < std::chrono::steady_clock::now()) {
 			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
-			lastPathUpdate = std::chrono::system_clock::now() +
+			lastPathUpdate = std::chrono::steady_clock::now() +
 			                 std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 		}
 	}
@@ -344,7 +344,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
                               const Position& oldPos, bool teleport)
 {
 	if (creature.get() == this) {
-		lastStep = std::chrono::system_clock::now();
+		lastStep = std::chrono::steady_clock::now();
 		lastStepCost = 1;
 
 		if (!teleport) {
@@ -417,8 +417,8 @@ void Creature::onDeath()
 
 	std::shared_ptr<Creature> mostDamageCreature = nullptr;
 
-	const auto timeNow = std::chrono::system_clock::now();
-	const auto inFightTicks = std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)};
+	const auto timeNow = std::chrono::steady_clock::now();
+	const auto inFightTicks = std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
 	int32_t mostDamage = 0;
 	std::map<std::shared_ptr<Creature>, uint64_t> experienceMap;
 	for (const auto& [id, cb] : damageMap | std::views::as_const) {
@@ -543,8 +543,8 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 	if (it == damageMap.end()) {
 		return false;
 	}
-	return (std::chrono::system_clock::now() - it->second.ticks) <=
-	       std::chrono::seconds{getNumber(ConfigManager::PZ_LOCKED)};
+	return (std::chrono::steady_clock::now() - it->second.ticks) <=
+	       std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
 }
 
 std::shared_ptr<Item> Creature::getCorpse(const std::shared_ptr<Creature>&, const std::shared_ptr<Creature>&)
@@ -793,13 +793,13 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate < std::chrono::system_clock::now()) {
+		if (follower->lastPathUpdate < std::chrono::steady_clock::now()) {
 			continue;
 		}
 
 		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
 		follower->lastPathUpdate =
-		    std::chrono::system_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 	}
 }
 
@@ -836,7 +836,7 @@ void Creature::addDamagePoints(const std::shared_ptr<Creature>& attacker, int32_
 	uint32_t attackerId = attacker->id;
 
 	auto& cb = damageMap[attackerId];
-	cb.ticks = std::chrono::system_clock::now();
+	cb.ticks = std::chrono::steady_clock::now();
 	cb.total += damagePoints;
 
 	lastHitCreatureId = attackerId;
@@ -1154,7 +1154,7 @@ bool Creature::hasCondition(ConditionType_t type, uint32_t subId /* = 0*/) const
 		return false;
 	}
 
-	auto timeNow = std::chrono::system_clock::now();
+	auto timeNow = std::chrono::steady_clock::now();
 	for (Condition* condition : conditions) {
 		if (condition->getType() != type || condition->getSubId() != subId) {
 			continue;

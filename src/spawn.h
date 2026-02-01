@@ -14,7 +14,7 @@ struct spawnBlock_t
 {
 	Position pos;
 	std::vector<std::pair<MonsterType*, uint16_t>> mTypes;
-	std::chrono::system_clock::time_point lastSpawn;
+	std::chrono::steady_clock::time_point lastSpawn;
 	std::chrono::milliseconds interval;
 	Direction direction;
 };

@@ -79,7 +79,7 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 				sb.pos = pos;
 				sb.direction = DIRECTION_NORTH;
 				sb.interval = interval;
-				sb.lastSpawn = std::chrono::system_clock::time_point::min();
+				sb.lastSpawn = std::chrono::steady_clock::time_point::min();
 
 				for (auto monsterNode : childNode.children()) {
 					pugi::xml_attribute nameAttribute = monsterNode.attribute("name");
@@ -322,7 +322,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 	monster->setMasterPos(pos);
 
 	spawnedMap.insert({spawnId, monster});
-	spawnMap[spawnId].lastSpawn = std::chrono::system_clock::now();
+	spawnMap[spawnId].lastSpawn = std::chrono::steady_clock::now();
 	return true;
 }
 
@@ -346,9 +346,9 @@ void Spawn::checkSpawn()
 			continue;
 		}
 
-		if (std::chrono::system_clock::now() >= sb.lastSpawn + sb.interval) {
+		if (std::chrono::steady_clock::now() >= sb.lastSpawn + sb.interval) {
 			if (!spawnMonster(spawnId, sb)) {
-				sb.lastSpawn = std::chrono::system_clock::now();
+				sb.lastSpawn = std::chrono::steady_clock::now();
 				continue;
 			}
 
@@ -396,7 +396,7 @@ bool Spawn::addMonster(const std::string& name, const Position& pos, Direction d
 	sb.pos = pos;
 	sb.direction = dir;
 	sb.interval = interval;
-	sb.lastSpawn = std::chrono::system_clock::time_point::min();
+	sb.lastSpawn = std::chrono::steady_clock::time_point::min();
 
 	return addBlock(sb);
 }

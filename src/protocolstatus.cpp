@@ -13,7 +13,7 @@
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 
-std::map<Connection::Address, std::chrono::system_clock::time_point> ipConnectMap = {};
+std::map<Connection::Address, std::chrono::steady_clock::time_point> ipConnectMap = {};
 
 enum RequestedInfo_t : uint16_t
 {
@@ -36,14 +36,14 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	if (!ip.is_loopback() && ip != acceptorAddress) {
 		if (auto it = ipConnectMap.find(ip);
 		    it != ipConnectMap.end() &&
-		    (std::chrono::system_clock::now() <
+		    (std::chrono::steady_clock::now() <
 		     (it->second + std::chrono::seconds{getNumber(ConfigManager::STATUSQUERY_TIMEOUT)}))) {
 			disconnect();
 			return;
 		}
 	}
 
-	ipConnectMap[ip] = std::chrono::system_clock::now();
+	ipConnectMap[ip] = std::chrono::steady_clock::now();
 
 	switch (msg.getByte()) {
 		// XML info protocol

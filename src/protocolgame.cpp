@@ -26,7 +26,7 @@ extern Scheduler g_scheduler;
 
 namespace {
 
-std::deque<std::pair<std::chrono::system_clock::time_point, uint32_t>> waitList; // (timeout, player guid)
+std::deque<std::pair<std::chrono::steady_clock::time_point, uint32_t>> waitList; // (timeout, player guid)
 auto priorityEnd = waitList.end();
 
 auto findClient(uint32_t guid)
@@ -66,7 +66,7 @@ std::size_t clientLogin(const Player& player)
 		return 0;
 	}
 
-	auto time = std::chrono::system_clock::now();
+	auto time = std::chrono::steady_clock::now();
 
 	auto it = waitList.begin();
 	while (it != waitList.end()) {
@@ -181,10 +181,11 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 		if (!player->hasFlag(PlayerFlag_CannotBeBanned)) {
 			if (const auto& banInfo = IOBan::getAccountBanInfo(accountId)) {
-				if (banInfo->expiresAt > std::chrono::system_clock::time_point{}) {
+				if (banInfo->expiresAt != std::chrono::system_clock::time_point::min()) {
 					disconnectClient(
 					    std::format("Your account has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
-					                formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
+					                formatDateShort(clock_cast<std::chrono::system_clock>(banInfo->expiresAt)),
+					                banInfo->bannedBy, banInfo->reason));
 				} else {
 					disconnectClient(
 					    std::format("Your account has been permanently banned by {:s}.\n\nReason specified:\n{:s}",
@@ -426,7 +427,8 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	auto ip = getIP();
 	if (const auto& banInfo = IOBan::getIpBanInfo(ip)) {
 		disconnectClient(std::format("Your IP has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
-		                             formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
+		                             formatDateShort(clock_cast<std::chrono::system_clock>(banInfo->expiresAt)),
+		                             banInfo->bannedBy, banInfo->reason));
 		return;
 	}
 
@@ -2939,7 +2941,7 @@ void ProtocolGame::sendTextWindow(uint32_t windowTextId, const std::shared_ptr<c
 	msg.addByte(0x00); // "(traded)" suffix after player name (bool)
 
 	auto writtenDate = item->getDate();
-	if (writtenDate != std::chrono::system_clock::time_point{}) {
+	if (writtenDate != std::chrono::system_clock::time_point::min()) {
 		msg.addString(formatDateShort(writtenDate));
 	} else {
 		msg.add<uint16_t>(0x00);

@@ -412,7 +412,7 @@ int luaWeaponDuration(lua_State* L)
 			it.decayTimeMin = std::chrono::seconds{tfs::lua::getField<uint32_t>(L, 2, "min")};
 			it.decayTimeMax = std::chrono::seconds{tfs::lua::getField<uint32_t>(L, 2, "max")};
 		} else {
-			it.decayTimeMin = std::chrono::seconds{tfs::lua::getNumber<uint32_t>(L, 2)};
+			it.decayTimeMin = it.decayTimeMax = std::chrono::seconds{tfs::lua::getNumber<uint32_t>(L, 2)};
 		}
 
 		it.showDuration = showDuration;

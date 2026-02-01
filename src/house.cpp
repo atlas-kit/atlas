@@ -64,7 +64,7 @@ void House::setOwner(uint32_t guid, bool updateDatabase /* = true*/,
 		}
 	} else {
 		std::string strRentPeriod = boost::algorithm::to_lower_copy(getString(ConfigManager::HOUSE_RENT_PERIOD));
-		std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
+		auto currentTime = std::chrono::system_clock::now();
 		if (strRentPeriod == "yearly") {
 			currentTime += std::chrono::days(365);
 		} else if (strRentPeriod == "monthly") {

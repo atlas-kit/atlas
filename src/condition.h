@@ -63,8 +63,8 @@ public:
 	Condition() = default;
 	Condition(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks, bool buff = false,
 	          uint32_t subId = 0, bool aggressive = false) :
-	    endTime{ticks < std::chrono::milliseconds::zero() ? std::chrono::system_clock::time_point::max()
-	                                                      : std::chrono::system_clock::time_point::min()},
+	    endTime{ticks < std::chrono::milliseconds::zero() ? std::chrono::steady_clock::time_point::max()
+	                                                      : std::chrono::steady_clock::time_point::min()},
 	    subId{subId},
 	    ticks{ticks},
 	    conditionType{type},
@@ -85,7 +85,7 @@ public:
 	virtual Condition* clone() const = 0;
 
 	ConditionType_t getType() const { return conditionType; }
-	std::chrono::system_clock::time_point getEndTime() const { return endTime; }
+	std::chrono::steady_clock::time_point getEndTime() const { return endTime; }
 	std::chrono::milliseconds getTicks() const { return ticks; }
 	void setTicks(std::chrono::milliseconds newTicks);
 	bool isAggressive() const { return aggressive; }
@@ -108,7 +108,7 @@ public:
 protected:
 	virtual bool updateCondition(const Condition* addCondition);
 
-	std::chrono::system_clock::time_point endTime;
+	std::chrono::steady_clock::time_point endTime;
 	uint32_t subId;
 	std::chrono::milliseconds ticks;
 	ConditionType_t conditionType;

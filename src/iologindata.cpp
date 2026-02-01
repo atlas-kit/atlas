@@ -242,7 +242,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
 		const auto skullSeconds =
 		    duration_cast<std::chrono::seconds>(result->getDateTime("skulltime") - std::chrono::system_clock::now());
-		if (skullSeconds.count() > 0) {
+		if (skullSeconds > std::chrono::seconds::zero()) {
 			// ensure that we round up the number of ticks
 			player->skullTicks = skullSeconds + 2s;
 
@@ -597,8 +597,8 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 
 	if (result->getNumber<uint16_t>("save") == 0) {
 		return db.executeQuery(
-		    std::format("UPDATE `players` SET `lastlogin` = {:d}, `lastip` = INET6_ATON('{:s}') WHERE `id` = {:d}",
-		                duration_cast<std::chrono::seconds>(player->lastLoginSaved.time_since_epoch()).count(),
+		    std::format("UPDATE `players` SET `lastlogin` = {:%Q}, `lastip` = INET6_ATON('{:s}') WHERE `id` = {:d}",
+		                duration_cast<std::chrono::seconds>(player->lastLoginSaved.time_since_epoch()),
 		                player->lastIP.to_string(), player->getGUID()));
 	}
 
@@ -662,11 +662,11 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
 		auto skullTime = std::chrono::seconds::zero();
 
-		if (player->skullTicks.count() > 0) {
+		if (player->skullTicks > std::chrono::seconds::zero()) {
 			skullTime = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch() +
 			                                                player->skullTicks);
 		}
-		query << "`skulltime` = " << skullTime << ',';
+		query << "`skulltime` = " << skullTime.count() << ',';
 
 		Skulls_t skull = SKULL_NONE;
 		if (player->getSkull() == SKULL_RED) {
@@ -996,6 +996,6 @@ void IOLoginData::removeVIPEntry(uint32_t accountId, uint32_t guid)
 void IOLoginData::updatePremiumTime(uint32_t accountId, std::chrono::system_clock::time_point endTime)
 {
 	Database::getInstance().executeQuery(
-	    std::format("UPDATE `accounts` SET `premium_ends_at` = {:d} WHERE `id` = {:d}",
-	                duration_cast<std::chrono::seconds>(endTime.time_since_epoch()).count(), accountId));
+	    std::format("UPDATE `accounts` SET `premium_ends_at` = {:%Q} WHERE `id` = {:d}",
+	                duration_cast<std::chrono::seconds>(endTime.time_since_epoch()), accountId));
 }

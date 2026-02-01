@@ -91,8 +91,8 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 		}
 
 		case CONDITIONATTR_TICKS: {
-			int32_t _ticks;
-			if (!propStream.read<int32_t>(_ticks)) {
+			uint32_t _ticks;
+			if (!propStream.read<uint32_t>(_ticks)) {
 				return false;
 			}
 
@@ -156,7 +156,7 @@ void Condition::serialize(PropWriteStream& propWriteStream)
 void Condition::setTicks(std::chrono::milliseconds newTicks)
 {
 	ticks = newTicks;
-	endTime = ticks + std::chrono::system_clock::now();
+	endTime = ticks + std::chrono::steady_clock::now();
 }
 
 bool Condition::executeCondition(const std::shared_ptr<Creature>&, std::chrono::milliseconds interval)
@@ -167,7 +167,7 @@ bool Condition::executeCondition(const std::shared_ptr<Creature>&, std::chrono::
 
 	// Not using set ticks here since it would reset endTime
 	ticks = std::max(std::chrono::milliseconds::zero(), ticks - interval);
-	return getEndTime() >= std::chrono::system_clock::now();
+	return getEndTime() >= std::chrono::steady_clock::now();
 }
 
 Condition* Condition::createCondition(ConditionId_t id, ConditionType_t type, std::chrono::milliseconds ticks,
@@ -301,7 +301,7 @@ Condition* Condition::createCondition(PropStream& propStream)
 bool Condition::startCondition(const std::shared_ptr<Creature>&)
 {
 	if (ticks > std::chrono::milliseconds::zero()) {
-		endTime = ticks + std::chrono::system_clock::now();
+		endTime = ticks + std::chrono::steady_clock::now();
 	}
 	return true;
 }
@@ -332,7 +332,7 @@ bool Condition::updateCondition(const Condition* addCondition)
 	}
 
 	if (addCondition->getTicks() >= std::chrono::milliseconds::zero() &&
-	    getEndTime() > (std::chrono::system_clock::now() + addCondition->getTicks())) {
+	    getEndTime() > (std::chrono::steady_clock::now() + addCondition->getTicks())) {
 		return false;
 	}
 
@@ -876,8 +876,6 @@ bool ConditionRegeneration::unserializeProp(ConditionAttr_t attr, PropStream& pr
 		}
 		manaTicks = std::chrono::milliseconds{value};
 		return true;
-	} else if (attr == CONDITIONATTR_MANAGAIN) {
-		return propStream.read<uint32_t>(manaGain);
 	} else if (attr == CONDITIONATTR_MANAGAIN) {
 		return propStream.read<uint32_t>(manaGain);
 	}

@@ -69,12 +69,10 @@ int luaDebugPrint(lua_State* L)
 	return 0;
 }
 
-auto start = std::chrono::system_clock::now();
-
 int luaGetWorldUpTime(lua_State* L)
 {
 	// getWorldUpTime()
-	uint64_t uptime = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start).count();
+	auto uptime = duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count();
 	tfs::lua::pushNumber(L, uptime);
 	return 1;
 }

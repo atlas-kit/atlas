@@ -105,7 +105,7 @@ public:
 	void setNormalCreatureLight() override;
 	bool getCombatValues(int32_t& min, int32_t& max) override;
 
-	bool hasExtraSwing() override { return lastMeleeAttack == std::chrono::system_clock::time_point::min(); }
+	bool hasExtraSwing() override { return lastMeleeAttack == std::chrono::steady_clock::time_point::min(); }
 
 	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(const std::shared_ptr<Creature>& creature);
@@ -166,7 +166,7 @@ private:
 	MonsterType* mType;
 	Spawn* spawn = nullptr;
 
-	std::chrono::system_clock::time_point lastMeleeAttack = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 
 	std::chrono::milliseconds attackTicks = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds targetChangeTicks = std::chrono::milliseconds::zero();

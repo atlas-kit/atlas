@@ -315,7 +315,7 @@ private:
 	std::shared_ptr<Player> player = nullptr;
 
 	uint32_t eventConnect = 0;
-	std::chrono::system_clock::time_point challengeTimestamp = {};
+	std::chrono::system_clock::time_point challengeTimestamp = std::chrono::system_clock::time_point::min();
 	uint16_t version = CLIENT_VERSION_MIN;
 
 	uint8_t challengeRandom = 0;

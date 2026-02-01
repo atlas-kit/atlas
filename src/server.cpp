@@ -15,8 +15,8 @@ namespace {
 
 struct ConnectBlock
 {
-	std::chrono::system_clock::time_point lastAttempt;
-	std::chrono::system_clock::time_point blockTime = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastAttempt;
+	std::chrono::steady_clock::time_point blockTime = std::chrono::steady_clock::time_point::min();
 	uint32_t count = 1;
 };
 
@@ -25,7 +25,7 @@ bool acceptConnection(const Connection::Address& clientIP)
 	static std::recursive_mutex mu;
 	std::lock_guard lock{mu};
 
-	auto currentTime = std::chrono::system_clock::now();
+	auto currentTime = std::chrono::steady_clock::now();
 
 	static std::map<Connection::Address, ConnectBlock> ipConnectMap;
 	auto it = ipConnectMap.find(clientIP);

@@ -3440,8 +3440,7 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 
 	auto muteTime = player->isMuted();
 	if (muteTime > std::chrono::seconds::zero()) {
-		player->sendTextMessage(MESSAGE_STATUS_SMALL,
-		                        std::format("You are still muted for {:d} seconds.", muteTime.count()));
+		player->sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are still muted for {:%Q} seconds.", muteTime));
 		return;
 	}
 
@@ -5610,7 +5609,7 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		return;
 	}
 
-	std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
+	auto currentTime = std::chrono::system_clock::now();
 	for (auto&& house : houses | std::views::values | std::views::as_const) {
 		if (house->getOwner() == 0) {
 			continue;
@@ -5637,7 +5636,7 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		if (player->getBankBalance() >= rent) {
 			player->setBankBalance(player->getBankBalance() - rent);
 
-			std::chrono::system_clock::time_point paidUntil = currentTime;
+			auto paidUntil = currentTime;
 			switch (rentPeriod) {
 				case RENTPERIOD_DAILY:
 					paidUntil += std::chrono::days(1);

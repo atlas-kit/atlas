@@ -14,24 +14,24 @@ class Task
 public:
 	explicit Task(TaskFunc&& f) : func(std::move(f)) {}
 	Task(uint32_t ms, TaskFunc&& f) :
-	    expiration(std::chrono::system_clock::now() + std::chrono::milliseconds(ms)), func(std::move(f))
+	    expiration(std::chrono::steady_clock::now() + std::chrono::milliseconds(ms)), func(std::move(f))
 	{}
 
 	virtual ~Task() = default;
 	void operator()() { func(); }
 
-	void setDontExpire() { expiration = std::chrono::system_clock::time_point::min(); }
+	void setDontExpire() { expiration = std::chrono::steady_clock::time_point::min(); }
 
 	bool hasExpired() const
 	{
-		if (expiration == std::chrono::system_clock::time_point::min()) {
+		if (expiration == std::chrono::steady_clock::time_point::min()) {
 			return false;
 		}
-		return expiration < std::chrono::system_clock::now();
+		return expiration < std::chrono::steady_clock::now();
 	}
 
 protected:
-	std::chrono::system_clock::time_point expiration = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point expiration = std::chrono::steady_clock::time_point::min();
 
 private:
 	// Expiration has another meaning for scheduler tasks, then it is the time the task should be added to the

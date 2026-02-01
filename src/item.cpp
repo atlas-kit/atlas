@@ -610,7 +610,7 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 	}
 
 	const auto writtenDate = getDate();
-	if (writtenDate != std::chrono::system_clock::time_point{}) {
+	if (writtenDate != std::chrono::system_clock::time_point::min()) {
 		propWriteStream.write<uint8_t>(ATTR_WRITTENDATE);
 		propWriteStream.write<uint32_t>(std::chrono::system_clock::to_time_t(writtenDate));
 	}
@@ -1094,7 +1094,7 @@ bool Item::hasMarketAttributes() const
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			auto duration = std::chrono::seconds{static_cast<uint32_t>(attr.value.integer)};
+			auto duration = std::chrono::seconds{attr.value.integer};
 			if (duration <= getDefaultDurationMin()) {
 				return false;
 			}

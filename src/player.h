@@ -193,7 +193,7 @@ public:
 	bool isInWarList(uint32_t guildId) const;
 
 	void setLoginPosition(Position pos) { loginPosition = pos; }
-	void setLastWalkthroughAttempt(std::chrono::system_clock::time_point walkthroughAttempt)
+	void setLastWalkthroughAttempt(std::chrono::steady_clock::time_point walkthroughAttempt)
 	{
 		lastWalkthroughAttempt = walkthroughAttempt;
 	}
@@ -496,8 +496,8 @@ public:
 	                     bool ignoreResistances = false) override;
 	bool hasExtraSwing() override
 	{
-		return lastAttack > std::chrono::system_clock::time_point{} &&
-		       ((std::chrono::system_clock::now() - lastAttack) >= getAttackSpeed());
+		return lastAttack > std::chrono::steady_clock::time_point{} &&
+		       ((std::chrono::steady_clock::now() - lastAttack) >= getAttackSpeed());
 	}
 
 	uint16_t getSpecialSkill(uint8_t skill) const { return std::max<uint16_t>(0, varSpecialSkills[skill]); }
@@ -1181,8 +1181,8 @@ public:
 	void setNextWalkActionTask(SchedulerTask_ptr task);
 	void setNextActionTask(SchedulerTask_ptr task);
 
-	void setNextAction(std::chrono::system_clock::time_point time) { nextAction = std::max(nextAction, time); }
-	bool canDoAction() const { return nextAction <= std::chrono::system_clock::now(); }
+	void setNextAction(std::chrono::steady_clock::time_point time) { nextAction = std::max(nextAction, time); }
+	bool canDoAction() const { return nextAction <= std::chrono::steady_clock::now(); }
 	std::chrono::milliseconds getNextActionTime() const;
 
 	std::shared_ptr<Item> getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen);
@@ -1287,13 +1287,13 @@ private:
 
 	uint64_t experience = 0;
 	uint64_t manaSpent = 0;
-	std::chrono::system_clock::time_point lastAttack = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastAttack = std::chrono::steady_clock::time_point::min();
 	uint64_t bankBalance = 0;
-	std::chrono::system_clock::time_point lastFailedFollow = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastFailedFollow = std::chrono::steady_clock::time_point::min();
 	std::chrono::seconds skullTicks = std::chrono::seconds::zero();
-	std::chrono::system_clock::time_point lastWalkthroughAttempt = std::chrono::system_clock::time_point::min();
-	std::chrono::system_clock::time_point lastToggleMount = std::chrono::system_clock::time_point::min();
-	std::chrono::system_clock::time_point nextAction = std::chrono::system_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastWalkthroughAttempt = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastToggleMount = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point nextAction = std::chrono::steady_clock::time_point::min();
 
 	ProtocolGame_ptr client;
 	Connection::Address lastIP = {};

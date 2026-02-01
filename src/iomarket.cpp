@@ -217,8 +217,8 @@ MarketOfferEx getOfferByCounter(std::chrono::system_clock::time_point timestamp,
 	const auto created = timestamp - std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	const auto& result = Database::getInstance().storeQuery(std::format(
-	    "SELECT `id`, `sale`, `itemtype`, `amount`, `created`, `price`, `player_id`, `anonymous`, (SELECT `name` FROM `players` WHERE `id` = `player_id`) AS `player_name` FROM `market_offers` WHERE `created` = {:d} AND (`id` & 65535) = {:d} LIMIT 1",
-	    duration_cast<std::chrono::seconds>(created.time_since_epoch()).count(), counter));
+	    "SELECT `id`, `sale`, `itemtype`, `amount`, `created`, `price`, `player_id`, `anonymous`, (SELECT `name` FROM `players` WHERE `id` = `player_id`) AS `player_name` FROM `market_offers` WHERE `created` = {:%Q} AND (`id` & 65535) = {:d} LIMIT 1",
+	    duration_cast<std::chrono::seconds>(created.time_since_epoch()), counter));
 	if (!result) {
 		offer.id = 0;
 		offer.playerId = 0;
@@ -264,10 +264,10 @@ void appendHistory(uint32_t playerId, MarketAction_t action, uint16_t itemId, ui
                    std::chrono::system_clock::time_point timestamp, MarketOfferState_t state)
 {
 	g_databaseTasks.addTask(std::format(
-	    "INSERT INTO `market_history` (`player_id`, `sale`, `itemtype`, `amount`, `price`, `expires_at`, `inserted`, `state`) VALUES ({:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d})",
+	    "INSERT INTO `market_history` (`player_id`, `sale`, `itemtype`, `amount`, `price`, `expires_at`, `inserted`, `state`) VALUES ({:d}, {:d}, {:d}, {:d}, {:d}, {:%Q}, {:%Q}, {:d})",
 	    playerId, std::to_underlying(action), itemId, amount, price,
-	    duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count(),
-	    duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(),
+	    duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()),
+	    duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()),
 	    std::to_underlying(state)));
 }
 

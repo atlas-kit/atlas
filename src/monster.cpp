@@ -808,19 +808,19 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 				spellBlock.spell->castSpell(asMonster(), attackedCreature);
 
 				if (spellBlock.isMelee) {
-					lastMeleeAttack = std::chrono::system_clock::now();
+					lastMeleeAttack = std::chrono::steady_clock::now();
 				}
 			}
 		}
 
 		if (!inRange && spellBlock.isMelee) {
 			// melee swing out of reach
-			lastMeleeAttack = std::chrono::system_clock::time_point::min();
+			lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 		}
 	}
 
 	// ensure ranged creatures turn to player
-	if (!lookUpdated && lastMeleeAttack == std::chrono::system_clock::time_point::min() && !isFleeing()) {
+	if (!lookUpdated && lastMeleeAttack == std::chrono::steady_clock::time_point::min() && !isFleeing()) {
 		updateLookDirection();
 	}
 
@@ -850,7 +850,12 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 	inRange = true;
 
 	if (sb.isMelee) {
-		if (isFleeing() || (std::chrono::system_clock::now() - lastMeleeAttack) < sb.speed) {
+		if (isFleeing()) {
+			return false;
+		}
+
+		if (lastMeleeAttack != std::chrono::steady_clock::time_point::min() &&
+		    std::chrono::steady_clock::now() - lastMeleeAttack < sb.speed) {
 			return false;
 		}
 	} else {

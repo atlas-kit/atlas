@@ -103,7 +103,7 @@ bool GlobalEvents::registerLuaEvent(GlobalEvent* event)
 
 void GlobalEvents::timer()
 {
-	auto now = std::chrono::system_clock::now();
+	auto now = std::chrono::steady_clock::now();
 
 	auto nextScheduledTime = std::chrono::milliseconds::max();
 
@@ -139,7 +139,7 @@ void GlobalEvents::timer()
 
 void GlobalEvents::think()
 {
-	auto now = std::chrono::system_clock::now();
+	auto now = std::chrono::steady_clock::now();
 
 	auto nextScheduledTime = std::chrono::milliseconds::max();
 	for (auto&& globalEvent : thinkMap | std::views::values) {
@@ -226,18 +226,18 @@ bool GlobalEvent::configureEvent(const pugi::xml_node& node)
 			}
 		}
 
-		auto timeNow = std::chrono::system_clock::now();
+		auto timeNow = std::chrono::steady_clock::now();
 
 		interval = std::chrono::days{1};
-		nextExecution = floor<std::chrono::days>(timeNow + std::chrono::hours{hour} + std::chrono::minutes{min} +
-		                                         std::chrono::seconds{sec});
+		nextExecution = floor<std::chrono::days>(timeNow) + std::chrono::hours{hour} + std::chrono::minutes{min} +
+		                std::chrono::seconds{sec};
 		if (nextExecution < timeNow) {
 			nextExecution += interval;
 		}
 		eventType = GLOBALEVENT_TIMER;
 	} else if ((attr = node.attribute("interval"))) {
 		interval = std::max(SCHEDULER_MINTICKS, std::chrono::milliseconds{pugi::cast<int32_t>(attr.value())});
-		nextExecution = std::chrono::system_clock::now() + interval;
+		nextExecution = std::chrono::steady_clock::now() + interval;
 	} else {
 		std::cout << "[Error - GlobalEvent::configureEvent] No interval for globalevent with name " << name
 		          << std::endl;

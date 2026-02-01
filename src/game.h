@@ -494,7 +494,7 @@ public:
 	auto getPlayerRecord() const { return playerRecord; }
 	void setPlayerRecord(uint32_t record) { playerRecord = record; }
 
-	auto getWorldUptime() const { return std::chrono::system_clock::now() - worldStart; }
+	auto getWorldUptime() const { return std::chrono::steady_clock::now() - worldStart; }
 
 private:
 	bool playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type, const std::string& text);
@@ -507,7 +507,7 @@ private:
 	void checkDecay();
 	void internalDecayItem(const std::shared_ptr<Item>& item);
 
-	std::chrono::system_clock::time_point worldStart = std::chrono::system_clock::now();
+	std::chrono::steady_clock::time_point worldStart = std::chrono::steady_clock::now();
 
 	std::unordered_map<uint32_t, std::weak_ptr<Player>> players;
 	std::unordered_map<std::string, std::weak_ptr<Player>> mappedPlayerNames;
