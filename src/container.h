@@ -60,6 +60,9 @@ public:
 	virtual std::shared_ptr<StoreInbox> asStoreInbox() { return nullptr; }
 	virtual std::shared_ptr<const StoreInbox> asStoreInbox() const { return nullptr; }
 
+	virtual bool isDepotChest() const { return false; }
+	virtual bool isStoreInbox() const { return false; }
+
 	bool hasContainerParent() const;
 
 	void readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator& last) override;
