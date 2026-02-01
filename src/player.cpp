@@ -1014,10 +1014,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		auto offlineTime = std::chrono::seconds::zero();
 		if (getLastLogout() != std::chrono::system_clock::time_point::min()) {
-			// Cap offline time to 21 days to avoid integer overflow when converting to milliseconds
-			offlineTime =
-			    std::min(duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - getLastLogout()),
-			             duration_cast<std::chrono::seconds>(std::chrono::days{21}));
+			offlineTime = duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - getLastLogout());
 		}
 
 		for (Condition* condition : getMuteConditions()) {

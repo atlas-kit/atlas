@@ -2940,9 +2940,8 @@ void ProtocolGame::sendTextWindow(uint32_t windowTextId, const std::shared_ptr<c
 
 	msg.addByte(0x00); // "(traded)" suffix after player name (bool)
 
-	auto writtenDate = item->getDate();
-	if (writtenDate != std::chrono::system_clock::time_point::min()) {
-		msg.addString(formatDateShort(writtenDate));
+	if (const auto writtenDate = item->getDate()) {
+		msg.addString(formatDateShort(*writtenDate));
 	} else {
 		msg.add<uint16_t>(0x00);
 	}

@@ -568,7 +568,13 @@ public:
 		setIntAttr(ITEM_ATTRIBUTE_DATE, std::chrono::system_clock::to_time_t(n));
 	}
 	void resetDate() { removeAttribute(ITEM_ATTRIBUTE_DATE); }
-	auto getDate() const { return std::chrono::system_clock::from_time_t(getIntAttr(ITEM_ATTRIBUTE_DATE)); }
+	std::optional<std::chrono::system_clock::time_point> getDate() const
+	{
+		if (hasAttribute(ITEM_ATTRIBUTE_DATE)) {
+			return std::chrono::system_clock::from_time_t(getIntAttr(ITEM_ATTRIBUTE_DATE));
+		}
+		return std::nullopt;
+	}
 
 	void setWriter(std::string_view writer) { setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 	void resetWriter() { removeAttribute(ITEM_ATTRIBUTE_WRITER); }

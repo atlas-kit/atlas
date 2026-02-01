@@ -609,10 +609,9 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 		propWriteStream.writeString(text);
 	}
 
-	const auto writtenDate = getDate();
-	if (writtenDate != std::chrono::system_clock::time_point::min()) {
+	if (const auto writtenDate = getDate()) {
 		propWriteStream.write<uint8_t>(ATTR_WRITTENDATE);
-		propWriteStream.write<uint32_t>(std::chrono::system_clock::to_time_t(writtenDate));
+		propWriteStream.write<uint32_t>(std::chrono::system_clock::to_time_t(*writtenDate));
 	}
 
 	const std::string& writer = getWriter();
