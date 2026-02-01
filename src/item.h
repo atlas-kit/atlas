@@ -640,14 +640,14 @@ public:
 		return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
 	}
 
-	void setDuration(std::chrono::milliseconds time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time.count()); }
-	void decreaseDuration(std::chrono::milliseconds time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time.count()); }
-	std::chrono::milliseconds getDuration() const
+	void setDuration(std::chrono::seconds time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time.count()); }
+	void decreaseDuration(std::chrono::seconds time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time.count()); }
+	std::chrono::seconds getDuration() const
 	{
 		if (!attributes) {
-			return std::chrono::milliseconds::zero();
+			return std::chrono::seconds::zero();
 		}
-		return std::chrono::milliseconds(getIntAttr(ITEM_ATTRIBUTE_DURATION));
+		return std::chrono::seconds(getIntAttr(ITEM_ATTRIBUTE_DURATION));
 	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
