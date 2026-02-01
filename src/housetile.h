@@ -15,11 +15,11 @@ public:
 	    DynamicTile{x, y, z}, house{house}
 	{}
 
-	std::shared_ptr<HouseTile> getHouseTile() override
+	std::shared_ptr<HouseTile> asHouseTile() override
 	{
 		return std::static_pointer_cast<HouseTile>(shared_from_this());
 	}
-	std::shared_ptr<const HouseTile> getHouseTile() const override
+	std::shared_ptr<const HouseTile> asHouseTile() const override
 	{
 		return std::static_pointer_cast<const HouseTile>(shared_from_this());
 	}

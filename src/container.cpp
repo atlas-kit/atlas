@@ -45,7 +45,7 @@ std::shared_ptr<Item> Container::clone() const
 std::string Container::getName(bool addArticle /* = false*/) const
 {
 	const ItemType& it = items[id];
-	return getNameDescription(it, getContainer(), -1, addArticle);
+	return getNameDescription(it, asContainer(), -1, addArticle);
 }
 
 bool Container::hasContainerParent() const
@@ -64,7 +64,7 @@ bool Container::hasContainerParent() const
 
 void Container::addItem(std::shared_ptr<Item> item)
 {
-	item->setParent(getContainer());
+	item->setParent(asContainer());
 	itemList.push_back(std::move(item));
 }
 
@@ -148,7 +148,7 @@ void Container::onAddContainerItem(const std::shared_ptr<Item>& item)
 	// send to client
 	for (const auto& spectator : spectators) {
 		assert(spectator->asPlayer() != nullptr);
-		std::static_pointer_cast<Player>(spectator)->sendAddContainerItem(getContainer(), item);
+		std::static_pointer_cast<Player>(spectator)->sendAddContainerItem(asContainer(), item);
 	}
 
 	// event methods
@@ -167,13 +167,13 @@ void Container::onUpdateContainerItem(uint32_t index, const std::shared_ptr<Item
 	// send to client
 	for (const auto& spectator : spectators) {
 		assert(spectator->asPlayer() != nullptr);
-		std::static_pointer_cast<Player>(spectator)->sendUpdateContainerItem(getContainer(), index, newItem);
+		std::static_pointer_cast<Player>(spectator)->sendUpdateContainerItem(asContainer(), index, newItem);
 	}
 
 	// event methods
 	for (const auto& spectator : spectators) {
 		assert(spectator->asPlayer() != nullptr);
-		std::static_pointer_cast<Player>(spectator)->onUpdateContainerItem(getContainer(), oldItem, newItem);
+		std::static_pointer_cast<Player>(spectator)->onUpdateContainerItem(asContainer(), oldItem, newItem);
 	}
 }
 
@@ -185,13 +185,13 @@ void Container::onRemoveContainerItem(uint32_t index, const std::shared_ptr<Item
 	// send change to client
 	for (const auto& spectator : spectators) {
 		assert(spectator->asPlayer() != nullptr);
-		std::static_pointer_cast<Player>(spectator)->sendRemoveContainerItem(getContainer(), index);
+		std::static_pointer_cast<Player>(spectator)->sendRemoveContainerItem(asContainer(), index);
 	}
 
 	// event methods
 	for (const auto& spectator : spectators) {
 		assert(spectator->asPlayer() != nullptr);
-		std::static_pointer_cast<Player>(spectator)->onRemoveContainerItem(getContainer(), item);
+		std::static_pointer_cast<Player>(spectator)->onRemoveContainerItem(asContainer(), item);
 	}
 }
 
@@ -272,7 +272,7 @@ ReturnValue Container::queryAdd(int32_t index, const std::shared_ptr<const Thing
 	const auto& topParent = getTopParent();
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = topParent->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->asPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}
@@ -361,7 +361,7 @@ ReturnValue Container::queryRemove(const std::shared_ptr<const Thing>& thing, ui
 	if (actor && getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		const auto& topParent = getTopParent();
 		if (const auto& tile = topParent->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!topParent->asCreature() && !houseTile->getHouse()->isInvited(actor->asPlayer())) {
 					return RETURNVALUE_PLAYERISNOTINVITED;
 				}
@@ -412,7 +412,7 @@ std::shared_ptr<Thing> Container::queryDestination(int32_t& index, const std::sh
 
 	if (index != INDEX_WHEREEVER) {
 		if (const auto& itemFromIndex = getItemByIndex(index)) {
-			if (const auto& receiver = itemFromIndex->getReceiver()) {
+			if (const auto& receiver = itemFromIndex->asReceiver()) {
 				index = INDEX_WHEREEVER;
 				destItem = nullptr;
 				return receiver;
@@ -453,7 +453,7 @@ void Container::addThing(int32_t index, const std::shared_ptr<Thing>& thing)
 		return /*RETURNVALUE_NOTPOSSIBLE*/;
 	}
 
-	item->setParent(getContainer());
+	item->setParent(asContainer());
 	itemList.push_front(item);
 	updateItemWeight(item->getWeight());
 	ammoCount += item->getItemCount();
@@ -521,7 +521,7 @@ void Container::replaceThing(uint32_t index, const std::shared_ptr<Thing>& thing
 	ammoCount -= replacedItem->getItemCount();
 
 	itemList[index] = item;
-	item->setParent(getContainer());
+	item->setParent(asContainer());
 	updateItemWeight(-static_cast<int32_t>(replacedItem->getWeight()) + item->getWeight());
 
 	ammoCount += item->getItemCount();
@@ -680,7 +680,7 @@ void Container::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 		return;
 	}
 
-	item->setParent(getContainer());
+	item->setParent(asContainer());
 	itemList.push_front(item);
 	updateItemWeight(item->getWeight());
 	ammoCount += item->getItemCount();
@@ -699,7 +699,7 @@ ContainerIterator Container::iterator() const
 {
 	ContainerIterator cit;
 	if (!itemList.empty()) {
-		cit.over.push_back(getContainer());
+		cit.over.push_back(asContainer());
 		cit.cur = itemList.begin();
 	}
 	return cit;
@@ -708,7 +708,7 @@ ContainerIterator Container::iterator() const
 void ContainerIterator::advance()
 {
 	if (const auto currentItem = cur->get()) {
-		if (const auto& c = currentItem->getContainer()) {
+		if (const auto& c = currentItem->asContainer()) {
 			if (!c->empty()) {
 				over.push_back(c);
 			}
