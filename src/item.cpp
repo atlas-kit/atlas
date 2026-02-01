@@ -222,16 +222,17 @@ void Item::setID(uint16_t newid)
 	id = newid;
 
 	const ItemType& it = Item::items[newid];
-	auto newDuration = std::chrono::seconds{normal_random(it.decayTimeMin.count(), it.decayTimeMax.count())};
+	auto newDuration = std::chrono::milliseconds{normal_random(it.decayTimeMin.count(), it.decayTimeMax.count())};
 
-	if (newDuration == std::chrono::seconds::zero() && !it.stopTime && it.decayTo < 0) {
+	if (newDuration == std::chrono::milliseconds::zero() && !it.stopTime && it.decayTo < 0) {
 		removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
 		removeAttribute(ITEM_ATTRIBUTE_DURATION);
 	}
 
 	removeAttribute(ITEM_ATTRIBUTE_CORPSEOWNER);
 
-	if (newDuration > std::chrono::seconds::zero() && (!prevIt.stopTime || !hasAttribute(ITEM_ATTRIBUTE_DURATION))) {
+	if (newDuration > std::chrono::milliseconds::zero() &&
+	    (!prevIt.stopTime || !hasAttribute(ITEM_ATTRIBUTE_DURATION))) {
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
 	}
@@ -628,7 +629,7 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 
 	if (hasAttribute(ITEM_ATTRIBUTE_DURATION)) {
 		propWriteStream.write<uint8_t>(ATTR_DURATION);
-		propWriteStream.write<uint32_t>(getIntAttr(ITEM_ATTRIBUTE_DURATION));
+		propWriteStream.write<uint32_t>(duration_cast<std::chrono::seconds>(getDuration()).count());
 	}
 
 	ItemDecayState_t decayState = getDecaying();
@@ -888,10 +889,10 @@ void Item::setDefaultDuration()
 {
 	auto duration = getDefaultDurationMin();
 	if (auto durationMax = getDefaultDurationMax(); durationMax != duration) {
-		duration = std::chrono::seconds{normal_random(duration.count(), durationMax.count())};
+		duration = std::chrono::milliseconds{normal_random(duration.count(), durationMax.count())};
 	}
 
-	if (duration != std::chrono::seconds::zero()) {
+	if (duration != std::chrono::milliseconds::zero()) {
 		setDuration(duration);
 	}
 }
@@ -902,8 +903,8 @@ bool Item::canDecay() const
 		return false;
 	}
 
-	if (getDecayTo() < 0 ||
-	    (getDecayTimeMin() == std::chrono::seconds::zero() && getDecayTimeMax() == std::chrono::seconds::zero())) {
+	if (getDecayTo() < 0 || (getDecayTimeMin() == std::chrono::milliseconds::zero() &&
+	                         getDecayTimeMax() == std::chrono::milliseconds::zero())) {
 		return false;
 	}
 
@@ -1093,7 +1094,7 @@ bool Item::hasMarketAttributes() const
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			auto duration = std::chrono::seconds{attr.value.integer};
+			auto duration = std::chrono::milliseconds{attr.value.integer};
 			if (duration <= getDefaultDurationMin()) {
 				return false;
 			}

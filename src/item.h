@@ -134,9 +134,12 @@ public:
 	void setCorpseOwner(uint32_t corpseOwner) { setIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER, corpseOwner); }
 	uint32_t getCorpseOwner() const { return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER); }
 
-	void setDuration(int32_t time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time); }
-	void decreaseDuration(int32_t time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time); }
-	uint32_t getDuration() const { return getIntAttr(ITEM_ATTRIBUTE_DURATION); }
+	void setDuration(std::chrono::milliseconds time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time.count()); }
+	void decreaseDuration(std::chrono::milliseconds time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time.count()); }
+	std::chrono::milliseconds getDuration() const
+	{
+		return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
 	ItemDecayState_t getDecaying() const
@@ -640,14 +643,14 @@ public:
 		return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
 	}
 
-	void setDuration(std::chrono::seconds time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time.count()); }
-	void decreaseDuration(std::chrono::seconds time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time.count()); }
-	std::chrono::seconds getDuration() const
+	void setDuration(std::chrono::milliseconds time) { attributes->setDuration(time); }
+	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
+	std::chrono::milliseconds getDuration() const
 	{
 		if (!attributes) {
-			return std::chrono::seconds::zero();
+			return std::chrono::milliseconds::zero();
 		}
-		return std::chrono::seconds(getIntAttr(ITEM_ATTRIBUTE_DURATION));
+		return std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
 	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
@@ -659,17 +662,17 @@ public:
 		return static_cast<ItemDecayState_t>(getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
 	}
 
-	std::chrono::seconds getDecayTimeMin() const
+	std::chrono::milliseconds getDecayTimeMin() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_DURATION_MIN)) {
-			return std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MIN)};
+			return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MIN)};
 		}
 		return items[id].decayTimeMin;
 	}
-	std::chrono::seconds getDecayTimeMax() const
+	std::chrono::milliseconds getDecayTimeMax() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_DURATION_MAX)) {
-			return std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MAX)};
+			return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MAX)};
 		}
 		return items[id].decayTimeMax;
 	}
@@ -847,8 +850,8 @@ public:
 	void setUniqueId(uint16_t n);
 
 	void setDefaultDuration();
-	std::chrono::seconds getDefaultDurationMin() const { return items[id].decayTimeMin; }
-	std::chrono::seconds getDefaultDurationMax() const { return items[id].decayTimeMax; }
+	auto getDefaultDurationMin() const { return items[id].decayTimeMin; }
+	auto getDefaultDurationMax() const { return items[id].decayTimeMax; }
 	bool canDecay() const;
 
 	virtual bool canRemove() const { return true; }

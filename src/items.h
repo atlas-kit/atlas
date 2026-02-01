@@ -333,8 +333,8 @@ public:
 	uint32_t attackSpeed = 0;
 	uint32_t weight = 0;
 	uint32_t levelDoor = 0;
-	std::chrono::seconds decayTimeMin = std::chrono::seconds::zero();
-	std::chrono::seconds decayTimeMax = std::chrono::seconds::zero();
+	std::chrono::milliseconds decayTimeMin = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds decayTimeMax = std::chrono::milliseconds::zero();
 	uint32_t wieldInfo = 0;
 	uint32_t minReqLevel = 0;
 	uint32_t minReqMagicLevel = 0;
