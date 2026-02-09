@@ -533,7 +533,7 @@ void Player::setVarStats(stats_t stat, int32_t modifier)
 	switch (stat) {
 		case STAT_MAXHITPOINTS: {
 			if (getHealth() > getMaxHealth()) {
-				Creature::changeHealth(getMaxHealth() - getHealth());
+				changeHealth(getMaxHealth() - getHealth());
 			} else {
 				g_game.addCreatureHealth(asPlayer());
 			}
@@ -1572,12 +1572,6 @@ void Player::removeMessageBuffer()
 			sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are muted for {:d} seconds.", muteTime));
 		}
 	}
-}
-
-void Player::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage)
-{
-	Creature::drainHealth(attacker, damage);
-	sendStats();
 }
 
 void Player::drainMana(const std::shared_ptr<Creature>& attacker, int32_t manaLoss)
@@ -3574,55 +3568,6 @@ void Player::onIdleStatus()
 	}
 }
 
-void Player::onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points)
-{
-	Creature::onAttackedCreatureDrainHealth(target, points);
-
-	if (!target) {
-		return;
-	}
-
-	if (Combat::isPlayerCombat(target)) {
-		return;
-	}
-
-	const auto& targetMonster = target->asMonster();
-	if (!targetMonster || !targetMonster->isHostile()) {
-		return;
-	}
-
-	if (const auto& party = getParty()) {
-		// We have fulfilled a requirement for shared experience
-		party->updatePlayerTicks(asPlayer(), points);
-	}
-}
-
-void Player::onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target, int32_t points)
-{
-	if (!target) {
-		return;
-	}
-
-	const auto& party = getParty();
-	if (!party) {
-		return;
-	}
-
-	std::shared_ptr<Player> tmpPlayer = nullptr;
-
-	if (target->asPlayer()) {
-		tmpPlayer = target->asPlayer();
-	} else if (const auto& targetMaster = target->getMaster()) {
-		if (const auto& targetMasterPlayer = targetMaster->asPlayer()) {
-			tmpPlayer = targetMasterPlayer;
-		}
-	}
-
-	if (isPartner(tmpPlayer)) {
-		party->updatePlayerTicks(asPlayer(), points);
-	}
-}
-
 bool Player::onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit /* = true*/)
 {
 	bool unjustified = false;
@@ -3725,12 +3670,6 @@ bool Player::lastHitIsPlayer(const std::shared_ptr<Creature>& lastHitCreature)
 
 	const auto& lastHitMaster = lastHitCreature->getMaster();
 	return lastHitMaster && lastHitMaster->asPlayer();
-}
-
-void Player::changeHealth(int32_t healthChange, bool sendHealthChange /* = true*/)
-{
-	Creature::changeHealth(healthChange, sendHealthChange);
-	sendStats();
 }
 
 void Player::changeMana(int32_t manaChange)

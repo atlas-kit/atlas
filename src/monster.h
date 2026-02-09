@@ -87,9 +87,6 @@ public:
 	                    bool teleport) override;
 	void onCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClasses type, const std::string& text) override;
 
-	void drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage) override;
-	void changeHealth(int32_t healthChange, bool sendHealthChange = true) override;
-
 	bool isWalkingToSpawn() const { return walkingToSpawn; }
 	bool walkToSpawn();
 	void onWalkComplete() override;
@@ -121,6 +118,8 @@ public:
 
 	bool getDistanceStep(const Position& targetPos, Direction& direction, bool flee = false);
 	bool isTargetNearby() const { return stepDuration >= 1; }
+
+	void setIgnoringFieldDamage(bool value) { ignoreFieldDamage = value; }
 	bool isIgnoringFieldDamage() const { return ignoreFieldDamage; }
 
 	BlockType_t blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
@@ -146,6 +145,8 @@ public:
 
 	void setIdle(bool idle);
 	bool getIdleStatus() const { return isIdle; }
+
+	bool isWalkingRandomly() const { return randomStepping; }
 
 	bool isInSpawnRange(const Position& pos) const;
 

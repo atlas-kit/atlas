@@ -140,7 +140,7 @@ void Creature::onIdleStatus()
 {
 	if (!isDead()) {
 		damageMap.clear();
-		lastHitCreatureId = 0;
+		setLastHitCreature(nullptr);
 	}
 }
 
@@ -405,7 +405,7 @@ void Creature::onDeath()
 {
 	bool lastHitUnjustified = false;
 	bool mostDamageUnjustified = false;
-	const auto& lastHitCreature = g_game.getCreatureByID(lastHitCreatureId);
+	const auto lastHitCreature = getLastHitCreature();
 
 	std::shared_ptr<Creature> lastHitCreatureMaster = nullptr;
 	if (lastHitCreature) {
@@ -549,41 +549,26 @@ std::shared_ptr<Item> Creature::getCorpse(const std::shared_ptr<Creature>&, cons
 	return Item::CreateItem(getLookCorpse());
 }
 
-void Creature::changeHealth(int32_t healthChange, bool sendHealthChange /* = true*/)
+void Creature::changeHealth(int32_t amount)
 {
-	int32_t oldHealth = health;
+	if (amount == 0) {
+		return;
+	}
 
-	if (healthChange > 0) {
-		health += std::min<int32_t>(healthChange, getMaxHealth() - health);
+	auto oldHealth = health;
+
+	if (amount > 0) {
+		health += std::min<int32_t>(amount, getMaxHealth() - health);
 	} else {
-		health = std::max<int32_t>(0, health + healthChange);
+		health = std::max<int32_t>(0, health + amount);
 	}
 
-	if (sendHealthChange && oldHealth != health) {
-		g_game.addCreatureHealth(asCreature());
-	}
+	if (oldHealth != health) {
+		tfs::events::dispatch<CreatureHealthChanged>(asCreature());
 
-	if (isDead()) {
-		g_dispatcher.addTask([id = getID()]() { g_game.executeDeath(id); });
-	}
-}
-
-void Creature::gainHealth(const std::shared_ptr<Creature>& healer, int32_t healthGain)
-{
-	changeHealth(healthGain);
-	if (healer) {
-		healer->onTargetCreatureGainHealth(asCreature(), healthGain);
-	}
-}
-
-void Creature::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage)
-{
-	changeHealth(-damage, false);
-
-	if (attacker) {
-		attacker->onAttackedCreatureDrainHealth(asCreature(), damage);
-	} else {
-		lastHitCreatureId = 0;
+		if (isDead()) {
+			g_dispatcher.addTask([id = getID()]() { g_game.executeDeath(id); });
+		}
 	}
 }
 
@@ -835,7 +820,7 @@ void Creature::addDamagePoints(const std::shared_ptr<Creature>& attacker, int32_
 	cb.ticks = OTSYS_TIME();
 	cb.total += damagePoints;
 
-	lastHitCreatureId = attackerId;
+	setLastHitCreature(attacker);
 }
 
 void Creature::onAddCondition(ConditionType_t type)
@@ -900,11 +885,6 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 }
 
 void Creature::onCombatRemoveCondition(Condition* condition) { removeCondition(condition); }
-
-void Creature::onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points)
-{
-	target->addDamagePoints(asCreature(), points);
-}
 
 bool Creature::onKilledCreature(const std::shared_ptr<Creature>& target, bool)
 {

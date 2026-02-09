@@ -55,6 +55,115 @@ void Game::start(ServiceManager* manager)
 	g_scheduler.addEvent(
 	    createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL), [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
+
+	// Updates the health bar for all observing clients when a creature's health changes
+	tfs::events::subscribe<CreatureHealthChanged>(
+	    [](const CreatureHealthChanged& event) { g_game.addCreatureHealth(event.creature); });
+
+	// Wakes up a monster from idle state whenever its health is modified
+	tfs::events::subscribe<CreatureHealthChanged>([](const CreatureHealthChanged& event) {
+		if (const auto& monster = event.creature->asMonster()) {
+			monster->setIdle(false);
+		}
+	});
+
+	// Synchronizes the player's status panel with the client
+	tfs::events::subscribe<CreatureHealthChanged>([](const CreatureHealthChanged& event) {
+		if (const auto& player = event.creature->asPlayer()) {
+			player->sendStats();
+		}
+	});
+
+	// Updates the player's status bar on the client when they take damage
+	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
+		if (const auto& player = event.victim->asPlayer()) {
+			player->sendStats();
+		}
+	});
+
+	// Allows monsters to ignore field damage if they take damage while idle
+	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
+		if (const auto& monster = event.victim->asMonster()) {
+			if (event.amount > 0 && monster->isWalkingRandomly()) {
+				monster->setIgnoringFieldDamage(true);
+			}
+		}
+	});
+
+	// Removes invisibility condition from a monster if it takes any form of damage
+	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
+		if (const auto& monster = event.victim->asMonster()) {
+			if (monster->isInvisible()) {
+				monster->removeCondition(CONDITION_INVISIBLE);
+			}
+		}
+	});
+
+	// Updates party shared experience ticks when a player heals a party member or their summon
+	tfs::events::subscribe<CreatureHealed>([](const CreatureHealed& event) {
+		if (!event.healer) {
+			return;
+		}
+
+		const auto& player = event.healer->asPlayer();
+		if (!player) {
+			return;
+		}
+
+		const auto& party = player->getParty();
+		if (!party) {
+			return;
+		}
+
+		std::shared_ptr<Player> tmpPlayer = nullptr;
+
+		if (const auto& victimPlayer = event.victim->asPlayer()) {
+			tmpPlayer = victimPlayer;
+		} else if (const auto& victimMaster = event.victim->getMaster()) {
+			if (const auto& victimMasterPlayer = victimMaster->asPlayer()) {
+				tmpPlayer = victimMasterPlayer;
+			}
+		}
+
+		if (player->isPartner(tmpPlayer)) {
+			party->updatePlayerTicks(player, event.amount);
+		}
+	});
+
+	// Updates party shared experience ticks when a player deals damage to a hostile monster
+	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
+		const auto& monster = event.victim->asMonster();
+		if (!monster || !monster->isHostile()) {
+			return;
+		}
+
+		if (!event.inflictor) {
+			return;
+		}
+
+		const auto& player = event.inflictor->asPlayer();
+		if (!player) {
+			return;
+		}
+
+		if (Combat::isPlayerCombat(monster)) {
+			return;
+		}
+
+		if (const auto& party = player->getParty()) {
+			// We have fulfilled a requirement for shared experience
+			party->updatePlayerTicks(player, event.amount);
+		}
+	});
+
+	// Tracks damage contributions for loot and experience distribution, or resets last hit if no inflictor
+	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
+		if (event.inflictor) {
+			event.victim->addDamagePoints(event.inflictor, event.amount);
+		} else {
+			event.victim->setLastHitCreature(nullptr);
+		}
+	});
 }
 
 GameState_t Game::getGameState() const { return gameState; }
@@ -4072,7 +4181,9 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		}
 
 		int32_t realHealthChange = target->getHealth();
-		target->gainHealth(attacker, damage.primary.value);
+
+		tfs::events::dispatch<CreatureHealed>(target, attacker, damage.primary.value);
+
 		realHealthChange = target->getHealth() - realHealthChange;
 
 		if (attackerPlayer && attackerPlayer != targetPlayer) {
@@ -4407,7 +4518,10 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 			}
 		}
 
-		target->drainHealth(attacker, realDamage);
+		target->changeHealth(-realDamage);
+
+		tfs::events::dispatch<CreatureHealthDamaged>(target, attacker, realDamage);
+
 		addCreatureHealth(spectators, target);
 	}
 

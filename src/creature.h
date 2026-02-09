@@ -281,10 +281,7 @@ public:
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true; }
 
-	virtual void changeHealth(int32_t healthChange, bool sendHealthChange = true);
-
-	void gainHealth(const std::shared_ptr<Creature>& healer, int32_t healthGain);
-	virtual void drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage);
+	void changeHealth(int32_t amount);
 
 	virtual bool challengeCreature(const std::shared_ptr<Creature>&, bool) { return false; }
 
@@ -300,8 +297,6 @@ public:
 	void onTickCondition(ConditionType_t type, bool& bRemove);
 	virtual void onCombatRemoveCondition(Condition* condition);
 	virtual void onAttackedCreature(const std::shared_ptr<Creature>&, bool = true) {}
-	virtual void onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points);
-	virtual void onTargetCreatureGainHealth(const std::shared_ptr<Creature>&, int32_t) {}
 	virtual bool onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit = true);
 	virtual void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target);
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
@@ -367,6 +362,9 @@ public:
 	const Position& getLastPosition() const { return lastPosition; }
 	void setLastPosition(Position newLastPos) { lastPosition = newLastPos; }
 
+	auto getLastHitCreature() const { return lastHitCreature.lock(); }
+	void setLastHitCreature(const std::shared_ptr<Creature>& creature) { lastHitCreature = creature; }
+
 	static bool canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY);
 
 	double getDamageRatio(const std::shared_ptr<Creature>& attacker) const;
@@ -398,7 +396,6 @@ protected:
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
 	uint32_t walkUpdateTicks = 0;
-	uint32_t lastHitCreatureId = 0;
 	uint32_t blockCount = 0;
 	uint32_t blockTicks = 0;
 	uint32_t lastStepCost = 1;
@@ -444,6 +441,8 @@ protected:
 	friend class Map;
 
 private:
+	std::weak_ptr<Creature> lastHitCreature;
+
 	std::weak_ptr<Tile> tile;
 	std::weak_ptr<Creature> attackedCreature;
 	std::weak_ptr<Creature> master;

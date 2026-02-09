@@ -483,7 +483,6 @@ public:
 	bool isAttackable() const override;
 	static bool lastHitIsPlayer(const std::shared_ptr<Creature>& lastHitCreature);
 
-	void changeHealth(int32_t healthChange, bool sendHealthChange = true) override;
 	void changeMana(int32_t manaChange);
 	void changeSoul(int32_t soulChange);
 
@@ -515,7 +514,6 @@ public:
 	int32_t getWeaponSkill(const std::shared_ptr<const Item>& item) const;
 	std::pair<std::shared_ptr<const Item>, std::shared_ptr<const Item>> getShieldAndWeapon() const;
 
-	void drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage) override;
 	void drainMana(const std::shared_ptr<Creature>& attacker, int32_t manaLoss);
 	void addManaSpent(uint64_t amount);
 	void removeManaSpent(uint64_t amount, bool notify = false);
@@ -537,8 +535,6 @@ public:
 	void onEndCondition(ConditionType_t type) override;
 	void onCombatRemoveCondition(Condition* condition) override;
 	void onAttackedCreature(const std::shared_ptr<Creature>& target, bool addFightTicks = true) override;
-	void onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points) override;
-	void onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target, int32_t points) override;
 	bool onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit = true) override;
 	void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target) override;
 	void onGainSharedExperience(uint64_t gainExp, const std::shared_ptr<Creature>& source);

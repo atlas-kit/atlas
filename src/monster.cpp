@@ -1927,26 +1927,6 @@ void Monster::dropLoot(const std::shared_ptr<Container>& corpse, const std::shar
 
 void Monster::setNormalCreatureLight() { internalLight = mType->info.light; }
 
-void Monster::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage)
-{
-	Creature::drainHealth(attacker, damage);
-
-	if (damage > 0 && randomStepping) {
-		ignoreFieldDamage = true;
-	}
-
-	if (isInvisible()) {
-		removeCondition(CONDITION_INVISIBLE);
-	}
-}
-
-void Monster::changeHealth(int32_t healthChange, bool sendHealthChange /* = true*/)
-{
-	// In case a player with ignore flag set attacks the monster
-	setIdle(false);
-	Creature::changeHealth(healthChange, sendHealthChange);
-}
-
 bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool force /* = false*/)
 {
 	if (isSummon()) {

@@ -9,10 +9,51 @@
 #include "lua/script.h"
 #include "networkmessage.h"
 
+#include <stdexcept>
+#include <typeindex>
+
 class ItemType;
 class Party;
 class Spell;
 class Tile;
+
+struct IEvent
+{
+	constexpr IEvent() = default;
+	virtual ~IEvent() = default;
+
+	IEvent(const IEvent&) = delete;
+	IEvent& operator=(const IEvent&) = delete;
+};
+
+struct CreatureHealthChanged : public IEvent
+{
+	CreatureHealthChanged(std::shared_ptr<Creature> creature) : creature{std::move(creature)} {}
+
+	const std::shared_ptr<Creature> creature;
+};
+
+struct CreatureHealed : public IEvent
+{
+	CreatureHealed(std::shared_ptr<Creature> victim, std::shared_ptr<Creature> healer, int32_t amount) :
+	    victim{std::move(victim)}, healer{std::move(healer)}, amount{amount}
+	{}
+
+	const std::shared_ptr<Creature> victim;
+	const std::shared_ptr<Creature> healer;
+	const int32_t amount;
+};
+
+struct CreatureHealthDamaged : public IEvent
+{
+	CreatureHealthDamaged(std::shared_ptr<Creature> victim, std::shared_ptr<Creature> inflictor, int32_t amount) :
+	    victim{std::move(victim)}, inflictor{std::move(inflictor)}, amount{amount}
+	{}
+
+	const std::shared_ptr<Creature> victim;
+	const std::shared_ptr<Creature> inflictor;
+	const int32_t amount;
+};
 
 enum class EventInfoId
 {
@@ -23,7 +64,45 @@ enum class EventInfoId
 	MONSTER_ONSPAWN
 };
 
+namespace {
+
+using Callback = std::move_only_function<void(const IEvent&)>;
+std::unordered_map<std::type_index, std::vector<Callback>> callbacks;
+
+} // namespace
+
 namespace tfs::events {
+
+template <typename T>
+void subscribe(std::move_only_function<void(const T&)> callback)
+{
+	static_assert(std::is_base_of_v<IEvent, T>, "T must derive from IEvent");
+
+	if (!callback) {
+		throw std::invalid_argument("IEvent callback is empty");
+	}
+
+	const auto index = std::type_index(typeid(T));
+	callbacks[index].push_back(
+	    [callback = std::move(callback)](const IEvent& event) mutable { callback(static_cast<const T&>(event)); });
+}
+
+template <typename T, typename... Args>
+void dispatch(Args&&... args)
+{
+	static_assert(std::is_base_of_v<IEvent, T>, "T must derive from IEvent");
+
+	T event(std::forward<Args>(args)...);
+	const auto index = std::type_index(typeid(T));
+	const auto it = callbacks.find(index);
+	if (it == callbacks.end()) {
+		return;
+	}
+
+	for (auto& system : it->second) {
+		system(event);
+	}
+}
 
 void load();
 void reload();
