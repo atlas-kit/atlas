@@ -56,6 +56,19 @@ void Game::start(ServiceManager* manager)
 	    createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL), [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 
+	// Synchronizes the player's status panel with the client
+	tfs::events::subscribe<PlayerManaChanged>([](const PlayerManaChanged& event) { event.player->sendStats(); });
+
+	// Attributes damage points to the inflictor for combat tracking and loot participation
+	tfs::events::subscribe<PlayerManaDrained>([](const PlayerManaDrained& event) {
+		if (event.inflictor) {
+			event.victim->addDamagePoints(event.inflictor, event.amount);
+		}
+	});
+
+	// Ensures the player stays in a combat state when mana is affected
+	tfs::events::subscribe<PlayerManaDrained>([](const PlayerManaDrained& event) { event.victim->addInFightTicks(); });
+
 	// Updates the health bar for all observing clients when a creature's health changes
 	tfs::events::subscribe<CreatureHealthChanged>(
 	    [](const CreatureHealthChanged& event) { g_game.addCreatureHealth(event.creature); });
@@ -70,13 +83,6 @@ void Game::start(ServiceManager* manager)
 	// Synchronizes the player's status panel with the client
 	tfs::events::subscribe<CreatureHealthChanged>([](const CreatureHealthChanged& event) {
 		if (const auto& player = event.creature->asPlayer()) {
-			player->sendStats();
-		}
-	});
-
-	// Updates the player's status bar on the client when they take damage
-	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
-		if (const auto& player = event.victim->asPlayer()) {
 			player->sendStats();
 		}
 	});
@@ -4309,7 +4315,10 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 			}
 
 			if (manaDamage != 0) {
-				targetPlayer->drainMana(attacker, manaDamage);
+				targetPlayer->changeMana(-manaDamage);
+
+				tfs::events::dispatch<PlayerManaDrained>(targetPlayer, attacker, manaDamage);
+
 				if (targetPlayer->getMana() == 0) {
 					targetPlayer->removeCondition(CONDITION_MANASHIELD_BREAKABLE);
 				}
@@ -4595,7 +4604,9 @@ bool Game::combatChangeMana(const std::shared_ptr<Creature>& attacker, const std
 			return combatChangeMana(attacker, target, damage);
 		}
 
-		targetPlayer->drainMana(attacker, manaLoss);
+		targetPlayer->changeMana(-manaLoss);
+
+		tfs::events::dispatch<PlayerManaDrained>(targetPlayer, attacker, manaLoss);
 
 		std::string spectatorMessage;
 

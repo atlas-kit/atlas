@@ -1574,18 +1574,6 @@ void Player::removeMessageBuffer()
 	}
 }
 
-void Player::drainMana(const std::shared_ptr<Creature>& attacker, int32_t manaLoss)
-{
-	addInFightTicks();
-	changeMana(-manaLoss);
-
-	if (attacker) {
-		addDamagePoints(attacker, manaLoss);
-	}
-
-	sendStats();
-}
-
 void Player::addManaSpent(uint64_t amount)
 {
 	if (hasFlag(PlayerFlag_NotGainMana)) {
@@ -3672,17 +3660,17 @@ bool Player::lastHitIsPlayer(const std::shared_ptr<Creature>& lastHitCreature)
 	return lastHitMaster && lastHitMaster->asPlayer();
 }
 
-void Player::changeMana(int32_t manaChange)
+void Player::changeMana(int32_t amount)
 {
 	if (!hasFlag(PlayerFlag_HasInfiniteMana)) {
-		if (manaChange > 0) {
-			mana += std::min<int32_t>(manaChange, getMaxMana() - mana);
+		if (amount > 0) {
+			mana += std::min<int32_t>(amount, getMaxMana() - mana);
 		} else {
-			mana = std::max<int32_t>(0, mana + manaChange);
+			mana = std::max<int32_t>(0, mana + amount);
 		}
 	}
 
-	sendStats();
+	tfs::events::dispatch<PlayerManaChanged>(asPlayer());
 }
 
 void Player::changeSoul(int32_t soulChange)

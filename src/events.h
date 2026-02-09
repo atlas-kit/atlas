@@ -55,6 +55,24 @@ struct CreatureHealthDamaged : public IEvent
 	const int32_t amount;
 };
 
+struct PlayerManaChanged : public IEvent
+{
+	PlayerManaChanged(std::shared_ptr<Player> player) : player{std::move(player)} {}
+
+	const std::shared_ptr<Player> player;
+};
+
+struct PlayerManaDrained : public IEvent
+{
+	PlayerManaDrained(std::shared_ptr<Player> victim, std::shared_ptr<Creature> inflictor, int32_t amount) :
+	    victim{std::move(victim)}, inflictor{std::move(inflictor)}, amount{amount}
+	{}
+
+	const std::shared_ptr<Player> victim;
+	const std::shared_ptr<Creature> inflictor;
+	const int32_t amount;
+};
+
 enum class EventInfoId
 {
 	// Creature

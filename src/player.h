@@ -483,7 +483,7 @@ public:
 	bool isAttackable() const override;
 	static bool lastHitIsPlayer(const std::shared_ptr<Creature>& lastHitCreature);
 
-	void changeMana(int32_t manaChange);
+	void changeMana(int32_t amount);
 	void changeSoul(int32_t soulChange);
 
 	bool isPzLocked() const { return pzLocked; }
@@ -514,7 +514,6 @@ public:
 	int32_t getWeaponSkill(const std::shared_ptr<const Item>& item) const;
 	std::pair<std::shared_ptr<const Item>, std::shared_ptr<const Item>> getShieldAndWeapon() const;
 
-	void drainMana(const std::shared_ptr<Creature>& attacker, int32_t manaLoss);
 	void addManaSpent(uint64_t amount);
 	void removeManaSpent(uint64_t amount, bool notify = false);
 	void addSkillAdvance(skills_t skill, uint64_t count);
