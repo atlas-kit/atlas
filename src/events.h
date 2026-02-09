@@ -4,8 +4,6 @@
 #ifndef FS_EVENTS_H
 #define FS_EVENTS_H
 
-#include "otpch.h"
-
 #include "const.h"
 #include "creature.h"
 #include "lua/script.h"

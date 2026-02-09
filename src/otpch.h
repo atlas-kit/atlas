@@ -23,7 +23,6 @@
 #include <condition_variable>
 #include <cstdint>
 #include <cstdlib>
-#include <typeindex>
 #include <deque>
 #include <filesystem>
 #include <format>
@@ -48,6 +47,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <typeindex>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
