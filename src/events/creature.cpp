@@ -5,7 +5,6 @@
 
 #include "creature.h"
 
-#include "../item.h"
 #include "../lua/env.h"
 #include "../lua/error.h"
 
