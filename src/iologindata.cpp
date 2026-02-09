@@ -543,7 +543,7 @@ bool IOLoginData::saveItems(const std::shared_ptr<const Player>& player, const I
 	}
 
 	for (size_t i = 0; i < containers.size(); ++i) {
-		const auto& [container, parentId] = containers[i];
+		const auto [container, parentId] = containers[i];
 
 		for (const auto& item : container->getItemList()) {
 			++runningId;
