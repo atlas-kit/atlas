@@ -670,9 +670,6 @@
     <ClInclude Include="..\src\lua\modules.h">
       <Filter>Header Files\lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lua\modules\register.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\events\events.h">
       <Filter>Header Files\events</Filter>
     </ClInclude>
@@ -690,6 +687,9 @@
     </ClInclude>
     <ClInclude Include="..\src\events\player.h">
       <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\register.h">
+      <Filter>Header Files\lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
