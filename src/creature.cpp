@@ -473,6 +473,10 @@ void Creature::onDeath()
 
 	if (droppedCorpse) {
 		g_game.removeCreature(asCreature(), false);
+	} else {
+		while (!conditions.empty()) {
+			removeCondition(conditions.back(), true);
+		}
 	}
 }
 
@@ -524,7 +528,7 @@ bool Creature::dropCorpse(const std::shared_ptr<Creature>& lastHitCreature,
 		                               mostDamageUnjustified);
 
 		if (corpse) {
-			dropLoot(corpse->getContainer(), lastHitCreature);
+			dropLoot(corpse->asContainer(), lastHitCreature);
 		}
 	}
 

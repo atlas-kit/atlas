@@ -42,6 +42,17 @@ function Item:isItemType()
 	return false
 end
 
+function Item.getSpecialDescription(self)
+	return self:getAttribute(ITEM_ATTRIBUTE_DESCRIPTION)
+end
+
+function Item.setSpecialDescription(self, description)
+	if description ~= nil then
+		return self:setAttribute(ITEM_ATTRIBUTE_DESCRIPTION, description)
+	end
+	return self:removeAttribute(ITEM_ATTRIBUTE_DESCRIPTION)
+end
+
 do
 	local aux = {
 		["Defense"] = {key = ITEM_ATTRIBUTE_DEFENSE},
@@ -745,9 +756,21 @@ do
 			end
 
 			if desc and desc:len() > 0 then
-				if not (isBed and desc == "Nobody is sleeping there.") then
+				response[#response + 1] = string.format("\n%s", desc)
+			end
+		else
+			if lookDistance <= 4 then
+				local desc = not isVirtual and item:getSpecialDescription()
+
+				if not desc or desc == "" then
+					desc = itemType:getDescription()
+				end
+
+				if desc and desc:len() > 0 then
 					response[#response + 1] = string.format("\n%s", desc)
 				end
+			else
+				response[#response + 1] = "\nYou are too far away to read it."
 			end
 		end
 
