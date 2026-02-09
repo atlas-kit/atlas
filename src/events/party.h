@@ -4,6 +4,7 @@
 #pragma once
 
 class Party;
+class Player;
 
 namespace tfs::events::party {
 
