@@ -23,6 +23,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <cstdlib>
+#include <typeindex>
 #include <deque>
 #include <filesystem>
 #include <format>

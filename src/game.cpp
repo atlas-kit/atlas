@@ -4190,9 +4190,9 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 
 		target->changeHealth(damage.primary.value);
 
-		tfs::events::dispatch<CreatureHealed>(target, attacker, damage.primary.value);
-
 		realHealthChange = target->getHealth() - realHealthChange;
+
+		tfs::events::dispatch<CreatureHealed>(target, attacker, realHealthChange);
 
 		if (attackerPlayer && attackerPlayer != targetPlayer) {
 			attackerPlayer->sendCombatAnalyzer(damage.primary.type, damage.primary.value,
@@ -4532,8 +4532,6 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		target->changeHealth(-realDamage);
 
 		tfs::events::dispatch<CreatureHealthDamaged>(target, attacker, realDamage);
-
-		addCreatureHealth(spectators, target);
 	}
 
 	return true;
