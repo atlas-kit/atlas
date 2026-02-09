@@ -15,7 +15,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/databasetasks.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.cpp
-	${CMAKE_CURRENT_LIST_DIR}/events.cpp
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.cpp
 	${CMAKE_CURRENT_LIST_DIR}/game.cpp
 	${CMAKE_CURRENT_LIST_DIR}/groups.cpp
@@ -169,6 +168,7 @@ add_subdirectory(lua)
 target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
 add_subdirectory(events)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:events>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 
