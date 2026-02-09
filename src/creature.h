@@ -447,7 +447,7 @@ private:
 	std::weak_ptr<Creature> attackedCreature;
 	std::weak_ptr<Creature> master;
 	std::weak_ptr<Creature> followCreature;
-	std::weak_ptr<Creature> lastHitCreature;
+	std::weak_ptr<Creature> lastAttacker;
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> followers;
 
 	std::vector<std::weak_ptr<Creature>> summons;

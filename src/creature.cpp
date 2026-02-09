@@ -140,7 +140,7 @@ void Creature::onIdleStatus()
 {
 	if (!isDead()) {
 		damageMap.clear();
-		lastHitCreature.reset();
+		lastAttacker.reset();
 	}
 }
 
@@ -405,7 +405,7 @@ void Creature::onDeath()
 {
 	bool lastHitUnjustified = false;
 	bool mostDamageUnjustified = false;
-	auto lastHitCreature = this->lastHitCreature.lock();
+	auto lastHitCreature = lastAttacker.lock();
 
 	std::shared_ptr<Creature> lastHitCreatureMaster = nullptr;
 	if (lastHitCreature) {
@@ -583,7 +583,7 @@ void Creature::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t da
 	if (attacker) {
 		attacker->onAttackedCreatureDrainHealth(asCreature(), damage);
 	} else {
-		lastHitCreature.reset();
+		lastAttacker.reset();
 	}
 }
 
@@ -835,7 +835,7 @@ void Creature::addDamagePoints(const std::shared_ptr<Creature>& attacker, int32_
 	cb.ticks = OTSYS_TIME();
 	cb.total += damagePoints;
 
-	lastHitCreature = attacker;
+	lastAttacker = attacker;
 }
 
 void Creature::onAddCondition(ConditionType_t type)
