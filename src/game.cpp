@@ -87,7 +87,7 @@ void Game::start(ServiceManager* manager)
 		}
 	});
 
-	// Allows monsters to ignore field damage if they take damage while idle
+	// Allows monsters to ignore field damage if they are struck while in a random walk state
 	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
 		if (const auto& monster = event.victim->asMonster()) {
 			if (event.amount > 0 && monster->isWalkingRandomly()) {
