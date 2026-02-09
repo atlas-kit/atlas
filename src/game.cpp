@@ -4188,6 +4188,8 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 
 		int32_t realHealthChange = target->getHealth();
 
+		target->changeHealth(damage.primary.value);
+
 		tfs::events::dispatch<CreatureHealed>(target, attacker, damage.primary.value);
 
 		realHealthChange = target->getHealth() - realHealthChange;
