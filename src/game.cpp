@@ -87,9 +87,11 @@ void Game::start(ServiceManager* manager)
 		}
 	});
 
-	// Allows monsters to ignore field damage if they are struck while in a random walk state
+	// Allows monsters to ignore field damage if they are struck while in a random walk state (non-aggressive/wandering)
 	tfs::events::subscribe<CreatureHealthDamaged>([](const CreatureHealthDamaged& event) {
 		if (const auto& monster = event.victim->asMonster()) {
+			// When a wandering monster takes damage, we toggle ignoreFieldDamage to prevent it
+			// from being trapped in a damage-loop while not in active combat.
 			if (event.amount > 0 && monster->isWalkingRandomly()) {
 				monster->setIgnoringFieldDamage(true);
 			}
