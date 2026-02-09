@@ -23,6 +23,13 @@ struct IEvent
 	IEvent& operator=(const IEvent&) = delete;
 };
 
+struct CreatureAttackBlocked : public IEvent
+{
+	CreatureAttackBlocked(std::shared_ptr<Creature> creature) : creature{std::move(creature)} {}
+
+	const std::shared_ptr<Creature> creature;
+};
+
 struct CreatureHealthChanged : public IEvent
 {
 	CreatureHealthChanged(std::shared_ptr<Creature> creature) : creature{std::move(creature)} {}

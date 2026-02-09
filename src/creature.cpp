@@ -614,7 +614,7 @@ BlockType_t Creature::blockHit(const std::shared_ptr<Creature>& attacker, Combat
 		}
 
 		if (hasDefense && blockType != BLOCK_NONE) {
-			onBlockHit();
+			tfs::events::dispatch<CreatureAttackBlocked>(asCreature());
 		}
 	}
 

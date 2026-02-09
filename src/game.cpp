@@ -56,6 +56,26 @@ void Game::start(ServiceManager* manager)
 	    createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL), [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 
+	// Manages shield block charges and skill progression when an attack is successfully mitigated
+	tfs::events::subscribe<CreatureAttackBlocked>([](const CreatureAttackBlocked& event) {
+		const auto& player = event.creature->asPlayer();
+		if (!player) {
+			return;
+		}
+
+		const auto count = player->getShieldBlockCount();
+		if (count <= 0) {
+			return;
+		}
+
+		// Consume one block charge and advance shield skill if a shield is equipped
+		player->setShieldBlockCount(count - 1);
+
+		if (player->hasShield()) {
+			player->addSkillAdvance(SKILL_SHIELD, 1);
+		}
+	});
+
 	// Synchronizes the player's status panel with the client
 	tfs::events::subscribe<PlayerManaChanged>([](const PlayerManaChanged& event) { event.player->sendStats(); });
 

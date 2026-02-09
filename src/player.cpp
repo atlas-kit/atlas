@@ -1836,17 +1836,6 @@ uint16_t Player::getBasisPointLevel(uint64_t count, uint64_t nextLevelCount)
 	return result;
 }
 
-void Player::onBlockHit()
-{
-	if (shieldBlockCount > 0) {
-		--shieldBlockCount;
-
-		if (hasShield()) {
-			addSkillAdvance(SKILL_SHIELD, 1);
-		}
-	}
-}
-
 void Player::onAttackedCreatureBlockHit(BlockType_t blockType)
 {
 	lastAttackBlockType = blockType;

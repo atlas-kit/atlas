@@ -538,7 +538,6 @@ public:
 	void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target) override;
 	void onGainSharedExperience(uint64_t gainExp, const std::shared_ptr<Creature>& source);
 	void onAttackedCreatureBlockHit(BlockType_t blockType) override;
-	void onBlockHit() override;
 	void onChangeZone(ZoneType_t zone) override;
 	void onAttackedCreatureChangeZone(ZoneType_t zone) override;
 	void onIdleStatus() override;
@@ -1211,6 +1210,9 @@ public:
 	void addExperience(const std::shared_ptr<Creature>& source, uint64_t exp, bool sendText = false);
 	void removeExperience(uint64_t exp, bool sendText = false);
 	double getLossPercent() const;
+
+	auto getShieldBlockCount() const { return shieldBlockCount; }
+	void setShieldBlockCount(int32_t count) { shieldBlockCount = count; }
 
 private:
 	std::forward_list<Condition*> getMuteConditions() const;

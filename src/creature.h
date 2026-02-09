@@ -300,7 +300,6 @@ public:
 	virtual bool onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit = true);
 	virtual void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target);
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
-	virtual void onBlockHit() {}
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 	virtual void onIdleStatus();
