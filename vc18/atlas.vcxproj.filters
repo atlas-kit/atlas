@@ -28,6 +28,12 @@
     <Filter Include="Source Files\lua\modules">
       <UniqueIdentifier>{204d093a-c85d-4688-b824-d8307abd324b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{10098169-ea92-400d-9c11-c929ebde3f8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\events">
+      <UniqueIdentifier>{4b72bf06-a423-457b-8098-95fa37d32492}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="atlas.rc">
@@ -135,9 +141,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\depotlocker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\fileloader.cpp">
@@ -377,6 +380,24 @@
     <ClCompile Include="..\src\lua\modules\stdlib.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\events\events.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events\creature.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events\game.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events\monster.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events\party.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events\player.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\http\http.h">
@@ -467,9 +488,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\enums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\fileloader.h">
@@ -653,7 +671,25 @@
       <Filter>Header Files\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\modules\register.h">
-      <Filter>Header Files\lua\modules</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\events.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\creature.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\game.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\monster.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\party.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\events\player.h">
+      <Filter>Header Files\events</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

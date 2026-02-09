@@ -140,7 +140,12 @@
     <ClCompile Include="..\src\databasetasks.cpp" />
     <ClCompile Include="..\src\depotchest.cpp" />
     <ClCompile Include="..\src\depotlocker.cpp" />
-    <ClCompile Include="..\src\events.cpp" />
+    <ClCompile Include="..\src\events\creature.cpp" />
+    <ClCompile Include="..\src\events\events.cpp" />
+    <ClCompile Include="..\src\events\game.cpp" />
+    <ClCompile Include="..\src\events\monster.cpp" />
+    <ClCompile Include="..\src\events\party.cpp" />
+    <ClCompile Include="..\src\events\player.cpp" />
     <ClCompile Include="..\src\fileloader.cpp" />
     <ClCompile Include="..\src\game.cpp" />
     <ClCompile Include="..\src\groups.cpp" />
@@ -263,7 +268,12 @@
     <ClInclude Include="..\src\depotchest.h" />
     <ClInclude Include="..\src\depotlocker.h" />
     <ClInclude Include="..\src\enums.h" />
-    <ClInclude Include="..\src\events.h" />
+    <ClInclude Include="..\src\events\creature.h" />
+    <ClInclude Include="..\src\events\events.h" />
+    <ClInclude Include="..\src\events\game.h" />
+    <ClInclude Include="..\src\events\monster.h" />
+    <ClInclude Include="..\src\events\party.h" />
+    <ClInclude Include="..\src\events\player.h" />
     <ClInclude Include="..\src\fileloader.h" />
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\groups.h" />

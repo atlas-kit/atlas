@@ -7,7 +7,7 @@
 
 #include "combat.h"
 #include "configmanager.h"
-#include "events.h"
+#include "events/player.h"
 #include "game.h"
 #include "lua/env.h"
 #include "lua/meta.h"
