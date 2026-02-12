@@ -4,6 +4,7 @@
 ---@field __index fun(self: table, key: any): any
 rawgetmetatable = {}
 
+---@alias FightMode_t table<string, integer>
 ---@alias Outfit_t table<string, integer>
 ---@alias MagicEffect_t table<string, integer>
 
@@ -452,9 +453,6 @@ Creature = {}
 ---@field getContainerIndex fun(self: Player, containerId: number): number
 ---@field getInstantSpells fun(self: Player): table
 ---@field canCast fun(self: Player, spellId: number): boolean
----@field hasChaseMode fun(self: Player): boolean
----@field hasSecureMode fun(self: Player): boolean
----@field getFightMode fun(self: Player): number
 ---@field getStoreInbox fun(self: Player): Container
 ---@field isNearDepotBox fun(self: Player): boolean
 ---@field getIdleTime fun(self: Player): number
@@ -466,6 +464,10 @@ Creature = {}
 ---@field setClientStaminaBonusDisplay fun(self: Player, display: number)
 ---@field getClientLowLevelBonusDisplay fun(self: Player): number
 ---@field setClientLowLevelBonusDisplay fun(self: Player, display: number)
+---@field getFightMode fun(self: Player): number
+---@field isSecureModeEnabled fun(self: Player): boolean
+---@field isChasingEnabled fun(self: Player): boolean
+---@field setFightingModes fun(self: Player, mode?: FightMode_t, secure?: boolean, chase?: boolean)
 Player = {}
 
 ---@class Monster : Creature
@@ -1045,6 +1047,7 @@ Weapon = {}
 ---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
 ---@field onPlayerTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
 ---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil
+---@field onPlayerFightingModesChanged fun(player:Player, mode:FightMode_t, chase:boolean, secure:boolean):nil
 ---@field onMonsterDropLoot fun(monster:Monster, corpse?:Container):nil
 ---@field onMonsterSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
 ---@operator call():Event
@@ -1811,6 +1814,15 @@ ORIGIN_REFLECT = 6
 
 PLAYERSEX_FEMALE = 0
 PLAYERSEX_MALE = 1
+
+FIGHTMODE_ATTACK = 1
+FIGHTMODE_BALANCED = 2
+FIGHTMODE_DEFENSE = 3
+
+PVP_MODE_DOVE = 0
+PVP_MODE_WHITE_HAND = 1
+PVP_MODE_YELLOW_HAND = 2
+PVP_MODE_RED_FIST = 3
 
 CONDITIONID_DEFAULT = -1
 CONDITIONID_COMBAT = 0

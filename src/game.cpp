@@ -3204,15 +3204,6 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
 }
 
-void Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, bool chaseMode, bool secureMode)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		player->setFightMode(fightMode);
-		player->setChaseMode(chaseMode);
-		player->setSecureMode(secureMode);
-	}
-}
-
 void Game::playerRequestAddVip(uint32_t playerId, const std::string& name)
 {
 	if (name.length() > PLAYER_NAME_LENGTH) {
