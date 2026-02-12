@@ -4630,5 +4630,6 @@ void Player::setFightingModes(FightMode_t mode, bool chase, bool secure)
 	fighting.chase = chase;
 	fighting.secure = secure;
 
-	tfs::events::player::onFightingModesChanged(asPlayer(), previousFighting.mode, previousFighting.chase, previousFighting.secure);
+	tfs::events::player::onFightingModesChanged(asPlayer(), previousFighting.mode, previousFighting.chase,
+	                                            previousFighting.secure);
 }
