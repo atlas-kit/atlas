@@ -4,6 +4,13 @@
 #ifndef FS_ENUMS_H
 #define FS_ENUMS_H
 
+enum FightMode_t : uint8_t
+{
+	FIGHTMODE_ATTACK = 1,
+	FIGHTMODE_BALANCED = 2,
+	FIGHTMODE_DEFENSE = 3,
+};
+
 enum RuleViolationType_t : uint8_t
 {
 	REPORT_TYPE_NAME = 0,

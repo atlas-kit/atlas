@@ -30,13 +30,6 @@ enum skillsid_t
 	SKILLVALUE_PERCENT = 2,
 };
 
-enum fightMode_t : uint8_t
-{
-	FIGHTMODE_ATTACK = 1,
-	FIGHTMODE_BALANCED = 2,
-	FIGHTMODE_DEFENSE = 3,
-};
-
 enum pvpMode_t : uint8_t
 {
 	PVP_MODE_DOVE = 0,
@@ -230,8 +223,6 @@ public:
 
 		return client->getVersion();
 	}
-
-	bool hasSecureMode() const { return secureMode; }
 
 	void setParty(const std::shared_ptr<Party>& party) { this->party = party; }
 	std::shared_ptr<Party> getParty() const { return party.lock(); }
@@ -466,13 +457,6 @@ public:
 	bool closeShopWindow(bool sendCloseShopWindow = true);
 	bool updateSaleShopList(const std::shared_ptr<const Item>& item);
 	bool hasShopItemForSale(uint32_t itemId, uint8_t subType) const;
-
-	bool getChaseMode() const { return chaseMode; }
-	void setChaseMode(bool mode);
-	fightMode_t getFightMode() const { return fightMode; }
-	void setFightMode(fightMode_t mode) { fightMode = mode; }
-	bool getSecureMode() const { return secureMode; }
-	void setSecureMode(bool mode) { secureMode = mode; }
 
 	// combat functions
 	void setAttackedCreature(const std::shared_ptr<Creature>& creature) override;
@@ -1137,12 +1121,6 @@ public:
 			client->sendEnterWorld();
 		}
 	}
-	void sendFightModes()
-	{
-		if (client) {
-			client->sendFightModes();
-		}
-	}
 	void sendNetworkMessage(const NetworkMessage& message)
 	{
 		if (client) {
@@ -1216,6 +1194,11 @@ public:
 	void addExperience(const std::shared_ptr<Creature>& source, uint64_t exp, bool sendText = false);
 	void removeExperience(uint64_t exp, bool sendText = false);
 	double getLossPercent() const;
+
+	auto getFightMode() const { return fighting.mode; }
+	auto isSecureModeEnabled() const { return fighting.secure; }
+	auto isChasingEnabled() const { return fighting.chase; }
+	void setFightingModes(FightMode_t mode, bool secure, bool chase);
 
 private:
 	std::forward_list<Condition*> getMuteConditions() const;
@@ -1360,11 +1343,8 @@ private:
 	OperatingSystem_t operatingSystem = CLIENTOS_NONE;
 	BlockType_t lastAttackBlockType = BLOCK_NONE;
 	tradestate_t tradeState = TRADE_NONE;
-	fightMode_t fightMode = FIGHTMODE_ATTACK;
 	AccountType_t accountType = ACCOUNT_TYPE_NORMAL;
 
-	bool chaseMode = false;
-	bool secureMode = false;
 	bool inMarket = false;
 	bool wasMounted_ = false;
 	bool ghostMode = false;
@@ -1402,6 +1382,13 @@ private:
 	uint32_t getConditionSuppressions() const override { return conditionSuppressions; }
 	uint16_t getLookCorpse() const override;
 	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const override;
+
+	struct Fighting
+	{
+		FightMode_t mode = FIGHTMODE_ATTACK;
+		bool secure;
+		bool chase;
+	} fighting;
 
 	friend class IOLoginData;
 	friend class ProtocolGame;

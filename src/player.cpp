@@ -343,7 +343,7 @@ int32_t Player::getDefense() const
 	}
 
 	if (defenseSkill == 0) {
-		switch (fightMode) {
+		switch (getFightMode()) {
 			case FIGHTMODE_ATTACK:
 			case FIGHTMODE_BALANCED:
 				return 1;
@@ -368,7 +368,7 @@ uint32_t Player::getAttackSpeed() const
 
 float Player::getAttackFactor() const
 {
-	switch (fightMode) {
+	switch (getFightMode()) {
 		case FIGHTMODE_ATTACK:
 			return 1.0f;
 		case FIGHTMODE_BALANCED:
@@ -382,7 +382,7 @@ float Player::getAttackFactor() const
 
 float Player::getDefenseFactor() const
 {
-	switch (fightMode) {
+	switch (getFightMode()) {
 		case FIGHTMODE_ATTACK:
 			return (OTSYS_TIME() - lastAttack) < getAttackSpeed() ? 0.5f : 1.0f;
 		case FIGHTMODE_BALANCED:
@@ -3274,7 +3274,7 @@ void Player::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 	Creature::setAttackedCreature(creature);
 
 	const auto& followCreature = getFollowCreature();
-	if (chaseMode) {
+	if (isChasingEnabled()) {
 		if (followCreature != creature) {
 			// chase opponent
 			setFollowCreature(creature);
@@ -3340,24 +3340,6 @@ void Player::onUnfollowCreature()
 	Creature::onUnfollowCreature();
 
 	stopWalk();
-}
-
-void Player::setChaseMode(bool mode)
-{
-	bool prevChaseMode = chaseMode;
-	chaseMode = mode;
-
-	if (const auto& attackedCreature = getAttackedCreature(); attackedCreature && prevChaseMode != chaseMode) {
-		if (chaseMode) {
-			if (!getFollowCreature()) {
-				// chase opponent
-				setFollowCreature(attackedCreature);
-			}
-		} else {
-			removeFollowCreature();
-			cancelNextWalk = true;
-		}
-	}
 }
 
 void Player::onWalkAborted()
@@ -4639,4 +4621,14 @@ void Player::updateRegeneration()
 		condition->setParam(CONDITION_PARAM_MANAGAIN, vocation->getManaGainAmount());
 		condition->setParam(CONDITION_PARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
 	}
+}
+
+void Player::setFightingModes(FightMode_t mode, bool chase, bool secure)
+{
+	const auto previousFighting = fighting;
+	fighting.mode = mode;
+	fighting.chase = chase;
+	fighting.secure = secure;
+
+	tfs::events::player::onFightingModesChanged(asPlayer(), previousFighting.mode, previousFighting.chase, previousFighting.secure);
 }

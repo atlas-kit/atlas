@@ -74,6 +74,7 @@ ec.onPlayerAdvance = {}
 ec.onPlayerModalWindow = {}
 ec.onPlayerTextEdit = {}
 ec.onPlayerExtendedOpcode = {}
+ec.onPlayerFightingModesChanged = {}
 -- Monster
 ec.onMonsterDropLoot = {}
 ec.onMonsterSpawn = {}

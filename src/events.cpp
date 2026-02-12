@@ -142,6 +142,7 @@ struct PlayerHandlers
 	int32_t onModalWindow = -1;
 	int32_t onTextEdit = -1;
 	int32_t onExtendedOpcode = -1;
+	int32_t onFightingModesChanged = -1;
 } playerHandlers;
 
 void load_player_from_scripts()
@@ -186,6 +187,7 @@ void load_player_from_scripts()
 	playerHandlers.onModalWindow = scriptInterface.getMetaEvent("Player", "onModalWindow");
 	playerHandlers.onTextEdit = scriptInterface.getMetaEvent("Player", "onTextEdit");
 	playerHandlers.onExtendedOpcode = scriptInterface.getMetaEvent("Player", "onExtendedOpcode");
+	playerHandlers.onFightingModesChanged = scriptInterface.getMetaEvent("Player", "onFightingModesChanged");
 }
 
 struct MonsterHandlers
@@ -1725,6 +1727,31 @@ void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std
 	tfs::lua::pushNumber(L, opcode);
 	tfs::lua::pushString(L, buffer);
 	scriptInterface.callVoidFunction(3);
+}
+
+void onFightingModesChanged(const std::shared_ptr<Player>& player, FightMode_t mode, bool chase, bool secure)
+{
+	// Player:onFightingModesChanged(mode, chase, secure)
+	if (playerHandlers.onFightingModesChanged == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::player::onFightingModesChanged] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(playerHandlers.onFightingModesChanged, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(playerHandlers.onFightingModesChanged);
+
+	tfs::lua::pushThing(L, player);
+	tfs::lua::pushNumber(L, mode);
+	tfs::lua::pushBoolean(L, chase);
+	tfs::lua::pushBoolean(L, secure);
+	scriptInterface.callVoidFunction(4);
 }
 
 } // namespace tfs::events::player

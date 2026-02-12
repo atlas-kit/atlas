@@ -679,9 +679,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x9E:
 			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerCloseNpcChannel(playerID); });
 			break;
-		case 0xA0:
-			parseFightModes(msg);
-			break;
 		case 0xA1:
 			parseAttack(msg);
 			break;
@@ -1251,27 +1248,6 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 
 	g_dispatcher.addTask([=, playerID = player->getID(), receiver = std::move(receiver), text = std::move(text)]() {
 		g_game.playerSay(playerID, channelId, type, receiver, text);
-	});
-}
-
-void ProtocolGame::parseFightModes(NetworkMessage& msg)
-{
-	uint8_t rawFightMode = msg.getByte();  // 1 - offensive, 2 - balanced, 3 - defensive
-	uint8_t rawChaseMode = msg.getByte();  // 0 - stand while fighting, 1 - chase opponent
-	uint8_t rawSecureMode = msg.getByte(); // 0 - can't attack unmarked, 1 - can attack unmarked
-	// uint8_t rawPvpMode = msg.getByte(); // pvp mode introduced in 10.0
-
-	fightMode_t fightMode;
-	if (rawFightMode == 1) {
-		fightMode = FIGHTMODE_ATTACK;
-	} else if (rawFightMode == 2) {
-		fightMode = FIGHTMODE_BALANCED;
-	} else {
-		fightMode = FIGHTMODE_DEFENSE;
-	}
-
-	g_dispatcher.addTask([=, playerID = player->getID()]() {
-		g_game.playerSetFightModes(playerID, fightMode, rawChaseMode != 0, rawSecureMode != 0);
 	});
 }
 
@@ -2700,17 +2676,6 @@ void ProtocolGame::sendEnterWorld()
 {
 	NetworkMessage msg;
 	msg.addByte(0x0F);
-	writeToOutputBuffer(msg);
-}
-
-void ProtocolGame::sendFightModes()
-{
-	NetworkMessage msg;
-	msg.addByte(0xA7);
-	msg.addByte(player->fightMode);
-	msg.addByte(player->chaseMode);
-	msg.addByte(player->secureMode);
-	msg.addByte(PVP_MODE_DOVE);
 	writeToOutputBuffer(msg);
 }
 

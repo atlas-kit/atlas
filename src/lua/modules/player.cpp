@@ -2205,39 +2205,6 @@ int luaPlayerCanCast(lua_State* L)
 	return 1;
 }
 
-int luaPlayerHasChaseMode(lua_State* L)
-{
-	// player:hasChaseMode()
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushBoolean(L, player->getChaseMode());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerHasSecureMode(lua_State* L)
-{
-	// player:hasSecureMode()
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushBoolean(L, player->getSecureMode());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerGetFightMode(lua_State* L)
-{
-	// player:getFightMode()
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushNumber(L, player->getFightMode());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 int luaPlayerGetStoreInbox(lua_State* L)
 {
 	// player:getStoreInbox()
@@ -2424,6 +2391,66 @@ int luaPlayerSendEnterMarket(lua_State* L)
 	// player:sendEnterMarket()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
 		player->sendMarketEnter();
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerGetFightMode(lua_State* L)
+{
+	// player:getFightMode()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		tfs::lua::pushNumber(L, player->getFightMode());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerIsSecureModeEnabled(lua_State* L)
+{
+	// player:isSecureModeEnabled()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		tfs::lua::pushBoolean(L, player->isSecureModeEnabled());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerIsChasingEnabled(lua_State* L)
+{
+	// player:isChasingEnabled()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		tfs::lua::pushBoolean(L, player->isChasingEnabled());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerSetFightingModes(lua_State* L)
+{
+	// player:setFightingModes(mode, secure, chase)
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		const auto mode = tfs::lua::getNumber<FightMode_t>(L, 2, player->getFightMode());
+		const auto chase = tfs::lua::getBoolean(L, 3, player->isChasingEnabled());
+		const auto secure = tfs::lua::getBoolean(L, 4, player->isSecureModeEnabled());
+		player->setFightingModes(mode, chase, secure);
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerStopWalk(lua_State* L)
+{
+	// player:stopWalk()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		player->stopWalk();
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -2650,10 +2677,6 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "getInstantSpells", luaPlayerGetInstantSpells);
 	lsi.registerMethod("Player", "canCast", luaPlayerCanCast);
 
-	lsi.registerMethod("Player", "hasChaseMode", luaPlayerHasChaseMode);
-	lsi.registerMethod("Player", "hasSecureMode", luaPlayerHasSecureMode);
-	lsi.registerMethod("Player", "getFightMode", luaPlayerGetFightMode);
-
 	lsi.registerMethod("Player", "getStoreInbox", luaPlayerGetStoreInbox);
 
 	lsi.registerMethod("Player", "isNearDepotBox", luaPlayerIsNearDepotBox);
@@ -2676,4 +2699,11 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "sendResourceBalance", luaPlayerSendResourceBalance);
 
 	lsi.registerMethod("Player", "sendEnterMarket", luaPlayerSendEnterMarket);
+
+	lsi.registerMethod("Player", "getFightMode", luaPlayerGetFightMode);
+	lsi.registerMethod("Player", "isSecureModeEnabled", luaPlayerIsSecureModeEnabled);
+	lsi.registerMethod("Player", "isChasingEnabled", luaPlayerIsChasingEnabled);
+	lsi.registerMethod("Player", "setFightingModes", luaPlayerSetFightingModes);
+
+	lsi.registerMethod("Player", "stopWalk", luaPlayerStopWalk);
 }
