@@ -116,7 +116,7 @@ inline constexpr size_t TILE_UPDATE_THRESHOLD = 8;
 class Tile : public Thing
 {
 public:
-	static const std::shared_ptr<Tile> nullptrTile;
+	static const std::shared_ptr<Tile> invalidTile;
 	Tile(uint16_t x, uint16_t y, uint8_t z) : tilePos{x, y, z} {}
 	virtual ~Tile() = default;
 
@@ -124,8 +124,8 @@ public:
 	Tile(const Tile&) = delete;
 	Tile& operator=(const Tile&) = delete;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Tile> getTile() override final { return std::static_pointer_cast<Tile>(shared_from_this()); }
 	std::shared_ptr<const Tile> getTile() const override final
@@ -139,8 +139,8 @@ public:
 		return std::static_pointer_cast<const Tile>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<HouseTile> getHouseTile() { return nullptr; }
-	virtual std::shared_ptr<const HouseTile> getHouseTile() const { return nullptr; }
+	virtual std::shared_ptr<HouseTile> asHouseTile() { return nullptr; }
+	virtual std::shared_ptr<const HouseTile> asHouseTile() const { return nullptr; }
 
 	virtual TileItemVector* getItemList() = 0;
 	virtual const TileItemVector* getItemList() const = 0;

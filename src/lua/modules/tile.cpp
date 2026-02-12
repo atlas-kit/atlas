@@ -718,7 +718,7 @@ int luaTileGetHouse(lua_State* L)
 		return 1;
 	}
 
-	if (const auto& houseTile = tile->getHouseTile()) {
+	if (const auto& houseTile = tile->asHouseTile()) {
 		tfs::lua::pushSharedPtr(L, houseTile->getHouse());
 		tfs::lua::setMetatable(L, -1, "House");
 	} else {

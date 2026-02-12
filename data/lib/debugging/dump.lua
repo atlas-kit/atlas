@@ -11,15 +11,23 @@ function dumpLevel(input, level)
 		local lines = {}
 
 		for k, v in pairs(input) do
-			if type(k) ~= 'number' then
-				k = '"' .. k .. '"'
+			local keyStr
+			if type(k) ~= "number" then
+				keyStr = '"' .. tostring(k) .. '"'
+			else
+				keyStr = tostring(k)
 			end
 
-			if type(v) == 'string' then
-				v = '"' .. v .. '"'
+			local valueStr
+			if type(v) == "string" then
+				valueStr = '"' .. v:gsub('"', '\\"') .. '"'
+			elseif type(v) == "table" then
+				valueStr = dumpLevel(v, level + 1)
+			else
+				valueStr = tostring(v)
 			end
 
-			table.insert(lines, indent .. '    [' .. k .. '] = ' .. dumpLevel(v, level + 1))
+			table.insert(lines, indent .. '    [' .. keyStr .. '] = ' .. valueStr)
 		end
 		return str .. table.concat(lines, ',\n') .. '\n' .. indent .. '}'
 	end
