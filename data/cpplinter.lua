@@ -467,7 +467,7 @@ Creature = {}
 ---@field getFightMode fun(self: Player): number
 ---@field isSecureModeEnabled fun(self: Player): boolean
 ---@field isChasingEnabled fun(self: Player): boolean
----@field setFightingModes fun(self: Player, mode?: FightMode_t, secure?: boolean, chase?: boolean)
+---@field setFightingModes fun(self: Player, mode?: FightMode_t, chase?: boolean, secure?: boolean)
 Player = {}
 
 ---@class Monster : Creature
