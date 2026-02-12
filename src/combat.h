@@ -150,11 +150,11 @@ class MagicField final : public Item
 public:
 	explicit MagicField(uint16_t type) : Item{type}, createTime(OTSYS_TIME()) {}
 
-	std::shared_ptr<MagicField> getMagicField() override
+	std::shared_ptr<MagicField> asMagicField() override
 	{
 		return std::static_pointer_cast<MagicField>(shared_from_this());
 	}
-	std::shared_ptr<const MagicField> getMagicField() const override
+	std::shared_ptr<const MagicField> asMagicField() const override
 	{
 		return std::static_pointer_cast<const MagicField>(shared_from_this());
 	}

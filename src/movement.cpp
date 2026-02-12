@@ -641,7 +641,7 @@ bool MoveEvent::configureEvent(const pugi::xml_node& node)
 uint32_t MoveEvent::StepInField(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& item,
                                 const Position&)
 {
-	if (const auto& field = item->getMagicField()) {
+	if (const auto& field = item->asMagicField()) {
 		field->onStepInField(creature);
 		return 1;
 	}
@@ -656,7 +656,7 @@ uint32_t MoveEvent::StepOutField(const std::shared_ptr<Creature>&, const std::sh
 
 uint32_t MoveEvent::AddItemField(const std::shared_ptr<Item>& item, const std::shared_ptr<Item>&, const Position&)
 {
-	if (const auto& field = item->getMagicField()) {
+	if (const auto& field = item->asMagicField()) {
 		const auto& tile = item->getTile();
 		if (CreatureVector* creatures = tile->getCreatures()) {
 			for (const auto& creature : *creatures) {
