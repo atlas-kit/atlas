@@ -77,7 +77,12 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 				uint16_t totalChance = 0;
 				spawnBlock_t sb;
 				sb.pos = pos;
-				sb.direction = DIRECTION_NORTH;
+				pugi::xml_attribute directionAttribute = childNode.attribute("direction");
+				if (directionAttribute) {
+					sb.direction = static_cast<Direction>(pugi::cast<uint16_t>(directionAttribute.value()));
+				} else {
+					sb.direction = DIRECTION_NORTH;
+				}
 				sb.interval = interval;
 				sb.lastSpawn = 0;
 
@@ -304,6 +309,8 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 		return false;
 	}
 
+	monster->setDirection(dir);
+
 	if (startup) {
 		// No need to send out events to the surrounding since there is no one out there to listen!
 		if (!g_game.internalPlaceCreature(monster, pos, true)) {
@@ -316,8 +323,6 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 			return false;
 		}
 	}
-
-	monster->setDirection(dir);
 	monster->setSpawn(this);
 	monster->setMasterPos(pos);
 

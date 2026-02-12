@@ -1826,7 +1826,6 @@ void Monster::death(const std::shared_ptr<Creature>&)
 
 	clearTargetList();
 	clearFriendList();
-	onIdleStatus();
 }
 
 std::shared_ptr<Item> Monster::getCorpse(const std::shared_ptr<Creature>& lastHitCreature,
