@@ -4,7 +4,7 @@
 ---@field __index fun(self: table, key: any): any
 rawgetmetatable = {}
 
----@alias FightMode_t table<string, integer>
+---@alias FightMode_t integer
 ---@alias Outfit_t table<string, integer>
 ---@alias MagicEffect_t table<string, integer>
 

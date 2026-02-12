@@ -2433,7 +2433,7 @@ int luaPlayerIsChasingEnabled(lua_State* L)
 
 int luaPlayerSetFightingModes(lua_State* L)
 {
-	// player:setFightingModes(mode, secure, chase)
+	// player:setFightingModes(mode, chase, secure)
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
 		const auto mode = tfs::lua::getNumber<FightMode_t>(L, 2, player->getFightMode());
 		const auto chase = tfs::lua::getBoolean(L, 3, player->isChasingEnabled());

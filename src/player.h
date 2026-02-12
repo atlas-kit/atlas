@@ -1198,7 +1198,7 @@ public:
 	auto getFightMode() const { return fighting.mode; }
 	auto isSecureModeEnabled() const { return fighting.secure; }
 	auto isChasingEnabled() const { return fighting.chase; }
-	void setFightingModes(FightMode_t mode, bool secure, bool chase);
+	void setFightingModes(FightMode_t mode, bool chase, bool secure);
 
 private:
 	std::forward_list<Condition*> getMuteConditions() const;
@@ -1386,8 +1386,8 @@ private:
 	struct Fighting
 	{
 		FightMode_t mode = FIGHTMODE_ATTACK;
-		bool secure;
-		bool chase;
+		bool secure = false;
+		bool chase = false;
 	} fighting;
 
 	friend class IOLoginData;
