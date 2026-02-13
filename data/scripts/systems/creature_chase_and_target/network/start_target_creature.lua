@@ -1,32 +1,50 @@
+-- start_target_creature.lua
+
+-- Create a handler for packet 0xA1 (161).
+-- This packet is sent by the client when a player clicks to attack a creature.
 local handler = PacketHandler(0xA1)
 
+-- Triggered when the server receives the 0xA1 packet.
 function handler.onReceive(player, msg)
-	local targetId = msg:getU32()
-	if targetId == 0 then
-		return
-	end
+    -- Read the 32-bit ID of the creature the player wants to attack.
+    local targetId = msg:getU32()
+    
+    -- If the ID is 0, the target is invalid; exit.
+    if targetId == 0 then
+        return
+    end
 
-	local targetCreature = Creature(targetId)
-	if not targetCreature then
-		return
-	end
+    -- Find the creature object in the game world.
+    local targetCreature = Creature(targetId)
+    if not targetCreature then
+        return
+    end
 
-	local position = player:getPosition()
-	local targetPosition = targetCreature:getPosition()
-	if position.z ~= targetPosition.z or not player:canSee(targetPosition) then
-		player:sendCancelTarget()
-		return
-	end
+    local position = player:getPosition()
+    local targetPosition = targetCreature:getPosition()
+    
+    -- Safety Check: Ensure the player can actually see the target and is on the same floor.
+    if position.z ~= targetPosition.z or not player:canSee(targetPosition) then
+        -- If they can't see the target, tell the client to clear the red square.
+        player:sendCancelTarget()
+        return
+    end
 
-	-- ReturnValue ret = Combat::canTargetCreature(player, targetCreature);
-	-- if (ret != RETURNVALUE_NOERROR) {
-	-- 	player->sendCancelMessage(ret);
-	-- 	player->sendCancelTarget();
-	-- 	player->setTargetCreature(nullptr);
-	-- 	return;
-	-- }
+    -- The following block is a placeholder for engine-level combat checks 
+    -- (e.g., checking if the target is in a protection zone or if it's a teammate).
+    -- ReturnValue ret = Combat::canTargetCreature(player, targetCreature);
+    -- if (ret != RETURNVALUE_NOERROR) {
+    --  player->sendCancelMessage(ret);
+    --  player->sendCancelTarget();
+    --  player->setTargetCreature(nullptr);
+    --  return;
+    -- }
 
-	player:setTargetCreature(targetCreature)
+    -- Log the successful target acquisition.
+    print(string.format("[PacketHandler 0xA1] Player %s is now attacking %s.", player:getName(), targetCreature:getName()))
+
+    -- Set the server-side target, which will trigger attack ticks and combat logic.
+    player:setTargetCreature(targetCreature)
 end
 
 handler:register()

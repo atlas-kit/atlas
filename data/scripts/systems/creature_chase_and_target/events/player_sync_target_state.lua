@@ -1,15 +1,26 @@
+-- player_sync_target_state.lua
 local event = Event()
 
+-- Triggered when a player's combat target changes.
+-- This ensures the client-side UI stays in sync with the server-side target state.
 function event.onCreatureTargetCreatureChanged(creature)
-	local player = creature:asPlayer()
-	if not player then
-		return
-	end
+    -- Ensure the entity is a player.
+    local player = creature:asPlayer()
+    if not player then
+        return
+    end
 
-	if not player:hasTargetCreature() then
-		player:sendCancelTarget()
-		player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
-	end
+    -- If the player no longer has a target (target was lost or cleared):
+    if not player:hasTargetCreature() then
+        -- Force the game client to clear the red attack square.
+        player:sendCancelTarget()
+        
+        -- Notify the player via the status message area (bottom of the screen).
+        player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        
+        -- Log the synchronization event to the console.
+        print(string.format("[player_sync_target_state:onCreatureTargetCreatureChanged] Player %s: Target state synchronized (Target lost).", player:getName()))
+    end
 end
 
 event:register()

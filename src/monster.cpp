@@ -367,17 +367,25 @@ bool Monster::isFriend(const std::shared_ptr<const Creature>& creature) const
 
 bool Monster::isOpponent(const std::shared_ptr<const Creature>& creature) const
 {
-	if (isSummon() && getMaster()->asPlayer()) {
-		if (creature != getMaster()) {
-			return true;
-		}
-	} else {
-		if ((creature->asPlayer() && !creature->asPlayer()->hasFlag(PlayerFlag_IgnoredByMonsters)) ||
-		    (creature->getMaster() && creature->getMaster()->asPlayer())) {
-			return true;
-		}
+	// Logic for Summons (Monster has a master)
+	if (const auto master = getMaster()) {
+		const auto playerMaster = master->asPlayer();
+		// If master is a player, attack everything except the master itself.
+		// If master is not a player, the monster is passive (returns false).
+		return playerMaster && (creature != playerMaster);
 	}
 
+	// Logic for Wild Monsters (No master)
+
+	// Check if the target is a Player
+	if (const auto player = creature->asPlayer()) {
+		return !player->hasFlag(PlayerFlag_IgnoredByMonsters);
+	}
+
+	// Check if the target is a Summon of a Player
+	if (const auto creatureMaster = creature->getMaster()) {
+		return creatureMaster->asPlayer() != nullptr;
+	}
 	return false;
 }
 

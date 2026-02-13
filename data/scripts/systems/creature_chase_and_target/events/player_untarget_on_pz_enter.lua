@@ -1,68 +1,90 @@
+-- player_untarget_on_pz_enter.lua
 do
-	local event = Event()
+    local event = Event()
 
-	function event.onCreatureZoneChanged(creature)
-		local player = creature:asPlayer()
-		if not player then
-			return
-		end
+    -- Triggered when the player themselves changes zones.
+    -- Prevents players from maintaining an active target while inside a Protection Zone.
+    function event.onCreatureZoneChanged(creature)
+        local player = creature:asPlayer()
+        if not player then
+            return
+        end
 
-		if not player:hasTargetCreature() then
-			return
-		end
+        -- If the player isn't attacking anyone, no action is needed.
+        if not player:hasTargetCreature() then
+            return
+        end
 
-		local zone = player:getZone()
-		if zone ~= ZONE_PROTECTION then
-			return
-		end
+        -- Check if the player has entered a Protection Zone (PZ).
+        local zone = player:getZone()
+        if zone ~= ZONE_PROTECTION then
+            return
+        end
 
-		if player:hasFlag(PlayerFlag_IgnoreProtectionZone) then
-			return
-		end
+        -- Respect player flags (e.g., GMs) that allow attacking from within a PZ.
+        if player:hasFlag(PlayerFlag_IgnoreProtectionZone) then
+            return
+        end
 
-		player:setTargetCreature(nil)
-	end
+        -- Cancel target because the attacker entered a safe zone.
+        -- Print format updated with [FileName:EventName]
+        print(string.format("[player_untarget_on_pz_enter:onCreatureZoneChanged] Player %s: Attack cancelled (Entered Protection Zone).", player:getName()))
+        player:setTargetCreature(nil)
+    end
 
-	event:register()
+    event:register()
 end
 
 do
-	local event = Event()
+    local event = Event()
 
-	function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature)
-		local player = creature:asPlayer()
-		if not player then
-			return
-		end
+    -- Triggered when a nearby creature (potentially the target) changes zones.
+    function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature)
+        local player = creature:asPlayer()
+        if not player then
+            return
+        end
 
-		local targetCreature = player:getTargetCreature()
-		if not targetCreature then
-			return
-		end
+        local targetCreature = player:getTargetCreature()
+        if not targetCreature then
+            return
+        end
 
-		if targetCreature ~= nearbyCreature then
-			return
-		end
+        -- Ensure the zone change event belongs to the player's current target.
+        if targetCreature ~= nearbyCreature then
+            return
+        end
 
-		if player:hasFlag(PlayerFlag_IgnoreProtectionZone) then
-			return
-		end
+        -- Respect special flags that ignore zone restrictions.
+        if player:hasFlag(PlayerFlag_IgnoreProtectionZone) then
+            return
+        end
 
-		local zone = targetCreature:getZone()
-		if zone == ZONE_PROTECTION then
-			player:setTargetCreature(nil)
-		elseif zone == ZONE_NOPVP then
-			if targetCreature:isPlayer() then
-				player:setTargetCreature(nil)
-			end
-		elseif zone == ZONE_NORMAL then
-			if targetCreature:isPlayer() then
-				if Game.getWorldType() == WORLD_TYPE_NO_PVP then
-					player:setTargetCreature(nil)
-				end
-			end
-		end
-	end
+        local zone = targetCreature:getZone()
+        
+        -- Logic for different zone types:
+        if zone == ZONE_PROTECTION then
+            -- Case 1: Target entered a Protection Zone.
+            print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s entered Protection Zone.", player:getName(), targetCreature:getName()))
+            player:setTargetCreature(nil)
+            
+        elseif zone == ZONE_NOPVP then
+            -- Case 2: Target entered a No-PVP zone and the target is a player.
+            if targetCreature:isPlayer() then
+                print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s entered No-PVP Zone.", player:getName(), targetCreature:getName()))
+                player:setTargetCreature(nil)
+            end
+            
+        elseif zone == ZONE_NORMAL then
+            -- Case 3: In Optional-PVP (No-PVP) worlds, players cannot be targeted in normal zones.
+            if targetCreature:isPlayer() then
+                if Game.getWorldType() == WORLD_TYPE_NO_PVP then
+                    print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s is protected by World Type (No-PVP).", player:getName(), targetCreature:getName()))
+                    player:setTargetCreature(nil)
+                end
+            end
+        end
+    end
 
-	event:register()
+    event:register()
 end
