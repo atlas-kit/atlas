@@ -138,8 +138,6 @@ void Monster::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, 
 
 void Monster::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
 {
-	Creature::onRemoveCreature(creature, isLogout);
-
 	if (mType->info.creatureDisappearEvent != -1) {
 		// onCreatureDisappear(self, creature)
 		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
@@ -232,31 +230,6 @@ void Monster::onCreatureMove(const std::shared_ptr<Creature>& creature, const st
 		}
 
 		updateIdleStatus();
-
-		if (!isSummon()) {
-			if (const auto& followCreature = getFollowCreature()) {
-				const Position& followPosition = followCreature->getPosition();
-				const Position& position = getPosition();
-
-				int32_t offset_x = followPosition.getDistanceX(position);
-				int32_t offset_y = followPosition.getDistanceY(position);
-				if ((offset_x > 1 || offset_y > 1) && mType->info.changeTargetChance > 0) {
-					Direction dir = getDirectionTo(position, followPosition);
-					const Position& checkPosition = getNextPosition(dir, position);
-
-					if (const auto& tile = g_game.map.getTile(checkPosition)) {
-						if (const auto& topCreature = tile->getTopCreature()) {
-							if (followCreature != topCreature && isOpponent(topCreature)) {
-								selectTarget(topCreature);
-							}
-						}
-					}
-				}
-			} else if (isOpponent(creature)) {
-				// we have no target lets try pick this one
-				selectTarget(creature);
-			}
-		}
 	}
 }
 
@@ -441,8 +414,8 @@ bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAUL
 	const Position& myPos = getPosition();
 
 	auto resultList = targetList | tfs::views::lock_weak_ptrs |
-	                  std::views::filter([&, followCreature = getFollowCreature()](const auto& creature) {
-		                  return followCreature != creature && isTarget(creature) &&
+	                  std::views::filter([&, chaseCreature = getChaseCreature()](const auto& creature) {
+		                  return chaseCreature != creature && isTarget(creature) &&
 		                         (searchType == TARGETSEARCH_RANDOM || canUseAttack(myPos, creature));
 	                  }) |
 	                  std::ranges::to<std::vector>();
@@ -506,9 +479,9 @@ bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAUL
 	}
 
 	// lets just pick the first target in the list
-	const auto& followCreature = getFollowCreature();
+	const auto& chaseCreature = getChaseCreature();
 	for (const auto& target : targetList | tfs::views::lock_weak_ptrs) {
-		if (followCreature != target && selectTarget(target)) {
+		if (chaseCreature != target && selectTarget(target)) {
 			return true;
 		}
 	}
@@ -517,21 +490,21 @@ bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAUL
 
 void Monster::goToFollowCreature()
 {
-	const auto& followCreature = getFollowCreature();
-	if (!followCreature) {
+	const auto& chaseCreature = getChaseCreature();
+	if (!chaseCreature) {
 		return;
 	}
 
 	FindPathParams fpp;
-	getPathSearchParams(followCreature, fpp);
+	getPathSearchParams(chaseCreature, fpp);
 
 	if (!isSummon()) {
 		Direction dir = DIRECTION_NONE;
 
 		if (isFleeing()) {
-			getDistanceStep(followCreature->getPosition(), dir, true);
+			getDistanceStep(chaseCreature->getPosition(), dir, true);
 		} else { // maxTargetDist > 1
-			if (!getDistanceStep(followCreature->getPosition(), dir)) {
+			if (!getDistanceStep(chaseCreature->getPosition(), dir)) {
 				// if we can't get anything then let the A* calculate
 				updateFollowCreaturePath(fpp);
 				return;
@@ -554,8 +527,8 @@ void Monster::goToFollowCreature()
 
 void Monster::onFollowCreatureComplete()
 {
-	auto it = std::ranges::find_if(targetList, [followCreature = getFollowCreature()](const auto& target) {
-		return tfs::owner_equal(target, followCreature);
+	auto it = std::ranges::find_if(targetList, [chaseCreature = getChaseCreature()](const auto& target) {
+		return tfs::owner_equal(target, chaseCreature);
 	});
 	if (it != targetList.end()) {
 		if (hasFollowPath) {
@@ -620,14 +593,14 @@ bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)
 	}
 
 	if (isSummon()) {
-		setAttackedCreature(creature);
+		setTargetCreature(creature);
 	} else if (isHostile()) {
-		setAttackedCreature(creature);
+		setTargetCreature(creature);
 		g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
 	}
 
-	setFollowCreature(creature);
-	return getFollowCreature() == creature;
+	setChaseCreature(creature);
+	return getChaseCreature() == creature;
 }
 
 void Monster::setIdle(bool idle)
@@ -721,27 +694,12 @@ void Monster::onThink(uint32_t interval)
 		if (!isIdle) {
 			addEventWalk();
 
-			if (const auto& master = getMaster()) {
-				if (const auto& attackedCreature = getAttackedCreature(); !attackedCreature) {
-					if (master->getAttackedCreature()) {
-						// This happens if the monster is summoned during combat
-						selectTarget(master->getAttackedCreature());
-					} else if (!tfs::owner_equal(master, getFollowCreature())) {
-						// Our master has not ordered us to attack anything, lets follow him around instead.
-						setFollowCreature(master);
-					}
-				} else if (attackedCreature.get() == this) {
-					setFollowCreature(nullptr);
-				} else if (!tfs::owner_equal(attackedCreature, getFollowCreature())) {
-					// This happens just after a master orders an attack, so lets follow it as well.
-					setFollowCreature(attackedCreature);
-				}
-			} else if (!targetList.empty()) {
-				if (!getFollowCreature() || !hasFollowPath) {
+			if (!targetList.empty() && !getMaster()) {
+				if (!getChaseCreature() || !hasFollowPath) {
 					searchTarget();
 				} else if (isFleeing()) {
-					if (const auto& attackedCreature = getAttackedCreature();
-					    attackedCreature && !canUseAttack(getPosition(), attackedCreature)) {
+					if (const auto& targetCreature = getTargetCreature();
+					    targetCreature && !canUseAttack(getPosition(), targetCreature)) {
 						searchTarget(TARGETSEARCH_ATTACKRANGE);
 					}
 				}
@@ -756,21 +714,21 @@ void Monster::onThink(uint32_t interval)
 
 void Monster::onAttacking(uint32_t interval)
 {
-	const auto& attackedCreature = getAttackedCreature();
-	if (!attackedCreature) {
+	const auto& targetCreature = getTargetCreature();
+	if (!targetCreature) {
 		return;
 	}
 
-	if (const auto& player = attackedCreature->asPlayer()) {
+	if (const auto& player = targetCreature->asPlayer()) {
 		player->addInFightTicks();
 	}
 
-	if (isSummon() && attackedCreature.get() == this) {
+	if (isSummon() && targetCreature.get() == this) {
 		return;
 	}
 
 	const auto& position = getPosition();
-	const auto& targetPosition = attackedCreature->getPosition();
+	const auto& targetPosition = targetCreature->getPosition();
 	if (!g_game.isSightClear(position, targetPosition, true)) {
 		return;
 	}
@@ -780,7 +738,7 @@ void Monster::onAttacking(uint32_t interval)
 	attackTicks += interval;
 
 	for (const spellBlock_t& spellBlock : mType->info.attackSpells) {
-		if (!attackedCreature) {
+		if (!targetCreature) {
 			break;
 		}
 
@@ -795,7 +753,7 @@ void Monster::onAttacking(uint32_t interval)
 
 				minCombatValue = spellBlock.minCombatValue;
 				maxCombatValue = spellBlock.maxCombatValue;
-				spellBlock.spell->castSpell(asMonster(), attackedCreature);
+				spellBlock.spell->castSpell(asMonster(), targetCreature);
 
 				if (spellBlock.isMelee) {
 					lastMeleeAttack = OTSYS_TIME();
@@ -1140,13 +1098,13 @@ bool Monster::getNextStep(Direction& direction, uint32_t& flags)
 	}
 
 	bool result = false;
-	if (!walkingToSpawn && (!getFollowCreature() || !hasFollowPath) && (!isSummon() || !isMasterInRange)) {
+	if (!walkingToSpawn && (!getChaseCreature() || !hasFollowPath) && (!isSummon() || !isMasterInRange)) {
 		if (getTimeSinceLastMove() >= 1000) {
 			randomStepping = true;
 			// choose a random direction
 			result = getRandomStep(getPosition(), direction);
 		}
-	} else if ((isSummon() && isMasterInRange) || getFollowCreature() || walkingToSpawn) {
+	} else if ((isSummon() && isMasterInRange) || getChaseCreature() || walkingToSpawn) {
 		if (!hasFollowPath && getMaster() && !getMaster()->asPlayer()) {
 			randomStepping = true;
 			result = getRandomStep(getPosition(), direction);
@@ -1160,8 +1118,8 @@ bool Monster::getNextStep(Direction& direction, uint32_t& flags)
 					ignoreFieldDamage = false;
 				}
 				// target dancing
-				if (const auto& attackedCreature = getAttackedCreature();
-				    attackedCreature && tfs::owner_equal(attackedCreature, getFollowCreature())) {
+				if (const auto& targetCreature = getTargetCreature();
+				    targetCreature && tfs::owner_equal(targetCreature, getChaseCreature())) {
 					if (isFleeing()) {
 						result = getDanceStep(getPosition(), direction, false, false);
 					} else if (mType->info.staticAttackChance < static_cast<uint32_t>(uniform_random(1, 100))) {
@@ -1203,12 +1161,12 @@ bool Monster::getRandomStep(const Position& creaturePos, Direction& direction) c
 bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bool keepAttack /*= true*/,
                            bool keepDistance /*= true*/)
 {
-	const auto& attackedCreature = getAttackedCreature();
-	assert(attackedCreature);
+	const auto& targetCreature = getTargetCreature();
+	assert(targetCreature);
 
-	bool canDoAttackNow = canUseAttack(creaturePos, attackedCreature);
+	bool canDoAttackNow = canUseAttack(creaturePos, targetCreature);
 
-	const Position& centerPos = attackedCreature->getPosition();
+	const Position& centerPos = targetCreature->getPosition();
 
 	int32_t offset_x = creaturePos.getOffsetX(centerPos);
 	int32_t offset_y = creaturePos.getOffsetY(centerPos);
@@ -1228,7 +1186,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), attackedCreature));
+				          canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -1244,7 +1202,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), attackedCreature));
+				          canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -1260,7 +1218,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), attackedCreature));
+				          canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -1276,7 +1234,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), attackedCreature));
+				          canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -1806,7 +1764,7 @@ bool Monster::canWalkTo(Position pos, Direction direction) const
 
 void Monster::death(const std::shared_ptr<Creature>&)
 {
-	setAttackedCreature(nullptr);
+	setTargetCreature(nullptr);
 
 	for (const auto& summon : getSummons() | tfs::views::lock_weak_ptrs) {
 		summon->changeHealth(-summon->getHealth());
@@ -1877,15 +1835,15 @@ bool Monster::getCombatValues(int32_t& min, int32_t& max)
 
 void Monster::updateLookDirection()
 {
-	const auto& attackedCreature = getAttackedCreature();
-	if (!attackedCreature) {
+	const auto& targetCreature = getTargetCreature();
+	if (!targetCreature) {
 		return;
 	}
 
 	auto lookDirection = DIRECTION_NONE;
 
 	const auto& currentPosition = getPosition();
-	const auto& targetPosition = attackedCreature->getPosition();
+	const auto& targetPosition = targetCreature->getPosition();
 
 	auto offsetX = targetPosition.getOffsetX(currentPosition);
 	auto absOffsetX = std::abs(offsetX);
@@ -1963,7 +1921,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 	fpp.maxTargetDist = mType->info.targetDistance;
 
 	if (isSummon()) {
-		if (const auto& followCreature = getFollowCreature(); followCreature && followCreature == getMaster()) {
+		if (const auto& chaseCreature = getChaseCreature(); chaseCreature && chaseCreature == getMaster()) {
 			fpp.summonTargetMaster = true;
 		}
 		if (getMaster() == creature) {

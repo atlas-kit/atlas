@@ -25,7 +25,7 @@ Creature::Creature() { onIdleStatus(); }
 Creature::~Creature()
 {
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
-		summon->setAttackedCreature(nullptr);
+		summon->setTargetCreature(nullptr);
 		summon->removeMaster();
 	}
 	assert(conditions.empty());
@@ -107,30 +107,6 @@ int32_t Creature::getWalkDelay() const
 
 void Creature::onThink(uint32_t interval)
 {
-	if (const auto& followCreature = getFollowCreature();
-	    followCreature && !tfs::owner_equal(master, followCreature) && !canSeeCreature(followCreature)) {
-		setFollowCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-			player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-	}
-
-	if (const auto& attackedCreature = getAttackedCreature();
-	    attackedCreature && !tfs::owner_equal(master, attackedCreature) && !canSeeCreature(attackedCreature)) {
-		setAttackedCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-			player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
-	}
-
 	blockTicks += interval;
 	if (blockTicks >= 1000) {
 		blockCount = std::min<uint32_t>(blockCount + 1, 2);
@@ -142,7 +118,7 @@ void Creature::onThink(uint32_t interval)
 
 void Creature::forceUpdatePath()
 {
-	if (attackedCreature.expired() && followCreature.expired()) {
+	if (targetCreature.expired() && chaseCreature.expired()) {
 		return;
 	}
 
@@ -193,7 +169,7 @@ void Creature::onWalk()
 		addEventWalk();
 	}
 
-	if (!attackedCreature.expired() || !followCreature.expired()) {
+	if (!targetCreature.expired() || !chaseCreature.expired()) {
 		if (lastPathUpdate < OTSYS_TIME()) {
 			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 			lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
@@ -307,54 +283,15 @@ void Creature::updateIcons() const
 	}
 }
 
-void Creature::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool)
-{
-	if (const auto& attackedCreature = getAttackedCreature(); creature == attackedCreature) {
-		setAttackedCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
-	}
-
-	if (const auto& followCreature = getFollowCreature(); creature == followCreature) {
-		setFollowCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-		}
-	}
-}
-
 void Creature::updateFollowCreaturePath(FindPathParams& fpp)
 {
 	listWalkDir.clear();
 
-	if (const auto& followCreature = getFollowCreature(); getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
+	if (const auto& chaseCreature = getChaseCreature(); getPathTo(chaseCreature->getPosition(), listWalkDir, fpp)) {
 		hasFollowPath = true;
 		startAutoWalk();
 	} else {
 		hasFollowPath = false;
-	}
-}
-
-void Creature::onChangeZone(ZoneType_t zone)
-{
-	if (const auto& attackedCreature = getAttackedCreature(); attackedCreature && zone == ZONE_PROTECTION) {
-		setAttackedCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-			player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
 	}
 }
 
@@ -393,84 +330,16 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 		}
 
 		if (newTile->getZone() != oldTile->getZone()) {
-			tfs::events::creature::onChangeZone(asCreature(), oldTile->getZone(), newTile->getZone());
 			onChangeZone(getZone());
 		}
 	}
 
-	if (const auto& followCreature = getFollowCreature();
-	    creature == followCreature || (creature.get() == this && followCreature)) {
-		if (newPos.z != oldPos.z || !canSee(followCreature->getPosition())) {
-			setFollowCreature(nullptr);
-
-			if (const auto& player = asPlayer()) {
-				player->sendCancelTarget();
-				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-		}
-	}
-
-	if (const auto& attackedCreature = getAttackedCreature();
-	    creature == attackedCreature || (creature.get() == this && attackedCreature)) {
-		if (newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())) {
-			setAttackedCreature(nullptr);
-
-			if (const auto& player = asPlayer()) {
-				player->sendCancelTarget();
-				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
-		} else {
+	if (const auto& targetCreature = getTargetCreature();
+	    creature == targetCreature || (creature.get() == this && targetCreature)) {
+		if (newPos.z == oldPos.z && canSee(targetCreature->getPosition())) {
 			if (hasExtraSwing()) {
 				// our target is moving lets see if we can get in hit
 				g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
-			}
-
-			if (newTile->getZone() != oldTile->getZone()) {
-				const auto zone = attackedCreature->getZone();
-
-				if (const auto& player = asPlayer()) {
-					if (zone == ZONE_PROTECTION) {
-						if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-							player->setAttackedCreature(nullptr);
-							player->sendCancelTarget();
-							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-						}
-					} else if (zone == ZONE_NOPVP) {
-						if (attackedCreature->asPlayer()) {
-							if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-								player->setAttackedCreature(nullptr);
-								player->sendCancelTarget();
-								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-							}
-						}
-					} else if (zone == ZONE_NORMAL) {
-						// attackedCreature can leave a pvp zone if not pzlocked
-						if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-							if (attackedCreature->asPlayer()) {
-								player->setAttackedCreature(nullptr);
-								player->sendCancelTarget();
-								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-							}
-						}
-					}
-				} else {
-					if (zone == ZONE_PROTECTION) {
-						setAttackedCreature(nullptr);
-
-						if (const auto& player = asPlayer()) {
-							player->sendCancelTarget();
-							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-						}
-
-						if (const auto& monster = asMonster()) {
-							monster->resetAttackTicks();
-						}
-					}
-				}
 			}
 		}
 	}
@@ -751,66 +620,6 @@ BlockType_t Creature::blockHit(const std::shared_ptr<Creature>& attacker, Combat
 	return blockType;
 }
 
-void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (!creature) {
-		attackedCreature.reset();
-
-		for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
-			summon->setAttackedCreature(nullptr);
-		}
-
-		if (const auto& player = asPlayer()) {
-			if (player->getFollowCreature()) {
-				player->setFollowCreature(nullptr);
-			}
-		}
-		return;
-	}
-
-	if (tfs::owner_equal(creature, attackedCreature)) {
-		return;
-	}
-
-	const auto& creaturePosition = creature->getPosition();
-	if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
-		setAttackedCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-		}
-		return;
-	}
-
-	attackedCreature = creature;
-	creature->addFollower(asCreature());
-	onAttackedCreature(creature);
-
-	if (const auto& player = creature->asPlayer()) {
-		player->addInFightTicks();
-	}
-
-	forceUpdatePath();
-
-	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
-		summon->setAttackedCreature(creature);
-	}
-
-	if (const auto& player = asPlayer()) {
-		const auto& followCreature = player->getFollowCreature();
-		if (player->hasSecureMode()) {
-			if (followCreature != creature) {
-				// chase opponent
-				player->setFollowCreature(creature);
-			}
-		} else if (followCreature) {
-			player->setFollowCreature(nullptr);
-		}
-
-		g_dispatcher.addTask([id = player->getID()]() { g_game.checkCreatureAttack(id); });
-	}
-}
-
 void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindPathParams& fpp) const
 {
 	fpp.fullPathSearch = !hasFollowPath;
@@ -818,48 +627,6 @@ void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindP
 	fpp.maxSearchDist = Map::maxViewportX + Map::maxViewportY;
 	fpp.minTargetDist = 1;
 	fpp.maxTargetDist = 1;
-}
-
-void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (!creature) {
-		followCreature.reset();
-
-		hasFollowPath = false;
-
-		if (const auto& player = asPlayer()) {
-			player->stopWalk();
-		}
-		return;
-	}
-
-	if (tfs::owner_equal(followCreature, creature)) {
-		return;
-	}
-
-	const auto& creaturePosition = creature->getPosition();
-	if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
-		setFollowCreature(nullptr);
-
-		if (const auto& player = asPlayer()) {
-			player->setAttackedCreature(nullptr);
-			player->sendCancelTarget();
-			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-			player->stopWalk();
-		}
-		return;
-	}
-
-	followCreature = creature;
-	creature->addFollower(asCreature());
-	hasFollowPath = false;
-
-	if (!listWalkDir.empty()) {
-		listWalkDir.clear();
-		onWalkAborted();
-	}
-
-	forceUpdatePath();
 }
 
 // Pathfinding Events
@@ -1459,4 +1226,80 @@ std::optional<int32_t> Creature::getStorageValue(uint32_t key) const
 		return std::nullopt;
 	}
 	return std::make_optional(it->second);
+}
+
+void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
+{
+	if (creature) {
+		if (tfs::owner_equal(chaseCreature, creature)) {
+			return;
+		}
+
+		const auto& creaturePosition = creature->getPosition();
+		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
+			return;
+		}
+
+		if (const auto& player = asPlayer()) {
+			player->setTargetCreature(nullptr);
+			player->sendCancelTarget();
+			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
+			player->stopWalk();
+		}
+
+		chaseCreature = creature;
+		creature->addFollower(asCreature());
+
+		if (!listWalkDir.empty()) {
+			listWalkDir.clear();
+			onWalkAborted();
+		}
+
+		forceUpdatePath();
+	} else {
+		if (chaseCreature.expired()) {
+			return;
+		}
+
+		chaseCreature.reset();
+	}
+
+	hasFollowPath = false;
+
+	tfs::events::creature::onChaseCreatureChanged(asCreature());
+}
+
+void Creature::setTargetCreature(const std::shared_ptr<Creature>& creature)
+{
+	if (creature) {
+		if (tfs::owner_equal(creature, targetCreature)) {
+			return;
+		}
+
+		const auto& creaturePosition = creature->getPosition();
+		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
+			return;
+		}
+
+		targetCreature = creature;
+		onAttackedCreature(creature);
+
+		forceUpdatePath();
+
+		if (const auto& player = asPlayer()) {
+			g_dispatcher.addTask([id = player->getID()]() { g_game.checkCreatureAttack(id); });
+		}
+	} else {
+		if (targetCreature.expired()) {
+			return;
+		}
+
+		targetCreature.reset();
+	}
+
+	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
+		summon->setTargetCreature(creature);
+	}
+
+	tfs::events::creature::onTargetCreatureChanged(asCreature());
 }

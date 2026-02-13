@@ -1,3 +1,15 @@
+function Creature:onChaseCreatureChanged()
+	if Event.onCreatureChaseCreatureChanged then
+		Event.onCreatureChaseCreatureChanged(self)
+	end
+end
+
+function Creature:onTargetCreatureChanged()
+	if Event.onCreatureTargetCreatureChanged then
+		Event.onCreatureTargetCreatureChanged(self)
+	end
+end
+
 function Creature:onChangeOutfit(outfit)
 	if Event.onCreatureChangeMount and not Event.onCreatureChangeMount(self, outfit.lookMount) then
 		return false
@@ -28,9 +40,39 @@ function Creature:onHear(speaker, words, type)
 	end
 end
 
-function Creature:onChangeZone(fromZone, toZone)
-	if Event.onCreatureChangeZone then
-		Event.onCreatureChangeZone(self, fromZone, toZone)
+function Creature:onMoved(fromTile, toTile)
+	if Event.onCreatureMoved then
+		Event.onCreatureMoved(self, fromTile, toTile)
+	end
+
+	if fromTile:getZone() ~= toTile:getZone() then
+		if Event.onCreatureZoneChanged then
+			Event.onCreatureZoneChanged(self)
+		end
+	end
+end
+
+function Creature:onNearbyCreatureMoved(nearbyCreature, fromTile, toTile)
+	if Event.onCreatureNearbyCreatureMoved then
+		Event.onCreatureNearbyCreatureMoved(self, nearbyCreature, fromTile, toTile)
+	end
+
+	if fromTile:getZone() ~= toTile:getZone() then
+		if Event.onCreatureNearbyCreatureZoneChanged then
+			Event.onCreatureNearbyCreatureZoneChanged(self, nearbyCreature)
+		end
+	end
+end
+
+function Creature:onRemoved()
+	if Event.onCreatureRemoved then
+		Event.onCreatureRemoved(self)
+	end
+end
+
+function Creature:onNearbyCreatureRemoved(nearbyCreature)
+	if Event.onCreatureNearbyCreatureRemoved then
+		Event.onCreatureNearbyCreatureRemoved(self, nearbyCreature)
 	end
 end
 

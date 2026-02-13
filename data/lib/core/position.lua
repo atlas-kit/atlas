@@ -33,6 +33,18 @@ function Position:getDistance(positionEx)
 	return max(dx, dy, dz)
 end
 
+function Position:getDistanceX(x)
+	return abs(self.x - x)
+end
+
+function Position:getDistanceY(y)
+	return abs(self.y - y)
+end
+
+function Position:getDistanceZ(z)
+	return abs(self.z - z)
+end
+
 function Position:getNextPosition(direction, steps)
 	local offset = Position.directionOffset[direction]
 	if offset then
@@ -105,4 +117,51 @@ function Position:notifySummonAppear(summon)
 			spectator:addTarget(summon)
 		end
 	end
+end
+
+function Position:getDirectionTo(to)
+    if self == to then
+        return DIRECTION_NONE
+    end
+
+    local dir
+    -- x_offset logic: from.x - to.x
+    local x_offset = self.x - to.x
+    
+    if x_offset < 0 then
+        dir = DIRECTION_EAST
+        x_offset = math.abs(x_offset)
+    else
+        dir = DIRECTION_WEST
+    end
+
+    -- y_offset logic: from.y - to.y
+    local y_offset = self.y - to.y
+    
+    if y_offset >= 0 then
+        -- Logic for North (y decreases as you go North)
+        if y_offset > x_offset then
+            dir = DIRECTION_NORTH
+        elseif y_offset == x_offset then
+            if dir == DIRECTION_EAST then
+                dir = DIRECTION_NORTHEAST
+            else
+                dir = DIRECTION_NORTHWEST
+            end
+        end
+    else
+        -- Logic for South (y increases as you go South)
+        y_offset = math.abs(y_offset)
+        if y_offset > x_offset then
+            dir = DIRECTION_SOUTH
+        elseif y_offset == x_offset then
+            if dir == DIRECTION_EAST then
+                dir = DIRECTION_SOUTHEAST
+            else
+                dir = DIRECTION_SOUTHWEST
+            end
+        end
+    end
+
+    return dir
 end

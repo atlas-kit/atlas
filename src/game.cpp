@@ -552,8 +552,14 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		}
 	}
 
+	tfs::events::creature::onRemoved(creature);
+
 	// event method
 	for (const auto& spectator : spectators) {
+		if (spectator != creature) {
+			tfs::events::creature::onNearbyCreatureRemoved(spectator, creature);
+		}
+
 		spectator->onRemoveCreature(creature, isLogout);
 	}
 
@@ -3142,66 +3148,6 @@ void Game::playerLookInBattleList(uint32_t playerId, uint32_t creatureId)
 	}
 
 	tfs::events::player::onLookInBattleList(player, creature, lookDistance);
-}
-
-void Game::playerCancelAttackAndFollow(uint32_t playerId)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		playerSetAttackedCreature(playerId, 0);
-		playerFollowCreature(playerId, 0);
-		player->stopWalk();
-	}
-}
-
-void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
-{
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	if (player->getAttackedCreature() && creatureId == 0) {
-		player->setAttackedCreature(nullptr);
-		player->sendCancelTarget();
-		return;
-	}
-
-	const auto& attackCreature = getCreatureByID(creatureId);
-	if (!attackCreature) {
-		player->setAttackedCreature(nullptr);
-		player->sendCancelTarget();
-		return;
-	}
-
-	ReturnValue ret = Combat::canTargetCreature(player, attackCreature);
-	if (ret != RETURNVALUE_NOERROR) {
-		player->sendCancelMessage(ret);
-		player->sendCancelTarget();
-		player->setAttackedCreature(nullptr);
-		return;
-	}
-
-	player->setAttackedCreature(attackCreature);
-
-	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
-}
-
-void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
-{
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	player->setAttackedCreature(nullptr);
-
-	if (const auto& followCreature = getCreatureByID(creatureId)) {
-		player->setFollowCreature(followCreature);
-	} else {
-		player->setFollowCreature(nullptr);
-	}
-
-	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
 }
 
 void Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, bool chaseMode, bool secureMode)

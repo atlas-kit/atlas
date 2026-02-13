@@ -521,7 +521,7 @@ public:
 	float getAttackFactor() const override;
 	float getDefenseFactor() const override;
 
-	void addInFightTicks(bool pzlock = false);
+	void addInFightTicks();
 
 	uint64_t getGainedExperience(const std::shared_ptr<Creature>& attacker) const override;
 
@@ -530,7 +530,7 @@ public:
 	void onAddCombatCondition(ConditionType_t type) override;
 	void onEndCondition(ConditionType_t type) override;
 	void onCombatRemoveCondition(Condition* condition) override;
-	void onAttackedCreature(const std::shared_ptr<Creature>& target, bool addFightTicks = true) override;
+	void onAttackedCreature(const std::shared_ptr<Creature>& target) override;
 	void onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points) override;
 	void onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target, int32_t points) override;
 	bool onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit = true) override;

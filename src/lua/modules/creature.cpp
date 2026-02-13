@@ -205,66 +205,66 @@ int luaCreatureGetName(lua_State* L)
 	return 1;
 }
 
-int luaCreatureGetTarget(lua_State* L)
+int luaCreatureGetTargetCreature(lua_State* L)
 {
-	// creature:getTarget()
-	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	// creature:getTargetCreature()
+	const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	if (const auto& target = creature->getAttackedCreature()) {
-		tfs::lua::pushSharedPtr(L, target);
-		tfs::lua::setCreatureMetatable(L, -1, target);
+	if (const auto& targetCreature = creature->getTargetCreature()) {
+		tfs::lua::pushSharedPtr(L, targetCreature);
+		tfs::lua::setCreatureMetatable(L, -1, targetCreature);
 	} else {
 		lua_pushnil(L);
 	}
 	return 1;
 }
 
-int luaCreatureSetTarget(lua_State* L)
+int luaCreatureSetTargetCreature(lua_State* L)
 {
-	// creature:setTarget(target)
+	// creature:setTargetCreature(target)
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	creature->setAttackedCreature(tfs::lua::getCreature(L, 2));
+	creature->setTargetCreature(tfs::lua::getCreature(L, 2));
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
-int luaCreatureGetFollowCreature(lua_State* L)
+int luaCreatureGetChaseCreature(lua_State* L)
 {
-	// creature:getFollowCreature()
-	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	// creature:getChaseCreature()
+	const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	if (const auto& followCreature = creature->getFollowCreature()) {
-		tfs::lua::pushSharedPtr(L, followCreature);
-		tfs::lua::setCreatureMetatable(L, -1, followCreature);
+	if (const auto& chaseCreature = creature->getChaseCreature()) {
+		tfs::lua::pushSharedPtr(L, chaseCreature);
+		tfs::lua::setCreatureMetatable(L, -1, chaseCreature);
 	} else {
 		lua_pushnil(L);
 	}
 	return 1;
 }
 
-int luaCreatureSetFollowCreature(lua_State* L)
+int luaCreatureSetChaseCreature(lua_State* L)
 {
-	// creature:setFollowCreature(followedCreature)
+	// creature:setChaseCreature(followedCreature)
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	creature->setFollowCreature(tfs::lua::getCreature(L, 2));
+	creature->setChaseCreature(tfs::lua::getCreature(L, 2));
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -1068,6 +1068,17 @@ int luaCreatureSetStorageValue(lua_State* L)
 	return 1;
 }
 
+int luaCreaturehHasNextWalk(lua_State* L)
+{
+	// creature:hasNextWalk()
+	if (const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1)) {
+		tfs::lua::pushBoolean(L, creature->hasNextWalk());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerCreature(LuaScriptInterface& lsi)
@@ -1140,11 +1151,11 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "getId", luaCreatureGetId);
 	lsi.registerMethod("Creature", "getName", luaCreatureGetName);
 
-	lsi.registerMethod("Creature", "getTarget", luaCreatureGetTarget);
-	lsi.registerMethod("Creature", "setTarget", luaCreatureSetTarget);
+	lsi.registerMethod("Creature", "getTargetCreature", luaCreatureGetTargetCreature);
+	lsi.registerMethod("Creature", "setTargetCreature", luaCreatureSetTargetCreature);
 
-	lsi.registerMethod("Creature", "getFollowCreature", luaCreatureGetFollowCreature);
-	lsi.registerMethod("Creature", "setFollowCreature", luaCreatureSetFollowCreature);
+	lsi.registerMethod("Creature", "getChaseCreature", luaCreatureGetChaseCreature);
+	lsi.registerMethod("Creature", "setChaseCreature", luaCreatureSetChaseCreature);
 
 	lsi.registerMethod("Creature", "getMaster", luaCreatureGetMaster);
 	lsi.registerMethod("Creature", "setMaster", luaCreatureSetMaster);
@@ -1205,4 +1216,6 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Creature", "getStorageValue", luaCreatureGetStorageValue);
 	lsi.registerMethod("Creature", "setStorageValue", luaCreatureSetStorageValue);
+
+	lsi.registerMethod("Creature", "hasNextWalk", luaCreaturehHasNextWalk);
 }

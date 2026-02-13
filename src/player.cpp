@@ -1098,12 +1098,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 void Player::onChangeZone(ZoneType_t zone)
 {
 	if (zone == ZONE_PROTECTION) {
-		if (getAttackedCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			setAttackedCreature(nullptr);
-			sendCancelTarget();
-			sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-
 		if (!group->access && isMounted()) {
 			dismount();
 			g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
@@ -1122,18 +1116,12 @@ void Player::onChangeZone(ZoneType_t zone)
 
 void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
 {
-	Creature::onRemoveCreature(creature, isLogout);
-
 	if (creature.get() == this) {
 		if (isLogout) {
 			loginPosition = getPosition();
 		}
 
 		lastLogout = time(nullptr);
-
-		if (eventWalk != 0) {
-			setFollowCreature(nullptr);
-		}
 
 		if (!tradePartner.expired()) {
 			g_game.internalCloseTrade(asPlayer());
@@ -1225,8 +1213,8 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
-	if (const auto& followCreature = getFollowCreature();
-	    hasFollowPath && (creature == followCreature || (creature.get() == this && followCreature))) {
+	if (const auto& chaseCreature = getChaseCreature();
+	    hasFollowPath && (creature == chaseCreature || (creature.get() == this && chaseCreature))) {
 		g_dispatcher.addTask([id = getID()]() { g_game.updateCreatureWalk(id); });
 	}
 
@@ -1425,14 +1413,14 @@ void Player::onThink(uint32_t interval)
 
 void Player::onAttacking(uint32_t)
 {
-	const auto& attackedCreature = getAttackedCreature();
-	if (!attackedCreature) {
+	const auto& targetCreature = getTargetCreature();
+	if (!targetCreature) {
 		return;
 	}
 
 	addInFightTicks();
 
-	if (const auto& player = attackedCreature->asPlayer()) {
+	if (const auto& player = targetCreature->asPlayer()) {
 		player->addInFightTicks();
 	}
 
@@ -1448,7 +1436,7 @@ void Player::onAttacking(uint32_t)
 		return;
 	}
 
-	if (!g_game.isSightClear(getPosition(), attackedCreature->getPosition(), true)) {
+	if (!g_game.isSightClear(getPosition(), targetCreature->getPosition(), true)) {
 		return;
 	}
 
@@ -1460,14 +1448,14 @@ void Player::onAttacking(uint32_t)
 
 	if (const auto& weapon = g_weapons->getWeapon(tool)) {
 		if (!weapon->interruptSwing()) {
-			result = weapon->useWeapon(asPlayer(), tool, getAttackedCreature());
+			result = weapon->useWeapon(asPlayer(), tool, getTargetCreature());
 		} else if (!classicSpeed && !canDoAction()) {
 			delay = getNextActionTime();
 		} else {
-			result = weapon->useWeapon(asPlayer(), tool, getAttackedCreature());
+			result = weapon->useWeapon(asPlayer(), tool, getTargetCreature());
 		}
 	} else {
-		result = Weapon::useFist(asPlayer(), getAttackedCreature());
+		result = Weapon::useFist(asPlayer(), getTargetCreature());
 	}
 
 	auto task = createSchedulerTask(std::max<uint32_t>(SCHEDULER_MINTICKS, delay),
@@ -2164,14 +2152,10 @@ std::shared_ptr<Item> Player::getCorpse(const std::shared_ptr<Creature>& lastHit
 	return corpse;
 }
 
-void Player::addInFightTicks(bool pzlock /*= false*/)
+void Player::addInFightTicks()
 {
 	if (hasFlag(PlayerFlag_NotGainInFight)) {
 		return;
-	}
-
-	if (pzlock) {
-		pzLocked = true;
 	}
 
 	Condition* condition =
@@ -3201,8 +3185,8 @@ void Player::internalAddThing(uint32_t index, const std::shared_ptr<Thing>& thin
 
 void Player::goToFollowCreature()
 {
-	const auto& followCreature = getFollowCreature();
-	if (walkTask || !followCreature) {
+	const auto& chaseCreature = getChaseCreature();
+	if (walkTask || !chaseCreature) {
 		return;
 	}
 
@@ -3211,7 +3195,7 @@ void Player::goToFollowCreature()
 	}
 
 	FindPathParams fpp;
-	getPathSearchParams(followCreature, fpp);
+	getPathSearchParams(chaseCreature, fpp);
 	updateFollowCreaturePath(fpp);
 
 	if (!hasFollowPath) {
@@ -3244,14 +3228,14 @@ void Player::setChaseMode(bool mode)
 	bool prevChaseMode = chaseMode;
 	chaseMode = mode;
 
-	if (const auto& attackedCreature = getAttackedCreature(); attackedCreature && prevChaseMode != chaseMode) {
+	if (const auto& targetCreature = getTargetCreature(); targetCreature && prevChaseMode != chaseMode) {
 		if (chaseMode) {
-			if (!getFollowCreature()) {
+			if (!getChaseCreature()) {
 				// chase opponent
-				setFollowCreature(attackedCreature);
+				setChaseCreature(targetCreature);
 			}
 		} else {
-			setFollowCreature(nullptr);
+			setChaseCreature(nullptr);
 			cancelNextWalk = true;
 		}
 	}
@@ -3405,18 +3389,14 @@ void Player::onCombatRemoveCondition(Condition* condition)
 	}
 }
 
-void Player::onAttackedCreature(const std::shared_ptr<Creature>& target, bool addFightTicks /* = true */)
+void Player::onAttackedCreature(const std::shared_ptr<Creature>& target)
 {
-	Creature::onAttackedCreature(target);
-
 	if (target->getZone() == ZONE_PVP) {
 		return;
 	}
 
 	if (target.get() == this) {
-		if (addFightTicks) {
-			addInFightTicks();
-		}
+		addInFightTicks();
 		return;
 	}
 
@@ -3457,9 +3437,7 @@ void Player::onAttackedCreature(const std::shared_ptr<Creature>& target, bool ad
 		}
 	}
 
-	if (addFightTicks) {
-		addInFightTicks();
-	}
+	addInFightTicks();
 }
 
 void Player::onIdleStatus()

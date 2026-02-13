@@ -23,12 +23,17 @@ ec.onGameStartup = {}
 ec.onGameShutdown = {}
 ec.onGameSave = {}
 -- Creature
+ec.onCreatureChaseCreatureChanged = {}
+ec.onCreatureTargetCreatureChanged = {}
+ec.onCreatureZoneChanged = {}
+ec.onCreatureNearbyCreatureZoneChanged = {}
+ec.onCreatureMoved = {}
+ec.onCreatureNearbyCreatureMoved = {}
 ec.onCreatureChangeOutfit = {}
 ec.onCreatureChangeMount = {}
 ec.onCreatureAreaCombat = {returnValue=true}
 ec.onCreatureTargetCombat = {returnValue=true}
 ec.onCreatureHear = {}
-ec.onCreatureChangeZone = {}
 ec.onCreatureUpdateStorage = {}
 ec.onCreatureChangeHealth = {}
 ec.onCreatureChangeMana = {}

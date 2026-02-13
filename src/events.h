@@ -41,12 +41,20 @@ void onSave();
 
 namespace tfs::events::creature {
 
+void onChaseCreatureChanged(const std::shared_ptr<Creature>& creature);
+void onTargetCreatureChanged(const std::shared_ptr<Creature>& creature);
+void onMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& fromTile,
+             const std::shared_ptr<Tile>& toTile);
+void onNearbyCreatureMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature,
+                           const std::shared_ptr<Tile>& fromTile, const std::shared_ptr<Tile>& toTile);
+void onRemoved(const std::shared_ptr<Creature>& creature);
+void onNearbyCreatureRemoved(const std::shared_ptr<Creature>& creature,
+                             const std::shared_ptr<Creature>& nearbyCreature);
 bool onChangeOutfit(const std::shared_ptr<Creature>& creature, const Outfit_t& outfit);
 ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& tile, bool aggressive);
 ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target);
 void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& speaker,
             const std::string& words, SpeakClasses type);
-void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone);
 void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
                      std::optional<int32_t> oldValue, bool isSpawn);
 void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,

@@ -28,10 +28,6 @@ function Creature.getClosestFreePosition(self, position, maxRadius, mustBeReacha
 	return Position()
 end
 
-function Creature.getPlayer(self)
-	return self:isPlayer() and self or nil
-end
-
 function Creature.isContainer(self)
 	return false
 end
@@ -40,15 +36,7 @@ function Creature.isItem(self)
 	return false
 end
 
-function Creature.isMonster(self)
-	return false
-end
-
 function Creature.isNpc(self)
-	return false
-end
-
-function Creature.isPlayer(self)
 	return false
 end
 
@@ -96,8 +84,8 @@ function Creature:addSummon(monster)
 		return false
 	end
 
-	summon:setTarget(nil)
-	summon:setFollowCreature(nil)
+	summon:setTargetCreature(nil)
+	summon:setChaseCreature(nil)
 	summon:setDropLoot(false)
 	summon:setSkillLoss(false)
 	summon:setMaster(self)
@@ -115,8 +103,8 @@ function Creature:removeSummon(monster)
 		return false
 	end
 
-	summon:setTarget(nil)
-	summon:setFollowCreature(nil)
+	summon:setTargetCreature(nil)
+	summon:setChaseCreature(nil)
 	summon:setDropLoot(true)
 	summon:setSkillLoss(true)
 	summon:setMaster(nil)
@@ -174,10 +162,6 @@ function Creature:canAccessPz()
 	return true
 end
 
-function Creature.getMonster(self)
-	return self:isMonster() and self or nil
-end
-
 function Creature.getKillers(self, onlyPlayers)
 	local killers = {}
 	local inFightTicks = configManager.getNumber(configKeys.PZ_LOCKED)
@@ -202,4 +186,46 @@ end
 
 function Creature.removeStorageValue(self, key)
 	return self:setStorageValue(key, nil)
+end
+
+do
+	function Creature.asPlayer(self)
+		return self:isPlayer() and self or nil
+	end
+	
+	function Creature.getPlayer(self)
+		return self:isPlayer() and self or nil
+	end
+	
+	function Creature.isPlayer(self)
+		return false
+	end
+end
+
+do
+	function Creature.asMonster(self)
+		return self:isMonster() and self or nil
+	end
+	
+	function Creature.getMonster(self)
+		return self:isMonster() and self or nil
+	end
+	
+	function Creature.isMonster(self)
+		return false
+	end
+end
+
+do
+	function Creature.asNpc(self)
+		return self:isNpc() and self or nil
+	end
+	
+	function Creature.getNpc(self)
+		return self:isNpc() and self or nil
+	end
+	
+	function Creature.isNpc(self)
+		return false
+	end
 end

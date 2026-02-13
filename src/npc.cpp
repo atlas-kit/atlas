@@ -221,9 +221,9 @@ std::string Npc::getDescription(int32_t) const
 
 void Npc::goToFollowCreature()
 {
-	if (const auto& followCreature = getFollowCreature()) {
+	if (const auto& chaseCreature = getChaseCreature()) {
 		FindPathParams fpp;
-		getPathSearchParams(followCreature, fpp);
+		getPathSearchParams(chaseCreature, fpp);
 		updateFollowCreaturePath(fpp);
 	}
 }
@@ -262,8 +262,6 @@ void Npc::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, Magi
 
 void Npc::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
 {
-	Creature::onRemoveCreature(creature, isLogout);
-
 	if (creature.get() == this) {
 		closeAllShopWindows();
 		if (npcEventHandler) {
@@ -664,7 +662,7 @@ int NpcScriptInterface::luaActionFollow(lua_State* L)
 		return 1;
 	}
 
-	npc->setFollowCreature(tfs::lua::getPlayer(L, 1));
+	npc->setChaseCreature(tfs::lua::getPlayer(L, 1));
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }

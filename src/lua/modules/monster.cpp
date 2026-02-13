@@ -468,6 +468,18 @@ int luaMonsterRemoveIcon(lua_State* L)
 	return 1;
 }
 
+int luaMonsterResetAttackTicks(lua_State* L)
+{
+	// monster:resetAttackTicks()
+	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
+		monster->resetAttackTicks();
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerMonster(LuaScriptInterface& lsi)
@@ -521,4 +533,6 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "setSpecialIcon", luaMonsterSetIcon);
 	lsi.registerMethod("Monster", "getSpecialIcon", luaMonsterGetIcon);
 	lsi.registerMethod("Monster", "removeSpecialIcon", luaMonsterRemoveIcon);
+
+	lsi.registerMethod("Monster", "resetAttackTicks", luaMonsterResetAttackTicks);
 }

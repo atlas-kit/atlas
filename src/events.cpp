@@ -40,11 +40,16 @@ void load_game_from_scripts()
 
 struct CreatureHandlers
 {
+	int32_t onChaseCreatureChanged = -1;
+	int32_t onTargetCreatureChanged = -1;
+	int32_t onMoved = -1;
+	int32_t onNearbyCreatureMoved = -1;
+	int32_t onRemoved = -1;
+	int32_t onNearbyCreatureRemoved = -1;
 	int32_t onChangeOutfit = -1;
 	int32_t onAreaCombat = -1;
 	int32_t onTargetCombat = -1;
 	int32_t onHear = -1;
-	int32_t onChangeZone = -1;
 	int32_t onUpdateStorage = -1;
 	int32_t onChangeHealth = -1;
 	int32_t onChangeMana = -1;
@@ -64,11 +69,16 @@ void load_creature_from_scripts()
 		return;
 	}
 
+	creatureHandlers.onChaseCreatureChanged = scriptInterface.getMetaEvent("Creature", "onChaseCreatureChanged");
+	creatureHandlers.onTargetCreatureChanged = scriptInterface.getMetaEvent("Creature", "onTargetCreatureChanged");
+	creatureHandlers.onMoved = scriptInterface.getMetaEvent("Creature", "onMoved");
+	creatureHandlers.onNearbyCreatureMoved = scriptInterface.getMetaEvent("Creature", "onNearbyCreatureMoved");
+	creatureHandlers.onRemoved = scriptInterface.getMetaEvent("Creature", "onRemoved");
+	creatureHandlers.onNearbyCreatureRemoved = scriptInterface.getMetaEvent("Creature", "onNearbyCreatureRemoved");
 	creatureHandlers.onChangeOutfit = scriptInterface.getMetaEvent("Creature", "onChangeOutfit");
 	creatureHandlers.onAreaCombat = scriptInterface.getMetaEvent("Creature", "onAreaCombat");
 	creatureHandlers.onTargetCombat = scriptInterface.getMetaEvent("Creature", "onTargetCombat");
 	creatureHandlers.onHear = scriptInterface.getMetaEvent("Creature", "onHear");
-	creatureHandlers.onChangeZone = scriptInterface.getMetaEvent("Creature", "onChangeZone");
 	creatureHandlers.onUpdateStorage = scriptInterface.getMetaEvent("Creature", "onUpdateStorage");
 	creatureHandlers.onChangeHealth = scriptInterface.getMetaEvent("Creature", "onChangeHealth");
 	creatureHandlers.onChangeMana = scriptInterface.getMetaEvent("Creature", "onChangeMana");
@@ -314,6 +324,147 @@ void onSave()
 
 namespace tfs::events::creature {
 
+void onChaseCreatureChanged(const std::shared_ptr<Creature>& creature)
+{
+	// Creature:onChaseCreatureChanged()
+	if (creatureHandlers.onChaseCreatureChanged == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onChaseCreatureChanged] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onChaseCreatureChanged, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onChaseCreatureChanged);
+
+	tfs::lua::pushThing(L, creature);
+	scriptInterface.callVoidFunction(1);
+}
+
+void onTargetCreatureChanged(const std::shared_ptr<Creature>& creature)
+{
+	// Creature:onTargetCreatureChanged()
+	if (creatureHandlers.onTargetCreatureChanged == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onTargetCreatureChanged] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onTargetCreatureChanged, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onTargetCreatureChanged);
+
+	tfs::lua::pushThing(L, creature);
+	scriptInterface.callVoidFunction(1);
+}
+
+void onMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& fromTile,
+             const std::shared_ptr<Tile>& toTile)
+{
+	// Creature:onMoved(fromTile, toTile)
+	if (creatureHandlers.onMoved == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onMoved] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onMoved, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onMoved);
+
+	tfs::lua::pushThing(L, creature);
+	tfs::lua::pushThing(L, fromTile);
+	tfs::lua::pushThing(L, toTile);
+	scriptInterface.callVoidFunction(3);
+}
+
+void onNearbyCreatureMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature,
+                           const std::shared_ptr<Tile>& fromTile, const std::shared_ptr<Tile>& toTile)
+{
+	// Creature:onNearbyCreatureMoved(nearbyCreature, fromTile, toTile)
+	if (creatureHandlers.onNearbyCreatureMoved == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onNearbyCreatureMoved] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onNearbyCreatureMoved, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onNearbyCreatureMoved);
+
+	tfs::lua::pushThing(L, creature);
+	tfs::lua::pushThing(L, nearbyCreature);
+	tfs::lua::pushThing(L, fromTile);
+	tfs::lua::pushThing(L, toTile);
+	scriptInterface.callVoidFunction(4);
+}
+
+
+void onRemoved(const std::shared_ptr<Creature>& creature)
+{
+	// Creature:onRemoved()
+	if (creatureHandlers.onRemoved == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onRemoved] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onRemoved, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onRemoved);
+
+	tfs::lua::pushThing(L, creature);
+	scriptInterface.callVoidFunction(1);
+}
+
+void onNearbyCreatureRemoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature)
+{
+	// Creature:onNearbyCreatureRemoved(nearbyCreature)
+	if (creatureHandlers.onNearbyCreatureRemoved == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::creature::onNearbyCreatureRemoved] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(creatureHandlers.onNearbyCreatureRemoved, &scriptInterface);
+
+	const auto L = scriptInterface.getLuaState();
+	scriptInterface.pushFunction(creatureHandlers.onNearbyCreatureRemoved);
+
+	tfs::lua::pushThing(L, creature);
+	tfs::lua::pushThing(L, nearbyCreature);
+	scriptInterface.callVoidFunction(2);
+}
+
 bool onChangeOutfit(const std::shared_ptr<Creature>& creature, const Outfit_t& outfit)
 {
 	// Creature:onChangeOutfit(outfit)
@@ -440,30 +591,6 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 	tfs::lua::pushString(L, words);
 	tfs::lua::pushNumber(L, type);
 	scriptInterface.callVoidFunction(4);
-}
-
-void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone)
-{
-	// Creature:onChangeZone(fromZone, toZone)
-	if (creatureHandlers.onChangeZone == -1) {
-		return;
-	}
-
-	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::creature::onChangeZone] Call stack overflow" << std::endl;
-		return;
-	}
-
-	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(creatureHandlers.onChangeZone, &scriptInterface);
-
-	const auto L = scriptInterface.getLuaState();
-	scriptInterface.pushFunction(creatureHandlers.onChangeZone);
-
-	tfs::lua::pushThing(L, creature);
-	tfs::lua::pushNumber(L, fromZone);
-	tfs::lua::pushNumber(L, toZone);
-	scriptInterface.callVoidFunction(3);
 }
 
 void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,

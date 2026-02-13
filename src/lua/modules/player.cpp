@@ -2431,6 +2431,18 @@ int luaPlayerSendEnterMarket(lua_State* L)
 	return 1;
 }
 
+int luaPlayerStopWalk(lua_State* L)
+{
+	// player:stopWalk()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		player->stopWalk();
+		tfs::lua::pushBoolean(L, true);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
@@ -2676,4 +2688,6 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "sendResourceBalance", luaPlayerSendResourceBalance);
 
 	lsi.registerMethod("Player", "sendEnterMarket", luaPlayerSendEnterMarket);
+
+	lsi.registerMethod("Player", "stopWalk", luaPlayerStopWalk);
 }

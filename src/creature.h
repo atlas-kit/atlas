@@ -275,14 +275,14 @@ public:
 	virtual void onEndCondition(ConditionType_t type);
 	void onTickCondition(ConditionType_t type, bool& bRemove);
 	virtual void onCombatRemoveCondition(Condition* condition);
-	virtual void onAttackedCreature(const std::shared_ptr<Creature>&, bool = true) {}
+	virtual void onAttackedCreature(const std::shared_ptr<Creature>&) {}
 	virtual void onAttackedCreatureDrainHealth(const std::shared_ptr<Creature>& target, int32_t points);
 	virtual void onTargetCreatureGainHealth(const std::shared_ptr<Creature>&, int32_t) {}
 	virtual bool onKilledCreature(const std::shared_ptr<Creature>& target, bool lastHit = true);
 	virtual void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target);
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
 	virtual void onBlockHit() {}
-	virtual void onChangeZone(ZoneType_t zone);
+	virtual void onChangeZone(ZoneType_t zone) {}
 	virtual void onIdleStatus();
 
 	virtual LightInfo getCreatureLight() const;
@@ -305,7 +305,7 @@ public:
 	{}
 
 	virtual void onCreatureAppear(const std::shared_ptr<Creature>&, bool, MagicEffectClasses) {}
-	virtual void onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout);
+	virtual void onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout) {}
 	virtual void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                            const Position& newPos, const std::shared_ptr<const Tile>& oldTile,
 	                            const Position& oldPos, bool teleport);
@@ -352,11 +352,13 @@ public:
 	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
 
-	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	void setFollowCreature(const std::shared_ptr<Creature>& creature);
+	std::shared_ptr<Creature> getChaseCreature() const { return chaseCreature.lock(); }
+	void setChaseCreature(const std::shared_ptr<Creature>& creature);
 
-	std::shared_ptr<Creature> getAttackedCreature() { return attackedCreature.lock(); }
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
+	std::shared_ptr<Creature> getTargetCreature() const { return targetCreature.lock(); }
+	void setTargetCreature(const std::shared_ptr<Creature>& creature);
+
+	bool hasNextWalk() const { return eventWalk != 0; }
 
 protected:
 	struct CountBlock_t
@@ -420,10 +422,11 @@ protected:
 	friend class Map;
 
 private:
+	std::weak_ptr<Creature> chaseCreature;
+	std::weak_ptr<Creature> targetCreature;
+
 	std::weak_ptr<Tile> tile;
-	std::weak_ptr<Creature> attackedCreature;
 	std::weak_ptr<Creature> master;
-	std::weak_ptr<Creature> followCreature;
 	std::weak_ptr<Creature> lastAttacker;
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> followers;
 

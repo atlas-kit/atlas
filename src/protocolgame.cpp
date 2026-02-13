@@ -682,12 +682,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xA0:
 			parseFightModes(msg);
 			break;
-		case 0xA1:
-			parseAttack(msg);
-			break;
-		case 0xA2:
-			parseFollow(msg);
-			break;
 		case 0xA3:
 			parseInviteToParty(msg);
 			break;
@@ -716,9 +710,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 			parseChannelExclude(msg);
 			break;
 		// case 0xB1: break; // request highscores
-		case 0xBE:
-			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerCancelAttackAndFollow(playerID); });
-			break;
 		// case 0xC7: break; // request tournament leaderboard
 		case 0xC9: /* update tile */
 			break;
@@ -1273,20 +1264,6 @@ void ProtocolGame::parseFightModes(NetworkMessage& msg)
 	g_dispatcher.addTask([=, playerID = player->getID()]() {
 		g_game.playerSetFightModes(playerID, fightMode, rawChaseMode != 0, rawSecureMode != 0);
 	});
-}
-
-void ProtocolGame::parseAttack(NetworkMessage& msg)
-{
-	uint32_t creatureID = msg.get<uint32_t>();
-	// msg.get<uint32_t>(); creatureID (same as above)
-	g_dispatcher.addTask([=, playerID = player->getID()]() { g_game.playerSetAttackedCreature(playerID, creatureID); });
-}
-
-void ProtocolGame::parseFollow(NetworkMessage& msg)
-{
-	uint32_t creatureID = msg.get<uint32_t>();
-	// msg.get<uint32_t>(); creatureID (same as above)
-	g_dispatcher.addTask([=, playerID = player->getID()]() { g_game.playerFollowCreature(playerID, creatureID); });
 }
 
 void ProtocolGame::parseEquipObject(NetworkMessage& msg)

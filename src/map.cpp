@@ -7,6 +7,7 @@
 
 #include "combat.h"
 #include "creature.h"
+#include "events.h"
 #include "game.h"
 #include "iomap.h"
 #include "iomapserialize.h"
@@ -363,8 +364,14 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 		}
 	}
 
+	tfs::events::creature::onMoved(creature, oldTile, newTile);
+
 	// event method
 	for (const auto& spectator : spectators) {
+		if (spectator != creature) {
+			tfs::events::creature::onNearbyCreatureMoved(spectator, creature, oldTile, newTile);
+		}
+
 		spectator->onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 	}
 

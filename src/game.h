@@ -358,9 +358,6 @@ public:
 	void playerCloseShop(uint32_t playerId);
 	void playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 	void playerCloseTrade(uint32_t playerId);
-	void playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
-	void playerFollowCreature(uint32_t playerId, uint32_t creatureId);
-	void playerCancelAttackAndFollow(uint32_t playerId);
 	void playerSetFightModes(uint32_t playerId, fightMode_t fightMode, bool chaseMode, bool secureMode);
 	void playerLookAt(uint32_t playerId, const Position& pos, uint8_t stackPos);
 	void playerLookInBattleList(uint32_t playerId, uint32_t creatureId);

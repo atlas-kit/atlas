@@ -327,7 +327,7 @@ function getCreatureNoMove(cid) local c = Creature(cid) return c and c:isMovemen
 function getCreatureTarget(cid)
 	local c = Creature(cid)
 	if c then
-		local target = c:getTarget()
+		local target = c:getTargetCreature()
 		return target and target:getId() or 0
 	end
 	return false

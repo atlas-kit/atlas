@@ -727,6 +727,18 @@ int luaTileGetHouse(lua_State* L)
 	return 1;
 }
 
+int luaTileGetZone(lua_State* L)
+{
+	// tile:getZone()
+	const auto& tile = tfs::lua::getSharedPtr<Tile>(L, 1);
+	if (tile) {
+		tfs::lua::pushNumber(L, tile->getZone());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerTile(LuaScriptInterface& lsi)
@@ -807,4 +819,6 @@ void tfs::lua::registerTile(LuaScriptInterface& lsi)
 	lsi.registerMethod("Tile", "addItemEx", luaTileAddItemEx);
 
 	lsi.registerMethod("Tile", "getHouse", luaTileGetHouse);
+
+	lsi.registerMethod("Tile", "getZone", luaTileGetZone);
 }

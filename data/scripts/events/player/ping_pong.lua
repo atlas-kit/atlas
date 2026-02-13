@@ -26,9 +26,9 @@ event.onCreatureThink = function(self, interval)
 
     local noPongTime = timeNow - self:getLastPong()
     if hasLostConnection or noPongTime >= REMOVE_TARGET_PLAYER_SECS then
-        local target = self:getTarget()
+        local target = self:getTargetCreature()
         if target and target:isPlayer() then
-            self:setTarget(nil)
+            self:setTargetCreature(nil)
         end
     end
 

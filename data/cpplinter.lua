@@ -278,10 +278,10 @@ Podium = {}
 ---@field getParent fun(self: Creature): Creature
 ---@field getId fun(self: Creature): number
 ---@field getName fun(self: Creature): string
----@field getTarget fun(self: Creature): Creature
----@field setTarget fun(self: Creature, target: Creature)
----@field getFollowCreature fun(self: Creature): Creature
----@field setFollowCreature fun(self: Creature, creature: Creature)
+---@field getTargetCreature fun(self: Creature): Creature
+---@field setTargetCreature fun(self: Creature, target: Creature)
+---@field getChaseCreature fun(self: Creature): Creature
+---@field setChaseCreature fun(self: Creature, creature: Creature)
 ---@field getMaster fun(self: Creature): Creature
 ---@field setMaster fun(self: Creature, master: Creature)
 ---@field getLight fun(self: Creature): table
@@ -997,11 +997,12 @@ Weapon = {}
 ---@field onGameStartup fun():nil
 ---@field onGameShutdown fun():nil
 ---@field onGameSave fun():nil
+---@field onCreatureTargetCreatureChanged fun(creature:Creature):nil
+---@field onCreatureZoneChanged fun(creature:Creature):nil
 ---@field onCreatureChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean
 ---@field onCreatureAreaCombat fun(creature:Creature, tile:Tile, aggresive:boolean): integer
 ---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
 ---@field onCreatureHear fun(creature:Creature, speaker:Creature, words:string, type:integer):nil
----@field onCreatureChangeZone fun(creature:Creature, fromZone:integer, toZone:integer):nil
 ---@field onCreatureChangeHealth fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
 ---@field onCreatureChangeMana fun(creature:Creature, attacker:Creature, primaryDamage:integer, primaryType:integer, secondaryDamage:integer, secondaryType:integer, origin:integer):integer, integer, integer, integer
 ---@field onCreatureUpdateStorage fun(creature:Creature, key:integer, value?:integer, oldValue?:integer, isSpawn?:boolean):nil
