@@ -1198,7 +1198,7 @@ public:
 	auto getFightMode() const { return fighting.mode; }
 	auto isSecureModeEnabled() const { return fighting.secure; }
 	auto isChasingEnabled() const { return fighting.chase; }
-	void setFightingModes(FightMode_t mode, bool chase, bool secure);
+	void setFightModes(FightMode_t mode, bool chase, bool secure);
 
 private:
 	std::forward_list<Condition*> getMuteConditions() const;

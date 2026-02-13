@@ -1,7 +1,7 @@
 local event = Event()
 
-event.onPlayerFightingModesChanged = function(self, mode, chase, secure)
-	self:sendFightingModes()
+event.onPlayerFightModesChanged = function(self, mode, chase, secure)
+	self:sendFightModes()
 end
 
 event:register()

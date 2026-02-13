@@ -2431,14 +2431,14 @@ int luaPlayerIsChasingEnabled(lua_State* L)
 	return 1;
 }
 
-int luaPlayerSetFightingModes(lua_State* L)
+int luaPlayerSetFightModes(lua_State* L)
 {
-	// player:setFightingModes(mode, chase, secure)
+	// player:setFightModes(mode, chase, secure)
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
 		const auto mode = tfs::lua::getNumber<FightMode_t>(L, 2, player->getFightMode());
 		const auto chase = tfs::lua::getBoolean(L, 3, player->isChasingEnabled());
 		const auto secure = tfs::lua::getBoolean(L, 4, player->isSecureModeEnabled());
-		player->setFightingModes(mode, chase, secure);
+		player->setFightModes(mode, chase, secure);
 		tfs::lua::pushBoolean(L, true);
 	} else {
 		lua_pushnil(L);
@@ -2703,7 +2703,7 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "getFightMode", luaPlayerGetFightMode);
 	lsi.registerMethod("Player", "isSecureModeEnabled", luaPlayerIsSecureModeEnabled);
 	lsi.registerMethod("Player", "isChasingEnabled", luaPlayerIsChasingEnabled);
-	lsi.registerMethod("Player", "setFightingModes", luaPlayerSetFightingModes);
+	lsi.registerMethod("Player", "setFightModes", luaPlayerSetFightModes);
 
 	lsi.registerMethod("Player", "stopWalk", luaPlayerStopWalk);
 }

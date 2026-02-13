@@ -13,7 +13,7 @@ function handler.onReceive(player, msg)
 		fightMode = FIGHTMODE_BALANCED
 	end
 
-	player:setFightingModes(fightMode, chaseModeRaw ~= 0, secureModeRaw ~= 0)
+	player:setFightModes(fightMode, chaseModeRaw ~= 0, secureModeRaw ~= 0)
 end
 
 handler:register()

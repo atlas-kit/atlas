@@ -319,8 +319,8 @@ function Player:onExtendedOpcode(opcode, buffer)
 	end
 end
 
-function Player:onFightingModesChanged(mode, chase, secure)
-	if Event.onPlayerFightingModesChanged then
-		Event.onPlayerFightingModesChanged(self, mode, chase, secure)
+function Player:onFightModesChanged(mode, chase, secure)
+	if Event.onPlayerFightModesChanged then
+		Event.onPlayerFightModesChanged(self, mode, chase, secure)
 	end
 end
