@@ -461,11 +461,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 					if (zone == ZONE_PROTECTION) {
 						setAttackedCreature(nullptr);
 
-						if (const auto& player = asPlayer()) {
-							player->sendCancelTarget();
-							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-						}
-
 						if (const auto& monster = asMonster()) {
 							monster->resetAttackTicks();
 						}

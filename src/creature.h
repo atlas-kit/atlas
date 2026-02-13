@@ -355,7 +355,7 @@ public:
 	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
 	void setFollowCreature(const std::shared_ptr<Creature>& creature);
 
-	std::shared_ptr<Creature> getAttackedCreature() { return attackedCreature.lock(); }
+	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
 	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
 protected:
