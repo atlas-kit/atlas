@@ -568,15 +568,23 @@ BlockType_t Monster::blockHit(const std::shared_ptr<Creature>& attacker, CombatT
 
 bool Monster::isTarget(const std::shared_ptr<const Creature>& creature) const
 {
-	if (creature->isRemoved() || !creature->isAttackable() || creature->getZone() == ZONE_PROTECTION ||
-	    !canSeeCreature(creature)) {
+	if (creature->isRemoved()) {
 		return false;
 	}
 
-	if (creature->getPosition().z != getPosition().z) {
+	if (!creature->isAttackable()) {
 		return false;
 	}
-	return true;
+
+	if (creature->getZone() == ZONE_PROTECTION) {
+		return false;
+	}
+
+	if (!canSeeCreature(creature)) {
+		return false;
+	}
+
+	return creature->getPosition().z == getPosition().z;
 }
 
 bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)

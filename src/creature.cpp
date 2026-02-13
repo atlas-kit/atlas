@@ -1240,13 +1240,6 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 			return;
 		}
 
-		if (const auto& player = asPlayer()) {
-			player->setTargetCreature(nullptr);
-			player->sendCancelTarget();
-			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-			player->stopWalk();
-		}
-
 		chaseCreature = creature;
 		creature->addFollower(asCreature());
 

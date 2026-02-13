@@ -53,7 +53,7 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
 		return
 	end
 
-	if monster:isOpponent(tileTopCreature)
+	if monster:isOpponent(tileTopCreature) then
 		monster:selectTarget(tileTopCreature)
 	end
 end

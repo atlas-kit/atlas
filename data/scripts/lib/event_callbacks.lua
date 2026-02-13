@@ -29,6 +29,8 @@ ec.onCreatureZoneChanged = {}
 ec.onCreatureNearbyCreatureZoneChanged = {}
 ec.onCreatureMoved = {}
 ec.onCreatureNearbyCreatureMoved = {}
+ec.onCreatureRemoved = {}
+ec.onCreatureNearbyCreatureRemoved = {}
 ec.onCreatureChangeOutfit = {}
 ec.onCreatureChangeMount = {}
 ec.onCreatureAreaCombat = {returnValue=true}
