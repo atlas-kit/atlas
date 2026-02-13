@@ -467,7 +467,7 @@ Creature = {}
 ---@field getFightMode fun(self: Player): number
 ---@field isSecureModeEnabled fun(self: Player): boolean
 ---@field isChasingEnabled fun(self: Player): boolean
----@field setFightModes fun(self: Player, mode?: FightMode_t, chase?: boolean, secure?: boolean)
+---@field setFightMode fun(self: Player, stance?: FightMode_t, chase?: boolean, secure?: boolean)
 Player = {}
 
 ---@class Monster : Creature
@@ -1047,7 +1047,7 @@ Weapon = {}
 ---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil
 ---@field onPlayerTextEdit fun(player:Player, item:Item, text:string, windowTextId:integer):boolean
 ---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil
----@field onPlayerFightModesChanged fun(player:Player, mode:FightMode_t, chase:boolean, secure:boolean):nil
+---@field onPlayerFightModeChanged fun(player:Player, stance:FightMode_t, chase:boolean, secure:boolean):nil
 ---@field onMonsterDropLoot fun(monster:Monster, corpse?:Container):nil
 ---@field onMonsterSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
 ---@operator call():Event

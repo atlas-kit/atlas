@@ -1,4 +1,4 @@
-function Player.sendFightModes(self)
+function Player.sendFightMode(self)
 	local msg = NetworkMessage()
 	msg:addByte(0xA7)
 	msg:addByte(self:getFightMode())

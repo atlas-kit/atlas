@@ -1,6 +1,6 @@
 local event = Event()
 
-event.onPlayerFightModesChanged = function(self, mode, chase, secure)
+event.onPlayerFightModeChanged = function(self, stance, chase, secure)
 	local targetCreature = self:getTarget()
 	if not targetCreature then
 		return

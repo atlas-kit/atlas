@@ -124,7 +124,7 @@ void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId
 bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, std::string_view text,
                 const uint32_t windowTextId);
 void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std::string_view buffer);
-void onFightModesChanged(const std::shared_ptr<Player>& player, FightMode_t mode, bool chase, bool secure);
+void onFightModeChanged(const std::shared_ptr<Player>& player, FightMode_t stance, bool chase, bool secure);
 
 } // namespace tfs::events::player
 
