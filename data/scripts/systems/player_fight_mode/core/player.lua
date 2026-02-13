@@ -1,10 +1,10 @@
 function Player.sendFightingModes(self)
-    local msg = NetworkMessage()
+	local msg = NetworkMessage()
 	msg:addByte(0xA7)
 	msg:addByte(self:getFightMode())
 	msg:addByte(self:isChasingEnabled() and 1 or 0)
 	msg:addByte(self:isSecureModeEnabled() and 1 or 0)
 	msg:addByte(PVP_MODE_DOVE)
-    msg:sendToPlayer(self)
-    msg:delete()
+	msg:sendToPlayer(self)
+	msg:delete()
 end
