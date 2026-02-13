@@ -25,7 +25,6 @@ Creature::Creature() { onIdleStatus(); }
 Creature::~Creature()
 {
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
-		summon->setTargetCreature(nullptr);
 		summon->removeMaster();
 	}
 	assert(conditions.empty());

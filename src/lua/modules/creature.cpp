@@ -1079,6 +1079,17 @@ int luaCreaturehHasNextWalk(lua_State* L)
 	return 1;
 }
 
+int luaCreaturehIsAttackable(lua_State* L)
+{
+	// creature:isAttackable()
+	if (const auto& creature = tfs::lua::getSharedPtr<const Creature>(L, 1)) {
+		tfs::lua::pushBoolean(L, creature->isAttackable());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 } // namespace
 
 void tfs::lua::registerCreature(LuaScriptInterface& lsi)
@@ -1218,4 +1229,6 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "setStorageValue", luaCreatureSetStorageValue);
 
 	lsi.registerMethod("Creature", "hasNextWalk", luaCreaturehHasNextWalk);
+
+	lsi.registerMethod("Creature", "isAttackable", luaCreaturehIsAttackable);
 }

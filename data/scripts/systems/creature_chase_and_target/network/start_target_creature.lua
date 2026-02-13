@@ -7,15 +7,18 @@ local handler = PacketHandler(0xA1)
 -- Triggered when the server receives the 0xA1 packet.
 function handler.onReceive(player, msg)
     -- Read the 32-bit ID of the creature the player wants to attack.
-    local targetId = msg:getU32()
+    local targetCreatureId = msg:getU32()
     
-    -- If the ID is 0, the target is invalid; exit.
-    if targetId == 0 then
+    -- Case: ID is 0. This happens when the player clicks on the ground or 
+    -- deselects the current target manually.
+    if targetCreatureId == 0 then
+        print(string.format("[start_target_creature:Packet 0xA1] Player %s: Manual untarget (ID 0 received).", player:getName()))
+        player:setTargetCreature(nil)
         return
     end
 
     -- Find the creature object in the game world.
-    local targetCreature = Creature(targetId)
+    local targetCreature = Creature(targetCreatureId)
     if not targetCreature then
         return
     end
@@ -41,7 +44,7 @@ function handler.onReceive(player, msg)
     -- }
 
     -- Log the successful target acquisition.
-    print(string.format("[PacketHandler 0xA1] Player %s is now attacking %s.", player:getName(), targetCreature:getName()))
+    print(string.format("[start_target_creature:Packet 0xA1] Player %s clicked to attack %s.", player:getName(), targetCreature:getName()))
 
     -- Set the server-side target, which will trigger attack ticks and combat logic.
     player:setTargetCreature(targetCreature)

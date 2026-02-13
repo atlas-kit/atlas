@@ -108,7 +108,6 @@ public:
 	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(const std::shared_ptr<Creature>& creature);
 
-	const auto& getTargetList() const { return targetList; }
 	const auto& getFriendList() const { return friendList; }
 
 	bool isTarget(const std::shared_ptr<const Creature>& creature) const;
@@ -139,9 +138,6 @@ public:
 	void addTarget(const std::shared_ptr<Creature>& creature, bool pushFront = false);
 	void removeTarget(const std::shared_ptr<Creature>& creature);
 
-	bool isFriend(const std::shared_ptr<const Creature>& creature) const;
-	bool isOpponent(const std::shared_ptr<const Creature>& creature) const;
-
 	void setIdle(bool idle);
 	bool getIdleStatus() const { return isIdle; }
 
@@ -154,9 +150,17 @@ public:
 
 	void resetAttackTicks() { attackTicks = 0; }
 
+	const auto& getTargetCreatures() const { return targetCreatures; }
+	void addTargetCreature(const std::shared_ptr<Creature>& creature) { targetCreatures.push_back(creature); }
+	void removeTargetCreature(const std::shared_ptr<Creature>& creature);
+
+	bool isFriendCreature(const std::shared_ptr<const Creature>& creature) const;
+	bool isOpponentCreature(const std::shared_ptr<const Creature>& creature) const;
+
 private:
-	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
-	std::deque<std::weak_ptr<Creature>> targetList;
+	std::deque<std::weak_ptr<Creature>> targetCreatures;
+	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendCreatures;
+
 	MonsterIconHashMap monsterIcons;
 
 	std::string name;

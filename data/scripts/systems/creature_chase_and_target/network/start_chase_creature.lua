@@ -9,8 +9,11 @@ function handler.onReceive(player, msg)
     -- Read the 32-bit unsigned integer representing the Unique ID of the creature to chase.
     local chaseCreatureId = msg:getU32()
     
-    -- If the ID is 0, it is an invalid target; exit the function.
+    -- Case: ID is 0. This happens when the player clicks to stop chasing.
     if chaseCreatureId == 0 then
+        -- Updated log and function to reflect 'Chase' instead of 'Target'
+        print(string.format("[start_chase_creature:Packet 0xA2] Player %s: Manual stop chase (ID 0 received).", player:getName()))
+        player:setChaseCreature(nil)
         return
     end
 
@@ -21,7 +24,7 @@ function handler.onReceive(player, msg)
     end
 
     -- Log the chase request for debugging.
-    print(string.format("[PacketHandler 0xA2] Player %s is now chasing %s.", player:getName(), chaseCreature:getName()))
+    print(string.format("[start_chase_creature:Packet 0xA2] Player %s is now chasing %s.", player:getName(), chaseCreature:getName()))
 
     -- Set the server-side chase target, initiating the auto-walk behavior toward that creature.
     player:setChaseCreature(chaseCreature)
