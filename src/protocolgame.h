@@ -225,7 +225,7 @@ private:
 	void sendPendingStateEntered();
 	void sendEnterWorld();
 
-	void sendFightModes();
+	void sendFightMode();
 
 	void sendCreatureLight(const std::shared_ptr<const Creature>& creature);
 
