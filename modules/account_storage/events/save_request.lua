@@ -1,4 +1,4 @@
-function Game.saveAccountsStorage()
+local function saveAccountsStorage()
 	local transaction = DBTransaction()
 	if not transaction:begin() then
 		return false
@@ -26,3 +26,14 @@ function Game.saveAccountsStorage()
 
 	return transaction:commit()
 end
+
+local event = Event()
+
+event.onGameSave = function()
+	local success = saveAccountsStorage()
+	if not success then
+		print("Failed to save account-level storage values.")
+	end
+end
+
+event:register()

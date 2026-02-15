@@ -5528,8 +5528,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 		}
 
 		case RELOAD_TYPE_MODULES: {
-			tfs::lua::modules::reload();
-			return true;
+			return tfs::lua::modules::reload();
 		}
 
 		case RELOAD_TYPE_SCRIPTS: {

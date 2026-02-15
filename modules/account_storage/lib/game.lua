@@ -4,15 +4,15 @@ do
 	function Game.getAccountsStorage() return storages end
 
 	function Game.clearAccountStorageValue(accountId, key)
-		local accountStorage = storages[accountId]
-		if accountStorage then
-			accountStorage[key] = nil
+		local storage = storages[accountId]
+		if storage then
+			storage[key] = nil
 		end
 	end
 
 	function Game.getAccountStorageValue(accountId, key)
-		local accountStorage = storages[accountId]
-		return accountStorage and accountStorage[key] or nil
+		local storage = storages[accountId]
+		return storage and storage[key] or nil
 	end
 
 	function Game.setAccountStorageValue(accountId, key, value)
