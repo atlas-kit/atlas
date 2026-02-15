@@ -159,7 +159,7 @@ bool load()
 
 		try {
 			loadModule(name, false);
-		} catch (std::exception e) {
+		} catch (const std::exception e) {
 			std::cout << "[Module error - tfs::lua::modules::load] " << e.what() << std::endl;
 			return false;
 		}
@@ -178,7 +178,6 @@ bool reload()
 
 	loadModulesFiles();
 
-	std::string currentModule;
 	for (const auto& [name, module] : loaded_modules) {
 		if (module.state == MODULE_STATE_LOADED) {
 			continue;
@@ -186,7 +185,7 @@ bool reload()
 
 		try {
 			loadModule(name, true);
-		} catch (std::exception e) {
+		} catch (const std::exception& e) {
 			std::cout << "[Module error - tfs::lua::modules::reload] " << e.what() << std::endl;
 			return false;
 		}
