@@ -125,10 +125,6 @@ void Creature::onThink(uint32_t interval)
 			player->sendCancelTarget();
 			player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
 	}
 
 	blockTicks += interval;
@@ -344,16 +340,31 @@ void Creature::updateFollowCreaturePath(FindPathParams& fpp)
 
 void Creature::onChangeZone(ZoneType_t zone)
 {
-	if (const auto& attackedCreature = getAttackedCreature(); attackedCreature && zone == ZONE_PROTECTION) {
-		setAttackedCreature(nullptr);
+	if (zone == ZONE_PROTECTION) {
+		if (const auto& attackedCreature = getAttackedCreature()) {
+			setAttackedCreature(nullptr);
 
-		if (const auto& player = asPlayer()) {
-			player->sendCancelTarget();
-			player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+			if (const auto& player = asPlayer()) {
+				player->sendCancelTarget();
+				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+			}
+
+			if (const auto& monster = asMonster()) {
+				monster->resetAttackTicks();
+			}
 		}
 
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
+		if (const auto& followCreature = getFollowCreature()) {
+			setFollowCreature(nullptr);
+
+			if (const auto& player = asPlayer()) {
+				player->sendCancelTarget();
+				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+			}
+
+			if (const auto& monster = asMonster()) {
+				monster->resetAttackTicks();
+			}
 		}
 	}
 }
@@ -406,6 +417,10 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 			if (const auto& player = asPlayer()) {
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+			}
+
+			if (const auto& monster = asMonster()) {
+				monster->resetAttackTicks();
 			}
 		}
 	}
@@ -759,6 +774,10 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 			if (player->getFollowCreature()) {
 				player->setFollowCreature(nullptr);
 			}
+		}
+
+		if (const auto& monster = asMonster()) {
+			monster->resetAttackTicks();
 		}
 		return;
 	}
