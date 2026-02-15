@@ -10,6 +10,27 @@ namespace fs = std::filesystem;
 
 namespace {
 
+enum ModuleState
+{
+	MODULE_STATE_NOT_LOADED,
+	MODULE_STATE_LOADING,
+	MODULE_STATE_LOADED
+};
+
+struct ModuleFile
+{
+	bool isLib;
+	bool enabled;
+	std::filesystem::path path;
+};
+
+struct Module
+{
+	std::string name;
+	std::vector<ModuleFile> files;
+	ModuleState state = MODULE_STATE_NOT_LOADED;
+};
+
 LuaScriptInterface lsi("Modules Interface");
 
 std::map<std::string, Module> loaded_modules;
@@ -134,7 +155,7 @@ int luaModulesModule(lua_State* L)
 		loadModule(name, false);
 		return 1;
 	} catch (const std::exception& e) {
-		return luaL_error(L, "Failed to load module '%s': %s", name.c_str(), ex.what());
+		return luaL_error(L, "Failed to load module '%s': %s", name.c_str(), e.what());
 	}
 }
 
