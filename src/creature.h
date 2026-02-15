@@ -317,7 +317,7 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t) {}
 
-	virtual void updateFollowPath(bool force = false);
+	virtual void updateFollowPath();
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
@@ -393,7 +393,6 @@ protected:
 	std::vector<Direction> listWalkDir;
 
 	uint64_t lastStep = 0;
-	int64_t lastPathUpdate = 0;
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;

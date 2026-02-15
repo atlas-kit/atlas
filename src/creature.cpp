@@ -126,20 +126,11 @@ void Creature::onThink(uint32_t interval)
 	tfs::events::creature::onThink(asCreature(), interval);
 }
 
-void Creature::updateFollowPath(bool force)
+void Creature::updateFollowPath()
 {
-	if (followCreature.expired()) {
-		return;
+	if (!followCreature.expired()) {
+		g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 	}
-
-	if (!force) {
-		if (lastPathUpdate >= OTSYS_TIME()) {
-			return;
-		}
-	}
-
-	lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
-	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
 void Creature::onIdleStatus()
@@ -172,8 +163,6 @@ void Creature::onWalk()
 		}
 	}
 
-	updateFollowersPaths();
-
 	if (cancelNextWalk) {
 		listWalkDir.clear();
 		onWalkAborted();
@@ -185,6 +174,7 @@ void Creature::onWalk()
 		addEventWalk();
 	}
 
+	updateFollowersPaths();
 	updateFollowPath();
 }
 
@@ -316,7 +306,8 @@ void Creature::updateFollowCreaturePath(FindPathParams& fpp)
 {
 	listWalkDir.clear();
 
-	if (const auto& followCreature = getFollowCreature(); getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
+	if (const auto& followCreature = getFollowCreature();
+	    followCreature && getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
 		hasFollowPath = true;
 		startAutoWalk();
 	} else {
@@ -747,7 +738,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 	hasFollowPath = false;
 	onFollowCreature(creature);
 
-	updateFollowPath(true);
+	updateFollowPath();
 }
 
 void Creature::removeFollowCreature()
