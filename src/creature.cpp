@@ -797,7 +797,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 	}
 
 	attackedCreature = creature;
-	creature->addFollower(asCreature());
+
 	onAttackedCreature(creature);
 
 	if (const auto& player = creature->asPlayer()) {
@@ -812,7 +812,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 
 	if (const auto& player = asPlayer()) {
 		const auto& followCreature = player->getFollowCreature();
-		if (player->hasSecureMode()) {
+		if (player->getChaseMode()) {
 			if (followCreature != creature) {
 				// chase opponent
 				player->setFollowCreature(creature);
@@ -864,8 +864,12 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 		return;
 	}
 
-	followCreature = creature;
+	if (const auto& oldFollow = getFollowCreature()) {
+		oldFollow->removeFollower(asCreature());
+	}
 	creature->addFollower(asCreature());
+
+	followCreature = creature;
 	hasFollowPath = false;
 
 	if (!listWalkDir.empty()) {
