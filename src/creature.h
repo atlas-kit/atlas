@@ -317,7 +317,7 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t) {}
 
-	virtual void forceUpdatePath();
+	virtual void updateFollowPath(bool force = false);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 

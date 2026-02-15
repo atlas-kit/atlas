@@ -126,10 +126,16 @@ void Creature::onThink(uint32_t interval)
 	tfs::events::creature::onThink(asCreature(), interval);
 }
 
-void Creature::forceUpdatePath()
+void Creature::updateFollowPath(bool force)
 {
 	if (followCreature.expired()) {
 		return;
+	}
+
+	if (!force) {
+		if (lastPathUpdate >= OTSYS_TIME()) {
+			return;
+		}
 	}
 
 	lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
@@ -179,12 +185,7 @@ void Creature::onWalk()
 		addEventWalk();
 	}
 
-	if (!attackedCreature.expired() || !followCreature.expired()) {
-		if (lastPathUpdate < OTSYS_TIME()) {
-			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
-			lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
-		}
-	}
+	updateFollowPath();
 }
 
 void Creature::onWalk(Direction& dir)
@@ -746,7 +747,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 	hasFollowPath = false;
 	onFollowCreature(creature);
 
-	forceUpdatePath();
+	updateFollowPath(true);
 }
 
 void Creature::removeFollowCreature()
@@ -795,13 +796,9 @@ void Creature::updateFollowersPaths()
 	            }) |
 	            std::ranges::to<decltype(followers)>();
 
+	const auto size = followers.size();
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate < OTSYS_TIME()) {
-			continue;
-		}
-
-		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
-		follower->lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
+		follower->updateFollowPath();
 	}
 }
 
