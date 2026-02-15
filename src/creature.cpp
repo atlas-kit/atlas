@@ -340,11 +340,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
                               const Position& newPos, const std::shared_ptr<const Tile>& oldTile,
                               const Position& oldPos, bool teleport)
 {
-	if (const auto& followCreature = getFollowCreature();
-	    (creature == followCreature || (creature.get() == this && followCreature))) {
-		updateFollowPath();
-	}
-
 	if (creature.get() == this) {
 		lastStep = OTSYS_TIME();
 		lastStepCost = 1;
@@ -385,6 +380,8 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 	    creature == followCreature || (creature.get() == this && followCreature)) {
 		if (newPos.z != oldPos.z || !canSee(followCreature->getPosition())) {
 			onCreatureDisappear(followCreature, false);
+		} else {
+			updateFollowPath();
 		}
 	}
 
