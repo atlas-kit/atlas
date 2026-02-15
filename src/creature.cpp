@@ -796,7 +796,6 @@ void Creature::updateFollowersPaths()
 	            }) |
 	            std::ranges::to<decltype(followers)>();
 
-	const auto size = followers.size();
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
 		follower->updateFollowPath();
 	}
