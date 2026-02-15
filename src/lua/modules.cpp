@@ -133,7 +133,7 @@ int luaModulesModule(lua_State* L)
 	try {
 		loadModule(name, false);
 		return 1;
-	} catch (std::exception ex) {
+	} catch (const std::exception& e) {
 		return luaL_error(L, "Failed to load module '%s': %s", name.c_str(), ex.what());
 	}
 }
@@ -159,7 +159,7 @@ bool load()
 
 		try {
 			loadModule(name, false);
-		} catch (const std::exception e) {
+		} catch (const std::exception& e) {
 			std::cout << "[Module error - tfs::lua::modules::load] " << e.what() << std::endl;
 			return false;
 		}
