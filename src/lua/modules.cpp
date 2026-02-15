@@ -87,6 +87,10 @@ void loadModule(const std::string& name, bool reload)
 			continue;
 		}
 
+		if (reload && file.isLib) {
+			continue;
+		}
+
 		const auto fileName = file.path.filename().string();
 
 		if (lsi.loadFile(file.path.string()) == -1) {
