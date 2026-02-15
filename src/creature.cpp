@@ -128,9 +128,17 @@ void Creature::onThink(uint32_t interval)
 
 void Creature::updateFollowPath()
 {
-	if (!followCreature.expired()) {
-		g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
 	}
+
+	if (followCreature.expired()) {
+		return;
+	}
+
+	eventFollowPath = g_scheduler.addEvent(
+	    createSchedulerTask(EVENT_CHECK_CREATURE_INTERVAL, [id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
 void Creature::onIdleStatus()
@@ -175,7 +183,6 @@ void Creature::onWalk()
 	}
 
 	updateFollowersPaths();
-	updateFollowPath();
 }
 
 void Creature::onWalk(Direction& dir)

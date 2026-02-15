@@ -213,6 +213,7 @@ public:
 	{
 		return tfs::owner_equal(followCreature, creature);
 	}
+	void completeEventFollowWalk() { eventFollowPath = 0; }
 
 	// follow events
 	virtual void onFollowCreature(const std::shared_ptr<const Creature>&);
@@ -393,6 +394,7 @@ protected:
 	std::vector<Direction> listWalkDir;
 
 	uint64_t lastStep = 0;
+	uint32_t eventFollowPath = 0;
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
