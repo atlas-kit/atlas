@@ -23,8 +23,6 @@ namespace tfs::lua {
 std::string getErrorDesc(ErrorCode_t code)
 {
 	switch (code) {
-		case LUA_ERROR_MODULE_NOT_FOUND:
-			return "Module not found";
 		case LUA_ERROR_PLAYER_NOT_FOUND:
 			return "Player not found";
 		case LUA_ERROR_CREATURE_NOT_FOUND:
