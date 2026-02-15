@@ -759,6 +759,11 @@ void Creature::removeFollowCreature()
 		oldFollow->removeFollower(asCreature());
 	}
 
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+
 	followCreature.reset();
 	onUnfollowCreature();
 }
