@@ -527,30 +527,23 @@ void Monster::goToFollowCreature()
 	FindPathParams fpp;
 	getPathSearchParams(followCreature, fpp);
 
-	if (!isSummon()) {
 		Direction dir = DIRECTION_NONE;
 
-		if (isFleeing()) {
-			getDistanceStep(followCreature->getPosition(), dir, true);
-		} else { // maxTargetDist > 1
-			if (!getDistanceStep(followCreature->getPosition(), dir)) {
-				// if we can't get anything then let the A* calculate
-				updateFollowCreaturePath(fpp);
-				return;
-			}
-		}
-
-		if (dir != DIRECTION_NONE) {
+	bool simpleStep = !isSummon() && (isFleeing() || fpp.maxTargetDist > 1);
+	if (simpleStep) {
+		if (getDistanceStep(followCreature->getPosition(), dir, isFleeing())) {
 			listWalkDir.clear();
 			listWalkDir.push_back(dir);
 
 			hasFollowPath = true;
 			startAutoWalk();
+
+			onFollowCreatureComplete();
+			return;
 		}
-	} else {
-		updateFollowCreaturePath(fpp);
 	}
 
+	updateFollowCreaturePath(fpp);
 	onFollowCreatureComplete();
 }
 
