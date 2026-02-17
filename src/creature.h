@@ -214,6 +214,7 @@ public:
 		return tfs::owner_equal(followCreature, creature);
 	}
 	void completeEventFollowWalk() { eventFollowPath = 0; }
+	bool hasPathToFollow() const { return hasFollowPath; }
 
 	// follow events
 	virtual void onFollowCreature(const std::shared_ptr<const Creature>&);

@@ -3793,7 +3793,11 @@ void Game::updateCreaturesFollowPath(size_t index)
 	}));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
-		if (!creature->isDead() && creature->getFollowCreature()) {
+		if (creature->isDead()) {
+			continue;
+		}
+
+		if (creature->getFollowCreature() && !creature->hasPathToFollow()) {
 			creature->updateFollowPath();
 		}
 	}
