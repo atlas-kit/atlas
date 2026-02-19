@@ -531,8 +531,9 @@ void Monster::goToFollowCreature()
 	if (simpleStep) {
 		auto direction = DIRECTION_NONE;
 		if (getDistanceStep(followCreature->getPosition(), direction, isFleeing())) {
+			hasFollowPath = true;
+
 			if (direction != DIRECTION_NONE) {
-				hasFollowPath = true;
 				startAutoWalk(direction);
 			}
 
