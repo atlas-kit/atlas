@@ -527,7 +527,7 @@ void Monster::goToFollowCreature()
 	FindPathParams fpp;
 	getPathSearchParams(followCreature, fpp);
 
-	const auto simpleStep = !isSummon() && (isFleeing() || fpp.maxTargetDist >= 1);
+	const auto simpleStep = !isSummon() && (isFleeing() || fpp.maxTargetDist > 1);
 	if (simpleStep) {
 		auto direction = DIRECTION_NONE;
 		if (getDistanceStep(followCreature->getPosition(), direction, isFleeing())) {
