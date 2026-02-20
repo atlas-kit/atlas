@@ -129,8 +129,7 @@ void Creature::onThink(uint32_t interval)
 void Creature::updateFollowPath()
 {
 	if (eventFollowPath != 0) {
-		g_scheduler.stopEvent(eventFollowPath);
-		eventFollowPath = 0;
+		return;
 	}
 
 	if (followCreature.expired()) {
