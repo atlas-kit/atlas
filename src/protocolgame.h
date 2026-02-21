@@ -97,7 +97,6 @@ private:
 	void parseFollow(NetworkMessage& msg);
 	void parseEquipObject(NetworkMessage& msg);
 
-	void parseDebugAssert(NetworkMessage& msg);
 	void parseRuleViolationReport(NetworkMessage& msg);
 
 	void parseThrow(NetworkMessage& msg);
@@ -317,7 +316,6 @@ private:
 
 	uint8_t challengeRandom = 0;
 
-	bool debugAssertSent = false;
 	bool acceptPackets = false;
 };
 
