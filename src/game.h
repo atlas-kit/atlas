@@ -432,7 +432,7 @@ public:
 	                    bool ignoreResistances = false);
 
 	void combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-	                       uint8_t& effect);
+	                       uint16_t& effect);
 
 	bool combatChangeHealth(const std::shared_ptr<Creature>& attacker, const std::shared_ptr<Creature>& target,
 	                        CombatDamage& damage);

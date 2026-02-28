@@ -227,6 +227,28 @@ private:
 	void sendPendingStateEntered();
 	void sendEnterWorld();
 
+	// New 15.11 login packets
+	void sendAllowBugReport();
+	void sendTibiaTime(uint16_t time);
+	void sendDisableLoginMusic();
+	void sendBlessStatus();
+	void sendPremiumTrigger();
+	void sendWorldLight(const LightInfo& lightInfo);
+	void sendClientCheck();
+	void sendGameNews();
+	void sendInventoryIds();
+
+	// Stubs for systems not yet implemented
+	void sendBosstiaryCooldownTimer();
+	void sendItemsPrice();
+	void sendPreyPrices();
+	void sendPreyData();
+	void sendTaskHuntingData();
+	void sendForgingData();
+	void sendVIPGroups();
+	void sendLootContainers();
+	void sendHousesInfo();
+
 	void sendFightModes();
 
 	void sendCreatureLight(const std::shared_ptr<const Creature>& creature);
@@ -307,6 +329,10 @@ private:
 	// shop
 	void AddShopItem(NetworkMessage& msg, const ShopInfo& item);
 
+	// New 15.11 parse stubs
+	void parseImbuementWindow(NetworkMessage& msg);
+	void parseWeaponProficiency(NetworkMessage& msg);
+
 	// otclient
 	void parseExtendedOpcode(NetworkMessage& msg);
 
@@ -317,13 +343,16 @@ private:
 
 	uint32_t eventConnect = 0;
 	uint32_t challengeTimestamp = 0;
+	int32_t clientVersion = 0;
 	uint16_t version = CLIENT_VERSION_MIN;
-	uint32_t clientVersion = 0;
+	uint16_t otclientV8 = 0;
 
 	uint8_t challengeRandom = 0;
 
 	bool debugAssertSent = false;
 	bool acceptPackets = false;
+	bool isOTC = false;
+	bool loggedIn = false;
 };
 
 #endif // FS_PROTOCOLGAME_H

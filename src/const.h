@@ -4,7 +4,7 @@
 #ifndef FS_CONST_H
 #define FS_CONST_H
 
-static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 24590;
+static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
 static constexpr int32_t MIN_MARKET_FEE = 20;
 static constexpr int32_t MAX_MARKET_FEE = 100000;
 
@@ -20,7 +20,7 @@ enum MagicEffectsType_t : uint8_t
 	MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT = 7,  // needs uint8_t and uint16_t after type (added in 13.00)
 };
 
-enum MagicEffectClasses : uint8_t
+enum MagicEffectClasses : uint16_t
 {
 	CONST_ME_NONE,
 
@@ -177,7 +177,7 @@ enum MagicEffectClasses : uint8_t
 	CONST_ME_FOAM = 241,
 };
 
-enum ShootType_t : uint8_t
+enum ShootType_t : uint16_t
 {
 	CONST_ANI_NONE,
 
@@ -438,6 +438,8 @@ enum Icons_t
 	ICON_GOSHNAR4 = 1 << 24,
 	ICON_GOSHNAR5 = 1 << 25,
 	ICON_MANASHIELD_BREAKABLE = 1 << 26,
+	ICON_AGONY = 1 << 27,
+	ICON_POWERLESS = 1 << 28,
 };
 
 enum WeaponType_t : uint8_t
@@ -604,9 +606,20 @@ enum ResourceTypes_t : uint8_t
 {
 	RESOURCE_BANK_BALANCE = 0x00,
 	RESOURCE_GOLD_EQUIPPED = 0x01,
+	RESOURCE_INVENTORY_CURRENCY_CUSTOM = 0x02,
 	RESOURCE_PREY_WILDCARDS = 0x0A,
 	RESOURCE_DAILYREWARD_STREAK = 0x14,
 	RESOURCE_DAILYREWARD_JOKERS = 0x15,
+	RESOURCE_TASK_HUNTING = 0x32,
+	RESOURCE_FORGE_DUST = 0x46,
+	RESOURCE_FORGE_SLIVER = 0x47,
+	RESOURCE_FORGE_CORES = 0x48,
+	RESOURCE_LESSER_GEMS = 0x51,
+	RESOURCE_REGULAR_GEMS = 0x52,
+	RESOURCE_GREATER_GEMS = 0x53,
+	RESOURCE_LESSER_FRAGMENT = 0x54,
+	RESOURCE_GREATER_FRAGMENT = 0x55,
+	RESOURCE_WHEEL_OF_DESTINY = 0x56,
 };
 
 enum PlayerFlags : uint64_t

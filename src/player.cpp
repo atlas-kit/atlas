@@ -1070,30 +1070,54 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 	}
 
+	// 15.11 login packet sequence
 	sendClientFeatures();
+	sendAllowBugReport();
+	sendTibiaTime(12 * 60); // noon (no day/night cycle in Atlas)
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
-	sendStats();
-	sendSkills();
-	sendIcons();
-	sendBasicData();
-	sendItems();
-	sendLight();
-	sendVIPEntries();
-	//sendItemClasses();
-
-	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
-		auto slot = static_cast<slots_t>(i);
-		sendInventoryItem(slot, getInventoryItem(slot));
-	}
-	sendInventoryItem(CONST_SLOT_STORE_INBOX, nullptr);
-
-	//openSavedContainers();
 
 	if (magicEffect != CONST_ME_NONE) {
 		sendMagicEffect(magicEffect);
 	}
+	sendDisableLoginMusic();
+
+	// Inventory slots (before stats in 15.11)
+	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
+		auto slot = static_cast<slots_t>(i);
+		sendInventoryItem(slot, getInventoryItem(slot));
+	}
+	sendInventoryItem(CONST_SLOT_STORE_INBOX, getStoreInbox()->asItem());
+
+	sendStats();
+	sendSkills();
+	sendBlessStatus();
+	sendPremiumTrigger();
+	sendItemsPrice();
+	sendPreyPrices();
+	sendPreyData();
+	sendTaskHuntingData();
+	sendForgingData();
+
+	// World light (static daylight since Atlas has no day/night cycle)
+	sendWorldLight(LightInfo{250, 215});
+
+	// Player creature light
+	sendLight();
+
+	sendVIPGroups();
+	sendVIPEntries();
+	sendInventoryIds();
+	sendLootContainers();
+	sendBasicData();
+	sendHousesInfo();
+	sendClientCheck();
+	sendGameNews();
+	sendIcons();
+
+	openSavedContainers();
+	sendBosstiaryCooldownTimer();
 
 	tfs::events::player::onJoin(asPlayer());
 }

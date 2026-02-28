@@ -869,6 +869,114 @@ public:
 			client->sendItemClasses();
 		}
 	}
+	void sendAllowBugReport() const
+	{
+		if (client) {
+			client->sendAllowBugReport();
+		}
+	}
+	void sendTibiaTime(uint16_t time) const
+	{
+		if (client) {
+			client->sendTibiaTime(time);
+		}
+	}
+	void sendDisableLoginMusic() const
+	{
+		if (client) {
+			client->sendDisableLoginMusic();
+		}
+	}
+	void sendBlessStatus() const
+	{
+		if (client) {
+			client->sendBlessStatus();
+		}
+	}
+	void sendPremiumTrigger() const
+	{
+		if (client) {
+			client->sendPremiumTrigger();
+		}
+	}
+	void sendWorldLight(const LightInfo& lightInfo) const
+	{
+		if (client) {
+			client->sendWorldLight(lightInfo);
+		}
+	}
+	void sendClientCheck() const
+	{
+		if (client) {
+			client->sendClientCheck();
+		}
+	}
+	void sendGameNews() const
+	{
+		if (client) {
+			client->sendGameNews();
+		}
+	}
+	void sendInventoryIds() const
+	{
+		if (client) {
+			client->sendInventoryIds();
+		}
+	}
+	void sendBosstiaryCooldownTimer() const
+	{
+		if (client) {
+			client->sendBosstiaryCooldownTimer();
+		}
+	}
+	void sendItemsPrice() const
+	{
+		if (client) {
+			client->sendItemsPrice();
+		}
+	}
+	void sendPreyPrices() const
+	{
+		if (client) {
+			client->sendPreyPrices();
+		}
+	}
+	void sendPreyData() const
+	{
+		if (client) {
+			client->sendPreyData();
+		}
+	}
+	void sendTaskHuntingData() const
+	{
+		if (client) {
+			client->sendTaskHuntingData();
+		}
+	}
+	void sendForgingData() const
+	{
+		if (client) {
+			client->sendForgingData();
+		}
+	}
+	void sendVIPGroups() const
+	{
+		if (client) {
+			client->sendVIPGroups();
+		}
+	}
+	void sendLootContainers() const
+	{
+		if (client) {
+			client->sendLootContainers();
+		}
+	}
+	void sendHousesInfo() const
+	{
+		if (client) {
+			client->sendHousesInfo();
+		}
+	}
 	void sendClientFeatures() const
 	{
 		if (client) {
