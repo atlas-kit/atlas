@@ -213,7 +213,7 @@ public:
 		return storeInbox;
 	}
 
-	uint32_t getClientIcons() const;
+	uint64_t getClientIcons() const;
 
 	const GuildWarVector& getGuildWarVector() const { return guildWarVector; }
 

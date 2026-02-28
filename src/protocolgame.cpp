@@ -508,8 +508,8 @@ void ProtocolGame::onConnect()
 	output->addByte(0x71);
 
 	// Go back and write checksum
-	output->skipBytes(-13);
-	output->add<uint32_t>(adlerChecksum(output->getOutputBuffer() + sizeof(uint32_t), 9));
+	output->skipBytes(-12);
+	output->add<uint32_t>(adlerChecksum(output->getOutputBuffer() + sizeof(uint32_t), 8));
 
 	send(output);
 }
@@ -1914,12 +1914,12 @@ void ProtocolGame::sendChannelMessage(const std::string& author, const std::stri
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendIcons(uint32_t icons)
+void ProtocolGame::sendIcons(uint64_t icons)
 {
 	NetworkMessage msg;
 	msg.addByte(0xA2);
-	msg.add<uint32_t>(icons);
-	msg.addByte(0x00);
+	msg.add<uint64_t>(icons);
+	msg.addByte(0x00); // bakragore
 	writeToOutputBuffer(msg);
 }
 
@@ -3627,31 +3627,31 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 	msg.add<uint16_t>(0); // flat damage/healing bonus
 	msg.add<uint16_t>(0); // attack total
 	msg.addByte(0);        // element type
-	msg.addDouble(0.0, 3); // converted damage ratio
+	msg.addDouble(0.0, 4); // converted damage ratio
 	msg.addByte(0);        // converted element type
 
 	// Life leech (from special skills)
-	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_LIFELEECHAMOUNT]) / 100.0, 2);
+	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_LIFELEECHAMOUNT]) / 100.0, 4);
 	// Mana leech
-	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_MANALEECHAMOUNT]) / 100.0, 2);
+	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_MANALEECHAMOUNT]) / 100.0, 4);
 	// Critical hit chance
-	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_CRITICALHITCHANCE]) / 100.0, 2);
+	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_CRITICALHITCHANCE]) / 100.0, 4);
 	// Critical hit damage
-	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_CRITICALHITAMOUNT]) / 100.0, 2);
+	msg.addDouble(static_cast<double>(player->varSpecialSkills[SPECIALSKILL_CRITICALHITAMOUNT]) / 100.0, 4);
 
-	msg.addDouble(0.0, 2); // onslaught (forge bonus)
+	msg.addDouble(0.0, 4); // onslaught (forge bonus)
 	msg.add<uint16_t>(0);  // defense
 	msg.add<uint16_t>(0);  // armor
 	msg.add<uint16_t>(0);  // mantra total
-	msg.addDouble(0.0, 2); // mitigation
-	msg.addDouble(0.0, 2); // dodge/ruse (forge bonus)
+	msg.addDouble(0.0, 4); // mitigation
+	msg.addDouble(0.0, 4); // dodge/ruse (forge bonus)
 	msg.add<uint16_t>(0);  // damage reflection
 
 	msg.addByte(0); // combat absorb count (0 = no absorb data)
 
-	msg.addDouble(0.0, 2); // momentum (forge bonus)
-	msg.addDouble(0.0, 2); // transcendence (forge bonus)
-	msg.addDouble(0.0, 2); // amplification (forge bonus)
+	msg.addDouble(0.0, 4); // momentum (forge bonus)
+	msg.addDouble(0.0, 4); // transcendence (forge bonus)
+	msg.addDouble(0.0, 4); // amplification (forge bonus)
 }
 
 void ProtocolGame::AddOutfit(NetworkMessage& msg, const Outfit_t& outfit)
@@ -3862,7 +3862,10 @@ void ProtocolGame::sendPremiumTrigger()
 {
 	NetworkMessage msg;
 	msg.addByte(0x9E);
-	msg.addByte(0); // trigger count (0 = no premium triggers)
+	msg.addByte(16); // 16 premium triggers
+	for (uint16_t i = 0; i <= 15; i++) {
+		msg.addByte(0x01);
+	}
 	writeToOutputBuffer(msg);
 }
 
@@ -3870,7 +3873,7 @@ void ProtocolGame::sendWorldLight(const LightInfo& lightInfo)
 {
 	NetworkMessage msg;
 	msg.addByte(0x82);
-	msg.addByte(lightInfo.level);
+	msg.addByte(player->isAccessPlayer() ? 0xFF : lightInfo.level);
 	msg.addByte(lightInfo.color);
 	writeToOutputBuffer(msg);
 }

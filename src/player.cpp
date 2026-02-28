@@ -393,9 +393,9 @@ float Player::getDefenseFactor() const
 	}
 }
 
-uint32_t Player::getClientIcons() const
+uint64_t Player::getClientIcons() const
 {
-	uint32_t icons = 0;
+	uint64_t icons = 0;
 	for (Condition* condition : conditions) {
 		if (!isSuppress(condition->getType())) {
 			icons |= condition->getIcons();

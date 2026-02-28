@@ -164,7 +164,7 @@ private:
 	void sendToChannel(const std::shared_ptr<const Creature>& creature, SpeakClasses type, const std::string& text,
 	                   uint16_t channelId);
 	void sendPrivateMessage(const std::shared_ptr<const Player>& speaker, SpeakClasses type, const std::string& text);
-	void sendIcons(uint32_t icons);
+	void sendIcons(uint64_t icons);
 	void sendFYIBox(const std::string& message);
 
 	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type);
