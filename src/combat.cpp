@@ -15,7 +15,7 @@
 #include "weapons.h"
 
 extern Game g_game;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 std::vector<std::shared_ptr<Tile>> getList(const MatrixArea& area, const Position& targetPos, const Direction dir)
 {
@@ -1309,7 +1309,7 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 	// remove magic walls/wild growth
 	if (id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE || isBlocking()) {
 		if (!creature->isInGhostMode()) {
-			g_game.internalRemoveItem(getMagicField(), 1);
+			g_game.internalRemoveItem(asMagicField(), 1);
 		}
 
 		return;
@@ -1318,7 +1318,7 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 	// remove magic walls/wild growth (only nopvp tiles/world)
 	if (id == ITEM_MAGICWALL_NOPVP || id == ITEM_WILDGROWTH_NOPVP) {
 		if (g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE)) {
-			g_game.internalRemoveItem(getMagicField(), 1);
+			g_game.internalRemoveItem(asMagicField(), 1);
 		}
 		return;
 	}

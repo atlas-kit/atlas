@@ -105,7 +105,7 @@ public:
 
 	bool configureSpell(const pugi::xml_node& node);
 	const std::string& getName() const { return name; }
-	void setName(std::string n) { name = n; }
+	void setName(std::string n) { name = std::move(n); }
 	uint16_t getId() const { return spellId; }
 	void setId(uint16_t id) { spellId = id; }
 
