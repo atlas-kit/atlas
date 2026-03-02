@@ -12,9 +12,16 @@ public:
 	explicit DepotChest(uint16_t type, bool paginated = true) : Container{type, items[type].maxItems, true, paginated}
 	{}
 
-	void setMaxDepotItems(uint32_t maxitems) { maxDepotItems = maxitems; }
+	std::shared_ptr<DepotChest> asDepotChest() override
+	{
+		return std::static_pointer_cast<DepotChest>(shared_from_this());
+	}
+	std::shared_ptr<const DepotChest> asDepotChest() const override
+	{
+		return std::static_pointer_cast<const DepotChest>(shared_from_this());
+	}
 
-	bool isDepotChest() const override { return true; }
+	void setMaxDepotItems(uint32_t maxitems) { maxDepotItems = maxitems; }
 
 	ReturnValue queryAdd(int32_t index, const std::shared_ptr<const Thing>& thing, uint32_t count, uint32_t flags,
 	                     const std::shared_ptr<Creature>& actor = nullptr) const override;
