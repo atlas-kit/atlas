@@ -1195,9 +1195,9 @@ public:
 	void removeExperience(uint64_t exp, bool sendText = false);
 	double getLossPercent() const;
 
-	auto getFightMode() const { return fighting.mode; }
-	auto isSecureModeEnabled() const { return fighting.secure; }
-	auto isChasingEnabled() const { return fighting.chase; }
+	auto getFightMode() const { return fightMode.stance; }
+	auto isSecureModeEnabled() const { return fightMode.secure; }
+	auto isChasingEnabled() const { return fightMode.chase; }
 	void setFightMode(FightMode_t stance, bool chase, bool secure);
 
 private:
@@ -1383,12 +1383,12 @@ private:
 	uint16_t getLookCorpse() const override;
 	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const override;
 
-	struct Fighting
+	struct FightMode
 	{
-		FightMode_t mode = FIGHTMODE_ATTACK;
+		FightMode_t stance = FIGHTMODE_ATTACK;
 		bool secure = false;
 		bool chase = false;
-	} fighting;
+	} fightMode;
 
 	friend class IOLoginData;
 	friend class ProtocolGame;

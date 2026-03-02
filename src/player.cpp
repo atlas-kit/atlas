@@ -4625,11 +4625,10 @@ void Player::updateRegeneration()
 
 void Player::setFightMode(FightMode_t stance, bool chase, bool secure)
 {
-	const auto previousFighting = fighting;
-	fighting.mode = stance;
-	fighting.chase = chase;
-	fighting.secure = secure;
+	const auto previousMode = fightMode;
+	fightMode.stance = stance;
+	fightMode.chase = chase;
+	fightMode.secure = secure;
 
-	tfs::events::player::onFightModeChanged(asPlayer(), previousFighting.mode, previousFighting.chase,
-	                                        previousFighting.secure);
+	tfs::events::player::onFightModeChanged(asPlayer(), previousMode.stance, previousMode.chase, previousMode.secure);
 }
