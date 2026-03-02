@@ -1492,7 +1492,7 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
 	scriptInterface.callVoidFunction(4);
 }
 
-void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, NetworkMessage_ptr& msg)
+void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
 {
 	// Player:onNetworkMessage(recvByte, msg)
 	if (playerHandlers.onNetworkMessage == -1) {

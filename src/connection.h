@@ -26,17 +26,9 @@ static constexpr int32_t CONNECTION_WRITE_TIMEOUT = 30;
 static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
 class Protocol;
-using Protocol_ptr = std::shared_ptr<Protocol>;
 class OutputMessage;
-using OutputMessage_ptr = std::shared_ptr<OutputMessage>;
 class Connection;
-using Connection_ptr = std::shared_ptr<Connection>;
-using ConnectionWeak_ptr = std::weak_ptr<Connection>;
-class ServiceBase;
-using Service_ptr = std::shared_ptr<ServiceBase>;
 class ServicePort;
-using ServicePort_ptr = std::shared_ptr<ServicePort>;
-using ConstServicePort_ptr = std::shared_ptr<const ServicePort>;
 
 class ConnectionManager
 {
@@ -47,14 +39,15 @@ public:
 		return instance;
 	}
 
-	Connection_ptr createConnection(boost::asio::io_context& io_context, ConstServicePort_ptr servicePort);
-	void releaseConnection(const Connection_ptr& connection);
+	std::shared_ptr<Connection> createConnection(boost::asio::io_context& io_context,
+	                                             std::shared_ptr<const ServicePort> servicePort);
+	void releaseConnection(const std::shared_ptr<Connection>& connection);
 	void closeAll();
 
 private:
 	ConnectionManager() = default;
 
-	std::unordered_set<Connection_ptr> connections;
+	std::unordered_set<std::shared_ptr<Connection>> connections;
 	std::mutex connectionManagerLock;
 };
 
@@ -71,17 +64,17 @@ public:
 		FORCE_CLOSE = true
 	};
 
-	Connection(boost::asio::io_context& io_context, ConstServicePort_ptr service_port);
+	Connection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> service_port);
 	~Connection();
 
 	friend class ConnectionManager;
 
 	void close(bool force = false);
 	// Used by protocols that require server to send first
-	void accept(Protocol_ptr protocol);
+	void accept(std::shared_ptr<Protocol> protocol);
 	void accept();
 
-	void send(const OutputMessage_ptr& msg);
+	void send(const std::shared_ptr<OutputMessage>& msg);
 
 	const Address& getIP() const { return remoteAddress; };
 
@@ -91,10 +84,10 @@ private:
 
 	void onWriteOperation(const boost::system::error_code& error);
 
-	static void handleTimeout(ConnectionWeak_ptr connectionWeak, const boost::system::error_code& error);
+	static void handleTimeout(std::weak_ptr<Connection> connectionWeak, const boost::system::error_code& error);
 
 	void closeSocket();
-	void internalSend(const OutputMessage_ptr& msg);
+	void internalSend(const std::shared_ptr<OutputMessage>& msg);
 
 	boost::asio::ip::tcp::socket& getSocket() { return socket; }
 	friend class ServicePort;
@@ -106,10 +99,10 @@ private:
 
 	std::recursive_mutex connectionLock;
 
-	std::list<OutputMessage_ptr> messageQueue;
+	std::list<std::shared_ptr<OutputMessage>> messageQueue;
 
-	ConstServicePort_ptr service_port;
-	Protocol_ptr protocol;
+	std::shared_ptr<const ServicePort> service_port;
+	std::shared_ptr<Protocol> protocol;
 
 	boost::asio::ip::tcp::socket socket;
 	Address remoteAddress;

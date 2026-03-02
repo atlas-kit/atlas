@@ -11,8 +11,8 @@ class Podium final : public Item
 public:
 	explicit Podium(uint16_t type) : Item(type) {};
 
-	std::shared_ptr<Podium> getPodium() override { return std::static_pointer_cast<Podium>(shared_from_this()); }
-	std::shared_ptr<const Podium> getPodium() const override
+	std::shared_ptr<Podium> asPodium() override { return std::static_pointer_cast<Podium>(shared_from_this()); }
+	std::shared_ptr<const Podium> asPodium() const override
 	{
 		return std::static_pointer_cast<const Podium>(shared_from_this());
 	}

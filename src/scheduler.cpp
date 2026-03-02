@@ -9,7 +9,7 @@ extern Dispatcher g_dispatcher;
 
 Scheduler g_scheduler;
 
-uint32_t Scheduler::addEvent(SchedulerTask_ptr&& task)
+uint32_t Scheduler::addEvent(std::unique_ptr<SchedulerTask>&& task)
 {
 	// check if the event has a valid id
 	if (task->getEventId() == 0) {
@@ -67,7 +67,7 @@ void Scheduler::shutdown()
 	});
 }
 
-SchedulerTask_ptr createSchedulerTask(uint32_t delay, TaskFunc&& f)
+std::unique_ptr<SchedulerTask> createSchedulerTask(uint32_t delay, TaskFunc&& f)
 {
-	return SchedulerTask_ptr(new SchedulerTask(delay, std::move(f)));
+	return std::make_unique<SchedulerTask>(delay, std::move(f));
 }

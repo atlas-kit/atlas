@@ -527,30 +527,22 @@ void Monster::goToFollowCreature()
 	FindPathParams fpp;
 	getPathSearchParams(followCreature, fpp);
 
-	if (!isSummon()) {
-		Direction dir = DIRECTION_NONE;
-
-		if (isFleeing()) {
-			getDistanceStep(followCreature->getPosition(), dir, true);
-		} else { // maxTargetDist > 1
-			if (!getDistanceStep(followCreature->getPosition(), dir)) {
-				// if we can't get anything then let the A* calculate
-				updateFollowCreaturePath(fpp);
-				return;
-			}
-		}
-
-		if (dir != DIRECTION_NONE) {
-			listWalkDir.clear();
-			listWalkDir.push_back(dir);
-
+	const auto simpleStep = !isSummon() && (isFleeing() || fpp.maxTargetDist > 1);
+	if (simpleStep) {
+		auto direction = DIRECTION_NONE;
+		if (getDistanceStep(followCreature->getPosition(), direction, isFleeing())) {
 			hasFollowPath = true;
-			startAutoWalk();
+
+			if (direction != DIRECTION_NONE) {
+				startAutoWalk(direction);
+			}
+
+			onFollowCreatureComplete();
+			return;
 		}
-	} else {
-		updateFollowCreaturePath(fpp);
 	}
 
+	updateFollowCreaturePath(fpp);
 	onFollowCreatureComplete();
 }
 
@@ -1826,7 +1818,6 @@ void Monster::death(const std::shared_ptr<Creature>&)
 
 	clearTargetList();
 	clearFriendList();
-	onIdleStatus();
 }
 
 std::shared_ptr<Item> Monster::getCorpse(const std::shared_ptr<Creature>& lastHitCreature,

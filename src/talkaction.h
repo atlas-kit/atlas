@@ -8,9 +8,6 @@
 #include "const.h"
 #include "lua/script.h"
 
-class TalkAction;
-using TalkAction_ptr = std::unique_ptr<TalkAction>;
-
 enum TalkActionResult_t
 {
 	TALKACTION_CONTINUE,
@@ -33,7 +30,7 @@ public:
 		wordsMap.emplace_back(word);
 	}
 	std::string getSeparator() const { return separator; }
-	void setSeparator(std::string sep) { separator = sep; }
+	void setSeparator(std::string sep) { separator = std::move(sep); }
 
 	// scripting
 	bool executeSay(const std::shared_ptr<Player>& player, const std::string& words, const std::string& param,
@@ -76,8 +73,8 @@ public:
 private:
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "talkactions"; }
-	Event_ptr getEvent(const std::string& nodeName) override;
-	bool registerEvent(Event_ptr event, const pugi::xml_node& node) override;
+	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
 
 	std::map<std::string, TalkAction> talkActions;
 

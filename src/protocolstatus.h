@@ -24,7 +24,7 @@ public:
 	};
 	static const char* protocol_name() { return "status protocol"; }
 
-	explicit ProtocolStatus(Connection_ptr connection) : Protocol(connection) {}
+	explicit ProtocolStatus(std::shared_ptr<Connection> connection) : Protocol(std::move(connection)) {}
 
 	void onRecvFirstMessage(NetworkMessage& msg) override;
 

@@ -95,15 +95,15 @@ public:
 	static uint32_t playerAutoID;
 	static uint32_t playerIDLimit;
 
-	explicit Player(ProtocolGame_ptr p);
+	explicit Player(std::shared_ptr<ProtocolGame> protocol);
 	~Player() = default;
 
 	// non-copyable
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Player> asPlayer() override { return std::static_pointer_cast<Player>(shared_from_this()); }
 	std::shared_ptr<const Player> asPlayer() const override
@@ -248,9 +248,6 @@ public:
 	uint64_t getSpentMana() const { return manaSpent; }
 
 	bool hasFlag(PlayerFlags value) const { return (group->flags & value) != 0; }
-
-	std::shared_ptr<BedItem> getBedItem() const { return bedItem.lock(); }
-	void setBedItem(const std::shared_ptr<BedItem>& bedItem) { this->bedItem = bedItem; }
 
 	void addBlessing(uint8_t blessing) { blessings.set(blessing); }
 	void removeBlessing(uint8_t blessing) { blessings.reset(blessing); }
@@ -633,13 +630,14 @@ public:
 		}
 	}
 
-	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type, uint16_t channel)
+	void sendChannelMessage(const std::string& author, const std::string& text, SpeakClasses type,
+	                        uint16_t channel) const
 	{
 		if (client) {
 			client->sendChannelMessage(author, text, type, channel);
 		}
 	}
-	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent)
+	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent) const
 	{
 		if (client) {
 			client->sendChannelEvent(channelId, playerName, channelEvent);
@@ -931,7 +929,7 @@ public:
 			client->sendCreatePrivateChannel(channelId, channelName);
 		}
 	}
-	void sendClosePrivate(uint16_t channelId);
+	void sendClosePrivate(uint16_t channelId) const;
 	void sendIcons() const
 	{
 		if (client) {
@@ -1173,8 +1171,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask_ptr task);
-	void setNextActionTask(SchedulerTask_ptr task);
+	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
 	void setNextAction(int64_t time)
 	{
@@ -1295,9 +1293,8 @@ private:
 	int64_t lastToggleMount = 0;
 	int64_t nextAction = 0;
 
-	ProtocolGame_ptr client;
+	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
-	std::weak_ptr<BedItem> bedItem;
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
 	Group* group = nullptr;
@@ -1309,7 +1306,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask_ptr walkTask;
+	std::unique_ptr<SchedulerTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;

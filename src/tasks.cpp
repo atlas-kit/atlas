@@ -12,13 +12,16 @@ extern Game g_game;
 
 Dispatcher g_dispatcher;
 
-Task_ptr createTask(TaskFunc&& f) { return std::make_unique<Task>(std::move(f)); }
+std::unique_ptr<Task> createTask(TaskFunc&& f) { return std::make_unique<Task>(std::move(f)); }
 
-Task_ptr createTask(uint32_t expiration, TaskFunc&& f) { return std::make_unique<Task>(expiration, std::move(f)); }
+std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f)
+{
+	return std::make_unique<Task>(expiration, std::move(f));
+}
 
 void Dispatcher::threadMain()
 {
-	std::vector<Task_ptr> tmpTaskList;
+	std::vector<std::unique_ptr<Task>> tmpTaskList;
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	std::unique_lock<std::mutex> taskLockUnique(taskLock, std::defer_lock);
 
@@ -43,7 +46,7 @@ void Dispatcher::threadMain()
 	}
 }
 
-void Dispatcher::addTask(Task_ptr&& task)
+void Dispatcher::addTask(std::unique_ptr<Task>&& task)
 {
 	bool do_signal = false;
 
