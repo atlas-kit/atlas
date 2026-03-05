@@ -435,12 +435,12 @@ int luaAddEvent(lua_State* L)
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
 	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
 
-	auto& lastTimerEventId = g_luaEnvironment.lastEventTimerId;
-	eventDesc.eventId = g_scheduler.addEvent(
-	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
+	uint32_t timerId = g_luaEnvironment.lastEventTimerId++;
+	eventDesc.eventId =
+	    g_scheduler.addEvent(createSchedulerTask(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
 
-	g_luaEnvironment.timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
-	tfs::lua::pushNumber(L, lastTimerEventId++);
+	g_luaEnvironment.timerEvents.emplace(timerId, std::move(eventDesc));
+	tfs::lua::pushNumber(L, timerId);
 	return 1;
 }
 
