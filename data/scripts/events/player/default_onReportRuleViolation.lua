@@ -1,5 +1,5 @@
 local function hasPendingReport(name, targetName, reportType)
-	local f = io.open(string.format("data/reports/players/%s-%s-%d.txt", name, targetName, reportType), "r")
+	local f = io.open(string.format("data/logs/reports/players/%s-%s-%d.txt", name, targetName, reportType), "r")
 	if f then
 		io.close(f)
 		return true
@@ -16,7 +16,7 @@ event.onPlayerReportRuleViolation = function(self, targetName, reportType, repor
 		return
 	end
 
-	local file = io.open(string.format("data/reports/players/%s-%s-%d.txt", name, targetName, reportType), "a")
+	local file = io.open(string.format("data/logs/reports/players/%s-%s-%d.txt", name, targetName, reportType), "a")
 	if not file then
 		self:sendTextMessage(MESSAGE_EVENT_ADVANCE, "There was an error when processing your report, please contact a gamemaster.")
 		return
