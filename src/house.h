@@ -41,8 +41,8 @@ public:
 	Door(const Door&) = delete;
 	Door& operator=(const Door&) = delete;
 
-	std::shared_ptr<Door> getDoor() override { return std::static_pointer_cast<Door>(shared_from_this()); }
-	std::shared_ptr<const Door> getDoor() const override
+	std::shared_ptr<Door> asDoor() override { return std::static_pointer_cast<Door>(shared_from_this()); }
+	std::shared_ptr<const Door> asDoor() const override
 	{
 		return std::static_pointer_cast<const Door>(shared_from_this());
 	}

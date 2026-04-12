@@ -16,16 +16,19 @@ local function findRelevantBed(player)
     end
 
     local directions = {DIRECTION_NORTH, DIRECTION_EAST, DIRECTION_SOUTH, DIRECTION_WEST}
+    local checkPos = Position(pos)
     for _, dir in ipairs(directions) do
-        local checkPos = Position(pos)
+        checkPos.x = pos.x
+        checkPos.y = pos.y
+        checkPos.z = pos.z
         checkPos:getNextPosition(dir)
         local adjacentTile = Tile(checkPos)
         if adjacentTile then
-            local headboard = adjacentTile:getHeadboard()
-            if headboard then
-                local footboard = headboard:getPartnerBed()
+            local adjacentHeadboard = adjacentTile:getHeadboard()
+            if adjacentHeadboard then
+                local footboard = adjacentHeadboard:getPartnerBed()
                 if footboard and footboard:isFootboard() then
-                    return headboard, footboard
+                    return adjacentHeadboard, footboard
                 end
             end
         end
@@ -59,10 +62,7 @@ function event.onPlayerLogin(player)
     end
 
     local lastLogout = player:getLastLogout()
-    local sleptSeconds = 0
-    if lastLogout > 0 then
-        sleptSeconds = math.max(0, os.time() - lastLogout)
-    end
+    local sleptSeconds = lastLogout > 0 and math.max(0, os.time() - lastLogout) or 0
 
     regeneratePlayer(player, sleptSeconds)
 

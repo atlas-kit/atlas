@@ -138,7 +138,7 @@ void ServicePort::accept()
 	                       });
 }
 
-void ServicePort::onAccept(Connection_ptr connection, const boost::system::error_code& error)
+void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::system::error_code& error)
 {
 	if (!error) {
 		if (services.empty()) {
@@ -147,7 +147,7 @@ void ServicePort::onAccept(Connection_ptr connection, const boost::system::error
 
 		const auto& remote_ip = connection->getIP();
 		if (acceptConnection(remote_ip)) {
-			Service_ptr service = services.front();
+			const auto service = services.front();
 			if (service->is_single_socket()) {
 				connection->accept(service->make_protocol(connection));
 			} else {
@@ -170,7 +170,8 @@ void ServicePort::onAccept(Connection_ptr connection, const boost::system::error
 	}
 }
 
-Protocol_ptr ServicePort::make_protocol(NetworkMessage& msg, const Connection_ptr& connection) const
+std::shared_ptr<Protocol> ServicePort::make_protocol(NetworkMessage& msg,
+                                                     const std::shared_ptr<Connection>& connection) const
 {
 	uint8_t protocolID = msg.getByte();
 	for (auto& service : services) {
@@ -230,12 +231,12 @@ void ServicePort::close()
 	}
 }
 
-bool ServicePort::add_service(const Service_ptr& new_svc)
+bool ServicePort::add_service(const std::shared_ptr<ServiceBase>& service)
 {
-	if (std::any_of(services.begin(), services.end(), [](const Service_ptr& svc) { return svc->is_single_socket(); })) {
+	if (std::any_of(services.begin(), services.end(), [](const auto& svc) { return svc->is_single_socket(); })) {
 		return false;
 	}
 
-	services.push_back(new_svc);
+	services.push_back(service);
 	return true;
 }
