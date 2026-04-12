@@ -1404,15 +1404,9 @@
 		<attribute key="rotateTo" value="1751" />
 		<attribute key="type" value="container" />
 	</item>
-	<item fromid="1754" toid="1755" article="a" name="bed">
-		<attribute key="moveable" value="true" />
-	</item>
-	<item fromid="1756" toid="1759" article="a" name="cot">
-		<attribute key="moveable" value="true" />
-	</item>
-	<item fromid="1760" toid="1761" article="a" name="bed">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="1754" toid="1755" article="a" name="bed" />
+	<item fromid="1756" toid="1759" article="a" name="cot" />
+	<item fromid="1760" toid="1761" article="a" name="bed" />
 	<item fromid="1762" toid="1765" article="a" name="bed" />
 	<item fromid="1766" toid="1769" article="a" name="cot" />
 	<item id="1770" article="a" name="barrel">
@@ -7462,9 +7456,7 @@
 		<attribute key="rotateTo" value="3834" />
 		<attribute key="type" value="container" />
 	</item>
-	<item fromid="3836" toid="3839" article="a" name="hammock">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="3836" toid="3839" article="a" name="hammock" />
 	<item fromid="3840" toid="3843" article="a" name="hammock" />
 	<item fromid="3844" toid="3847" article="a" name="grass mat" />
 	<item fromid="3848" toid="3851" article="a" name="straw mat" />
@@ -14898,9 +14890,7 @@
 	<item fromid="7778" toid="7780" article="a" name="bed" />
 	<item fromid="7781" toid="7784" article="a" name="cot" />
 	<item fromid="7785" toid="7786" article="a" name="hammock" />
-	<item fromid="7787" toid="7810" article="a" name="bed">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="7787" toid="7810" article="a" name="bed" />
 	<item fromid="7811" toid="7822" article="a" name="bed" />
 	<item id="7823" article="an" name="obsidian statue">
 		<attribute key="allowDistRead" value="true" />
@@ -27630,9 +27620,7 @@
 	</item>
 	<item fromid="18005" toid="18008" article="a" name="stone block" />
 	<item fromid="18009" toid="18026" article="a" name="small stream" />
-	<item fromid="18027" toid="18030" article="a" name="simple bed">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="18027" toid="18030" article="a" name="simple bed" />
 	<item fromid="18031" toid="18038" article="a" name="simple bed" />
 	<item fromid="18039" toid="18042" article="a" name="painted mammoth" />
 	<item id="18043" name="painted deer" />
@@ -29713,9 +29701,7 @@
 	<item fromid="20190" toid="20192" article="a" name="stone archway" />
 	<item fromid="20193" toid="20194" article="a" name="gate" />
 	<item fromid="20195" toid="20196" name="crenellations" />
-	<item fromid="20197" toid="20200" article="a" name="canopy bed">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="20197" toid="20200" article="a" name="canopy bed" />
 	<item fromid="20201" toid="20208" article="a" name="canopy bed" />
 	<item fromid="20209" toid="20212" article="a" name="small wooden fence" />
 	<item fromid="20213" toid="20215" article="a" name="wooden gable" />
