@@ -3253,7 +3253,6 @@ void Player::removeAttackedCreature()
 	}
 }
 
-
 void Player::goToFollowCreature()
 {
 	const auto& followCreature = getFollowCreature();
