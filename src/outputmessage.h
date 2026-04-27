@@ -40,7 +40,7 @@ public:
 		info.position += msgLen;
 	}
 
-	void append(const OutputMessage_ptr& msg)
+	void append(const std::shared_ptr<OutputMessage>& msg)
 	{
 		auto msgLen = msg->getLength();
 		std::memcpy(buffer.data() + info.position, msg->getBuffer() + 8, msgLen);
@@ -68,9 +68,9 @@ private:
 
 namespace tfs::net {
 
-OutputMessage_ptr make_output_message();
-void insert_protocol_to_autosend(const Protocol_ptr& protocol);
-void remove_protocol_from_autosend(const Protocol_ptr& protocol);
+std::shared_ptr<OutputMessage> make_output_message();
+void insert_protocol_to_autosend(const std::shared_ptr<Protocol>& protocol);
+void remove_protocol_from_autosend(const std::shared_ptr<Protocol>& protocol);
 
 } // namespace tfs::net
 

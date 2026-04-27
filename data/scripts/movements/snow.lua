@@ -1,4 +1,6 @@
-function onStepOut(creature, item, position, fromPosition)
+local event = MoveEvent()
+
+function event.onStepOut(creature, item, position, fromPosition)
 	if not creature:isPlayer() or creature:isInGhostMode() then
 		return true
 	end
@@ -12,3 +14,6 @@ function onStepOut(creature, item, position, fromPosition)
 	item:decay()
 	return true
 end
+
+event:id(670, 6580, 6581, 6582, 6583, 6584, 6585, 6586, 6587, 6588, 6589, 6590, 6591, 6592, 6593)
+event:register()

@@ -227,16 +227,6 @@ public:
 	// Pathfinding events
 	void updateFollowersPaths();
 
-	// combat functions
-	std::shared_ptr<Creature> getAttackedCreature() { return attackedCreature.lock(); }
-	virtual void setAttackedCreature(const std::shared_ptr<Creature>& creature);
-	virtual void removeAttackedCreature();
-	bool canAttackCreature(const std::shared_ptr<Creature>& creature);
-	bool isAttackingCreature(const std::shared_ptr<Creature>& creature)
-	{
-		return tfs::owner_equal(creature, attackedCreature);
-	}
-
 	virtual BlockType_t blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
 	                             bool checkDefense = false, bool checkArmor = false, bool field = false,
 	                             bool ignoreResistances = false);
@@ -309,7 +299,6 @@ public:
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
 	virtual void onBlockHit() {}
 	virtual void onChangeZone(ZoneType_t zone);
-	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 	virtual void onIdleStatus();
 
 	virtual LightInfo getCreatureLight() const;
@@ -336,9 +325,6 @@ public:
 	virtual void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                            const Position& newPos, const std::shared_ptr<const Tile>& oldTile,
 	                            const Position& oldPos, bool teleport);
-
-	virtual void onAttackedCreatureDisappear(bool) {}
-	virtual void onFollowCreatureDisappear(bool) {}
 
 	virtual void onCreatureSay(const std::shared_ptr<Creature>&, SpeakClasses, const std::string&) {}
 
@@ -381,6 +367,9 @@ public:
 	virtual void setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn = false);
 	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
+
+	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
+	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
 protected:
 	struct CountBlock_t
@@ -426,7 +415,6 @@ protected:
 	bool canUseDefense = true;
 	bool movementBlocked = false;
 
-	void onCreatureDisappear(const std::shared_ptr<const Creature>& creature, bool isLogout);
 	virtual void doAttacking(uint32_t) {}
 	virtual bool hasExtraSwing() { return false; }
 

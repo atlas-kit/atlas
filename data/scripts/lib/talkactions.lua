@@ -1,7 +1,7 @@
 local logFormat = "[%s] %s %s\n"
 
 function logCommand(player, words, param)
-	local file = io.open("data/logs/" .. player:getName() .. " commands.log", "a")
+	local file = io.open("data/logs/commands/" .. player:getName() .. ".log", "a")
 	if not file then
 		return
 	end
