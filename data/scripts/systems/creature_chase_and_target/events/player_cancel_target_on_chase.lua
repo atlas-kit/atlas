@@ -19,7 +19,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     -- This occurs when the target dies, logs out, or the player manually stops the attack.
     if not player:hasTargetCreature() then
         -- Stop the player from chasing/following since there is no longer a target.
-        print(string.format("[player_cancel_chase_on_untarget:onCreatureTargetCreatureChanged] Player %s: Target lost, cancelling chase.", player:getName()))
         player:setChaseCreature(nil)
     end
 end

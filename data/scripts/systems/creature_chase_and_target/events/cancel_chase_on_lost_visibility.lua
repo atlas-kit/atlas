@@ -20,7 +20,6 @@ do
         end
 
         -- Stop chasing if visibility is lost after the move.
-        print(string.format("[cancel_chase_on_lost_visibility:onCreatureMoved] %s: Chase cancelled (Target no longer visible).", creature:getName()))
         creature:setChaseCreature(nil)
     end
 
@@ -51,7 +50,6 @@ do
         end
 
         -- Stop chasing if the target moved out of sight or changed floors.
-        print(string.format("[cancel_chase_on_lost_visibility:onCreatureNearbyCreatureMoved] %s: Chase cancelled (Target %s moved out of sight).", creature:getName(), nearbyCreature:getName()))
         creature:setChaseCreature(nil)
     end
 
@@ -80,7 +78,6 @@ do
         end
         
         -- Cancel chase if visibility is lost during the think cycle.
-        print(string.format("[cancel_chase_on_lost_visibility:onCreatureThink] %s: Chase cancelled (Target %s lost during think).", creature:getName(), chaseCreature:getName()))
         creature:setChaseCreature(nil)
     end
 
@@ -102,7 +99,6 @@ do
             return
         end
 
-        print(string.format("[cancel_chase_on_lost_visibility:onCreatureNearbyCreatureRemoved] %s: Chase cancelled (Target %s removed).", creature:getName(), nearbyCreature:getName()))
         creature:setChaseCreature(nil)
     end
 

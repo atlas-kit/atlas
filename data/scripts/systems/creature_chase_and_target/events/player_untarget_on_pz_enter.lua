@@ -28,7 +28,6 @@ do
 
         -- Cancel target because the attacker entered a safe zone.
         -- Print format updated with [FileName:EventName]
-        print(string.format("[player_untarget_on_pz_enter:onCreatureZoneChanged] Player %s: Attack cancelled (Entered Protection Zone).", player:getName()))
         player:setTargetCreature(nil)
     end
 
@@ -65,13 +64,11 @@ do
         -- Logic for different zone types:
         if zone == ZONE_PROTECTION then
             -- Case 1: Target entered a Protection Zone.
-            print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s entered Protection Zone.", player:getName(), targetCreature:getName()))
             player:setTargetCreature(nil)
             
         elseif zone == ZONE_NOPVP then
             -- Case 2: Target entered a No-PVP zone and the target is a player.
             if targetCreature:isPlayer() then
-                print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s entered No-PVP Zone.", player:getName(), targetCreature:getName()))
                 player:setTargetCreature(nil)
             end
             
@@ -79,7 +76,6 @@ do
             -- Case 3: In Optional-PVP (No-PVP) worlds, players cannot be targeted in normal zones.
             if targetCreature:isPlayer() then
                 if Game.getWorldType() == WORLD_TYPE_NO_PVP then
-                    print(string.format("[player_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] Player %s: Target %s is protected by World Type (No-PVP).", player:getName(), targetCreature:getName()))
                     player:setTargetCreature(nil)
                 end
             end

@@ -28,7 +28,6 @@ do
         
         -- If the target changes floor (Z) or the monster loses line of sight:
         if position.z ~= targetPosition.z or not monster:canSee(targetPosition) then
-            print("[monster_cancel_chase_on_lost_visibility:onCreatureNearbyCreatureMoved] Monster chase cancelled: Target moved out of sight or changed floor.")
             monster:setChaseCreature(nil)
         end
     end
@@ -59,7 +58,6 @@ do
         
         -- If the monster moved to a different floor or a spot where it cannot see the target:
         if position.z ~= targetPosition.z or not monster:canSee(targetPosition) then
-            print("[monster_cancel_chase_on_lost_visibility:onCreatureMoved] Monster chase cancelled: Monster moved and lost sight of target.")
             monster:setChaseCreature(nil)
         end
     end

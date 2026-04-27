@@ -14,7 +14,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     if not player:hasTargetCreature() then
         -- Cancel current movement to prevent the player from walking into danger 
         -- or continuing toward a target that no longer exists.
-        print(string.format("[player_stop_walking_on_target_loss:onCreatureTargetCreatureChanged] Player %s: Target lost, stopping movement.", player:getName()))
         player:stopWalk()
     end
 end

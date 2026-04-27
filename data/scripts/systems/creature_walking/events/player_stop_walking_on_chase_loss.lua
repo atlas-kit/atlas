@@ -14,7 +14,6 @@ function event.onCreatureChaseCreatureChanged(creature)
     if not player:hasChaseCreature() then
         -- Force the player character to stop walking immediately.
         -- This prevents the player from continuing to walk toward the last known chase position.
-        print(string.format("[player_stop_walking_on_chase_loss:onCreatureChaseCreatureChanged] Player %s: Chase lost, stopping all movement.", player:getName()))
         player:stopWalk()
     end
 end

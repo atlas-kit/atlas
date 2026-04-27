@@ -24,7 +24,6 @@ function event.onCreatureRemoved(creature)
     
     -- Stop the player's chase movement.
     -- This prevents the player from "sliding" or walking toward a creature that was just removed.
-    print(string.format("[player_lost_chase_on_remove:onCreatureRemoved] Player %s: Chase cancelled because target was removed while player was walking.", player:getName()))
     player:setChaseCreature(nil)
 end
 

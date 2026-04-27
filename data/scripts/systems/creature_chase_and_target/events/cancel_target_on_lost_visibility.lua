@@ -20,7 +20,6 @@ do
         end
 
         -- Clear target because it's no longer visible after moving.
-        print("[cancel_target_on_lost_visibility:onCreatureMoved] Target cancelled: No longer visible after movement.")
         creature:setTargetCreature(nil)
     end
 
@@ -52,7 +51,6 @@ do
         end
 
         -- Target moved to a different floor or behind an obstacle.
-        print("[cancel_target_on_lost_visibility:onCreatureNearbyCreatureMoved] Target cancelled: Target moved out of sight.")
         creature:setTargetCreature(nil)
     end
 
@@ -81,7 +79,6 @@ do
         end
 
         -- Target lost during the periodic think cycle.
-        print("[cancel_target_on_lost_visibility:onCreatureThink] Target cancelled: Visibility lost during think cycle.")
         creature:setTargetCreature(nil)
     end
 
@@ -103,7 +100,6 @@ do
             return
         end
 
-        print("[cancel_target_on_lost_visibility:onCreatureNearbyCreatureRemoved] Target cancelled: Target was removed from the game.")
         creature:setTargetCreature(nil)
     end
 

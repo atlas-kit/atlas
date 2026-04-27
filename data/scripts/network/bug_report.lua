@@ -18,7 +18,7 @@ function handler.onReceive(player, msg)
 		return
 	end
 
-	local file = io.open("data/reports/bugs/" .. player:getName() .. " report.txt", "a")
+	local file = io.open("data/logs/reports/bugs/" .. player:getName() .. " report.txt", "a")
 	if not file then
 		player:sendTextMessage(MESSAGE_EVENT_DEFAULT, "There was an error when processing your report, please contact a gamemaster.")
 		return

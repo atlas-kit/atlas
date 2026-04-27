@@ -18,8 +18,6 @@ function event.onCreatureTargetCreatureChanged(creature)
         -- Notify the player via the status message area (bottom of the screen).
         player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
         
-        -- Log the synchronization event to the console.
-        print(string.format("[player_sync_target_state:onCreatureTargetCreatureChanged] Player %s: Target state synchronized (Target lost).", player:getName()))
     end
 end
 

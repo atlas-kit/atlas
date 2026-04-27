@@ -13,7 +13,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     -- Check if the monster currently has no target.
     -- If the target was lost or cleared, we reset the attack cooldowns (ticks).
     if not monster:hasTargetCreature() then
-        print(string.format("[monster_reset_attack_ticks_on_target_loss:onCreatureTargetCreatureChanged] %s: Target lost. Resetting attack ticks.", monster:getName()))
         monster:resetAttackTicks()
     end
 end

@@ -22,7 +22,6 @@ do
         end
 
         -- Clear target because the opponent is in a safe zone.
-        print(string.format("[monster_untarget_on_pz_enter:onCreatureZoneChanged] %s: Target %s entered Protection Zone. Clearing target.", monster:getName(), targetCreature:getName()))
         monster:setTargetCreature(nil)
     end
 
@@ -55,7 +54,6 @@ do
             return
         end
 
-        print(string.format("[monster_untarget_on_pz_enter:onCreatureNearbyCreatureZoneChanged] %s: Target %s entered Protection Zone. Clearing target.", monster:getName(), targetCreature:getName()))
         monster:setTargetCreature(nil)
     end
 

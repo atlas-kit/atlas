@@ -19,10 +19,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     -- If Secure Mode is off, chase is set to nil (stand still).
     local shouldChase = player:hasChaseMode() and targetCreature or nil
     
-    if shouldChase then
-        print(string.format("[player_auto_chase_on_target:onCreatureTargetCreatureChanged] Player %s is now automatically chasing %s.", player:getName(), targetCreature:getName()))
-    end
-
     player:setChaseCreature(shouldChase)
 end
 

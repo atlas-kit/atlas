@@ -27,8 +27,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     -- Set the condition duration based on the server's PZ_LOCKED configuration (usually 60 seconds).
     condition:setTicks(configManager.getNumber(configKeys.PZ_LOCKED))
     
-    -- Apply the battle sign (In-Fight) to the player.
-    print(string.format("[player_infight_on_targeted:onCreatureTargetCreatureChanged] Player %s gained In-Fight condition by targeting %s.", player:getName(), targetCreature:getName()))
     player:addCondition(condition)
 end
 

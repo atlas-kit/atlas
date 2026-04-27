@@ -20,7 +20,6 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
     if not chaseCreature then
         -- If the creature that moved is an opponent, select it as the new target.
         if monster:isOpponent(nearbyCreature) and monster:canTarget(nearbyCreature) then
-            print(string.format("[monster_select_target:onCreatureNearbyCreatureMoved] %s: No current target. Selecting %s.", monster:getName(), nearbyCreature:getName()))
             monster:selectTarget(nearbyCreature)
         end
         return
@@ -69,7 +68,6 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
 
     -- if a different opponent is standing right in front of the monster, switch target to them.
     if monster:isOpponent(tileTopCreature) and monster:canTarget(tileTopCreature) then
-        print(string.format("[monster_select_target:onCreatureNearbyCreatureMoved] %s: Path blocked by %s. Switching target.", monster:getName(), tileTopCreature:getName()))
         monster:selectTarget(tileTopCreature)
     end
 end

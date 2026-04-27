@@ -95,7 +95,7 @@ public:
 	static uint32_t playerAutoID;
 	static uint32_t playerIDLimit;
 
-	explicit Player(ProtocolGame_ptr p);
+	explicit Player(std::shared_ptr<ProtocolGame> protocol);
 	~Player() = default;
 
 	// non-copyable
@@ -1161,8 +1161,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask_ptr task);
-	void setNextActionTask(SchedulerTask_ptr task);
+	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
 	void setNextAction(int64_t time)
 	{
@@ -1283,7 +1283,7 @@ private:
 	int64_t lastToggleMount = 0;
 	int64_t nextAction = 0;
 
-	ProtocolGame_ptr client;
+	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
@@ -1296,7 +1296,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask_ptr walkTask;
+	std::unique_ptr<SchedulerTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;

@@ -25,7 +25,6 @@ function event.onCreatureChaseCreatureChanged(creature)
     -- Logic: Only cancel the attack if the creature being chased is NOT the same as the creature being attacked.
     -- This allows "Attack + Follow" on the same target, but clears attack if you switch to following a friend/different enemy.
     if targetCreature ~= chaseCreature then
-        print(string.format("[player_cancel_target_on_chase:onCreatureChaseCreatureChanged] Player %s: Followed a different creature. Clearing attack target: %s.", player:getName(), targetCreature:getName()))
         player:setTargetCreature(nil)
     end
 end
