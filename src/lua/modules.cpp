@@ -47,7 +47,6 @@ void importModules(LuaScriptInterface& lsi)
 	registerTalkAction(lsi);
 	registerTile(lsi);
 	registerVariant(lsi);
-	registerVocation(lsi);
 	registerWeapon(lsi);
 	registerXml(lsi);
 }

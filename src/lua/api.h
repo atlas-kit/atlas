@@ -17,6 +17,7 @@ class ItemType;
 struct LootBlock;
 struct Mount;
 struct Town;
+class Vocation;
 
 namespace tfs::lua {
 
@@ -166,6 +167,7 @@ void pushVariant(lua_State* L, const LuaVariant& var);
 void pushThing(lua_State* L, const std::shared_ptr<Thing>& thing);
 void pushSpell(lua_State* L, const Spell& spell);
 void pushTown(lua_State* L, const Town& town);
+void pushVocation(lua_State* L, const Vocation& vocation);
 void pushLoot(lua_State* L, const std::vector<LootBlock>& lootList);
 void pushParty(lua_State* L, const std::shared_ptr<Party>& party);
 void pushItemType(lua_State* L, const ItemType* itemType);

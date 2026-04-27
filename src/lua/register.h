@@ -37,7 +37,6 @@ void registerTeleport(LuaScriptInterface& i);
 void registerThing(LuaScriptInterface& i);
 void registerTile(LuaScriptInterface& i);
 void registerVariant(LuaScriptInterface& i);
-void registerVocation(LuaScriptInterface& i);
 void registerWeapon(LuaScriptInterface& i);
 void registerXml(LuaScriptInterface& i);
 

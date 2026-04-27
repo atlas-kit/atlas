@@ -101,7 +101,7 @@ std::pair<beast::http::status, json::value> tfs::http::handle_login(const json::
 			    {"worldid", 0}, // not implemented
 			    {"name", playersRes->getString("name")},
 			    {"level", playersRes->getNumber<uint32_t>("level")},
-			    {"vocation", vocation->getVocName()},
+			    {"vocation", vocation->name},
 			    {"lastlogin", playersRes->getNumber<uint64_t>("lastlogin")},
 			    {"ismale", playersRes->getNumber<uint16_t>("sex") == PLAYERSEX_MALE},
 			    {"ishidden", false},        // not implemented

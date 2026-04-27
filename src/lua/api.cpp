@@ -10,6 +10,7 @@
 #include "../podium.h"
 #include "../spells.h"
 #include "../teleport.h"
+#include "../vocation.h"
 #include "env.h"
 #include "meta.h"
 
@@ -385,6 +386,45 @@ void pushTown(lua_State* L, const Town& town)
 	pushPosition(L, town.templePosition);
 	lua_setfield(L, -2, "templePosition");
 	lua_getglobal(L, "Town");
+	lua_setmetatable(L, -2);
+}
+
+void pushVocation(lua_State* L, const Vocation& vocation)
+{
+	lua_createtable(L, 0, 24);
+	setField(L, "id", vocation.id);
+	setField(L, "clientId", vocation.clientId);
+	setField(L, "name", vocation.name);
+	setField(L, "description", vocation.description);
+	setField(L, "magicShield", vocation.getMagicShield());
+	setField(L, "gainCap", vocation.gainCap);
+	setField(L, "gainHP", vocation.gainHP);
+	setField(L, "gainMana", vocation.gainMana);
+	setField(L, "gainHealthTicks", vocation.gainHealthTicks);
+	setField(L, "gainHealthAmount", vocation.gainHealthAmount);
+	setField(L, "gainManaTicks", vocation.gainManaTicks);
+	setField(L, "gainManaAmount", vocation.gainManaAmount);
+	setField(L, "manaMultiplier", vocation.manaMultiplier);
+	setField(L, "attackSpeed", vocation.attackSpeed);
+	setField(L, "baseSpeed", vocation.baseSpeed);
+	setField(L, "soulMax", vocation.soulMax);
+	setField(L, "gainSoulTicks", vocation.gainSoulTicks);
+	setField(L, "fromVocation", vocation.fromVocation);
+	setField(L, "allowPvp", vocation.allowPvp);
+	setField(L, "noPongKickTime", vocation.noPongKickTime);
+	setField(L, "meleeDamageMultiplier", vocation.meleeDamageMultiplier);
+	setField(L, "distDamageMultiplier", vocation.distDamageMultiplier);
+	setField(L, "defenseMultiplier", vocation.defenseMultiplier);
+	setField(L, "armorMultiplier", vocation.armorMultiplier);
+
+	lua_createtable(L, SKILL_LAST + 1, 0);
+	for (int i = 0; i <= SKILL_LAST; ++i) {
+		lua_pushnumber(L, vocation.skillMultipliers[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	lua_setfield(L, -2, "skillMultipliers");
+
+	lua_getglobal(L, "Vocation");
 	lua_setmetatable(L, -2);
 }
 

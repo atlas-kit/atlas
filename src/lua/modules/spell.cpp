@@ -564,7 +564,7 @@ int luaSpellVocation(lua_State* L)
 		lua_createtable(L, 0, 0);
 		int i = 0;
 		for (auto&& vocation : spell->getVocationSpellMap() | std::views::keys | std::views::as_const) {
-			const std::string& name = g_vocations.getVocation(vocation)->getVocName();
+			const std::string& name = g_vocations.getVocation(vocation)->name;
 			tfs::lua::pushString(L, name);
 			lua_rawseti(L, -2, ++i);
 		}

@@ -69,7 +69,8 @@ configManager = {}
 ---@field getHouses fun(): table
 ---@field getOutfits fun(sex: number): table
 ---@field getMounts fun(): table
----@field getVocations fun(): table
+---@field getVocations fun(): Vocation[]
+---@field registerVocation fun(vocation: Vocation): boolean
 ---@field getGameState fun(): string
 ---@field setGameState fun(state: string): boolean
 ---@field getWorldType fun(): string
@@ -381,7 +382,7 @@ Creature = {}
 ---@field getItemCount fun(self: Player, itemId: number): number
 ---@field getItemById fun(self: Player, itemId: number, subType?: number): Item
 ---@field getVocation fun(self: Player): Vocation
----@field setVocation fun(self: Player, vocationId: number)
+---@field setVocation fun(self: Player, vocation: Vocation|number)
 ---@field getSex fun(self: Player): number
 ---@field setSex fun(self: Player, sexId: number)
 ---@field getTown fun(self: Player): number
@@ -536,8 +537,30 @@ Guild = {}
 Group = {}
 
 ---@class Vocation
----@field create fun(): Vocation
 ---@field __eq fun(self: Vocation, other: Vocation): boolean
+---@field setId fun(self: Vocation, id: number): Vocation
+---@field setClientId fun(self: Vocation, clientId: number): Vocation
+---@field setName fun(self: Vocation, name: string): Vocation
+---@field setDescription fun(self: Vocation, description: string): Vocation
+---@field setMagicShield fun(self: Vocation, magicShield: boolean): Vocation
+---@field setCapacityGain fun(self: Vocation, gainCap: number): Vocation
+---@field setHealthGain fun(self: Vocation, gainHP: number): Vocation
+---@field setHealthGainTicks fun(self: Vocation, gainHealthTicks: number): Vocation
+---@field setHealthGainAmount fun(self: Vocation, gainHealthAmount: number): Vocation
+---@field setManaGain fun(self: Vocation, gainMana: number): Vocation
+---@field setManaGainTicks fun(self: Vocation, gainManaTicks: number): Vocation
+---@field setManaGainAmount fun(self: Vocation, gainManaAmount: number): Vocation
+---@field setManaMultiplier fun(self: Vocation, manaMultiplier: number): Vocation
+---@field setAttackSpeed fun(self: Vocation, attackSpeed: number): Vocation
+---@field setBaseSpeed fun(self: Vocation, baseSpeed: number): Vocation
+---@field setMaxSoul fun(self: Vocation, soulMax: number): Vocation
+---@field setSoulGainTicks fun(self: Vocation, gainSoulTicks: number): Vocation
+---@field setFromVocation fun(self: Vocation, fromVocation: number): Vocation
+---@field setAllowPvp fun(self: Vocation, allowPvp: boolean): Vocation
+---@field setNoPongKickTime fun(self: Vocation, noPongKickTime: number): Vocation
+---@field setFormula fun(self: Vocation, meleeDamage: number, distDamage: number, defense: number, armor: number): Vocation
+---@field setSkillMultipliers fun(self: Vocation, multipliers: number[]): Vocation
+---@field register fun(self: Vocation): boolean
 ---@field getId fun(self: Vocation): number
 ---@field getClientId fun(self: Vocation): number
 ---@field getName fun(self: Vocation): string
@@ -555,9 +578,13 @@ Group = {}
 ---@field getSoulGainTicks fun(self: Vocation): number
 ---@field getAttackSpeed fun(self: Vocation): number
 ---@field getBaseSpeed fun(self: Vocation): number
----@field getDemotion fun(self: Vocation): Vocation
----@field getPromotion fun(self: Vocation): Vocation
+---@field getFromVocation fun(self: Vocation): number
+---@field getNoPongKickTime fun(self: Vocation): number
 ---@field allowsPvp fun(self: Vocation): boolean
+---@field getDemotion fun(self: Vocation): Vocation|nil
+---@field getPromotion fun(self: Vocation): Vocation|nil
+---@field getBase fun(self: Vocation): Vocation
+---@field getRelated fun(self: Vocation): Vocation[]
 Vocation = {}
 
 ---@class Town

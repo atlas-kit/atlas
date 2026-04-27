@@ -41,7 +41,6 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/modules/thing.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/tile.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/variant.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/modules/vocation.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/weapon.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/xml.cpp
 	)

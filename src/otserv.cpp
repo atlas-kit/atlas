@@ -30,7 +30,6 @@ extern Game g_game;
 extern Monsters g_monsters;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
-extern Vocations g_vocations;
 
 std::mutex g_loaderLock;
 std::condition_variable g_loaderSignal;
@@ -164,13 +163,6 @@ void mainLoader(ServiceManager* services)
 
 	if (getBoolean(ConfigManager::OPTIMIZE_DATABASE) && !DatabaseManager::optimizeTables()) {
 		std::cout << "> No tables were optimized." << std::endl;
-	}
-
-	// load vocations
-	std::cout << ">> Loading vocations" << std::endl;
-	if (std::ifstream is{"data/XML/vocations.xml"}; !g_vocations.loadFromXml(is, "data/XML/vocations.xml")) {
-		startupErrorMessage("Unable to load vocations!");
-		return;
 	}
 
 	// load item data

@@ -803,8 +803,7 @@ int luaPlayerGetVocation(lua_State* L)
 {
 	// player:getVocation()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		tfs::lua::pushUserdata(L, player->getVocation());
-		tfs::lua::setMetatable(L, -1, "Vocation");
+		tfs::lua::pushVocation(L, *player->getVocation());
 	} else {
 		lua_pushnil(L);
 	}
@@ -813,7 +812,7 @@ int luaPlayerGetVocation(lua_State* L)
 
 int luaPlayerSetVocation(lua_State* L)
 {
-	// player:setVocation(id or name or userdata)
+	// player:setVocation(id or name or table)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
 		lua_pushnil(L);
@@ -825,8 +824,8 @@ int luaPlayerSetVocation(lua_State* L)
 		vocation = g_vocations.getVocation(tfs::lua::getNumber<uint16_t>(L, 2));
 	} else if (lua_isstring(L, 2)) {
 		vocation = g_vocations.getVocation(g_vocations.getVocationId(tfs::lua::getString(L, 2)));
-	} else if (lua_isuserdata(L, 2)) {
-		vocation = tfs::lua::getUserdata<Vocation>(L, 2);
+	} else if (lua_istable(L, 2)) {
+		vocation = g_vocations.getVocation(tfs::lua::getField<uint16_t>(L, 2, "id"));
 	}
 
 	if (!vocation) {
@@ -834,7 +833,7 @@ int luaPlayerSetVocation(lua_State* L)
 		return 1;
 	}
 
-	player->setVocation(vocation->getId());
+	player->setVocation(vocation->id);
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -1075,7 +1074,7 @@ int luaPlayerGetMaxSoul(lua_State* L)
 	// player:getMaxSoul()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
 		if (const auto& vocation = player->getVocation()) {
-			tfs::lua::pushNumber(L, vocation->getSoulMax());
+			tfs::lua::pushNumber(L, vocation->soulMax);
 			return 1;
 		}
 	}

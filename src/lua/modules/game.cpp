@@ -1,6 +1,7 @@
 #include "../../otpch.h"
 
 #include "../../game.h"
+#include "../../vocation.h"
 
 #include "../../configmanager.h"
 #include "../../events.h"
@@ -23,7 +24,7 @@ extern Spells* g_spells;
 extern Monsters g_monsters;
 extern Scripts* g_scripts;
 extern Dispatcher g_dispatcher;
-extern Vocations g_vocations;
+Vocations g_vocations;
 
 namespace {
 
@@ -338,11 +339,66 @@ int luaGameGetVocations(lua_State* L)
 
 	int index = 0;
 	for (const auto& [id, vocation] : vocations) {
-		tfs::lua::pushUserdata(L, &vocation);
-		tfs::lua::setMetatable(L, -1, "Vocation");
+		tfs::lua::pushVocation(L, vocation);
 		lua_rawseti(L, -2, ++index);
 	}
 
+	return 1;
+}
+
+int luaGameRegisterVocation(lua_State* L)
+{
+	// Game.registerVocation(data)
+	if (!lua_istable(L, 1)) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	uint16_t id = tfs::lua::getField<uint16_t>(L, 1, "id");
+	auto& voc = g_vocations.registerVocation(id);
+
+	voc.clientId = tfs::lua::getField<uint8_t>(L, 1, "clientId");
+	voc.name = tfs::lua::getFieldString(L, 1, "name");
+	voc.description = tfs::lua::getFieldString(L, 1, "description");
+	voc.magicShield = tfs::lua::getField<bool>(L, 1, "magicShield", false);
+	voc.gainCap = tfs::lua::getField<uint32_t>(L, 1, "gainCap") * 100;
+	voc.gainHP = tfs::lua::getField<uint32_t>(L, 1, "gainHP");
+	voc.gainMana = tfs::lua::getField<uint32_t>(L, 1, "gainMana");
+	voc.gainHealthTicks = tfs::lua::getField<uint32_t>(L, 1, "gainHealthTicks");
+	voc.gainHealthAmount = tfs::lua::getField<uint32_t>(L, 1, "gainHealthAmount");
+	voc.gainManaTicks = tfs::lua::getField<uint32_t>(L, 1, "gainManaTicks");
+	voc.gainManaAmount = tfs::lua::getField<uint32_t>(L, 1, "gainManaAmount");
+	voc.manaMultiplier = tfs::lua::getField<float>(L, 1, "manaMultiplier", 4.0f);
+	voc.attackSpeed = tfs::lua::getField<uint32_t>(L, 1, "attackSpeed");
+	voc.baseSpeed = tfs::lua::getField<uint32_t>(L, 1, "baseSpeed");
+	voc.soulMax = tfs::lua::getField<uint8_t>(L, 1, "soulMax");
+	voc.gainSoulTicks = tfs::lua::getField<uint16_t>(L, 1, "gainSoulTicks");
+	voc.fromVocation = tfs::lua::getField<uint32_t>(L, 1, "fromVocation", VOCATION_NONE);
+	voc.allowPvp = tfs::lua::getField<bool>(L, 1, "allowPvp", true);
+	voc.noPongKickTime = tfs::lua::getField<uint32_t>(L, 1, "noPongKickTime", 60) * 1000;
+
+	lua_getfield(L, 1, "formula");
+	if (lua_istable(L, -1)) {
+		voc.meleeDamageMultiplier = tfs::lua::getField<float>(L, -1, "meleeDamage", 1.0f);
+		voc.distDamageMultiplier = tfs::lua::getField<float>(L, -1, "distDamage", 1.0f);
+		voc.defenseMultiplier = tfs::lua::getField<float>(L, -1, "defense", 1.0f);
+		voc.armorMultiplier = tfs::lua::getField<float>(L, -1, "armor", 1.0f);
+	}
+	lua_pop(L, 1);
+
+	lua_getfield(L, 1, "skills");
+	if (lua_istable(L, -1)) {
+		for (int i = 0; i <= SKILL_LAST; ++i) {
+			lua_rawgeti(L, -1, i + 1);
+			if (lua_isnumber(L, -1)) {
+				voc.skillMultipliers[i] = lua_tonumber(L, -1);
+			}
+			lua_pop(L, 1);
+		}
+	}
+	lua_pop(L, 1);
+
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
@@ -724,6 +780,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "getOutfits", luaGameGetOutfits);
 	lsi.registerMethod("Game", "getMounts", luaGameGetMounts);
 	lsi.registerMethod("Game", "getVocations", luaGameGetVocations);
+	lsi.registerMethod("Game", "registerVocation", luaGameRegisterVocation);
 	lsi.registerMethod("Game", "getRuneSpells", luaGameGetRuneSpells);
 	lsi.registerMethod("Game", "getInstantSpells", luaGameGetInstantSpells);
 

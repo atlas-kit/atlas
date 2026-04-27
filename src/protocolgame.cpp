@@ -1722,7 +1722,7 @@ void ProtocolGame::sendBasicData()
 		msg.add<uint32_t>(0);
 	}
 
-	msg.addByte(player->getVocation()->getClientId());
+	msg.addByte(player->getVocation()->clientId);
 	msg.addByte(0x00); // is prey system enabled (bool)
 
 	// unlock spells on action bar
@@ -3423,7 +3423,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 
 	// Player vocation info
 	if (creatureType == CREATURETYPE_PLAYER) {
-		msg.addByte(otherPlayer ? otherPlayer->getVocation()->getClientId() : 0x00);
+		msg.addByte(otherPlayer ? otherPlayer->getVocation()->clientId : 0x00);
 	}
 
 	if (const auto npc = creature->asNpc()) {

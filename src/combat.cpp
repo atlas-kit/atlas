@@ -107,7 +107,7 @@ static bool isProtected(const std::shared_ptr<const Player>& attacker, const std
 		return true;
 	}
 
-	if (!attacker->getVocation()->allowsPvp() || !target->getVocation()->allowsPvp()) {
+	if (!attacker->getVocation()->allowPvp || !target->getVocation()->allowPvp) {
 		return true;
 	}
 
