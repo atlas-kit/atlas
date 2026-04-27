@@ -8,8 +8,6 @@
 #include "enums.h"
 #include "lua/script.h"
 
-class Action;
-using Action_ptr = std::unique_ptr<Action>;
 using ActionFunction = std::function<bool(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item,
                                           const Position& fromPosition, const std::shared_ptr<Thing>& target,
                                           const Position& toPosition, bool isHotkey)>;
@@ -95,8 +93,8 @@ private:
 
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "actions"; }
-	Event_ptr getEvent(const std::string& nodeName) override;
-	bool registerEvent(Event_ptr, const pugi::xml_node&) override { return false; }
+	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<Event>, const pugi::xml_node&) override { return false; }
 
 	using ActionUseMap = std::map<uint16_t, Action>;
 	ActionUseMap useItemMap;

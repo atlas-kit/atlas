@@ -22,7 +22,7 @@ struct spawnBlock_t
 class Spawn
 {
 public:
-	Spawn(const Position& pos, int32_t radius) : centerPos{pos}, radius{radius} {}
+	explicit Spawn(const Position& pos) : centerPos{pos} {}
 	~Spawn();
 
 	// non-copyable
@@ -53,7 +53,6 @@ private:
 	std::map<uint32_t, spawnBlock_t> spawnMap;
 
 	Position centerPos;
-	int32_t radius;
 
 	uint32_t interval = 60000;
 	uint32_t checkSpawnEvent = 0;
