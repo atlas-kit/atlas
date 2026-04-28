@@ -3215,16 +3215,6 @@ void Game::playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::str
 	}
 }
 
-void Game::playerTurn(uint32_t playerId, Direction dir)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		if (tfs::events::player::onTurn(player, dir)) {
-			player->resetIdleTime();
-			internalCreatureTurn(player, dir);
-		}
-	}
-}
-
 void Game::playerRequestEditPodium(uint32_t playerId, const Position& position, uint8_t stackPos,
                                    const uint16_t spriteId)
 {

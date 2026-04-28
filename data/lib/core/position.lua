@@ -33,15 +33,18 @@ function Position:getDistance(positionEx)
 	return max(dx, dy, dz)
 end
 
-function Position:getDistanceX(x)
+function Position:getDistanceX(positionOrX)
+	local x = type(positionOrX) == "table" and positionOrX.x or positionOrX
 	return abs(self.x - x)
 end
 
-function Position:getDistanceY(y)
+function Position:getDistanceY(positionOrY)
+	local y = type(positionOrY) == "table" and positionOrY.y or positionOrY
 	return abs(self.y - y)
 end
 
-function Position:getDistanceZ(z)
+function Position:getDistanceZ(positionOrZ)
+	local z = type(positionOrZ) == "table" and positionOrZ.z or positionOrZ
 	return abs(self.z - z)
 end
 

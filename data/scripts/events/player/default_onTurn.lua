@@ -61,7 +61,7 @@ local function sendCreatureTurn(player, creature, stackpos, direction)
     msg:addU16(0x63)
     msg:addU32(creature:getId())
     msg:addByte(direction)
-    msg:addBool(not canWalkthroughEx(player, creature))
+    msg:addByte(canWalkthroughEx(player, creature) and 0 or 1)
     return msg:sendToPlayer(player)
 end
 

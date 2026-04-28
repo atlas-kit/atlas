@@ -1215,7 +1215,7 @@ void Creature::setStorageValue(uint32_t key, std::optional<int32_t> value, bool 
 	} else {
 		storageMap.erase(key);
 	}
-	tfs::events::creature::onUpdateStorage(asCreature(), key, oldValue, value, isSpawn);
+	tfs::events::creature::onUpdateStorage(asCreature(), key, value, oldValue, isSpawn);
 }
 
 std::optional<int32_t> Creature::getStorageValue(uint32_t key) const

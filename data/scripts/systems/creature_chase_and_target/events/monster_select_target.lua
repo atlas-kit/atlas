@@ -26,7 +26,7 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
     end
 
     -- Fetch the monster's configuration type.
-    local monsterType = MonsterType(monster)
+    local monsterType = monster:getType()
     if not monsterType then
         return
     end
@@ -47,7 +47,7 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
     end
 
     -- Logic to check if a better opponent is blocking the path to the current target.
-    local direction = position:getDirectionTo(followPosition) -- Note: Ensure followPosition is defined in your engine
+    local direction = position:getDirectionTo(targetPosition)
     local nextPosition = position:getNextPosition(direction)
 
     local tile = Tile(nextPosition)
