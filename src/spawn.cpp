@@ -50,7 +50,7 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 			continue;
 		}
 
-		auto& spawn = spawnList.emplace_back(centerPos, radius);
+		auto& spawn = spawnList.emplace_back(centerPos);
 
 		for (auto childNode : spawnNode.children()) {
 			if (boost::iequals(childNode.name(), "monsters")) {

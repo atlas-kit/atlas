@@ -119,14 +119,16 @@ int luaSpellRegister(lua_State* L)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
 		if (spell->spellType == SPELL_INSTANT) {
-			InstantSpell* instant = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+			auto instant =
+			    std::unique_ptr<InstantSpell>{dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1))};
 			if (!instant->isScripted()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
-			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(instant));
+
+			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(std::move(instant)));
 		} else if (spell->spellType == SPELL_RUNE) {
-			RuneSpell* rune = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+			auto rune = std::unique_ptr<RuneSpell>{dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1))};
 			if (rune->getMagicLevel() != 0 || rune->getLevel() != 0) {
 				// Change information in the ItemType to get accurate description
 				ItemType& iType = Item::items.getItemType(rune->getRuneItemId());
@@ -135,11 +137,13 @@ int luaSpellRegister(lua_State* L)
 				iType.runeLevel = rune->getLevel();
 				iType.charges = rune->getCharges();
 			}
+
 			if (!rune->isScripted()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
-			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(rune));
+
+			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(std::move(rune)));
 		}
 	} else {
 		lua_pushnil(L);

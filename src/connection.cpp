@@ -15,8 +15,8 @@
 
 extern Dispatcher g_dispatcher;
 
-Connection_ptr ConnectionManager::createConnection(boost::asio::io_context& io_context,
-                                                   ConstServicePort_ptr servicePort)
+std::shared_ptr<Connection> ConnectionManager::createConnection(boost::asio::io_context& io_context,
+                                                                std::shared_ptr<const ServicePort> servicePort)
 {
 	std::lock_guard<std::mutex> lockClass(connectionManagerLock);
 
@@ -25,7 +25,7 @@ Connection_ptr ConnectionManager::createConnection(boost::asio::io_context& io_c
 	return connection;
 }
 
-void ConnectionManager::releaseConnection(const Connection_ptr& connection)
+void ConnectionManager::releaseConnection(const std::shared_ptr<Connection>& connection)
 {
 	std::lock_guard<std::mutex> lockClass(connectionManagerLock);
 
@@ -53,7 +53,7 @@ void ConnectionManager::closeAll()
 
 // Connection
 
-Connection::Connection(boost::asio::io_context& io_context, ConstServicePort_ptr service_port) :
+Connection::Connection(boost::asio::io_context& io_context, std::shared_ptr<const ServicePort> service_port) :
     readTimer(io_context),
     writeTimer(io_context),
     service_port(std::move(service_port)),
@@ -98,7 +98,7 @@ void Connection::closeSocket()
 
 Connection::~Connection() { closeSocket(); }
 
-void Connection::accept(Protocol_ptr protocol)
+void Connection::accept(std::shared_ptr<Protocol> protocol)
 {
 	this->protocol = protocol;
 	g_dispatcher.addTask([=]() { protocol->onConnect(); });
@@ -276,7 +276,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 }
 
-void Connection::send(const OutputMessage_ptr& msg)
+void Connection::send(const std::shared_ptr<OutputMessage>& msg)
 {
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	if (connectionState == CONNECTION_STATE_DISCONNECTED) {
@@ -297,7 +297,7 @@ void Connection::send(const OutputMessage_ptr& msg)
 	}
 }
 
-void Connection::internalSend(const OutputMessage_ptr& msg)
+void Connection::internalSend(const std::shared_ptr<OutputMessage>& msg)
 {
 	protocol->onSendMessage(msg);
 	try {
@@ -337,7 +337,7 @@ void Connection::onWriteOperation(const boost::system::error_code& error)
 	}
 }
 
-void Connection::handleTimeout(ConnectionWeak_ptr connectionWeak, const boost::system::error_code& error)
+void Connection::handleTimeout(std::weak_ptr<Connection> connectionWeak, const boost::system::error_code& error)
 {
 	if (error == boost::asio::error::operation_aborted) {
 		// The timer has been cancelled manually

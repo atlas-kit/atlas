@@ -16,8 +16,6 @@ class Player;
 class Thing;
 struct Outfit;
 
-using Combat_ptr = std::shared_ptr<Combat>;
-
 inline constexpr int32_t EVENT_ID_LOADING = 1;
 inline constexpr int32_t EVENT_ID_USER = 1000;
 
@@ -107,8 +105,8 @@ public:
 
 	LuaScriptInterface* getTestInterface();
 
-	Combat_ptr getCombatObject(uint32_t id) const;
-	Combat_ptr createCombatObject(LuaScriptInterface* interface);
+	std::shared_ptr<Combat> getCombatObject(uint32_t id) const;
+	std::shared_ptr<Combat> createCombatObject(LuaScriptInterface* interface);
 	void clearCombatObjects(LuaScriptInterface* interface);
 
 	AreaCombat* getAreaObject(uint32_t id) const;
@@ -121,7 +119,7 @@ public:
 	uint32_t lastEventTimerId = 1;
 
 private:
-	std::unordered_map<uint32_t, Combat_ptr> combatMap;
+	std::unordered_map<uint32_t, std::shared_ptr<Combat>> combatMap;
 	std::unordered_map<uint32_t, AreaCombat*> areaMap;
 
 	std::unordered_map<LuaScriptInterface*, std::vector<uint32_t>> combatIdMap;
