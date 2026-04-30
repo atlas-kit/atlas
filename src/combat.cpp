@@ -610,7 +610,8 @@ void Combat::doCombat(const std::shared_ptr<Creature>& caster, const std::shared
 				for (const auto& condition : params.conditionList) {
 					if (caster == target || !target->isImmune(condition->getType())) {
 						auto conditionCopy = condition->clone();
-						conditionCopy->setParam(CONDITION_PARAM_OWNER, caster->getID());
+						const uint32_t ownerId = caster ? caster->getID() : 0;
+						conditionCopy->setParam(CONDITION_PARAM_OWNER, ownerId);
 						target->addCombatCondition(std::move(conditionCopy));
 					}
 				}
