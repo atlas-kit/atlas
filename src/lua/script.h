@@ -120,7 +120,7 @@ public:
 
 private:
 	std::unordered_map<uint32_t, std::shared_ptr<Combat>> combatMap;
-	std::unordered_map<uint32_t, AreaCombat*> areaMap;
+	std::unordered_map<uint32_t, std::unique_ptr<AreaCombat>> areaMap;
 
 	std::unordered_map<LuaScriptInterface*, std::vector<uint32_t>> combatIdMap;
 	std::unordered_map<LuaScriptInterface*, std::vector<uint32_t>> areaIdMap;

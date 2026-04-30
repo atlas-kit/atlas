@@ -31,17 +31,17 @@
 #include <chrono>
 #include <fstream>
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
-extern GlobalEvents* g_globalEvents;
+extern std::unique_ptr<GlobalEvents> g_globalEvents;
 extern Monsters g_monsters;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
-extern Scripts* g_scripts;
-extern Spells* g_spells;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Scripts> g_scripts;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 
@@ -562,7 +562,13 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		creature->setMaster(nullptr);
 	}
 
+	std::vector<Condition*> conditions;
+	conditions.reserve(creature->getConditions().size());
 	for (const auto& condition : creature->getConditions()) {
+		conditions.push_back(condition.get());
+	}
+
+	for (Condition* condition : conditions) {
 		creature->removeCondition(condition, true);
 	}
 
@@ -3552,8 +3558,8 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -5374,15 +5380,14 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)

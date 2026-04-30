@@ -68,18 +68,11 @@ struct spellBlock_t
 	~spellBlock_t();
 	spellBlock_t(const spellBlock_t& other) = delete;
 	spellBlock_t& operator=(const spellBlock_t& other) = delete;
-	spellBlock_t(spellBlock_t&& other) :
-	    spell(other.spell),
-	    chance(other.chance),
-	    speed(other.speed),
-	    range(other.range),
-	    minCombatValue(other.minCombatValue),
-	    maxCombatValue(other.maxCombatValue),
-	    combatSpell(other.combatSpell),
-	    isMelee(other.isMelee)
-	{
-		other.spell = nullptr;
-	}
+	spellBlock_t(spellBlock_t&& other) noexcept;
+	spellBlock_t& operator=(spellBlock_t&& other) noexcept;
+
+	void setSpell(BaseSpell* spell);
+	void setOwnedSpell(std::unique_ptr<BaseSpell> spell);
 
 	BaseSpell* spell = nullptr;
 	uint32_t chance = 100;
@@ -89,6 +82,9 @@ struct spellBlock_t
 	int32_t maxCombatValue = 0;
 	bool combatSpell = false;
 	bool isMelee = false;
+
+private:
+	std::unique_ptr<BaseSpell> ownedSpell;
 };
 
 struct voiceBlock_t
@@ -264,8 +260,9 @@ public:
 	std::map<std::string, std::set<std::string>> bestiary;
 
 private:
-	ConditionDamage* getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage,
-	                                    int32_t startDamage, uint32_t tickInterval);
+	std::unique_ptr<ConditionDamage> getDamageCondition(ConditionType_t conditionType, int32_t maxDamage,
+	                                                    int32_t minDamage, int32_t startDamage,
+	                                                    uint32_t tickInterval);
 	bool deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, const std::string& description = "");
 
 	MonsterType* loadMonster(const std::string& file, const std::string& monsterName, bool reloading = false);

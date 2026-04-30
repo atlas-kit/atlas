@@ -116,9 +116,9 @@ public:
 	bool setParam(CombatParam_t param, uint32_t value);
 	int32_t getParam(CombatParam_t param);
 
-	void setArea(AreaCombat* area);
+	void setArea(std::unique_ptr<AreaCombat> area);
 	bool hasArea() const { return area != nullptr; }
-	void addCondition(const Condition* condition) { params.conditionList.emplace_back(condition); }
+	void addCondition(std::unique_ptr<const Condition> condition) { params.conditionList.emplace_back(std::move(condition)); }
 	void clearConditions() { params.conditionList.clear(); }
 	void setPlayerCombatValues(formulaType_t formulaType, double mina, double minb, double maxa, double maxb);
 	void postCombatEffects(const std::shared_ptr<Creature>& caster, const Position& pos) const

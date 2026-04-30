@@ -1009,12 +1009,7 @@ uint16_t AStarNodes::getTileWalkCost(const std::shared_ptr<const Creature>& crea
 }
 
 // QTreeNode
-QTreeNode::~QTreeNode()
-{
-	for (auto* ptr : child) {
-		delete ptr;
-	}
-}
+QTreeNode::~QTreeNode() = default;
 
 QTreeLeafNode* QTreeNode::getLeaf(uint32_t x, uint32_t y)
 {
@@ -1022,7 +1017,7 @@ QTreeLeafNode* QTreeNode::getLeaf(uint32_t x, uint32_t y)
 		return static_cast<QTreeLeafNode*>(this);
 	}
 
-	auto node = child[((x & 0x8000) >> 15) | ((y & 0x8000) >> 14)];
+	auto node = child[((x & 0x8000) >> 15) | ((y & 0x8000) >> 14)].get();
 	if (!node) {
 		return nullptr;
 	}
@@ -1035,9 +1030,9 @@ QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
 		uint32_t index = ((x & 0x8000) >> 15) | ((y & 0x8000) >> 14);
 		if (!child[index]) {
 			if (level != FLOOR_BITS) {
-				child[index] = new QTreeNode();
+				child[index] = std::make_unique<QTreeNode>();
 			} else {
-				child[index] = new QTreeLeafNode();
+				child[index] = std::make_unique<QTreeLeafNode>();
 				QTreeLeafNode::newLeaf = true;
 			}
 		}
@@ -1049,19 +1044,14 @@ QTreeLeafNode* QTreeNode::createLeaf(uint32_t x, uint32_t y, uint32_t level)
 // QTreeLeafNode
 bool QTreeLeafNode::newLeaf = false;
 
-QTreeLeafNode::~QTreeLeafNode()
-{
-	for (auto* ptr : array) {
-		delete ptr;
-	}
-}
+QTreeLeafNode::~QTreeLeafNode() = default;
 
 Floor* QTreeLeafNode::createFloor(uint32_t z)
 {
 	if (!array[z]) {
-		array[z] = new Floor();
+		array[z] = std::make_unique<Floor>();
 	}
-	return array[z];
+	return array[z].get();
 }
 
 uint32_t Map::clean() const

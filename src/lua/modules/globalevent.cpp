@@ -10,8 +10,8 @@
 #include "../register.h"
 #include "../script.h"
 
-extern GlobalEvents* g_globalEvents;
-extern Scripts* g_scripts;
+extern std::unique_ptr<GlobalEvents> g_globalEvents;
+extern std::unique_ptr<Scripts> g_scripts;
 
 namespace {
 

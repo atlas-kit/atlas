@@ -25,14 +25,14 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
+extern std::unique_ptr<GlobalEvents> g_globalEvents;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
-extern Spells* g_spells;
-extern Actions* g_actions;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<Actions> g_actions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Scheduler g_scheduler;
-extern Scripts* g_scripts;
+extern std::unique_ptr<Scripts> g_scripts;
 
 LuaEnvironment g_luaEnvironment;
 
@@ -1010,12 +1010,12 @@ AreaCombat* LuaEnvironment::getAreaObject(uint32_t id) const
 	if (it == areaMap.end()) {
 		return nullptr;
 	}
-	return it->second;
+	return it->second.get();
 }
 
 uint32_t LuaEnvironment::createAreaObject(LuaScriptInterface* interface)
 {
-	areaMap[++lastAreaId] = new AreaCombat;
+	areaMap[++lastAreaId] = std::make_unique<AreaCombat>();
 	areaIdMap[interface].push_back(lastAreaId);
 	return lastAreaId;
 }
@@ -1030,7 +1030,6 @@ void LuaEnvironment::clearAreaObjects(LuaScriptInterface* interface)
 	for (uint32_t id : it->second) {
 		auto itt = areaMap.find(id);
 		if (itt != areaMap.end()) {
-			delete itt->second;
 			areaMap.erase(itt);
 		}
 	}

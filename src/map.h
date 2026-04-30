@@ -101,6 +101,8 @@ public:
 	// non-copyable
 	QTreeNode(const QTreeNode&) = delete;
 	QTreeNode& operator=(const QTreeNode&) = delete;
+	QTreeNode(QTreeNode&&) = delete;
+	QTreeNode& operator=(QTreeNode&&) = delete;
 
 	bool isLeaf() const { return leaf; }
 
@@ -110,7 +112,7 @@ public:
 	static Leaf getLeafStatic(Node node, uint32_t x, uint32_t y)
 	{
 		do {
-			node = node->child[((x & 0x8000) >> 15) | ((y & 0x8000) >> 14)];
+			node = node->child[((x & 0x8000) >> 15) | ((y & 0x8000) >> 14)].get();
 			if (!node) {
 				return nullptr;
 			}
@@ -127,7 +129,7 @@ protected:
 	bool leaf = false;
 
 private:
-	QTreeNode* child[4] = {};
+	std::array<std::unique_ptr<QTreeNode>, 4> child = {};
 
 	friend class Map;
 };
@@ -145,9 +147,11 @@ public:
 	// non-copyable
 	QTreeLeafNode(const QTreeLeafNode&) = delete;
 	QTreeLeafNode& operator=(const QTreeLeafNode&) = delete;
+	QTreeLeafNode(QTreeLeafNode&&) = delete;
+	QTreeLeafNode& operator=(QTreeLeafNode&&) = delete;
 
 	Floor* createFloor(uint32_t z);
-	Floor* getFloor(uint8_t z) const { return array[z]; }
+	Floor* getFloor(uint8_t z) const { return array[z].get(); }
 
 	void addCreature(std::shared_ptr<Creature> c) { creatures.emplace(std::move(c)); }
 	void removeCreature(const std::shared_ptr<Creature>& c) { creatures.erase(c); }
@@ -156,7 +160,7 @@ private:
 	static bool newLeaf;
 	QTreeLeafNode* leafS = nullptr;
 	QTreeLeafNode* leafE = nullptr;
-	Floor* array[MAP_MAX_LAYERS] = {};
+	std::array<std::unique_ptr<Floor>, MAP_MAX_LAYERS> array = {};
 	boost::container::flat_set<std::shared_ptr<Creature>> creatures;
 
 	friend class Map;

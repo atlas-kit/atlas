@@ -110,7 +110,7 @@ int luaCombatSetArea(lua_State* L)
 		return 1;
 	}
 
-	combat->setArea(new AreaCombat(*area));
+	combat->setArea(std::make_unique<AreaCombat>(*area));
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }

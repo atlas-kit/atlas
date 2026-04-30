@@ -13,8 +13,8 @@
 #include "spells.h"
 
 extern Game g_game;
-extern Spells* g_spells;
-extern Actions* g_actions;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<Actions> g_actions;
 
 Actions::Actions() : scriptInterface("Action Interface") { scriptInterface.initState(); }
 

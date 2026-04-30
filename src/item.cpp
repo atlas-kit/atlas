@@ -17,7 +17,7 @@
 class Spells;
 
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 Items Item::items;
@@ -173,19 +173,19 @@ bool Item::operator==(const Item& otherItem) const
 	for (const auto& attribute : attributeList) {
 		if (ItemAttributes::isIntAttrType(attribute.type)) {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && attribute.value.integer != otherAttribute.value.integer) {
+				if (attribute.type == otherAttribute.type && attribute.integer != otherAttribute.integer) {
 					return false;
 				}
 			}
 		} else if (ItemAttributes::isStrAttrType(attribute.type)) {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && *attribute.value.string != *otherAttribute.value.string) {
+				if (attribute.type == otherAttribute.type && *attribute.string != *otherAttribute.string) {
 					return false;
 				}
 			}
 		} else {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && *attribute.value.custom != *otherAttribute.value.custom) {
+				if (attribute.type == otherAttribute.type && *attribute.custom != *otherAttribute.custom) {
 					return false;
 				}
 			}
@@ -970,7 +970,7 @@ const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 	if (!attr) {
 		return emptyString;
 	}
-	return *attr->value.string;
+	return *attr->string;
 }
 
 void ItemAttributes::setStrAttr(itemAttrTypes type, std::string_view value)
@@ -984,8 +984,7 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, std::string_view value)
 	}
 
 	Attribute& attr = getAttr(type);
-	delete attr.value.string;
-	attr.value.string = new std::string(value);
+	attr.string = std::make_unique<std::string>(value);
 }
 
 void ItemAttributes::removeAttribute(itemAttrTypes type)
@@ -1020,7 +1019,7 @@ int64_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 	if (!attr) {
 		return 0;
 	}
-	return attr->value.integer;
+	return attr->integer;
 }
 
 void ItemAttributes::setIntAttr(itemAttrTypes type, int64_t value)
@@ -1033,7 +1032,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, int64_t value)
 		value = 100;
 	}
 
-	getAttr(type).value.integer = value;
+	getAttr(type).integer = value;
 }
 
 void ItemAttributes::increaseIntAttr(itemAttrTypes type, int64_t value) { setIntAttr(type, getIntAttr(type) + value); }
@@ -1088,12 +1087,12 @@ bool Item::hasMarketAttributes() const
 	// discard items with other modified attributes
 	for (const auto& attr : attributes->getList()) {
 		if (attr.type == ITEM_ATTRIBUTE_CHARGES) {
-			uint16_t charges = static_cast<uint16_t>(attr.value.integer);
+			uint16_t charges = static_cast<uint16_t>(attr.integer);
 			if (charges != items[id].charges) {
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			uint32_t duration = static_cast<uint32_t>(attr.value.integer);
+			uint32_t duration = static_cast<uint32_t>(attr.integer);
 			if (duration <= getDefaultDurationMin()) {
 				return false;
 			}

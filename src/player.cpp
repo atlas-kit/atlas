@@ -23,7 +23,7 @@
 extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
@@ -397,7 +397,7 @@ float Player::getDefenseFactor() const
 uint32_t Player::getClientIcons() const
 {
 	uint32_t icons = 0;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (!isSuppress(condition->getType())) {
 			icons |= condition->getIcons();
 		}
@@ -1007,8 +1007,8 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 	if (isLogin) {
 		// Restore conditions stored during previous logout
-		for (Condition* condition : storedConditionList) {
-			addCondition(condition);
+		for (auto& condition : storedConditionList) {
+			addCondition(std::move(condition));
 		}
 		storedConditionList.clear();
 
@@ -1271,8 +1271,8 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 	if (teleport || oldPos.z != newPos.z) {
 		int32_t ticks = getNumber(ConfigManager::STAIRHOP_DELAY);
 		if (ticks > 0) {
-			if (Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, ticks, 0)) {
-				addCondition(condition);
+			if (auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, ticks, 0)) {
+				addCondition(std::move(condition));
 			}
 		}
 	}
@@ -1491,7 +1491,7 @@ uint32_t Player::isMuted() const
 	}
 
 	int32_t muteTicks = 0;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getType() == CONDITION_MUTED && condition->getTicks() > muteTicks) {
 			muteTicks = condition->getTicks();
 		}
@@ -1524,8 +1524,8 @@ void Player::removeMessageBuffer()
 
 			uint32_t muteTime = 5 * muteCount * muteCount;
 			muteCountMap[guid] = muteCount + 1;
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
-			addCondition(condition);
+			auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
+			addCondition(std::move(condition));
 
 			sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are muted for {:d} seconds.", muteTime));
 		}
@@ -2068,13 +2068,14 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		auto it = conditions.begin();
 		while (it != conditions.end()) {
-			Condition* condition = *it;
+			Condition* condition = it->get();
 			if (condition->isPersistent()) {
+				auto conditionHolder = std::move(*it);
 				it = conditions.erase(it);
 
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
-				delete condition;
+				ConditionType_t type = conditionHolder->getType();
+				conditionHolder->endCondition(asPlayer());
+				onEndCondition(type);
 			} else {
 				++it;
 			}
@@ -2084,13 +2085,14 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		auto it = conditions.begin();
 		while (it != conditions.end()) {
-			Condition* condition = *it;
+			Condition* condition = it->get();
 			if (condition->isPersistent()) {
+				auto conditionHolder = std::move(*it);
 				it = conditions.erase(it);
 
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
-				delete condition;
+				ConditionType_t type = conditionHolder->getType();
+				conditionHolder->endCondition(asPlayer());
+				onEndCondition(type);
 			} else {
 				++it;
 			}
@@ -2174,9 +2176,9 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 		pzLocked = true;
 	}
 
-	Condition* condition =
+	auto condition =
 	    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, getNumber(ConfigManager::PZ_LOCKED), 0);
-	addCondition(condition);
+	addCondition(std::move(condition));
 }
 
 void Player::kickPlayer(bool displayEffect)
@@ -3548,9 +3550,9 @@ bool Player::onKilledCreature(const std::shared_ptr<Creature>& target, bool last
 
 			if (lastHit && hasCondition(CONDITION_INFIGHT)) {
 				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-				                                                  getNumber(ConfigManager::WHITE_SKULL_TIME) * 1000, 0);
-				addCondition(condition);
+				auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+				                                            getNumber(ConfigManager::WHITE_SKULL_TIME) * 1000, 0);
+				addCondition(std::move(condition));
 			}
 		}
 	}
@@ -4480,7 +4482,7 @@ size_t Player::getMaxDepotItems() const
 std::forward_list<Condition*> Player::getMuteConditions() const
 {
 	std::forward_list<Condition*> muteConditions;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getTicks() <= 0) {
 			continue;
 		}
@@ -4490,7 +4492,7 @@ std::forward_list<Condition*> Player::getMuteConditions() const
 			continue;
 		}
 
-		muteConditions.push_front(condition);
+		muteConditions.push_front(condition.get());
 	}
 	return muteConditions;
 }

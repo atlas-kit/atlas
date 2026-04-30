@@ -9,8 +9,8 @@
 #include "../register.h"
 #include "../script.h"
 
-extern Scripts* g_scripts;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Scripts> g_scripts;
+extern std::unique_ptr<TalkActions> g_talkActions;
 
 namespace {
 
