@@ -490,7 +490,7 @@ int luaCreatureAddHealth(lua_State* L)
 		return 1;
 	}
 
-	CombatDamage damage;
+	CombatDamage damage{};
 	damage.primary.value = tfs::lua::getNumber<int32_t>(L, 2);
 	if (damage.primary.value >= 0) {
 		damage.primary.type = COMBAT_HEALING;

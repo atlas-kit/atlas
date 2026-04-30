@@ -614,6 +614,8 @@ void tfs::lua::registerWeapon(LuaScriptInterface& lsi)
 	registerEnum(lsi, AMMO_SNOWBALL);
 
 	lsi.registerClass("Weapon", "", luaCreateWeapon);
+	lsi.registerMetaMethod("Weapon", "__eq", tfs::lua::luaUserdataCompare);
+	lsi.registerMetaMethod("Weapon", "__gc", tfs::lua::luaSharedPtrDelete<Weapon>);
 	lsi.registerMethod("Weapon", "action", luaWeaponAction);
 	lsi.registerMethod("Weapon", "register", luaWeaponRegister);
 	lsi.registerMethod("Weapon", "id", luaWeaponId);

@@ -770,8 +770,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 			// case 0xFE: break; // store window history 2
 
 		default:
-			// we cannot pass an unique_ptr as capture here because
-			// std::function requires the callable object to be *copyable*
 			auto opcodeMessage = std::make_unique<NetworkMessage>(msg);
 			g_dispatcher.addTask([playerID = player->getID(), recvbyte, msg = std::move(opcodeMessage)]() mutable {
 				g_game.parsePlayerNetworkMessage(playerID, recvbyte, std::move(msg));

@@ -1414,7 +1414,7 @@ bool ConditionDamage::doDamage(const std::shared_ptr<Creature>& creature, int32_
 		return false;
 	}
 
-	CombatDamage damage;
+	CombatDamage damage{};
 	damage.origin = ORIGIN_CONDITION;
 	damage.primary.value = healthChange;
 	damage.primary.type = ConditionToDamageType(conditionType);

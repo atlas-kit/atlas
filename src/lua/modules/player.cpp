@@ -448,7 +448,7 @@ int luaPlayerAddMana(lua_State* L)
 	if (!animationOnLoss && manaChange < 0) {
 		player->changeMana(manaChange);
 	} else {
-		CombatDamage damage;
+		CombatDamage damage{};
 		damage.primary.value = manaChange;
 		damage.origin = ORIGIN_NONE;
 		g_game.combatChangeMana(nullptr, player, damage);

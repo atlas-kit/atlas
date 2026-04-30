@@ -1049,8 +1049,8 @@ int NpcScriptInterface::luaNpcCloseShopWindow(lua_State* L)
 	return 1;
 }
 
-NpcEventsHandler::NpcEventsHandler(const std::string& file, std::shared_ptr<Npc> npc) :
-    scriptInterface{std::make_unique<NpcScriptInterface>()}, npc{std::move(npc)}
+NpcEventsHandler::NpcEventsHandler(const std::string& file, std::shared_ptr<Npc> npcPtr) :
+    scriptInterface{std::make_unique<NpcScriptInterface>()}, npc{npcPtr}
 {
 	if (!scriptInterface->loadNpcLib("data/npc/lib/npc.lua")) {
 		std::cout << "[Warning - NpcLib::NpcLib] Can not load lib: " << file << std::endl;
@@ -1058,7 +1058,7 @@ NpcEventsHandler::NpcEventsHandler(const std::string& file, std::shared_ptr<Npc>
 		return;
 	}
 
-	loaded = scriptInterface->loadFile("data/npc/scripts/" + file, this->npc) == 0;
+	loaded = scriptInterface->loadFile("data/npc/scripts/" + file, npcPtr) == 0;
 	if (!loaded) {
 		std::cout << "[Warning - NpcScript::NpcScript] Can not load script: " << file << std::endl;
 		std::cout << scriptInterface->getLastLuaError() << std::endl;
@@ -1081,6 +1081,11 @@ void NpcEventsHandler::onCreatureAppear(const std::shared_ptr<Creature>& creatur
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onCreatureAppear(creature)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onCreatureAppear] Call stack overflow" << std::endl;
@@ -1089,7 +1094,7 @@ void NpcEventsHandler::onCreatureAppear(const std::shared_ptr<Creature>& creatur
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureAppearEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(creatureAppearEvent);
@@ -1104,6 +1109,11 @@ void NpcEventsHandler::onCreatureDisappear(const std::shared_ptr<Creature>& crea
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onCreatureDisappear(creature)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onCreatureDisappear] Call stack overflow" << std::endl;
@@ -1112,7 +1122,7 @@ void NpcEventsHandler::onCreatureDisappear(const std::shared_ptr<Creature>& crea
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureDisappearEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(creatureDisappearEvent);
@@ -1128,6 +1138,11 @@ void NpcEventsHandler::onCreatureMove(const std::shared_ptr<Creature>& creature,
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onCreatureMove(creature, oldPos, newPos)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onCreatureMove] Call stack overflow" << std::endl;
@@ -1136,7 +1151,7 @@ void NpcEventsHandler::onCreatureMove(const std::shared_ptr<Creature>& creature,
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureMoveEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(creatureMoveEvent);
@@ -1154,6 +1169,11 @@ void NpcEventsHandler::onCreatureSay(const std::shared_ptr<Creature>& creature, 
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onCreatureSay(creature, type, msg)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onCreatureSay] Call stack overflow" << std::endl;
@@ -1162,7 +1182,7 @@ void NpcEventsHandler::onCreatureSay(const std::shared_ptr<Creature>& creature, 
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(creatureSayEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(creatureSayEvent);
@@ -1180,6 +1200,11 @@ void NpcEventsHandler::onPlayerTrade(const std::shared_ptr<Player>& player, int3
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onBuy(player, itemid, count, amount, ignore, inbackpacks)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onPlayerTrade] Call stack overflow" << std::endl;
@@ -1188,7 +1213,7 @@ void NpcEventsHandler::onPlayerTrade(const std::shared_ptr<Player>& player, int3
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(-1, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	tfs::lua::pushCallback(L, callback);
@@ -1208,6 +1233,11 @@ void NpcEventsHandler::onPlayerCloseChannel(const std::shared_ptr<Player>& playe
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onPlayerCloseChannel(player)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onPlayerCloseChannel] Call stack overflow" << std::endl;
@@ -1216,7 +1246,7 @@ void NpcEventsHandler::onPlayerCloseChannel(const std::shared_ptr<Player>& playe
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerCloseChannelEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(playerCloseChannelEvent);
@@ -1231,6 +1261,11 @@ void NpcEventsHandler::onPlayerEndTrade(const std::shared_ptr<Player>& player)
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onPlayerEndTrade(player)
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onPlayerEndTrade] Call stack overflow" << std::endl;
@@ -1239,7 +1274,7 @@ void NpcEventsHandler::onPlayerEndTrade(const std::shared_ptr<Player>& player)
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(playerEndTradeEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	lua_State* L = scriptInterface->getLuaState();
 	scriptInterface->pushFunction(playerEndTradeEvent);
@@ -1254,6 +1289,11 @@ void NpcEventsHandler::onThink()
 		return;
 	}
 
+	const auto npcPtr = npc.lock();
+	if (!npcPtr) {
+		return;
+	}
+
 	// onThink()
 	if (!tfs::lua::reserveScriptEnv()) {
 		std::cout << "[Error - NpcScript::onThink] Call stack overflow" << std::endl;
@@ -1262,7 +1302,7 @@ void NpcEventsHandler::onThink()
 
 	const auto env = tfs::lua::getScriptEnv();
 	env->setScriptId(thinkEvent, scriptInterface.get());
-	env->setNpc(npc);
+	env->setNpc(npcPtr);
 
 	scriptInterface->pushFunction(thinkEvent);
 	scriptInterface->callFunction(0);

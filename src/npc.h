@@ -56,7 +56,7 @@ private:
 class NpcEventsHandler
 {
 public:
-	NpcEventsHandler(const std::string& file, std::shared_ptr<Npc> npc);
+	NpcEventsHandler(const std::string& file, std::shared_ptr<Npc> npcPtr);
 
 	void onCreatureAppear(const std::shared_ptr<Creature>& creature);
 	void onCreatureDisappear(const std::shared_ptr<Creature>& creature);
@@ -73,7 +73,7 @@ public:
 	std::unique_ptr<NpcScriptInterface> scriptInterface;
 
 private:
-	std::shared_ptr<Npc> npc;
+	std::weak_ptr<Npc> npc;
 
 	int32_t creatureAppearEvent = -1;
 	int32_t creatureDisappearEvent = -1;

@@ -66,7 +66,7 @@ std::vector<std::shared_ptr<Tile>> getCombatArea(const Position& centerPos, cons
 CombatDamage Combat::getCombatDamage(const std::shared_ptr<Creature>& creature,
                                      const std::shared_ptr<Creature>& target) const
 {
-	CombatDamage damage;
+	CombatDamage damage{};
 	damage.origin = params.origin;
 	damage.primary.type = params.combatType;
 	if (formulaType == COMBAT_FORMULA_DAMAGE) {
@@ -784,7 +784,7 @@ void Combat::doTargetCombat(const std::shared_ptr<Creature>& caster, const std::
 
 		if (!damage.leeched && damage.primary.type != COMBAT_HEALING && casterPlayer && target != caster &&
 		    damage.origin != ORIGIN_CONDITION) {
-			CombatDamage leechCombat;
+			CombatDamage leechCombat{};
 			leechCombat.origin = ORIGIN_NONE;
 			leechCombat.leeched = true;
 
@@ -896,7 +896,7 @@ void Combat::doAreaCombat(const std::shared_ptr<Creature>& caster, const Positio
 		}
 	}
 
-	CombatDamage leechCombat;
+	CombatDamage leechCombat{};
 	leechCombat.origin = ORIGIN_NONE;
 	leechCombat.leeched = true;
 

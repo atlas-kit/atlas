@@ -1941,7 +1941,7 @@ BlockType_t Player::blockHit(const std::shared_ptr<Creature>& attacker, CombatTy
 		}
 
 		if (attacker && reflect.chance > 0 && reflect.percent != 0 && uniform_random(1, 100) <= reflect.chance) {
-			CombatDamage reflectDamage;
+			CombatDamage reflectDamage{};
 			reflectDamage.primary.type = combatType;
 			reflectDamage.primary.value = -std::round(damage * (reflect.percent / 100.));
 			reflectDamage.origin = ORIGIN_REFLECT;

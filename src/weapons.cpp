@@ -19,7 +19,11 @@ extern std::unique_ptr<Weapons> g_weapons;
 
 Weapons::Weapons() { scriptInterface.initState(); }
 
-Weapons::~Weapons() { clear(false); }
+Weapons::~Weapons()
+{
+	clear(true);
+	clear(false);
+}
 
 std::shared_ptr<const Weapon> Weapons::getWeapon(const std::shared_ptr<const Item>& item) const
 {
@@ -248,7 +252,7 @@ bool Weapon::useFist(const std::shared_ptr<Player>& player, const std::shared_pt
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
 
-	CombatDamage damage;
+	CombatDamage damage{};
 	damage.origin = ORIGIN_MELEE;
 	damage.primary.type = params.combatType;
 	damage.primary.value = -normal_random(0, maxDamage);
@@ -269,7 +273,7 @@ void Weapon::internalUseWeapon(const std::shared_ptr<Player>& player, const std:
 		var.setNumber(target->getID());
 		executeUseWeapon(player, var);
 	} else {
-		CombatDamage damage;
+		CombatDamage damage{};
 		WeaponType_t weaponType = item->getWeaponType();
 		if (weaponType == WEAPON_AMMO || weaponType == WEAPON_DISTANCE) {
 			damage.origin = ORIGIN_RANGED;

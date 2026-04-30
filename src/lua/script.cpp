@@ -151,7 +151,7 @@ int luaDoAreaCombat(lua_State* L)
 		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
 		params.ignoreResistances = tfs::lua::getBoolean(L, 11, false);
 
-		CombatDamage damage;
+		CombatDamage damage{};
 		damage.origin = tfs::lua::getNumber<CombatOrigin>(L, 8, ORIGIN_SPELL);
 		damage.primary.type = combatType;
 		damage.primary.value = normal_random(tfs::lua::getNumber<int32_t>(L, 5), tfs::lua::getNumber<int32_t>(L, 6));
