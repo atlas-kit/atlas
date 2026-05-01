@@ -1014,10 +1014,10 @@ public:
 			client->sendCreatureHealth(creature);
 		}
 	}
-	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type) const
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendDistanceShoot(from, to, type);
+			client->sendDistanceShoot(from, to, type, source);
 		}
 	}
 	void sendHouseWindow(const std::shared_ptr<House>& house, uint32_t listId) const;
@@ -1034,16 +1034,16 @@ public:
 			client->sendIcons(getClientIcons());
 		}
 	}
-	void sendMagicEffect(uint16_t type) const
+	void sendMagicEffect(uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(getPosition(), type);
+			client->sendMagicEffect(getPosition(), type, source);
 		}
 	}
-	void sendMagicEffect(const Position& pos, uint16_t type) const
+	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(pos, type);
+			client->sendMagicEffect(pos, type, source);
 		}
 	}
 	void sendStats();

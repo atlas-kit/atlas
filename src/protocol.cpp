@@ -69,10 +69,10 @@ void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 		if (encryptionEnabled) {
 			msg->writePaddingLength();
 			XTEA_encrypt(*msg, key);
-			msg->addCryptoHeader(checksumMode);
+			msg->addCryptoHeader(checksumMode); // also writes message length
+		} else {
+			msg->writeMessageLength();
 		}
-
-		msg->writeMessageLength();
 	}
 }
 

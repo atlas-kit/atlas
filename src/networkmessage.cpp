@@ -110,23 +110,23 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00);
-	} else if (it.classification > 0) {
-		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientCharges) {
-		add<uint32_t>(it.charges);
-		addByte(0x00); // boolean (is brand new)
-	} else if (it.showClientDuration) {
-		add<uint32_t>(it.decayTimeMin);
-		addByte(0x00); // boolean (is brand new)
-	}
-
-	if (it.isPodium()) {
+		addByte(0x00); // assigned loot container icon
+	} else if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
-		add<uint16_t>(0); //
+		add<uint16_t>(0); // lookTypeEx
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
 		addByte(0x01);    // is visible (bool)
+	} else if (it.classification > 0) {
+		addByte(0x00); // item tier (0-10)
+	} else if (it.showClientDuration) {
+		add<uint32_t>(it.decayTimeMin);
+		addByte(0x00); // is brand new
+	} else if (it.showClientCharges) {
+		add<uint32_t>(it.charges);
+		addByte(0x00); // is brand new
+	} else if (it.wrapContainer) {
+		add<uint16_t>(0x00); // unWrapId (no wrapped item by default)
 	}
 }
 
@@ -140,34 +140,9 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
-	} else if (it.classification > 0) {
-		addByte(0x00); // item tier (0-10)
-	}
-
-	if (it.showClientCharges) {
-		add<uint32_t>(item->getCharges());
-		addByte(0); // boolean (is brand new)
-	} else if (it.showClientDuration) {
-		add<uint32_t>(item->getDuration() / 1000);
-		addByte(0); // boolean (is brand new)
-	}
-
-	if (it.isContainer()) {
+	} else if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
-		// quiver ammo count
-		/*
-		const auto& container = item->asContainer();
-		if (container && it.weaponType == WEAPON_QUIVER) {
-			addByte(0x01);
-			add<uint32_t>(container->getAmmoCount());
-		} else {
-			addByte(0x00);
-		}
-		*/
-	}
-
-	// display outfit on the podium
-	if (it.isPodium()) {
+	} else if (it.isPodium()) {
 		const auto& podium = item->asPodium();
 		const Outfit_t& outfit = podium->getOutfit();
 
@@ -203,7 +178,16 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 		addByte(podium->getDirection());
 		addByte(podium->hasFlag(PODIUM_SHOW_PLATFORM) ? 0x01 : 0x00);
-		return;
+	} else if (it.classification > 0) {
+		addByte(0x00); // item tier (0-10)
+	} else if (it.showClientDuration) {
+		add<uint32_t>(item->getDuration() / 1000);
+		addByte(0); // is brand new
+	} else if (it.showClientCharges) {
+		add<uint32_t>(item->getCharges());
+		addByte(0); // is brand new
+	} else if (it.wrapContainer) {
+		add<uint16_t>(0x00); // unWrapId (atlas does not store wrapped item id yet)
 	}
 }
 

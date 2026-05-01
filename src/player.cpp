@@ -948,12 +948,6 @@ void Player::openSavedContainers()
 		}
 	}
 
-	// fix broken containers when logged in from another location
-	for (uint8_t i = 0; i < 16; i++) {
-		client->sendEmptyContainer(i);
-		client->sendCloseContainer(i);
-	}
-
 	// send actual containers
 	for (auto&& [cid, container] : openContainersList | std::views::as_const) {
 		addContainer(cid - 1, container);
@@ -1067,7 +1061,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 	}
 
-	// 15.11 login packet sequence
+	// login packet sequence
 	sendClientFeatures();
 	sendAllowBugReport();
 	sendTibiaTime(12 * 60); // noon (no day/night cycle in Atlas)
@@ -1080,7 +1074,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	}
 	sendDisableLoginMusic();
 
-	// Inventory slots (before stats in 15.11)
+	// Inventory slots
 	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
 		auto slot = static_cast<slots_t>(i);
 		sendInventoryItem(slot, getInventoryItem(slot));
@@ -1094,7 +1088,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	sendItemsPrice();
 	sendPreyPrices();
 	sendPreyData();
-	sendTaskHuntingData();
 	sendForgingData();
 
 	// World light (static daylight since Atlas has no day/night cycle)
