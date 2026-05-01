@@ -394,10 +394,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(std::move(key));
 
-	// Change packet verifying mode for QT/OTC clients
-	if (operatingSystem >= CLIENTOS_QT_LINUX && operatingSystem <= CLIENTOS_OTCLIENT_MAC) {
-		setChecksumMode(CHECKSUM_SEQUENCE);
-	}
+	setChecksumMode(CHECKSUM_SEQUENCE);
 
 	// Web login skips the character list request so we need to check the client version again
 	if (version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX) {
@@ -428,7 +425,6 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 	// OTCv8 detection
 	if (msg.getRemainingBufferLength() >= 2) {
-		auto savedPos = msg.getBufferPosition();
 		uint16_t len = msg.get<uint16_t>();
 		if (len == 5 && msg.getRemainingBufferLength() >= 5) {
 			auto otcStr = msg.getString();
@@ -436,7 +432,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 				otclientV8 = msg.get<uint16_t>();
 			}
 		} else {
-			msg.setBufferPosition(savedPos); // rewind if not OTCv8
+			msg.skipBytes(-2); // rewind the u16 length probe if not OTCv8
 		}
 	}
 
@@ -514,11 +510,12 @@ void ProtocolGame::onConnect()
 	send(output);
 }
 
-void ProtocolGame::disconnectClient(const std::string& message) const
+void ProtocolGame::disconnectClient(const std::string& message, DisconnectClient_t reason) const
 {
 	auto output = tfs::net::make_output_message();
 	output->addByte(0x14);
 	output->addString(message);
+	output->addByte(static_cast<uint8_t>(reason));
 	send(output);
 
 	disconnect();
@@ -1752,13 +1749,9 @@ void ProtocolGame::sendBasicData()
 	}
 
 	msg.addByte(player->getVocation()->getClientId());
-	msg.addByte(0x01); // prey system enabled (15.11 sends based on vocation)
+	msg.addByte(0x01); // prey window allowed
 
-	// unlock spells on action bar (15.11 format: filtered list with U16 spell ids)
-	msg.add<uint16_t>(0xFF);
-	for (uint16_t spellId = 0x00; spellId < 0xFF; spellId++) {
-		msg.add<uint16_t>(spellId);
-	}
+	msg.add<uint16_t>(0); // spellCount
 
 	msg.addByte(player->getVocation()->getMagicShield()); // is magic shield active (bool)
 	writeToOutputBuffer(msg);
@@ -2539,7 +2532,7 @@ void ProtocolGame::sendSkills()
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint16_t type)
+void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint16_t type, SourceEffect_t source)
 {
 	NetworkMessage msg;
 	msg.addByte(0x83);
@@ -2548,11 +2541,12 @@ void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, u
 	msg.add<uint16_t>(type);
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.x) - static_cast<int32_t>(from.x))));
 	msg.addByte(static_cast<uint8_t>(static_cast<int8_t>(static_cast<int32_t>(to.y) - static_cast<int32_t>(from.y))));
+	msg.addByte(static_cast<uint8_t>(source));
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendMagicEffect(const Position& pos, uint16_t type)
+void ProtocolGame::sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source)
 {
 	if (!canSee(pos)) {
 		return;
@@ -2563,6 +2557,7 @@ void ProtocolGame::sendMagicEffect(const Position& pos, uint16_t type)
 	msg.addPosition(pos);
 	msg.addByte(MAGIC_EFFECTS_CREATE_EFFECT);
 	msg.add<uint16_t>(type);
+	msg.addByte(static_cast<uint8_t>(source));
 	msg.addByte(MAGIC_EFFECTS_END_LOOP);
 	writeToOutputBuffer(msg);
 }
@@ -2894,18 +2889,13 @@ void ProtocolGame::sendInventoryIds()
 	std::map<uint32_t, uint32_t> inventory;
 	player->getAllItemTypeCount(inventory);
 
-	msg.add<uint16_t>(inventory.size() + 11);
-	for (uint16_t i = 1; i <= 11; i++) {
-		msg.add<uint16_t>(i); // slotId
-		msg.addByte(0);       // tier (always 0 for slots)
-		msg.addByte(1);       // count (U8 in 15.11, was U16 in 13.10)
-	}
+	msg.add<uint16_t>(static_cast<uint16_t>(inventory.size()));
 
 	for (auto&& [itemId, count] : inventory | std::views::as_const) {
-		msg.add<uint16_t>(Item::items[itemId].clientId); // item clientId
-		msg.addByte(0);                                  // tier
+		msg.add<uint16_t>(Item::items[itemId].clientId);
+		msg.addByte(0); // tier
 
-		// 15.11 variable-length count encoding
+		// variable-length count encoding
 		if (count < 0x40) {
 			msg.addByte(static_cast<uint8_t>(count));
 		} else if (count < 0x4000) {
@@ -3531,7 +3521,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint64_t>(player->getExperience());
 
 	msg.add<uint16_t>(player->getLevel());
-	msg.addByte(player->getLevelPercent());
+	msg.add<uint16_t>(static_cast<uint16_t>(player->getLevelPercent() * 100)); // 15.24: u16 (percent * 100), was u8
 
 	msg.add<uint16_t>(player->getClientExpDisplay());
 	msg.add<uint16_t>(player->getClientLowLevelBonusDisplay());
@@ -3824,7 +3814,7 @@ void ProtocolGame::sendBlessStatus()
 	NetworkMessage msg;
 	msg.addByte(0x9C);
 	msg.add<uint16_t>(0); // glow effect (bitmask of blessings)
-	msg.addByte(0);       // bless icon type (0=none, 1-3=icon levels)
+	msg.addByte(1);       // bless icon: 1=Disabled, 2=normal, 3=green (0 crashes the official client)
 	writeToOutputBuffer(msg);
 }
 
