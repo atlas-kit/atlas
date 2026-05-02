@@ -204,36 +204,12 @@ public:
 	virtual void onWalkAborted() {}
 	virtual void onWalkComplete() {}
 
-	// follow functions
-	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	virtual void setFollowCreature(const std::shared_ptr<Creature>& creature);
-	virtual void removeFollowCreature();
-	bool canFollowCreature(const std::shared_ptr<Creature>& creature);
-	bool isFollowingCreature(const std::shared_ptr<Creature>& creature)
-	{
-		return tfs::owner_equal(followCreature, creature);
-	}
-
-	// follow events
-	virtual void onFollowCreature(const std::shared_ptr<const Creature>&);
-	virtual void onUnfollowCreature();
-
 	// Pathfinding functions
 	void addFollower(const std::shared_ptr<Creature>& creature) { followers.insert(creature); }
 	void removeFollower(const std::shared_ptr<Creature>& creature) { followers.erase(creature); }
 
 	// Pathfinding events
 	void updateFollowersPaths();
-
-	// combat functions
-	std::shared_ptr<Creature> getAttackedCreature() { return attackedCreature.lock(); }
-	virtual void setAttackedCreature(const std::shared_ptr<Creature>& creature);
-	virtual void removeAttackedCreature();
-	bool canAttackCreature(const std::shared_ptr<Creature>& creature);
-	bool isAttackingCreature(const std::shared_ptr<Creature>& creature)
-	{
-		return tfs::owner_equal(creature, attackedCreature);
-	}
 
 	virtual BlockType_t blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
 	                             bool checkDefense = false, bool checkArmor = false, bool field = false,
@@ -307,7 +283,6 @@ public:
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
 	virtual void onBlockHit() {}
 	virtual void onChangeZone(ZoneType_t zone);
-	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 	virtual void onIdleStatus();
 
 	virtual LightInfo getCreatureLight() const;
@@ -334,9 +309,6 @@ public:
 	virtual void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                            const Position& newPos, const std::shared_ptr<const Tile>& oldTile,
 	                            const Position& oldPos, bool teleport);
-
-	virtual void onAttackedCreatureDisappear(bool) {}
-	virtual void onFollowCreatureDisappear(bool) {}
 
 	virtual void onCreatureSay(const std::shared_ptr<Creature>&, SpeakClasses, const std::string&) {}
 
@@ -379,6 +351,12 @@ public:
 	virtual void setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn = false);
 	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
+
+	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
+	void setFollowCreature(const std::shared_ptr<Creature>& creature);
+
+	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
+	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
 protected:
 	struct CountBlock_t
@@ -424,7 +402,6 @@ protected:
 	bool canUseDefense = true;
 	bool movementBlocked = false;
 
-	void onCreatureDisappear(const std::shared_ptr<const Creature>& creature, bool isLogout);
 	virtual void doAttacking(uint32_t) {}
 	virtual bool hasExtraSwing() { return false; }
 

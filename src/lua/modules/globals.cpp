@@ -4,6 +4,7 @@
 #include "../../const.h"
 #include "../../enums.h"
 #include "../../globalevent.h"
+#include "../../scheduler.h"
 #include "../../script.h"
 #include "../../tools.h"
 #include "../api.h"
@@ -327,6 +328,8 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, RELOAD_TYPE_SPELLS);
 	registerEnum(lsi, RELOAD_TYPE_TALKACTIONS);
 	registerEnum(lsi, RELOAD_TYPE_WEAPONS);
+
+	registerEnum(lsi, SCHEDULER_MINTICKS);
 
 	lsi.registerGlobalBoolean("VIRTUAL_PARENT", true);
 

@@ -33,7 +33,7 @@ MuteCountMap Player::muteCountMap;
 uint32_t Player::playerAutoID = 0x10000000;
 uint32_t Player::playerIDLimit = 0x20000000;
 
-Player::Player(ProtocolGame_ptr p) : Creature{}, client{std::move(p)} {}
+Player::Player(std::shared_ptr<ProtocolGame> protocol) : Creature{}, client{std::move(protocol)} {}
 
 void Player::setID()
 {
@@ -1095,30 +1095,13 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	tfs::events::player::onJoin(asPlayer());
 }
 
-void Player::onAttackedCreatureDisappear(bool isLogout)
-{
-	sendCancelTarget();
-
-	if (!isLogout) {
-		sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-	}
-}
-
-void Player::onFollowCreatureDisappear(bool isLogout)
-{
-	sendCancelTarget();
-
-	if (!isLogout) {
-		sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-	}
-}
-
 void Player::onChangeZone(ZoneType_t zone)
 {
 	if (zone == ZONE_PROTECTION) {
 		if (getAttackedCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			removeAttackedCreature();
-			onAttackedCreatureDisappear(false);
+			setAttackedCreature(nullptr);
+			sendCancelTarget();
+			sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 		}
 
 		if (!group->access && isMounted()) {
@@ -1137,31 +1120,6 @@ void Player::onChangeZone(ZoneType_t zone)
 	sendIcons();
 }
 
-void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
-{
-	if (zone == ZONE_PROTECTION) {
-		if (!hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			removeAttackedCreature();
-			onAttackedCreatureDisappear(false);
-		}
-	} else if (zone == ZONE_NOPVP) {
-		if (const auto& attackedCreature = getAttackedCreature(); attackedCreature->asPlayer()) {
-			if (!hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-				removeAttackedCreature();
-				onAttackedCreatureDisappear(false);
-			}
-		}
-	} else if (zone == ZONE_NORMAL) {
-		// attackedCreature can leave a pvp zone if not pzlocked
-		if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-			if (const auto& attackedCreature = getAttackedCreature(); attackedCreature->asPlayer()) {
-				removeAttackedCreature();
-				onAttackedCreatureDisappear(false);
-			}
-		}
-	}
-}
-
 void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
 {
 	Creature::onRemoveCreature(creature, isLogout);
@@ -1174,7 +1132,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 		lastLogout = time(nullptr);
 
 		if (eventWalk != 0) {
-			removeFollowCreature();
+			setFollowCreature(nullptr);
 		}
 
 		if (!tradePartner.expired()) {
@@ -1425,7 +1383,7 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(SchedulerTask_ptr task)
+void Player::setNextWalkActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (walkTaskEvent != 0) {
 		g_scheduler.stopEvent(walkTaskEvent);
@@ -1435,7 +1393,7 @@ void Player::setNextWalkActionTask(SchedulerTask_ptr task)
 	walkTask = std::move(task);
 }
 
-void Player::setNextActionTask(SchedulerTask_ptr task)
+void Player::setNextActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (actionTaskEvent != 0) {
 		g_scheduler.stopEvent(actionTaskEvent);
@@ -3237,60 +3195,6 @@ void Player::internalAddThing(uint32_t index, const std::shared_ptr<Thing>& thin
 	}
 }
 
-void Player::setFollowCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (isFollowingCreature(creature)) {
-		return;
-	}
-
-	if (!canFollowCreature(creature)) {
-		removeFollowCreature();
-		removeAttackedCreature();
-		sendCancelTarget();
-		sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-		stopWalk();
-		return;
-	}
-
-	Creature::setFollowCreature(creature);
-}
-
-void Player::setAttackedCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (isAttackingCreature(creature)) {
-		return;
-	}
-
-	if (!canAttackCreature(creature)) {
-		removeAttackedCreature();
-		sendCancelTarget();
-		return;
-	}
-
-	Creature::setAttackedCreature(creature);
-
-	const auto& followCreature = getFollowCreature();
-	if (chaseMode) {
-		if (followCreature != creature) {
-			// chase opponent
-			setFollowCreature(creature);
-		}
-	} else if (followCreature) {
-		removeFollowCreature();
-	}
-
-	g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
-}
-
-void Player::removeAttackedCreature()
-{
-	Creature::removeAttackedCreature();
-
-	if (getFollowCreature()) {
-		removeFollowCreature();
-	}
-}
-
 void Player::goToFollowCreature()
 {
 	const auto& followCreature = getFollowCreature();
@@ -3331,13 +3235,6 @@ uint64_t Player::getGainedExperience(const std::shared_ptr<Creature>& attacker) 
 	return 0;
 }
 
-void Player::onUnfollowCreature()
-{
-	Creature::onUnfollowCreature();
-
-	stopWalk();
-}
-
 void Player::setChaseMode(bool mode)
 {
 	bool prevChaseMode = chaseMode;
@@ -3350,7 +3247,7 @@ void Player::setChaseMode(bool mode)
 				setFollowCreature(attackedCreature);
 			}
 		} else {
-			removeFollowCreature();
+			setFollowCreature(nullptr);
 			cancelNextWalk = true;
 		}
 	}

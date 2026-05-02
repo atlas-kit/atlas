@@ -28,17 +28,17 @@ void TalkActions::clear(bool fromLua)
 
 LuaScriptInterface& TalkActions::getScriptInterface() { return scriptInterface; }
 
-Event_ptr TalkActions::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> TalkActions::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "talkaction")) {
 		return nullptr;
 	}
-	return Event_ptr(new TalkAction(&scriptInterface));
+	return std::make_unique<TalkAction>(&scriptInterface);
 }
 
-bool TalkActions::registerEvent(Event_ptr event, const pugi::xml_node&)
+bool TalkActions::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
-	TalkAction_ptr talkAction{static_cast<TalkAction*>(event.release())}; // event is guaranteed to be a TalkAction
+	std::unique_ptr<TalkAction> talkAction{static_cast<TalkAction*>(event.release())};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {
@@ -54,7 +54,7 @@ bool TalkActions::registerEvent(Event_ptr event, const pugi::xml_node&)
 
 bool TalkActions::registerLuaEvent(TalkAction* event)
 {
-	TalkAction_ptr talkAction{event};
+	const std::unique_ptr<TalkAction> talkAction{event};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {

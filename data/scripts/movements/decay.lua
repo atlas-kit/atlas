@@ -1,4 +1,6 @@
-function onStepIn(creature, item, position, fromPosition)
+local event = MoveEvent()
+
+function event.onStepIn(creature, item, position, fromPosition)
 	if not creature:isPlayer() or creature:isInGhostMode() then
 		return true
 	end
@@ -7,3 +9,6 @@ function onStepIn(creature, item, position, fromPosition)
 	item:decay()
 	return true
 end
+
+event:id(293, 461, 3310)
+event:register()

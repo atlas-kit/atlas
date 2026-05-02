@@ -1,49 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <movements>
-	<!-- Decaying tiles -->
-	<movevent event="StepIn" itemid="293" script="decay.lua" />
-	<movevent event="StepIn" itemid="461" script="decay.lua" />
-	<movevent event="StepIn" itemid="3310" script="decay.lua" />
-
-	<!-- (Depot & Level) tiles -->
-	<movevent event="StepIn" itemid="416" script="tiles.lua" />
-	<movevent event="StepOut" itemid="417" script="tiles.lua" />
-	<movevent event="StepIn" itemid="426" script="tiles.lua" />
-	<movevent event="StepOut" itemid="425" script="tiles.lua" />
-	<movevent event="StepIn" itemid="446" script="tiles.lua" />
-	<movevent event="StepOut" itemid="447" script="tiles.lua" />
-	<movevent event="StepIn" itemid="3216" script="tiles.lua" />
-	<movevent event="StepOut" itemid="3217" script="tiles.lua" />
-	<movevent event="StepIn" itemid="11062" script="tiles.lua" />
-	<movevent event="StepOut" itemid="11063" script="tiles.lua" />
-
-	<!-- Traps -->
-	<movevent event="StepIn" itemid="1510" script="trap.lua" />
-	<movevent event="StepOut" itemid="1511" script="trap.lua" />
-	<movevent event="StepIn" itemid="1513" script="trap.lua" />
-	<movevent event="StepIn" itemid="2579" script="trap.lua" />
-	<movevent event="RemoveItem" itemid="2579" script="trap.lua" />
-	<movevent event="StepIn" itemid="4208" script="trap.lua" />
-	<movevent event="StepIn" itemid="25331" script="trap.lua" />
-
-	<!-- Citizen teleport -->
-	<movevent event="StepIn" itemid="1387" script="citizen.lua" />
-
-	<!-- Walkback when walking on quest chest -->
-	<movevent event="StepIn" itemid="1738" script="walk_back.lua" />
-	<movevent event="StepIn" itemid="1740" script="walk_back.lua" />
-	<movevent event="StepIn" fromid="1746" toid="1749" script="walk_back.lua" />
-
-	<!-- Snow footprint tiles -->
-	<movevent event="StepOut" itemid="670" script="snow.lua" />
-	<movevent event="StepOut" fromid="6580" toid="6593" script="snow.lua" />
-
-	<!-- Create bread movements -->
-	<movevent event="AddItem" tileitem="1" itemid="1786" script="dough.lua" />
-	<movevent event="AddItem" tileitem="1" itemid="1788" script="dough.lua" />
-	<movevent event="AddItem" tileitem="1" itemid="1790" script="dough.lua" />
-	<movevent event="AddItem" tileitem="1" itemid="1792" script="dough.lua" />
-
 	<!-- Campfires -->
 	<movevent event="StepIn" itemid="1423" function="onStepInField" />
 	<movevent event="AddItem" itemid="1423" function="onAddField" />
@@ -101,30 +57,6 @@
 	<!-- Magic Wall NoPvp / Wild Growth NoPvp -->
 	<movevent event="StepIn" itemid="20669" function="onStepInField" />
 	<movevent event="StepIn" itemid="20670" function="onStepInField" />
-
-	<!-- Swimming -->
-	<movevent event="StepIn" fromid="4620" toid="4625" script="swimming.lua" />
-	<movevent event="StepOut" fromid="4620" toid="4625" script="swimming.lua" />
-	<movevent event="StepIn" fromid="4820" toid="4825" script="swimming.lua" />
-	<movevent event="StepOut" fromid="4820" toid="4825" script="swimming.lua" />
-
-	<!-- Drowning -->
-	<movevent event="StepIn" fromid="5405" toid="5410" script="drowning.lua" />
-	<movevent event="StepOut" itemid="5405" toid="5410" script="drowning.lua" />
-	<movevent event="StepIn" fromid="5427" toid="5438" script="drowning.lua" />
-	<movevent event="StepOut" itemid="5427" toid="5438" script="drowning.lua" />
-	<movevent event="StepIn" fromid="5743" toid="5744" script="drowning.lua" />
-	<movevent event="StepOut" itemid="5743" toid="5744" script="drowning.lua" />
-	<movevent event="StepIn" fromid="5763" toid="5764" script="drowning.lua" />
-	<movevent event="StepOut" itemid="5763" toid="5764" script="drowning.lua" />
-	<movevent event="StepIn" fromid="9671" toid="9673" script="drowning.lua" />
-	<movevent event="StepOut" itemid="9671" toid="9673" script="drowning.lua" />
-	<movevent event="StepIn" itemid="10019" script="drowning.lua" />
-	<movevent event="StepOut" itemid="10019" script="drowning.lua" />
-	<movevent event="StepIn" fromid="23944" toid="23966" script="drowning.lua" />
-	<movevent event="StepOut" itemid="23944" toid="23966" script="drowning.lua" />
-	<movevent event="StepIn" itemid="24624" script="drowning.lua" />
-	<movevent event="StepOut" itemid="24624" script="drowning.lua" />
 
 	<!-- Boots -->
 	<movevent event="Equip" itemid="2195" slot="feet" function="onEquipItem" />
