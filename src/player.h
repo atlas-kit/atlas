@@ -1014,7 +1014,8 @@ public:
 			client->sendCreatureHealth(creature);
 		}
 	}
-	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type,
+	                       SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
 			client->sendDistanceShoot(from, to, type, source);

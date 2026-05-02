@@ -619,15 +619,10 @@ function Player.sendHighscores(self, entries, params)
 end
 
 function Player.takeScreenshot(self, screenshotType, ignoreConfig)
-	if not ignoreConfig and (screenshotType < SCREENSHOT_TYPE_FIRST or screenshotType > SCREENSHOT_TYPE_LAST) then
-		return false
-	end
-
-	local msg = NetworkMessage()
-	msg:addByte(0x75)
-	msg:addByte(screenshotType)
-	msg:sendToPlayer(self)
-	msg:delete()
+	-- 15.24: opcode 0x75 (ScreenshotAndBanner) uses a different enum and expects
+	-- per-type payload bytes. Atlas's old screenshot trigger format desyncs the
+	-- client. Disabled until mapped to SCREENSHOT_AND_BANNER_TYPE_* with the
+	-- correct trailing data.
 	return true
 end
 

@@ -23,7 +23,6 @@ enum SessionEndTypes_t : uint8_t
 	SESSION_END_UNKNOWN2 = 3, // unknown, no difference from logout
 };
 
-// 15.24+ disconnect reason byte (0x14 packet trailing byte)
 enum class DisconnectClient_t : uint8_t
 {
 	Default = 0,
@@ -31,7 +30,6 @@ enum class DisconnectClient_t : uint8_t
 	Outdated = 2,
 };
 
-// 15.24+ effect source byte (sendMagicEffect/sendDistanceShoot)
 enum class SourceEffect_t : uint8_t
 {
 	GLOBAL = 0,
@@ -180,7 +178,8 @@ private:
 	void sendIcons(uint64_t icons);
 	void sendFYIBox(const std::string& message);
 
-	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL);
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type,
+	                       SourceEffect_t source = SourceEffect_t::GLOBAL);
 	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL);
 	void sendCreatureHealth(const std::shared_ptr<const Creature>& creature);
 	void sendSkills();

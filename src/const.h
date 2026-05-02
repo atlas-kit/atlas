@@ -294,7 +294,7 @@ enum MessageClasses : uint8_t
 	MESSAGE_PARTY_MANAGEMENT = 34,
 	MESSAGE_PARTY = 35,
 
-	MESSAGE_REPORT = 38, // White, over player + conosle
+	MESSAGE_REPORT = 38,         // White, over player + conosle
 	MESSAGE_HOTKEY_PRESSED = 39, // Green, over player + console
 	// MESSAGE_TUTORIAL_HINT = 40, // not working (?)
 	// MESSAGE_THANK_YOU = 41, // not working (?)

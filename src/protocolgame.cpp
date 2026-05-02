@@ -359,8 +359,8 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	// Client type and OS used
 	OperatingSystem_t operatingSystem = static_cast<OperatingSystem_t>(msg.get<uint16_t>());
 
-	version = msg.get<uint16_t>();             // U16 protocol version
-	clientVersion = msg.get<int32_t>();         // U32 client version (stored now)
+	version = msg.get<uint16_t>();      // U16 protocol version
+	clientVersion = msg.get<int32_t>(); // U32 client version (stored now)
 
 	// String client version
 	if (msg.getRemainingBufferLength() > 132) {
@@ -1727,7 +1727,7 @@ void ProtocolGame::sendClientFeatures()
 	msg.addByte(0x00); // can change pvp framing option
 	msg.addByte(0x00); // expert mode button enabled
 
-	msg.addString(""); // store images URL (real string in 15.11, not U16)
+	msg.addString("");     // store images URL (real string in 15.11, not U16)
 	msg.add<uint16_t>(25); // premium coin package size
 
 	msg.addByte(0x00); // exiva button enabled (bool)
@@ -2918,10 +2918,7 @@ void ProtocolGame::sendInventoryIds()
 }
 
 // Legacy sendItems kept for internal use
-void ProtocolGame::sendItems()
-{
-	sendInventoryIds();
-}
+void ProtocolGame::sendItems() { sendInventoryIds(); }
 
 void ProtocolGame::sendAddContainerItem(uint8_t cid, uint16_t slot, const std::shared_ptr<const Item>& item)
 {
@@ -3547,8 +3544,8 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 
 	msg.add<uint16_t>(player->getOfflineTrainingTime() / 60 / 1000);
 
-	msg.add<uint16_t>(0);    // xp boost time (seconds)
-	msg.addByte(0x01);       // 15.11: always enable exp boost in store
+	msg.add<uint16_t>(0); // xp boost time (seconds)
+	msg.addByte(0x01);    // 15.11: always enable exp boost in store
 
 	if (ConditionManaShield* conditionManaShield =
 	        dynamic_cast<ConditionManaShield*>(player->getCondition(CONDITION_MANASHIELD_BREAKABLE))) {
@@ -3567,14 +3564,14 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 	// Magic level
 	msg.add<uint16_t>(player->getMagicLevel());
 	msg.add<uint16_t>(player->getBaseMagicLevel());
-	msg.add<uint16_t>(player->getBaseMagicLevel()); // loyalty bonus
+	msg.add<uint16_t>(player->getBaseMagicLevel());          // loyalty bonus
 	msg.add<uint16_t>(player->getMagicLevelPercent() * 100); // 15.11: percent * 100
 
 	// Regular skills (fist through fishing)
 	for (uint8_t i = SKILL_FIRST; i <= SKILL_LAST; ++i) {
 		msg.add<uint16_t>(std::min<int32_t>(player->getSkillLevel(i), std::numeric_limits<uint16_t>::max()));
 		msg.add<uint16_t>(player->getBaseSkill(i));
-		msg.add<uint16_t>(player->getBaseSkill(i)); // loyalty bonus
+		msg.add<uint16_t>(player->getBaseSkill(i));          // loyalty bonus
 		msg.add<uint16_t>(player->getSkillPercent(i) * 100); // 15.11: percent * 100
 	}
 
@@ -3589,8 +3586,8 @@ void ProtocolGame::AddPlayerSkills(NetworkMessage& msg)
 	msg.add<uint32_t>(capacityValue); // base capacity
 
 	// 15.11 combat stats (using special skills data where available, stubs otherwise)
-	msg.add<uint16_t>(0); // flat damage/healing bonus
-	msg.add<uint16_t>(0); // attack total
+	msg.add<uint16_t>(0);  // flat damage/healing bonus
+	msg.add<uint16_t>(0);  // attack total
 	msg.addByte(0);        // element type
 	msg.addDouble(0.0, 4); // converted damage ratio
 	msg.addByte(0);        // converted element type
@@ -3796,8 +3793,8 @@ void ProtocolGame::sendTibiaTime(uint16_t time)
 {
 	NetworkMessage msg;
 	msg.addByte(0xEF);
-	msg.addByte(time / 60);  // hour
-	msg.addByte(time % 60);  // minute
+	msg.addByte(time / 60); // hour
+	msg.addByte(time % 60); // minute
 	writeToOutputBuffer(msg);
 }
 
