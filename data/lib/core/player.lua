@@ -699,6 +699,7 @@ function Player.sendHotkeyPreset(self)
 	msg:addByte(0x9D)
 	msg:addU32(self:getVocation():getClientId())
 	msg:sendToPlayer(self)
+	msg:delete()
 	return true
 end
 
@@ -798,29 +799,30 @@ function Player.getTrackedBestiary(self)
 	return result
 end
 
-function Player.sendTrackedBestiary(self)
+function Player.sendTrackedBestiary(self, isBoss)
+	local entries = {}
+	for _, raceId in ipairs(self:getTrackedBestiary()) do
+		local monsterType = MonsterType(raceId)
+		if monsterType and monsterType:isBoss() == (isBoss or false) then
+			table.insert(entries, {raceId = raceId, monsterType = monsterType})
+		end
+	end
+
 	local msg = NetworkMessage()
 	msg:addByte(0xB9)
+	msg:addByte(isBoss and 0x01 or 0x00)
+	msg:addByte(#entries)
 
-	local trackedBestiary = self:getTrackedBestiary()
-	msg:addByte(#trackedBestiary)
+	for _, entry in ipairs(entries) do
+		local kills = self:getBestiaryKills(entry.raceId)
+		local info = entry.monsterType:getBestiaryInfo() or {prowess = 1, expertise = 2, mastery = 3}
 
-	for _, raceId in ipairs(trackedBestiary) do
-		msg:addU16(raceId)
-
-		local kills = self:getBestiaryKills(raceId)
+		msg:addU16(entry.raceId)
 		msg:addU32(kills)
-
-		local monsterType = MonsterType(raceId)
-		if not monsterType then
-			print(string.format("[Warning] MonsterType with raceId %d does not exist.", raceId))
-		end
-
-		local info = monsterType and monsterType:getBestiaryInfo() or {prowess = 1, expertise = 2, mastery = 3}
 		msg:addU16(info.prowess)
 		msg:addU16(info.expertise)
 		msg:addU16(info.mastery)
-		msg:addByte(kills >= info.mastery and 0x01 or 0x00)
+		msg:addByte(kills >= info.mastery and 0x04 or 0x00)
 	end
 
 	msg:sendToPlayer(self)

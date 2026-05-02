@@ -249,7 +249,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				return;
 			}
 		} else {
-			msg.skipBytes(1); // Skip protocol ID
+			msg.skipBytes(2); // Skip enter-game opcode (u16 in 15.24, was u8)
 		}
 
 		protocol->onRecvFirstMessage(msg);
