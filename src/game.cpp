@@ -2062,8 +2062,8 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (!fromPos.isInventoryOrContainer() && !toPos.isInventoryOrContainer() && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
-			    !fromPos.isInRange(toPos, 1, 1, 0)) {
+			if (!fromPos.isInventoryOrContainer() && !toPos.isInventoryOrContainer() &&
+			    fromPos.isInRange(player->getPosition(), 1, 1, 0) && !fromPos.isInRange(toPos, 1, 1, 0)) {
 				std::shared_ptr<Item> moveItem = nullptr;
 
 				ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), moveItem,
@@ -2270,7 +2270,7 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 	player->setNextActionTask(nullptr);
 
 	g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->getThingIndex(creature), item,
-	                     isHotkey, creature);
+	                     fromPos.isHotkey(), creature);
 }
 
 void Game::playerCloseContainer(uint32_t playerId, uint8_t cid)

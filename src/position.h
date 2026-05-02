@@ -50,10 +50,12 @@ struct Position
 	constexpr int32_t getDistanceY(const Position& p) const { return tfs::abs(getOffsetY(p)); }
 	constexpr int16_t getDistanceZ(const Position& p) const { return tfs::abs(getOffsetZ(p)); }
 
-	// Hotkey position is a special sentinel value used when items are used via hotkeys
+	// Hotkey is a special sentinel position used when items are used via hotkeys.
+	// Note: a hotkey position also satisfies isInventoryOrContainer(), so check isHotkey() first when both matter.
 	constexpr bool isHotkey() const { return x == 0xFFFF && y == 0 && z == 0; }
 
-	// Virtual position indicating item is in inventory or container (not on the map)
+	// Virtual position (x == 0xFFFF) used by the client protocol for items not on the map:
+	// inventory slots, container contents, and hotkey actions.
 	constexpr bool isInventoryOrContainer() const { return x == 0xFFFF; }
 
 	uint16_t x = 0;
