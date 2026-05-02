@@ -23,6 +23,10 @@ set(http_HDR
 add_library(http OBJECT ${http_SRC})
 target_link_libraries(http PRIVATE Boost::json)
 
+if(NOT MSVC)
+    target_compile_options(http PRIVATE -Wno-deprecated-declarations) # maybe this could be removed when updating to boost greater than 1.83.0
+endif()
+
 if (BUILD_TESTING)
     add_subdirectory(tests)
 endif()

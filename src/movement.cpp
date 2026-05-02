@@ -63,17 +63,17 @@ void MoveEvents::clear(bool fromLua)
 
 LuaScriptInterface& MoveEvents::getScriptInterface() { return scriptInterface; }
 
-Event_ptr MoveEvents::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "movevent")) {
 		return nullptr;
 	}
-	return Event_ptr(new MoveEvent(&scriptInterface));
+	return std::make_unique<MoveEvent>(&scriptInterface);
 }
 
-bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
+bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node)
 {
-	MoveEvent_ptr moveEvent{static_cast<MoveEvent*>(event.release())}; // event is guaranteed to be a MoveEvent
+	std::unique_ptr<MoveEvent> moveEvent{static_cast<MoveEvent*>(event.release())};
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
@@ -175,7 +175,7 @@ bool MoveEvents::registerEvent(Event_ptr event, const pugi::xml_node& node)
 
 bool MoveEvents::registerLuaFunction(MoveEvent* event)
 {
-	MoveEvent_ptr moveEvent{event};
+	const std::unique_ptr<MoveEvent> moveEvent{event};
 
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
@@ -213,8 +213,7 @@ bool MoveEvents::registerLuaFunction(MoveEvent* event)
 
 bool MoveEvents::registerLuaEvent(MoveEvent* event)
 {
-	MoveEvent_ptr moveEvent{event};
-
+	const std::unique_ptr<MoveEvent> moveEvent{event};
 	const MoveEvent_t eventType = moveEvent->getEventType();
 	if (eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM) {
 		if (moveEvent->getTileItem()) {
@@ -641,7 +640,7 @@ bool MoveEvent::configureEvent(const pugi::xml_node& node)
 uint32_t MoveEvent::StepInField(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& item,
                                 const Position&)
 {
-	if (const auto& field = item->getMagicField()) {
+	if (const auto& field = item->asMagicField()) {
 		field->onStepInField(creature);
 		return 1;
 	}
@@ -656,7 +655,7 @@ uint32_t MoveEvent::StepOutField(const std::shared_ptr<Creature>&, const std::sh
 
 uint32_t MoveEvent::AddItemField(const std::shared_ptr<Item>& item, const std::shared_ptr<Item>&, const Position&)
 {
-	if (const auto& field = item->getMagicField()) {
+	if (const auto& field = item->asMagicField()) {
 		const auto& tile = item->getTile();
 		if (CreatureVector* creatures = tile->getCreatures()) {
 			for (const auto& creature : *creatures) {

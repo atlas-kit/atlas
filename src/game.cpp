@@ -1467,7 +1467,7 @@ std::shared_ptr<Item> Game::findItemOfType(const std::shared_ptr<Thing>& fromThi
 		}
 
 		if (depthSearch) {
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				containers.push_back(container);
 			}
 		}
@@ -1481,7 +1481,7 @@ std::shared_ptr<Item> Game::findItemOfType(const std::shared_ptr<Thing>& fromThi
 				return item;
 			}
 
-			if (const auto& subContainer = item->getContainer()) {
+			if (const auto& subContainer = item->asContainer()) {
 				containers.push_back(subContainer);
 			}
 		}
@@ -1515,7 +1515,7 @@ bool Game::removeMoney(const std::shared_ptr<Thing>& fromThing, uint64_t money, 
 			continue;
 		}
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			containers.push_back(container);
 		} else {
 			const uint32_t worth = item->getWorth();
@@ -1530,7 +1530,7 @@ bool Game::removeMoney(const std::shared_ptr<Thing>& fromThing, uint64_t money, 
 	while (i < containers.size()) {
 		const auto container = containers[i++];
 		for (const auto& item : container->getItemList()) {
-			if (const auto& tmpContainer = item->getContainer()) {
+			if (const auto& tmpContainer = item->asContainer()) {
 				containers.push_back(tmpContainer);
 			} else {
 				const uint32_t worth = item->getWorth();
@@ -1815,7 +1815,7 @@ void Game::playerEquipItem(uint32_t playerId, uint16_t spriteId)
 		return;
 	}
 
-	const auto& backpack = item->getContainer();
+	const auto& backpack = item->asContainer();
 	if (!backpack) {
 		return;
 	}
@@ -2291,7 +2291,7 @@ static auto createBrowseField(const std::shared_ptr<Tile>& tile)
 
 	if (TileItemVector* itemVector = tile->getItemList()) {
 		for (const auto& item : *itemVector) {
-			if ((item->getContainer() || item->hasProperty(CONST_PROP_MOVEABLE)) &&
+			if ((item->asContainer() || item->hasProperty(CONST_PROP_MOVEABLE)) &&
 			    !item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
 				browseField->addItem(item);
 			}
@@ -2382,7 +2382,7 @@ void Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return;
 	}
 
-	if (const auto& podium = item->getPodium()) {
+	if (const auto& podium = item->asPodium()) {
 		podium->setDirection(static_cast<Direction>((podium->getDirection() + 1) % 4));
 		updatePodium(podium);
 	} else {
@@ -2619,7 +2619,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 
 	if (getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = tradeItem->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!tradeItem->getTopParent()->asCreature() && !houseTile->getHouse()->isInvited(player)) {
 					player->sendCancelMessage(RETURNVALUE_PLAYERISNOTINVITED);
 					return;
@@ -2652,7 +2652,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 		return;
 	}
 
-	if (const auto& tradeItemContainer = tradeItem->getContainer()) {
+	if (const auto& tradeItemContainer = tradeItem->asContainer()) {
 		for (auto&& item : tradeItems | std::views::keys | std::views::as_const) {
 			if (tradeItem == item) {
 				player->sendCancelMessage("This item is already being traded.");
@@ -2664,7 +2664,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 				return;
 			}
 
-			const auto& container = item->getContainer();
+			const auto& container = item->asContainer();
 			if (container && container->isHoldingItem(tradeItem)) {
 				player->sendCancelMessage("This item is already being traded.");
 				return;
@@ -2677,7 +2677,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 				return;
 			}
 
-			const auto& container = item->getContainer();
+			const auto& container = item->asContainer();
 			if (container && container->isHoldingItem(tradeItem)) {
 				player->sendCancelMessage("This item is already being traded.");
 				return;
@@ -2685,7 +2685,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 		}
 	}
 
-	if (const auto& tradeContainer = tradeItem->getContainer()) {
+	if (const auto& tradeContainer = tradeItem->asContainer()) {
 		if (tradeContainer->getItemHoldingCount() + 1 > ITEM_STACK_SIZE) {
 			player->sendCancelMessage(std::format("You can only trade up to {} objects at once.", ITEM_STACK_SIZE));
 			return;
@@ -2898,7 +2898,7 @@ void Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, uint8_t
 		return;
 	}
 
-	const auto& tradeContainer = tradeItem->getContainer();
+	const auto& tradeContainer = tradeItem->asContainer();
 	if (!tradeContainer) {
 		return;
 	}
@@ -2908,7 +2908,7 @@ void Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, uint8_t
 	while (i < containers.size()) {
 		const auto container = containers[i++];
 		for (const auto& item : container->getItemList()) {
-			if (const auto& childContainer = item->getContainer()) {
+			if (const auto& childContainer = item->asContainer()) {
 				containers.push_back(childContainer);
 			}
 
@@ -3161,14 +3161,14 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	if (player->getAttackedCreature() && creatureId == 0) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
 
 	const auto& attackCreature = getCreatureByID(creatureId);
 	if (!attackCreature) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
@@ -3177,7 +3177,7 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	if (ret != RETURNVALUE_NOERROR) {
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		return;
 	}
 
@@ -3193,12 +3193,12 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 		return;
 	}
 
-	player->removeAttackedCreature();
+	player->setAttackedCreature(nullptr);
 
 	if (const auto& followCreature = getCreatureByID(creatureId)) {
 		player->setFollowCreature(followCreature);
 	} else {
-		player->removeFollowCreature();
+		player->setFollowCreature(nullptr);
 	}
 
 	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
@@ -3266,16 +3266,6 @@ void Game::playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::str
 {
 	if (const auto& player = getPlayerByID(playerId)) {
 		player->editVIP(guid, description, icon, notify);
-	}
-}
-
-void Game::playerTurn(uint32_t playerId, Direction dir)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		if (tfs::events::player::onTurn(player, dir)) {
-			player->resetIdleTime();
-			internalCreatureTurn(player, dir);
-		}
 	}
 }
 
@@ -5328,10 +5318,10 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::str
 	}
 }
 
-void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg)
+void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		tfs::events::player::onNetworkMessage(player, recvByte, msg);
+		tfs::events::player::onNetworkMessage(player, recvByte, std::move(msg));
 	}
 }
 
@@ -5353,7 +5343,7 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 		containers.pop_front();
 
 		for (const auto& item : container->getItemList()) {
-			const auto& containerItem = item->getContainer();
+			const auto& containerItem = item->asContainer();
 			if (containerItem && !containerItem->empty()) {
 				containers.push_back(containerItem);
 				continue;

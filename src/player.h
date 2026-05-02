@@ -95,15 +95,15 @@ public:
 	static uint32_t playerAutoID;
 	static uint32_t playerIDLimit;
 
-	explicit Player(ProtocolGame_ptr p);
+	explicit Player(std::shared_ptr<ProtocolGame> protocol);
 	~Player() = default;
 
 	// non-copyable
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
 	std::shared_ptr<Player> asPlayer() override { return std::static_pointer_cast<Player>(shared_from_this()); }
 	std::shared_ptr<const Player> asPlayer() const override
@@ -450,11 +450,7 @@ public:
 	bool editVIP(uint32_t vipGuid, const std::string& description, uint32_t icon, bool notify);
 
 	// follow functions
-	void setFollowCreature(const std::shared_ptr<Creature>& creature) override;
 	void goToFollowCreature() override;
-
-	// follow events
-	void onUnfollowCreature() override;
 
 	// walk events
 	void onWalk(Direction& dir) override;
@@ -475,8 +471,6 @@ public:
 	void setSecureMode(bool mode) { secureMode = mode; }
 
 	// combat functions
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature) override;
-	void removeAttackedCreature() override;
 	bool isImmune(CombatType_t type) const override;
 	bool isImmune(ConditionType_t type) const override;
 	bool hasShield() const;
@@ -545,7 +539,6 @@ public:
 	void onAttackedCreatureBlockHit(BlockType_t blockType) override;
 	void onBlockHit() override;
 	void onChangeZone(ZoneType_t zone) override;
-	void onAttackedCreatureChangeZone(ZoneType_t zone) override;
 	void onIdleStatus() override;
 
 	LightInfo getCreatureLight() const override;
@@ -836,9 +829,6 @@ public:
 	void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                    const Position& newPos, const std::shared_ptr<const Tile>& oldTile, const Position& oldPos,
 	                    bool teleport) override;
-
-	void onAttackedCreatureDisappear(bool isLogout) override;
-	void onFollowCreatureDisappear(bool isLogout) override;
 
 	// container
 	void onAddContainerItem(const std::shared_ptr<const Item>& item);
@@ -1171,8 +1161,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask_ptr task);
-	void setNextActionTask(SchedulerTask_ptr task);
+	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
 	void setNextAction(int64_t time)
 	{
@@ -1293,7 +1283,7 @@ private:
 	int64_t lastToggleMount = 0;
 	int64_t nextAction = 0;
 
-	ProtocolGame_ptr client;
+	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
@@ -1306,7 +1296,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask_ptr walkTask;
+	std::unique_ptr<SchedulerTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;
