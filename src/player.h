@@ -450,11 +450,7 @@ public:
 	bool editVIP(uint32_t vipGuid, const std::string& description, uint32_t icon, bool notify);
 
 	// follow functions
-	void setFollowCreature(const std::shared_ptr<Creature>& creature) override;
 	void goToFollowCreature() override;
-
-	// follow events
-	void onUnfollowCreature() override;
 
 	// walk events
 	void onWalk(Direction& dir) override;
@@ -475,8 +471,6 @@ public:
 	void setSecureMode(bool mode) { secureMode = mode; }
 
 	// combat functions
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature) override;
-	void removeAttackedCreature() override;
 	bool isImmune(CombatType_t type) const override;
 	bool isImmune(ConditionType_t type) const override;
 	bool hasShield() const;
@@ -545,7 +539,6 @@ public:
 	void onAttackedCreatureBlockHit(BlockType_t blockType) override;
 	void onBlockHit() override;
 	void onChangeZone(ZoneType_t zone) override;
-	void onAttackedCreatureChangeZone(ZoneType_t zone) override;
 	void onIdleStatus() override;
 
 	LightInfo getCreatureLight() const override;
@@ -836,9 +829,6 @@ public:
 	void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                    const Position& newPos, const std::shared_ptr<const Tile>& oldTile, const Position& oldPos,
 	                    bool teleport) override;
-
-	void onAttackedCreatureDisappear(bool isLogout) override;
-	void onFollowCreatureDisappear(bool isLogout) override;
 
 	// container
 	void onAddContainerItem(const std::shared_ptr<const Item>& item);

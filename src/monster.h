@@ -78,8 +78,6 @@ public:
 	void setSpawn(Spawn* spawn) { this->spawn = spawn; }
 	bool canWalkOnFieldType(CombatType_t combatType) const;
 
-	void onAttackedCreatureDisappear(bool isLogout) override;
-
 	void onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, MagicEffectClasses) override;
 	void onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout) override;
 	void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
@@ -153,6 +151,8 @@ public:
 	const MonsterType* getMonsterType() const { return mType; }
 
 	static uint32_t monsterAutoID;
+
+	void resetAttackTicks() { attackTicks = 0; }
 
 private:
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;

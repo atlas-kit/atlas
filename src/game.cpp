@@ -3160,14 +3160,14 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	if (player->getAttackedCreature() && creatureId == 0) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
 
 	const auto& attackCreature = getCreatureByID(creatureId);
 	if (!attackCreature) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
@@ -3176,7 +3176,7 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	if (ret != RETURNVALUE_NOERROR) {
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		return;
 	}
 
@@ -3192,12 +3192,12 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 		return;
 	}
 
-	player->removeAttackedCreature();
+	player->setAttackedCreature(nullptr);
 
 	if (const auto& followCreature = getCreatureByID(creatureId)) {
 		player->setFollowCreature(followCreature);
 	} else {
-		player->removeFollowCreature();
+		player->setFollowCreature(nullptr);
 	}
 
 	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
@@ -3265,16 +3265,6 @@ void Game::playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::str
 {
 	if (const auto& player = getPlayerByID(playerId)) {
 		player->editVIP(guid, description, icon, notify);
-	}
-}
-
-void Game::playerTurn(uint32_t playerId, Direction dir)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		if (tfs::events::player::onTurn(player, dir)) {
-			player->resetIdleTime();
-			internalCreatureTurn(player, dir);
-		}
 	}
 }
 

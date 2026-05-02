@@ -92,8 +92,6 @@ bool Monster::canWalkOnFieldType(CombatType_t combatType) const
 	}
 }
 
-void Monster::onAttackedCreatureDisappear(bool) { attackTicks = 0; }
-
 void Monster::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, MagicEffectClasses)
 {
 	if (creature.get() == this) {
@@ -613,23 +611,15 @@ bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)
 		return false;
 	}
 
-	if (isHostile() || isSummon()) {
-		if (canAttackCreature(creature)) {
-			setAttackedCreature(creature);
-
-			if (isHostile()) {
-				g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
-			}
-		} else {
-			removeAttackedCreature();
-		}
+	if (isSummon()) {
+		setAttackedCreature(creature);
+	} else if (isHostile()) {
+		setAttackedCreature(creature);
+		g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
 	}
 
-	if (isFollowingCreature(creature) || canFollowCreature(creature)) {
-		setFollowCreature(creature);
-		return true;
-	}
-	return false;
+	setFollowCreature(creature);
+	return getFollowCreature() == creature;
 }
 
 void Monster::setIdle(bool idle)
@@ -733,7 +723,7 @@ void Monster::onThink(uint32_t interval)
 						setFollowCreature(master);
 					}
 				} else if (attackedCreature.get() == this) {
-					removeFollowCreature();
+					setFollowCreature(nullptr);
 				} else if (!tfs::owner_equal(attackedCreature, getFollowCreature())) {
 					// This happens just after a master orders an attack, so lets follow it as well.
 					setFollowCreature(attackedCreature);
@@ -1808,7 +1798,7 @@ bool Monster::canWalkTo(Position pos, Direction direction) const
 
 void Monster::death(const std::shared_ptr<Creature>&)
 {
-	removeAttackedCreature();
+	setAttackedCreature(nullptr);
 
 	for (const auto& summon : getSummons() | tfs::views::lock_weak_ptrs) {
 		summon->changeHealth(-summon->getHealth());
