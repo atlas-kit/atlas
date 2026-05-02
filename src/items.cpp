@@ -5,9 +5,9 @@
 
 #include "items.h"
 
-#include "protobuf/appearances.h"
 #include "configmanager.h"
 #include "movement.h"
+#include "protobuf/appearances.h"
 #include "pugicast.h"
 #include "weapons.h"
 
@@ -564,7 +564,7 @@ bool Items::loadFromOtb(const std::string& file)
 		iType.showClientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 		iType.showClientDuration = hasBitSet(FLAG_CLIENTDURATION, flags);
 
-		iType.id = clientId;      // Use clientId as primary ID
+		iType.id = clientId; // Use clientId as primary ID
 		iType.clientId = clientId;
 		iType.speed = speed;
 		iType.lightLevel = lightLevel;
