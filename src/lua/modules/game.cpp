@@ -683,6 +683,7 @@ int luaGameSetPlayerRecord(lua_State* L)
 void tfs::lua::registerGame(LuaScriptInterface& lsi)
 {
 	registerEnum(lsi, ITEM_STACK_SIZE);
+	registerEnum(lsi, MAX_STACKPOS);
 
 	registerEnum(lsi, GAME_STATE_STARTUP);
 	registerEnum(lsi, GAME_STATE_INIT);

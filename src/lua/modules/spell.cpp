@@ -121,7 +121,8 @@ int luaSpellRegister(lua_State* L)
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
-			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(instant));
+
+			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(std::unique_ptr<InstantSpell>{instant}));
 		} else if (RuneSpell* rune = spell->getRuneSpell()) {
 			if (rune->getMagicLevel() != 0 || rune->getLevel() != 0) {
 				// Change information in the ItemType to get accurate description
@@ -131,11 +132,13 @@ int luaSpellRegister(lua_State* L)
 				iType.runeLevel = rune->getLevel();
 				iType.charges = rune->getCharges();
 			}
+
 			if (!rune->isScripted()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
-			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(rune));
+
+			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(std::unique_ptr<RuneSpell>{rune}));
 		}
 	} else {
 		lua_pushnil(L);
