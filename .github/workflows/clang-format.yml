@@ -31,11 +31,12 @@ jobs:
 
       - name: Setup LLVM repository
         run: |
-          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo add-apt-repository -y 'deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main'
+          source /etc/os-release
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/llvm.gpg > /dev/null
+          sudo echo "deb [signed-by=/usr/share/keyrings/llvm.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-21 main" | sudo tee /etc/apt/sources.list.d/llvm.list
 
       - name: Install dependencies
-        run: sudo apt update -qq && sudo apt install -yqq clang-format
+        run: sudo apt-get update -yqq && sudo apt-get install -yqq clang-format-21
 
       - name: Check code style
-        run: clang-format -n -style=file --Werror src/*.{cpp,h}
+        run: clang-format-21 -n -style=file --Werror src/*.{cpp,h}

@@ -36,7 +36,7 @@ bool BaseEvents::loadFromXml()
 	loaded = true;
 
 	for (auto node : doc.child(scriptsName.c_str()).children()) {
-		Event_ptr event = getEvent(node.name());
+		auto event = getEvent(node.name());
 		if (!event) {
 			continue;
 		}

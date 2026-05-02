@@ -42,23 +42,23 @@ public:
 
 	std::shared_ptr<Item> clone() const override final;
 
-	std::shared_ptr<Thing> getReceiver() override final { return shared_from_this(); }
-	std::shared_ptr<const Thing> getReceiver() const override final { return shared_from_this(); }
+	std::shared_ptr<Thing> asReceiver() override final { return shared_from_this(); }
+	std::shared_ptr<const Thing> asReceiver() const override final { return shared_from_this(); }
 
-	std::shared_ptr<Container> getContainer() override final
+	std::shared_ptr<Container> asContainer() override final
 	{
 		return std::static_pointer_cast<Container>(shared_from_this());
 	}
-	std::shared_ptr<const Container> getContainer() const override final
+	std::shared_ptr<const Container> asContainer() const override final
 	{
 		return std::static_pointer_cast<const Container>(shared_from_this());
 	}
 
-	virtual std::shared_ptr<DepotLocker> getDepotLocker() { return nullptr; }
-	virtual std::shared_ptr<const DepotLocker> getDepotLocker() const { return nullptr; }
+	virtual std::shared_ptr<DepotLocker> asDepotLocker() { return nullptr; }
+	virtual std::shared_ptr<const DepotLocker> asDepotLocker() const { return nullptr; }
 
-	virtual std::shared_ptr<StoreInbox> getStoreInbox() { return nullptr; }
-	virtual std::shared_ptr<const StoreInbox> getStoreInbox() const { return nullptr; }
+	virtual std::shared_ptr<StoreInbox> asStoreInbox() { return nullptr; }
+	virtual std::shared_ptr<const StoreInbox> asStoreInbox() const { return nullptr; }
 
 	bool hasContainerParent() const;
 
