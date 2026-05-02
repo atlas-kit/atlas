@@ -13,7 +13,7 @@ std::optional<std::reference_wrapper<WildcardTreeNode>> WildcardTreeNode::getChi
 	if (it == children.end()) {
 		return std::nullopt;
 	}
-	return *it->second;
+	return it->second;
 }
 
 std::optional<std::reference_wrapper<const WildcardTreeNode>> WildcardTreeNode::getChild(char ch) const
@@ -22,22 +22,20 @@ std::optional<std::reference_wrapper<const WildcardTreeNode>> WildcardTreeNode::
 	if (it == children.end()) {
 		return std::nullopt;
 	}
-	return *it->second;
+	return it->second;
 }
 
 WildcardTreeNode& WildcardTreeNode::addChild(char ch, bool breakpoint)
 {
-	if (const auto& node = getChild(ch)) {
+	if (auto node = getChild(ch)) {
 		if (breakpoint && !node->get().breakpoint) {
 			node->get().breakpoint = true;
 		}
 		return *node;
 	}
 
-	auto newChild = std::make_unique<WildcardTreeNode>(breakpoint);
-	auto& childRef = *newChild;
-	children.emplace(ch, std::move(newChild));
-	return childRef;
+	auto [it, _] = children.try_emplace(ch, breakpoint);
+	return it->second;
 }
 
 void WildcardTreeNode::insert(const std::string& str)
@@ -59,11 +57,12 @@ void WildcardTreeNode::remove(const std::string& str)
 	std::stack<WildcardTreeNode*> path;
 	path.push(cur);
 	for (const auto& ch : str) {
-		const auto& node = cur->getChild(ch);
+		auto node = cur->getChild(ch);
 		if (!node) {
 			return;
 		}
-		path.push(&node->get());
+		cur = &node->get();
+		path.push(cur);
 	}
 
 	cur->breakpoint = false;
@@ -90,7 +89,7 @@ ReturnValue WildcardTreeNode::findOne(const std::string& query, std::string& res
 {
 	const WildcardTreeNode* cur = this;
 	for (char pos : query) {
-		const auto& node = cur->getChild(pos);
+		auto node = cur->getChild(pos);
 		if (!node) {
 			return RETURNVALUE_PLAYERWITHTHISNAMEISNOTONLINE;
 		}
@@ -107,8 +106,8 @@ ReturnValue WildcardTreeNode::findOne(const std::string& query, std::string& res
 			return RETURNVALUE_NAMEISTOOAMBIGUOUS;
 		}
 
-		auto&& [ch, node] = *cur->children.begin();
+		const auto& [ch, node] = *cur->children.begin();
 		result += ch;
-		cur = node.get();
+		cur = &node;
 	} while (true);
 }
