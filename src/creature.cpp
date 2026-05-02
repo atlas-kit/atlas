@@ -1084,9 +1084,7 @@ bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* 
 		if (walkDelay > 0) {
 			g_scheduler.addEvent(
 			    createSchedulerTask(walkDelay, [id = getID(), condition = std::move(condition)]() mutable {
-				    if (condition) {
-					    g_game.forceAddCondition(id, std::move(condition));
-				    }
+				    g_game.forceAddCondition(id, std::move(condition));
 			    }));
 			return false;
 		}
@@ -1109,7 +1107,6 @@ bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* 
 
 bool Creature::addCombatCondition(std::unique_ptr<Condition> condition)
 {
-	// Caution: condition variable could be deleted after the call to addCondition
 	ConditionType_t type = condition->getType();
 
 	if (!addCondition(std::move(condition))) {
