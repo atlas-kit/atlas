@@ -174,7 +174,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
-		Combat_ptr combat = std::make_shared<Combat>();
+		const auto combat = std::make_shared<Combat>();
 		if ((attr = node.attribute("length"))) {
 			int32_t length = pugi::cast<int32_t>(attr.value());
 			if (length > 0) {
@@ -592,7 +592,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
-		Combat_ptr combat = std::make_shared<Combat>();
+		const auto combat = std::make_shared<Combat>();
 		sb.combatSpell = true;
 
 		if (spell->length > 0) {
