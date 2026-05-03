@@ -41,6 +41,9 @@ public:
 	void append(const NetworkMessage& msg)
 	{
 		auto msgLen = msg.getLength();
+		if (msgLen == 0 || info.position + msgLen > buffer.size()) {
+			return;
+		}
 		std::memcpy(buffer.data() + info.position, msg.getBuffer() + INITIAL_BUFFER_POSITION, msgLen);
 		info.length += msgLen;
 		info.position += msgLen;
@@ -49,6 +52,9 @@ public:
 	void append(const std::shared_ptr<OutputMessage>& msg)
 	{
 		auto msgLen = msg->getLength();
+		if (msgLen == 0 || info.position + msgLen > buffer.size()) {
+			return;
+		}
 		std::memcpy(buffer.data() + info.position, msg->getBuffer() + INITIAL_BUFFER_POSITION, msgLen);
 		info.length += msgLen;
 		info.position += msgLen;
