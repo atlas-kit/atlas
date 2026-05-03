@@ -2,9 +2,9 @@ FROM debian:forky-slim AS build
 RUN apt-get update -q && apt-get install -yq \
   build-essential \
   cmake \
-  libboost-iostreams1.88-dev \
-  libboost-json1.88-dev \
-  libboost-system1.88-dev \
+  libboost-iostreams1.83-dev \
+  libboost-json1.83-dev \
+  libboost-system1.83-dev \
   liblua5.4-dev \
   libmariadb-dev \
   libpugixml-dev \
@@ -21,12 +21,12 @@ RUN cmake --preset default && cmake --build --config RelWithDebInfo --preset def
 
 FROM debian:forky-slim
 RUN apt-get update -q && apt-get install -yq \
-  libboost-iostreams1.88.0 \
-  libboost-json1.88.0 \
+  libboost-iostreams1.83.0 \
+  libboost-json1.83.0 \
   liblua5.4-0 \
   libmariadb3 \
   libpugixml1v5 \
-  libsimdutf31 \
+  libsimdutf33 \
   libspdlog1.15 \
   libssl3t64 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
