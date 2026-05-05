@@ -1932,12 +1932,7 @@ void ProtocolGame::sendContainer(uint8_t cid, const std::shared_ptr<const Contai
 	msg.addByte(0); // Categories size
 
 	msg.addByte(0); // Pickupable/Moveable (?)
-
-	if (container->getHoldingPlayer()) {
-		msg.addByte(1);
-	} else {
-		msg.addByte(0);
-	}
+	msg.addBool(container->getHoldingPlayer() != nullptr);
 
 	writeToOutputBuffer(msg);
 }
@@ -1952,14 +1947,21 @@ void ProtocolGame::sendEmptyContainer(uint8_t cid)
 	msg.addItem(ITEM_BAG, 1);
 	msg.addString("Placeholder");
 
-	msg.addByte(8);
+	msg.addByte(8);       // capacity
+	msg.addByte(0x00);    // has no parent container
+	msg.addByte(0x00);    // hide search icon
+	msg.addByte(0x01);    // is unlocked
+	msg.addByte(0x00);    // has no pagination
+	msg.add<uint16_t>(0); // container size
+	msg.add<uint16_t>(0); // first index
 	msg.addByte(0x00);
-	msg.addByte(0x00);
-	msg.addByte(0x01);
-	msg.addByte(0x00);
-	msg.add<uint16_t>(0);
-	msg.add<uint16_t>(0);
-	msg.addByte(0x00);
+
+	// TODO: check if these bytes are required for empty containers, if not remove them
+	// msg.addByte(0); // Category type
+	// msg.addByte(0); // Categories size
+	// msg.addByte(0); // Pickupable/Moveable (?)
+	// msg.addByte(0); // no holding player
+
 	writeToOutputBuffer(msg);
 }
 
