@@ -795,29 +795,35 @@ function Player.getTrackedBestiary(self)
 end
 
 function Player.sendTrackedBestiary(self, isBoss)
+	if isBoss == nil then
+		print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Calling Player.sendTrackedBestiary without isBoss argument is deprecated and will be removed in the future.")
+		self:sendTrackedBestiary(false)
+		self:sendTrackedBestiary(true)
+		return true
+	end
+
 	local entries = {}
 	for _, raceId in ipairs(self:getTrackedBestiary()) do
 		local monsterType = MonsterType(raceId)
-		if monsterType and monsterType:isBoss() == (isBoss or false) then
-			table.insert(entries, {raceId = raceId, monsterType = monsterType})
+		if monsterType and monsterType:isBoss() == isBoss then
+			table.insert(entries, monsterType:bestiaryInfo())
 		end
 	end
 
 	local msg = NetworkMessage()
 	msg:addByte(0xB9)
-	msg:addByte(isBoss and 0x01 or 0x00)
+	msg:addBool(isBoss)
 	msg:addByte(#entries)
 
-	for _, entry in ipairs(entries) do
-		local kills = self:getBestiaryKills(entry.raceId)
-		local info = entry.monsterType:getBestiaryInfo() or {prowess = 1, expertise = 2, mastery = 3}
+	for _, bestiaryInfo in ipairs(entries) do
+		local kills = self:getBestiaryKills(bestiaryInfo.raceId)
 
-		msg:addU16(entry.raceId)
+		msg:addU16(bestiaryInfo.raceId)
 		msg:addU32(kills)
-		msg:addU16(info.prowess)
-		msg:addU16(info.expertise)
-		msg:addU16(info.mastery)
-		msg:addByte(kills >= info.mastery and 0x04 or 0x00)
+		msg:addU16(bestiaryInfo.prowess)
+		msg:addU16(bestiaryInfo.expertise)
+		msg:addU16(bestiaryInfo.mastery)
+		msg:addByte(kills >= bestiaryInfo.mastery and 0x04 or 0x00)
 	end
 
 	msg:sendToPlayer(self)
