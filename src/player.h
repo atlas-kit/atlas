@@ -863,12 +863,6 @@ public:
 			client->sendAllowBugReport();
 		}
 	}
-	void sendTibiaTime(uint16_t time) const
-	{
-		if (client) {
-			client->sendTibiaTime(time);
-		}
-	}
 	void sendDisableLoginMusic() const
 	{
 		if (client) {
@@ -885,12 +879,6 @@ public:
 	{
 		if (client) {
 			client->sendPremiumTrigger();
-		}
-	}
-	void sendWorldLight(const LightInfo& lightInfo) const
-	{
-		if (client) {
-			client->sendWorldLight(lightInfo);
 		}
 	}
 	void sendClientCheck() const

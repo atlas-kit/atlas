@@ -1064,7 +1064,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	// login packet sequence
 	sendClientFeatures();
 	sendAllowBugReport();
-	sendTibiaTime(12 * 60); // noon (no day/night cycle in Atlas)
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
@@ -1089,9 +1088,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	sendPreyPrices();
 	sendPreyData();
 	sendForgingData();
-
-	// World light (static daylight since Atlas has no day/night cycle)
-	sendWorldLight(LightInfo{250, 215});
 
 	// Player creature light
 	sendLight();

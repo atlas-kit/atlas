@@ -241,11 +241,9 @@ private:
 
 	// New 15.11 login packets
 	void sendAllowBugReport();
-	void sendTibiaTime(uint16_t time);
 	void sendDisableLoginMusic();
 	void sendBlessStatus();
 	void sendPremiumTrigger();
-	void sendWorldLight(const LightInfo& lightInfo);
 	void sendClientCheck();
 	void sendGameNews();
 	void sendInventoryIds();

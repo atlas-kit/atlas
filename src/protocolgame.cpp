@@ -367,14 +367,12 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		msg.getString(); // client version string
 	}
 
-	// Asset hash identifier (new in 15.11, version >= 1334)
 	if (version >= 1334) {
-		msg.getString(); // asset hash
-	}
-
-	// Dat revision only for older protocols
-	if (version < 1334) {
-		msg.skipBytes(2); // U16 dat revision
+		// asset hash identifier (new in 15.11, version >= 1334)
+		msg.getString();
+	} else {
+		// U16 dat revision for older protocols
+		msg.skipBytes(2);
 	}
 
 	msg.skipBytes(1); // U8 preview state
@@ -3789,15 +3787,6 @@ void ProtocolGame::sendAllowBugReport()
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendTibiaTime(uint16_t time)
-{
-	NetworkMessage msg;
-	msg.addByte(0xEF);
-	msg.addByte(time / 60); // hour
-	msg.addByte(time % 60); // minute
-	writeToOutputBuffer(msg);
-}
-
 void ProtocolGame::sendDisableLoginMusic()
 {
 	if (isOTC) {
@@ -3828,15 +3817,6 @@ void ProtocolGame::sendPremiumTrigger()
 	for (uint16_t i = 0; i <= 15; i++) {
 		msg.addByte(0x01);
 	}
-	writeToOutputBuffer(msg);
-}
-
-void ProtocolGame::sendWorldLight(const LightInfo& lightInfo)
-{
-	NetworkMessage msg;
-	msg.addByte(0x82);
-	msg.addByte(player->isAccessPlayer() ? 0xFF : lightInfo.level);
-	msg.addByte(lightInfo.color);
 	writeToOutputBuffer(msg);
 }
 
