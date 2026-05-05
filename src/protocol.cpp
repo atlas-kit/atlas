@@ -57,7 +57,7 @@ Protocol::~Protocol()
 void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 {
 	if (!rawMessages) {
-		if (encryptionEnabled && checksumMode == CHECKSUM_SEQUENCE) {
+		if (encryptionEnabled) {
 			uint32_t compressionChecksum = 0;
 			if (msg->getLength() >= 128 && deflateMessage(*msg)) {
 				compressionChecksum = 0x80000000;
@@ -69,10 +69,9 @@ void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 		if (encryptionEnabled) {
 			msg->writePaddingLength();
 			XTEA_encrypt(*msg, key);
-			msg->addCryptoHeader(checksumMode); // also writes message length
-		} else {
-			msg->writeMessageLength();
+			msg->addCryptoHeader();
 		}
+		msg->writeMessageLength();
 	}
 }
 

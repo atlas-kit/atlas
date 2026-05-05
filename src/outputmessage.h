@@ -27,16 +27,7 @@ public:
 		add_header(paddingAmount);
 	}
 
-	void addCryptoHeader(checksumMode_t mode)
-	{
-		if (mode == CHECKSUM_ADLER) {
-			add_header(adlerChecksum(&buffer[outputBufferStart], info.length));
-		} else if (mode == CHECKSUM_SEQUENCE) {
-			add_header(getSequenceId());
-		}
-
-		writeMessageLength();
-	}
+	void addCryptoHeader() { add_header(getSequenceId()); }
 
 	void append(const NetworkMessage& msg)
 	{

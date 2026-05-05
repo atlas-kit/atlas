@@ -394,8 +394,6 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(std::move(key));
 
-	setChecksumMode(CHECKSUM_SEQUENCE);
-
 	// Web login skips the character list request so we need to check the client version again
 	if (version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX) {
 		disconnectClient(std::format("Only clients with protocol {:s} allowed!", CLIENT_VERSION_STR));
