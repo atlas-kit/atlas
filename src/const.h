@@ -409,7 +409,7 @@ enum TextColor_t : uint8_t
 	TEXTCOLOR_NONE = 255,
 };
 
-enum Icons_t
+enum Icons_t : uint64_t
 {
 	ICON_POISON = 1 << 0,
 	ICON_BURN = 1 << 1,
