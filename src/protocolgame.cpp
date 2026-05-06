@@ -467,6 +467,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	Connection::Address sessionIP = boost::asio::ip::make_address(result->getString("session_ip"));
 	if (!sessionIP.is_loopback() && ip != sessionIP) {
 		disconnectClient("Your game session is already locked to a different IP. Please log in again.");
+		return;
 	}
 
 	g_dispatcher.addTask([=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
@@ -1723,11 +1724,10 @@ void ProtocolGame::sendClientFeatures()
 	msg.addByte(0x00); // can change pvp framing option
 	msg.addByte(0x00); // expert mode button enabled
 
-	msg.addString("");     // store images URL (real string in 15.11, not U16)
+	msg.addString("");     // store images url
 	msg.add<uint16_t>(25); // premium coin package size
 
 	msg.addByte(0x00); // exiva button enabled (bool)
-	// Tournament button byte REMOVED in 15.11
 
 	writeToOutputBuffer(msg);
 }

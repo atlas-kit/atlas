@@ -713,7 +713,7 @@ enum InspectObjectType : uint8_t
 	INSPECT_PROFICIENCY = 4,
 };
 
-enum Imbuement_Window_t : uint8_t
+enum ImbuementWindow_t : uint8_t
 {
 	IMBUEMENT_WINDOW_CHOICE = 0,
 	IMBUEMENT_WINDOW_SELECT_ITEM = 1,

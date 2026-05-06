@@ -623,7 +623,7 @@ function Player.takeScreenshot(self, screenshotType, ignoreConfig)
 	-- per-type payload bytes. Atlas's old screenshot trigger format desyncs the
 	-- client. Disabled until mapped to SCREENSHOT_AND_BANNER_TYPE_* with the
 	-- correct trailing data.
-	return true
+	return false
 end
 
 local slots = {
