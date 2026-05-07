@@ -311,7 +311,7 @@ bool Condition::isPersistent() const
 	return true;
 }
 
-uint64_t Condition::getIcons() const { return isBuff ? ICON_PARTY_BUFF : 0; }
+uint64_t Condition::getIcons() const { return isBuff ? std::to_underlying(ICON_PARTY_BUFF) : 0; }
 
 bool Condition::updateCondition(const Condition* addCondition)
 {
@@ -2007,7 +2007,7 @@ void ConditionDrunk::addCondition(const std::shared_ptr<Creature>& creature, con
 
 void ConditionDrunk::endCondition(const std::shared_ptr<Creature>& creature) { creature->setDrunkenness(0); }
 
-uint64_t ConditionDrunk::getIcons() const { return ICON_DRUNK; }
+uint64_t ConditionDrunk::getIcons() const { return Condition::getIcons() | ICON_DRUNK; }
 
 bool ConditionDrunk::setParam(ConditionParam_t param, int32_t value)
 {
