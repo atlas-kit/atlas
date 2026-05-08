@@ -88,7 +88,6 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, MESSAGE_HOTKEY_PRESSED);
 	registerEnum(lsi, MESSAGE_MARKET);
 	registerEnum(lsi, MESSAGE_BEYOND_LAST);
-	registerEnum(lsi, MESSAGE_TOURNAMENT_INFO);
 	registerEnum(lsi, MESSAGE_ATTENTION);
 	registerEnum(lsi, MESSAGE_BOOSTED_CREATURE);
 	registerEnum(lsi, MESSAGE_OFFLINE_TRAINING);

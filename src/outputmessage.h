@@ -19,23 +19,23 @@ public:
 
 	uint8_t* getOutputBuffer() { return &buffer[outputBufferStart]; }
 
-	void writeMessageLength() { add_header(info.length); }
+	void writeMessageLength() { add_header(static_cast<uint16_t>((info.length - 4) / 8)); }
 
-	void addCryptoHeader(checksumMode_t mode)
+	void writePaddingLength()
 	{
-		if (mode == CHECKSUM_ADLER) {
-			add_header(adlerChecksum(&buffer[outputBufferStart], info.length));
-		} else if (mode == CHECKSUM_SEQUENCE) {
-			add_header(getSequenceId());
-		}
-
-		writeMessageLength();
+		uint8_t paddingAmount = static_cast<uint8_t>(8 - (info.length % 8) - 1);
+		add_header(paddingAmount);
 	}
+
+	void addCryptoHeader() { add_header(getSequenceId()); }
 
 	void append(const NetworkMessage& msg)
 	{
 		auto msgLen = msg.getLength();
-		std::memcpy(buffer.data() + info.position, msg.getBuffer() + 8, msgLen);
+		if (msgLen == 0 || info.position + msgLen > buffer.size()) {
+			return;
+		}
+		std::memcpy(buffer.data() + info.position, msg.getBuffer() + INITIAL_BUFFER_POSITION, msgLen);
 		info.length += msgLen;
 		info.position += msgLen;
 	}
@@ -43,7 +43,10 @@ public:
 	void append(const std::shared_ptr<OutputMessage>& msg)
 	{
 		auto msgLen = msg->getLength();
-		std::memcpy(buffer.data() + info.position, msg->getBuffer() + 8, msgLen);
+		if (msgLen == 0 || info.position + msgLen > buffer.size()) {
+			return;
+		}
+		std::memcpy(buffer.data() + info.position, msg->getBuffer() + INITIAL_BUFFER_POSITION, msgLen);
 		info.length += msgLen;
 		info.position += msgLen;
 	}
