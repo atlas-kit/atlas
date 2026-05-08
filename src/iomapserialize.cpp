@@ -89,12 +89,13 @@ void loadContainer(OTB::iterator& first, const OTB::iterator& last, const std::s
 
 void IOMapSerialize::loadHouseItems(Map* map)
 {
+	int64_t start = OTSYS_TIME();
+
 	const auto& result = Database::getInstance().storeQuery("SELECT `data` FROM `tile_store`");
 	if (!result) {
 		return;
 	}
 
-	int64_t start = OTSYS_TIME();
 	do {
 		auto attr = result->getString("data");
 		auto first = attr.data();
@@ -124,6 +125,7 @@ void IOMapSerialize::loadHouseItems(Map* map)
 
 bool IOMapSerialize::saveHouseItems()
 {
+	int64_t start = OTSYS_TIME();
 	Database& db = Database::getInstance();
 
 	// Start the transaction
@@ -136,8 +138,6 @@ bool IOMapSerialize::saveHouseItems()
 	if (!db.executeQuery("DELETE FROM `tile_store`")) {
 		return false;
 	}
-
-	int64_t start = OTSYS_TIME();
 	DBInsert stmt("INSERT INTO `tile_store` (`house_id`, `data`) VALUES ");
 
 	PropWriteStream stream;
