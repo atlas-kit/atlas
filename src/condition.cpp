@@ -311,7 +311,7 @@ bool Condition::isPersistent() const
 	return true;
 }
 
-uint32_t Condition::getIcons() const { return isBuff ? ICON_PARTY_BUFF : 0; }
+uint64_t Condition::getIcons() const { return isBuff ? std::to_underlying(ICON_PARTY_BUFF) : 0; }
 
 bool Condition::updateCondition(const Condition* addCondition)
 {
@@ -352,9 +352,9 @@ void ConditionGeneric::addCondition(const std::shared_ptr<Creature>&, const Cond
 	}
 }
 
-uint32_t ConditionGeneric::getIcons() const
+uint64_t ConditionGeneric::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint64_t icons = Condition::getIcons();
 
 	switch (conditionType) {
 		case CONDITION_MANASHIELD:
@@ -1501,9 +1501,9 @@ int32_t ConditionDamage::getTotalDamage() const
 	return std::abs(result);
 }
 
-uint32_t ConditionDamage::getIcons() const
+uint64_t ConditionDamage::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint64_t icons = Condition::getIcons();
 	switch (conditionType) {
 		case CONDITION_FIRE:
 			icons |= ICON_BURN;
@@ -1696,9 +1696,9 @@ void ConditionSpeed::addCondition(const std::shared_ptr<Creature>& creature, con
 	}
 }
 
-uint32_t ConditionSpeed::getIcons() const
+uint64_t ConditionSpeed::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint64_t icons = Condition::getIcons();
 	switch (conditionType) {
 		case CONDITION_HASTE:
 			icons |= ICON_HASTE;
@@ -2007,7 +2007,7 @@ void ConditionDrunk::addCondition(const std::shared_ptr<Creature>& creature, con
 
 void ConditionDrunk::endCondition(const std::shared_ptr<Creature>& creature) { creature->setDrunkenness(0); }
 
-uint32_t ConditionDrunk::getIcons() const { return ICON_DRUNK; }
+uint64_t ConditionDrunk::getIcons() const { return Condition::getIcons() | ICON_DRUNK; }
 
 bool ConditionDrunk::setParam(ConditionParam_t param, int32_t value)
 {
@@ -2117,9 +2117,9 @@ bool ConditionManaShield::setParam(ConditionParam_t param, int32_t value)
 	}
 }
 
-uint32_t ConditionManaShield::getIcons() const
+uint64_t ConditionManaShield::getIcons() const
 {
-	uint32_t icons = Condition::getIcons();
+	uint64_t icons = Condition::getIcons();
 
 	switch (conditionType) {
 		case CONDITION_MANASHIELD_BREAKABLE:
