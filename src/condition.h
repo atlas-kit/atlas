@@ -77,7 +77,7 @@ public:
 	virtual bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval);
 	virtual void endCondition(const std::shared_ptr<Creature>& creature) = 0;
 	virtual void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) = 0;
-	virtual uint32_t getIcons() const;
+	virtual uint64_t getIcons() const;
 	ConditionId_t getId() const { return id; }
 	uint32_t getSubId() const { return subId; }
 
@@ -130,7 +130,7 @@ public:
 	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
-	uint32_t getIcons() const override;
+	uint64_t getIcons() const override;
 
 	std::unique_ptr<Condition> clone() const override { return std::make_unique<ConditionGeneric>(*this); }
 };
@@ -260,7 +260,7 @@ public:
 	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
-	uint32_t getIcons() const override;
+	uint64_t getIcons() const override;
 
 	std::unique_ptr<Condition> clone() const override { return std::make_unique<ConditionDamage>(*this); }
 
@@ -313,7 +313,7 @@ public:
 	bool executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition) override;
-	uint32_t getIcons() const override;
+	uint64_t getIcons() const override;
 
 	std::unique_ptr<Condition> clone() const override { return std::make_unique<ConditionSpeed>(*this); }
 
@@ -429,7 +429,7 @@ public:
 		}
 	}
 
-	uint32_t getIcons() const override;
+	uint64_t getIcons() const override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
 	bool setParam(ConditionParam_t param, int32_t value) override;
@@ -454,7 +454,7 @@ public:
 	bool startCondition(const std::shared_ptr<Creature>& creature) override;
 	void endCondition(const std::shared_ptr<Creature>& creature) override;
 	void addCondition(const std::shared_ptr<Creature>& creature, const Condition* addCondition) override;
-	uint32_t getIcons() const override;
+	uint64_t getIcons() const override;
 
 	bool setParam(ConditionParam_t param, int32_t value) override;
 

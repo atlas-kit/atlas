@@ -327,12 +327,12 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 		}
 
 		case COMBAT_PARAM_EFFECT: {
-			params.impactEffect = static_cast<uint8_t>(value);
+			params.impactEffect = static_cast<uint16_t>(value);
 			return true;
 		}
 
 		case COMBAT_PARAM_DISTANCEEFFECT: {
-			params.distanceEffect = static_cast<uint8_t>(value);
+			params.distanceEffect = static_cast<uint16_t>(value);
 			return true;
 		}
 
@@ -553,7 +553,7 @@ void Combat::postCombatEffects(const std::shared_ptr<Creature>& caster, const Po
 }
 
 void Combat::addDistanceEffect(const std::shared_ptr<Creature>& caster, const Position& fromPos, const Position& toPos,
-                               uint8_t effect)
+                               uint16_t effect)
 {
 	if (effect == CONST_ANI_WEAPONTYPE) {
 		if (!caster) {
