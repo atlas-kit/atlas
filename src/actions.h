@@ -12,10 +12,10 @@ using ActionFunction = std::function<bool(const std::shared_ptr<Player>& player,
                                           const Position& fromPosition, const std::shared_ptr<Thing>& target,
                                           const Position& toPosition, bool isHotkey)>;
 
-class Action : public Event
+class Action : public BaseEvent
 {
 public:
-	explicit Action(LuaScriptInterface* interface);
+	explicit Action(LuaScriptInterface* luaInterface);
 
 	bool configureEvent(const pugi::xml_node&) override { return false; }
 
@@ -93,8 +93,8 @@ private:
 
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "actions"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event>, const pugi::xml_node&) override { return false; }
+	std::unique_ptr<BaseEvent> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<BaseEvent>, const pugi::xml_node&) override { return false; }
 
 	using ActionUseMap = std::map<uint16_t, Action>;
 	ActionUseMap useItemMap;

@@ -63,7 +63,7 @@ void MoveEvents::clear(bool fromLua)
 
 LuaScriptInterface& MoveEvents::getScriptInterface() { return scriptInterface; }
 
-std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
+std::unique_ptr<BaseEvent> MoveEvents::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "movevent")) {
 		return nullptr;
@@ -71,7 +71,7 @@ std::unique_ptr<Event> MoveEvents::getEvent(const std::string& nodeName)
 	return std::make_unique<MoveEvent>(&scriptInterface);
 }
 
-bool MoveEvents::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node)
+bool MoveEvents::registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node& node)
 {
 	std::unique_ptr<MoveEvent> moveEvent{static_cast<MoveEvent*>(event.release())};
 
@@ -490,7 +490,7 @@ uint32_t MoveEvents::onItemMove(const std::shared_ptr<Item>& item, const std::sh
 	return ret;
 }
 
-MoveEvent::MoveEvent(LuaScriptInterface* interface) : Event(interface) {}
+MoveEvent::MoveEvent(LuaScriptInterface* luaInterface) : BaseEvent(luaInterface) {}
 
 std::string_view MoveEvent::getScriptEventName() const
 {

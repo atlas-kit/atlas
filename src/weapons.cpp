@@ -85,7 +85,7 @@ void Weapons::loadDefaults()
 	}
 }
 
-std::unique_ptr<Event> Weapons::getEvent(const std::string& nodeName)
+std::unique_ptr<BaseEvent> Weapons::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "melee")) {
 		return std::make_unique<WeaponMelee>(&scriptInterface);
@@ -97,7 +97,7 @@ std::unique_ptr<Event> Weapons::getEvent(const std::string& nodeName)
 	return nullptr;
 }
 
-bool Weapons::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
+bool Weapons::registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node&)
 {
 	std::unique_ptr<Weapon> weapon{static_cast<Weapon*>(event.release())};
 	uint16_t weaponId = weapon->getID();
@@ -428,7 +428,7 @@ void Weapon::addVocationWeaponSet(const std::string& vocationName)
 	}
 }
 
-WeaponMelee::WeaponMelee(LuaScriptInterface* interface) : Weapon(interface)
+WeaponMelee::WeaponMelee(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
@@ -527,7 +527,7 @@ int32_t WeaponMelee::getWeaponDamage(const std::shared_ptr<const Player>& player
 	return -normal_random(0, maxValue);
 }
 
-WeaponDistance::WeaponDistance(LuaScriptInterface* interface) : Weapon(interface)
+WeaponDistance::WeaponDistance(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;

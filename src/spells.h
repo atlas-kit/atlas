@@ -47,8 +47,8 @@ public:
 
 private:
 	LuaScriptInterface& getScriptInterface() override;
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
+	std::unique_ptr<BaseEvent> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node& node) override;
 
 	std::map<uint16_t, RuneSpell> runes;
 	std::map<std::string, InstantSpell> instants;
@@ -67,7 +67,7 @@ public:
 	virtual bool castSpell(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target) = 0;
 };
 
-class CombatSpell final : public Event, public BaseSpell
+class CombatSpell final : public BaseEvent, public BaseSpell
 {
 public:
 	CombatSpell(std::shared_ptr<Combat> combat, bool needTarget, bool needDirection);
@@ -213,7 +213,7 @@ private:
 class InstantSpell final : public TalkAction, public Spell
 {
 public:
-	explicit InstantSpell(LuaScriptInterface* interface) : TalkAction(interface) {}
+	explicit InstantSpell(LuaScriptInterface* luaInterface) : TalkAction(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node& node) override;
 
@@ -255,7 +255,7 @@ private:
 class RuneSpell final : public Action, public Spell
 {
 public:
-	explicit RuneSpell(LuaScriptInterface* interface) : Action(interface) {}
+	explicit RuneSpell(LuaScriptInterface* luaInterface) : Action(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node& node) override;
 

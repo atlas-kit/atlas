@@ -31,18 +31,18 @@ public:
 private:
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "weapons"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
+	std::unique_ptr<BaseEvent> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node& node) override;
 
 	std::map<uint32_t, std::shared_ptr<Weapon>> weapons;
 
 	LuaScriptInterface scriptInterface{"Weapon Interface"};
 };
 
-class Weapon : public Event
+class Weapon : public BaseEvent
 {
 public:
-	explicit Weapon(LuaScriptInterface* interface) : Event(interface) {}
+	explicit Weapon(LuaScriptInterface* luaInterface) : BaseEvent(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node&) override { return false; }
 	bool loadFunction(const pugi::xml_attribute&, bool) final { return true; }
@@ -165,7 +165,7 @@ private:
 class WeaponMelee final : public Weapon
 {
 public:
-	explicit WeaponMelee(LuaScriptInterface* interface);
+	explicit WeaponMelee(LuaScriptInterface* luaInterface);
 
 	void configureWeapon(const ItemType& it) override;
 
@@ -189,7 +189,7 @@ private:
 class WeaponDistance final : public Weapon
 {
 public:
-	explicit WeaponDistance(LuaScriptInterface* interface);
+	explicit WeaponDistance(LuaScriptInterface* luaInterface);
 
 	void configureWeapon(const ItemType& it) override;
 	bool interruptSwing() const override { return true; }
@@ -214,7 +214,7 @@ private:
 class WeaponWand final : public Weapon
 {
 public:
-	explicit WeaponWand(LuaScriptInterface* interface) : Weapon(interface) {}
+	explicit WeaponWand(LuaScriptInterface* luaInterface) : Weapon(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node& node) override;
 	void configureWeapon(const ItemType& it) override;

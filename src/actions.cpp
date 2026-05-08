@@ -42,7 +42,7 @@ void Actions::clear(bool fromLua)
 
 LuaScriptInterface& Actions::getScriptInterface() { return scriptInterface; }
 
-std::unique_ptr<Event> Actions::getEvent(const std::string& nodeName)
+std::unique_ptr<BaseEvent> Actions::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "action")) {
 		return nullptr;
@@ -331,8 +331,8 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
 	return false;
 }
 
-Action::Action(LuaScriptInterface* interface) :
-    Event(interface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
+Action::Action(LuaScriptInterface* luaInterface) :
+    BaseEvent(luaInterface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
 {}
 
 ReturnValue Action::canExecuteAction(const std::shared_ptr<const Player>& player, const Position& toPos)

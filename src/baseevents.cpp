@@ -80,55 +80,55 @@ void BaseEvents::reInitState(bool fromLua)
 	}
 }
 
-Event::Event(LuaScriptInterface* interface) : scriptInterface(interface) {}
+BaseEvent::BaseEvent(LuaScriptInterface* luaInterface) : scriptInterface(luaInterface) {}
 
-bool Event::checkScript(const std::string& basePath, const std::string& scriptsName,
+bool BaseEvent::checkScript(const std::string& basePath, const std::string& scriptsName,
                         const std::string& scriptFile) const
 {
 	LuaScriptInterface* testInterface = g_luaEnvironment.getTestInterface();
 	testInterface->reInitState();
 
 	if (testInterface->loadFile(std::string(basePath + "lib/" + scriptsName + ".lua")) == -1) {
-		std::cout << "[Warning - Event::checkScript] Can not load " << scriptsName << " lib/" << scriptsName << ".lua"
+		std::cout << "[Warning - BaseEvent::checkScript] Can not load " << scriptsName << " lib/" << scriptsName << ".lua"
 		          << std::endl;
 	}
 
 	if (scriptId != 0) {
-		std::cout << "[Failure - Event::checkScript] scriptid = " << scriptId << std::endl;
+		std::cout << "[Failure - BaseEvent::checkScript] scriptid = " << scriptId << std::endl;
 		return false;
 	}
 
 	if (testInterface->loadFile(basePath + scriptFile) == -1) {
-		std::cout << "[Warning - Event::checkScript] Can not load script: " << scriptFile << std::endl;
+		std::cout << "[Warning - BaseEvent::checkScript] Can not load script: " << scriptFile << std::endl;
 		std::cout << testInterface->getLastLuaError() << std::endl;
 		return false;
 	}
 
 	int32_t id = testInterface->getEvent(getScriptEventName());
 	if (id == -1) {
-		std::cout << "[Warning - Event::checkScript] Event " << getScriptEventName() << " not found. " << scriptFile
+		std::cout << "[Warning - BaseEvent::checkScript] Event " << getScriptEventName() << " not found. " << scriptFile
 		          << std::endl;
 		return false;
 	}
 	return true;
 }
 
-bool Event::loadScript(const std::string& scriptFile)
+bool BaseEvent::loadScript(const std::string& scriptFile)
 {
 	if (!scriptInterface || scriptId != 0) {
-		std::cout << "Failure: [Event::loadScript] scriptInterface == nullptr. scriptid = " << scriptId << std::endl;
+		std::cout << "Failure: [BaseEvent::loadScript] scriptInterface == nullptr. scriptid = " << scriptId << std::endl;
 		return false;
 	}
 
 	if (scriptInterface->loadFile(scriptFile) == -1) {
-		std::cout << "[Warning - Event::loadScript] Can not load script. " << scriptFile << std::endl;
+		std::cout << "[Warning - BaseEvent::loadScript] Can not load script. " << scriptFile << std::endl;
 		std::cout << scriptInterface->getLastLuaError() << std::endl;
 		return false;
 	}
 
 	int32_t id = scriptInterface->getEvent(getScriptEventName());
 	if (id == -1) {
-		std::cout << "[Warning - Event::loadScript] Event " << getScriptEventName() << " not found. " << scriptFile
+		std::cout << "[Warning - BaseEvent::loadScript] Event " << getScriptEventName() << " not found. " << scriptFile
 		          << std::endl;
 		return false;
 	}
@@ -138,16 +138,16 @@ bool Event::loadScript(const std::string& scriptFile)
 	return true;
 }
 
-bool Event::loadCallback()
+bool BaseEvent::loadCallback()
 {
 	if (!scriptInterface || scriptId != 0) {
-		std::cout << "Failure: [Event::loadCallback] scriptInterface == nullptr. scriptid = " << scriptId << std::endl;
+		std::cout << "Failure: [BaseEvent::loadCallback] scriptInterface == nullptr. scriptid = " << scriptId << std::endl;
 		return false;
 	}
 
 	int32_t id = scriptInterface->getEvent();
 	if (id == -1) {
-		std::cout << "[Warning - Event::loadCallback] Event " << getScriptEventName() << " not found. " << std::endl;
+		std::cout << "[Warning - BaseEvent::loadCallback] Event " << getScriptEventName() << " not found. " << std::endl;
 		return false;
 	}
 
@@ -156,14 +156,14 @@ bool Event::loadCallback()
 	return true;
 }
 
-bool CallBack::loadCallBack(LuaScriptInterface* interface, const std::string& name)
+bool CallBack::loadCallBack(LuaScriptInterface* luaInterface, const std::string& name)
 {
-	if (!interface) {
+	if (!luaInterface) {
 		std::cout << "Failure: [CallBack::loadCallBack] scriptInterface == nullptr" << std::endl;
 		return false;
 	}
 
-	scriptInterface = interface;
+	scriptInterface = luaInterface;
 
 	int32_t id = scriptInterface->getEvent(name);
 	if (id == -1) {

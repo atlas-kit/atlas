@@ -15,10 +15,10 @@ enum TalkActionResult_t
 	TALKACTION_FAILED,
 };
 
-class TalkAction : public Event
+class TalkAction : public BaseEvent
 {
 public:
-	explicit TalkAction(LuaScriptInterface* interface) : Event(interface) {}
+	explicit TalkAction(LuaScriptInterface* luaInterface) : BaseEvent(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node&) override { return false; }
 
@@ -73,8 +73,8 @@ public:
 private:
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "talkactions"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
+	std::unique_ptr<BaseEvent> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node& node) override;
 
 	std::map<std::string, TalkAction> talkActions;
 

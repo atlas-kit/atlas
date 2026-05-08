@@ -50,7 +50,7 @@ void ScriptEnvironment::resetEnv()
 	scriptId = 0;
 	callbackId = 0;
 	timerEvent = false;
-	interface = nullptr;
+	luaInterface = nullptr;
 	localMap.clear();
 	tempResults.clear();
 }
@@ -59,14 +59,14 @@ bool ScriptEnvironment::setCallbackId(int32_t callbackId, LuaScriptInterface* sc
 {
 	if (this->callbackId != 0) {
 		// nested callbacks are not allowed
-		if (interface) {
-			reportError(interface->getLuaState(), "Nested callbacks!");
+		if (luaInterface) {
+			reportError(luaInterface->getLuaState(), "Nested callbacks!");
 		}
 		return false;
 	}
 
 	this->callbackId = callbackId;
-	interface = scriptInterface;
+	luaInterface = scriptInterface;
 	return true;
 }
 

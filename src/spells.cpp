@@ -107,7 +107,7 @@ void Spells::clear(bool fromLua)
 
 LuaScriptInterface& Spells::getScriptInterface() { return scriptInterface; }
 
-std::unique_ptr<Event> Spells::getEvent(const std::string& nodeName)
+std::unique_ptr<BaseEvent> Spells::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "rune")) {
 		return std::make_unique<RuneSpell>(&scriptInterface);
@@ -117,7 +117,7 @@ std::unique_ptr<Event> Spells::getEvent(const std::string& nodeName)
 	return nullptr;
 }
 
-bool Spells::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
+bool Spells::registerEvent(std::unique_ptr<BaseEvent> event, const pugi::xml_node&)
 {
 	if (std::unique_ptr<InstantSpell> instant{dynamic_cast<InstantSpell*>(event.get())}) {
 		auto result = instants.emplace(instant->getWords(), std::move(*instant));
@@ -255,7 +255,7 @@ Position Spells::getCasterPosition(const std::shared_ptr<Creature>& creature, Di
 }
 
 CombatSpell::CombatSpell(std::shared_ptr<Combat> combat, bool needTarget, bool needDirection) :
-    Event(&g_spells->getScriptInterface()),
+    BaseEvent(&g_spells->getScriptInterface()),
     combat(std::move(combat)),
     needDirection(needDirection),
     needTarget(needTarget)
