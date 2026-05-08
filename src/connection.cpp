@@ -191,7 +191,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 		packetsSent = 0;
 	}
 
-	uint16_t size = msg.getLengthHeader();
+	uint16_t size = (msg.getLengthHeader() * 8) + NetworkMessage::CHECKSUM_LENGTH;
 	if (size == 0 || size >= NETWORKMESSAGE_MAXSIZE - 16) {
 		close(FORCE_CLOSE);
 		return;
@@ -249,7 +249,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				return;
 			}
 		} else {
-			msg.skipBytes(1); // Skip protocol ID
+			msg.skipBytes(2); // Skip enter-game opcode (u16 in 15.24, was u8)
 		}
 
 		protocol->onRecvFirstMessage(msg);

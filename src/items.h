@@ -212,6 +212,7 @@ enum ItemParseAttributes_t
 	ITEM_PARSE_BOOSTPERCENTPHYSICAL,
 	ITEM_PARSE_BOOSTPERCENTHEALING,
 	ITEM_PARSE_SUPPLY,
+	ITEM_PARSE_WRAPCONTAINER,
 };
 
 struct Abilities
@@ -408,6 +409,7 @@ public:
 	bool supply = false;
 	bool showClientCharges = false;
 	bool showClientDuration = false;
+	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
 };
 
 class Items

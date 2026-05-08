@@ -3869,7 +3869,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 		} else if (blockType == BLOCK_ARMOR) {
 			addMagicEffect(targetPos, CONST_ME_BLOCKHIT);
 		} else if (blockType == BLOCK_IMMUNITY) {
-			uint8_t hitEffect = 0;
+			uint16_t hitEffect = 0;
 			switch (combatType) {
 				case COMBAT_UNDEFINEDDAMAGE: {
 					return;
@@ -3934,7 +3934,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 }
 
 void Game::combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-                             uint8_t& effect)
+                             uint16_t& effect)
 {
 	switch (combatType) {
 		case COMBAT_PHYSICALDAMAGE: {
@@ -4305,7 +4305,7 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		message.primary.value = damage.primary.value;
 		message.secondary.value = damage.secondary.value;
 
-		uint8_t hitEffect;
+		uint16_t hitEffect;
 		if (message.primary.value) {
 			combatGetTypeInfo(damage.primary.type, target, message.primary.color, hitEffect);
 			if (hitEffect != CONST_ME_NONE) {
@@ -4542,14 +4542,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const std::shared_p
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4558,7 +4558,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4569,7 +4569,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 }
 
 void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-                             uint8_t effect)
+                             uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {

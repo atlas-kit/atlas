@@ -213,7 +213,7 @@ public:
 		return storeInbox;
 	}
 
-	uint32_t getClientIcons() const;
+	uint64_t getClientIcons() const;
 
 	const GuildWarVector& getGuildWarVector() const { return guildWarVector; }
 
@@ -737,7 +737,7 @@ public:
 			client->sendCreatureShield(creature);
 		}
 	}
-	void sendSpellCooldown(uint8_t spellId, uint32_t time)
+	void sendSpellCooldown(uint16_t spellId, uint32_t time)
 	{
 		if (client) {
 			client->sendSpellCooldown(spellId, time);
@@ -857,6 +857,102 @@ public:
 			client->sendItemClasses();
 		}
 	}
+	void sendAllowBugReport() const
+	{
+		if (client) {
+			client->sendAllowBugReport();
+		}
+	}
+	void sendDisableLoginMusic() const
+	{
+		if (client) {
+			client->sendDisableLoginMusic();
+		}
+	}
+	void sendBlessStatus() const
+	{
+		if (client) {
+			client->sendBlessStatus();
+		}
+	}
+	void sendPremiumTrigger() const
+	{
+		if (client) {
+			client->sendPremiumTrigger();
+		}
+	}
+	void sendClientCheck() const
+	{
+		if (client) {
+			client->sendClientCheck();
+		}
+	}
+	void sendGameNews() const
+	{
+		if (client) {
+			client->sendGameNews();
+		}
+	}
+	void sendInventoryIds() const
+	{
+		if (client) {
+			client->sendInventoryIds();
+		}
+	}
+	void sendBosstiaryCooldownTimer() const
+	{
+		if (client) {
+			client->sendBosstiaryCooldownTimer();
+		}
+	}
+	void sendItemsPrice() const
+	{
+		if (client) {
+			client->sendItemsPrice();
+		}
+	}
+	void sendPreyPrices() const
+	{
+		if (client) {
+			client->sendPreyPrices();
+		}
+	}
+	void sendPreyData() const
+	{
+		if (client) {
+			client->sendPreyData();
+		}
+	}
+	void sendTaskHuntingData() const
+	{
+		if (client) {
+			client->sendTaskHuntingData();
+		}
+	}
+	void sendForgingData() const
+	{
+		if (client) {
+			client->sendForgingData();
+		}
+	}
+	void sendVIPGroups() const
+	{
+		if (client) {
+			client->sendVIPGroups();
+		}
+	}
+	void sendLootContainers() const
+	{
+		if (client) {
+			client->sendLootContainers();
+		}
+	}
+	void sendHousesInfo() const
+	{
+		if (client) {
+			client->sendHousesInfo();
+		}
+	}
 	void sendClientFeatures() const
 	{
 		if (client) {
@@ -906,10 +1002,11 @@ public:
 			client->sendCreatureHealth(creature);
 		}
 	}
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type,
+	                       SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendDistanceShoot(from, to, type);
+			client->sendDistanceShoot(from, to, type, source);
 		}
 	}
 	void sendHouseWindow(const std::shared_ptr<House>& house, uint32_t listId) const;
@@ -926,16 +1023,16 @@ public:
 			client->sendIcons(getClientIcons());
 		}
 	}
-	void sendMagicEffect(uint8_t type) const
+	void sendMagicEffect(uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(getPosition(), type);
+			client->sendMagicEffect(getPosition(), type, source);
 		}
 	}
-	void sendMagicEffect(const Position& pos, uint8_t type) const
+	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(pos, type);
+			client->sendMagicEffect(pos, type, source);
 		}
 	}
 	void sendStats();

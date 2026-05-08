@@ -398,9 +398,9 @@ float Player::getDefenseFactor() const
 	}
 }
 
-uint32_t Player::getClientIcons() const
+uint64_t Player::getClientIcons() const
 {
-	uint32_t icons = 0;
+	uint64_t icons = 0;
 	for (Condition* condition : conditions) {
 		if (!isSuppress(condition->getType())) {
 			icons |= condition->getIcons();
@@ -952,12 +952,6 @@ void Player::openSavedContainers()
 		}
 	}
 
-	// fix broken containers when logged in from another location
-	for (uint8_t i = 0; i < 16; i++) {
-		client->sendEmptyContainer(i);
-		client->sendCloseContainer(i);
-	}
-
 	// send actual containers
 	for (auto&& [cid, container] : openContainersList | std::views::as_const) {
 		addContainer(cid - 1, container);
@@ -1071,30 +1065,49 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 	}
 
+	// login packet sequence
 	sendClientFeatures();
+	sendAllowBugReport();
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
-	sendStats();
-	sendSkills();
-	sendIcons();
-	sendBasicData();
-	sendItems();
-	sendLight();
-	sendVIPEntries();
-	sendItemClasses();
 
+	if (magicEffect != CONST_ME_NONE) {
+		sendMagicEffect(magicEffect);
+	}
+	sendDisableLoginMusic();
+
+	// Inventory slots
 	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
 		auto slot = static_cast<slots_t>(i);
 		sendInventoryItem(slot, getInventoryItem(slot));
 	}
 	sendInventoryItem(CONST_SLOT_STORE_INBOX, getStoreInbox()->asItem());
 
-	openSavedContainers();
+	sendStats();
+	sendSkills();
+	sendBlessStatus();
+	sendPremiumTrigger();
+	sendItemsPrice();
+	sendPreyPrices();
+	sendPreyData();
+	sendForgingData();
 
-	if (magicEffect != CONST_ME_NONE) {
-		sendMagicEffect(magicEffect);
-	}
+	// Player creature light
+	sendLight();
+
+	sendVIPGroups();
+	sendVIPEntries();
+	sendInventoryIds();
+	sendLootContainers();
+	sendBasicData();
+	sendHousesInfo();
+	sendClientCheck();
+	sendGameNews();
+	sendIcons();
+
+	openSavedContainers();
+	sendBosstiaryCooldownTimer();
 
 	tfs::events::player::onJoin(asPlayer());
 }
