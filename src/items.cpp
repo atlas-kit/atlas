@@ -1885,13 +1885,26 @@ uint16_t Items::getItemIdByName(const std::string& name)
 	return result->second;
 }
 
+// The appearances.dat (protobuf) only contains client-side visual/behavioral flags.
+// Server-side gameplay data (armor, attack, defense, weight, decay, charges, abilities,
+// weapon/ammo/shoot types, corpse type, floor change, etc.) must still come from items.xml.
+//
+// Proto fields NOT mapped here because ItemType has no matching field:
+//   automapColor, isLyingObject, isDontHide, isTopEffect, defaultAction, elevation (value), lensHelp
+//
+// Proto fields NOT mapped here because proto data is insufficient:
+//   isCorpse/isPlayerCorpse — proto is bool, but corpseType needs a RaceType_t enum (blood/fire/etc)
+//   isAmmo — proto is bool, but ammoType needs the specific Ammo_t enum
+//
+// Proto fields that COULD be mapped but are left to items.xml for consistency:
+//   show_off_socket → ITEM_TYPE_PODIUM (proto marks podiums, but XML already handles type assignment)
+//   fullbank → walkStack (fullground = not walkable on top, but reference implementations use XML for this)
 bool Items::loadFromAppearances(const std::string& file)
 {
 	if (!g_appearances.loadFromFile(file)) {
 		return false;
 	}
 
-	// Populate items from appearances
 	const auto& objects = g_appearances.getObjects();
 	for (const auto& [id, appearance] : objects) {
 		if (id == 0) {
