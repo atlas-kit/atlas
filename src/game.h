@@ -429,7 +429,7 @@ public:
 	                    bool ignoreResistances = false);
 
 	void combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-	                       uint8_t& effect);
+	                       uint16_t& effect);
 
 	bool combatChangeHealth(const std::shared_ptr<Creature>& attacker, const std::shared_ptr<Creature>& target,
 	                        CombatDamage& damage);
@@ -439,11 +439,11 @@ public:
 	// animation help functions
 	void addCreatureHealth(const std::shared_ptr<const Creature>& target);
 	static void addCreatureHealth(const SpectatorVec& spectators, const std::shared_ptr<const Creature>& target);
-	void addMagicEffect(const Position& pos, uint8_t effect);
-	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect);
-	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect);
+	void addMagicEffect(const Position& pos, uint16_t effect);
+	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect);
+	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect);
 	static void addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-	                              uint8_t effect);
+	                              uint16_t effect);
 
 	void startDecay(const std::shared_ptr<Item>& item);
 

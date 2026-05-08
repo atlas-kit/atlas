@@ -16,7 +16,10 @@ function handler.onReceive(player, msg)
 		player:untrackBestiary(raceId)
 	end
 
-	player:sendTrackedBestiary()
+	local monsterType = MonsterType(raceId)
+	if monsterType then
+		player:sendTrackedBestiary(monsterType:isBoss())
+	end
 end
 
 handler:register()

@@ -26,7 +26,7 @@ int luaSpellCreate(lua_State* L)
 	SpellType_t spellType = SPELL_UNDEFINED;
 
 	if (tfs::lua::isNumber(L, 2)) {
-		int32_t id = tfs::lua::getNumber<int32_t>(L, 2);
+		uint16_t id = tfs::lua::getNumber<uint16_t>(L, 2);
 		RuneSpell* rune = g_spells->getRuneSpell(id);
 
 		if (rune) {
@@ -176,7 +176,7 @@ int luaSpellId(lua_State* L)
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushNumber(L, spell->getId());
 		} else {
-			spell->setId(tfs::lua::getNumber<uint8_t>(L, 2));
+			spell->setId(tfs::lua::getNumber<uint16_t>(L, 2));
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {
