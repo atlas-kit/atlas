@@ -145,7 +145,7 @@ int luaDoAreaCombat(lua_State* L)
 
 		CombatParams params;
 		params.combatType = combatType;
-		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
+		params.impactEffect = tfs::lua::getNumber<uint16_t>(L, 7);
 
 		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
 		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
@@ -187,7 +187,7 @@ int luaDoTargetCombat(lua_State* L)
 
 	CombatParams params{
 	    .combatType = combatType,
-	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
+	    .impactEffect = tfs::lua::getNumber<uint16_t>(L, 6),
 	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
 	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
 	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),

@@ -15,13 +15,6 @@ enum ConnectionState_t
 	CONNECTION_STATE_PENDING
 };
 
-enum checksumMode_t
-{
-	CHECKSUM_DISABLED,
-	CHECKSUM_ADLER,
-	CHECKSUM_SEQUENCE
-};
-
 static constexpr int32_t CONNECTION_WRITE_TIMEOUT = 30;
 static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
