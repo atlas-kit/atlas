@@ -563,7 +563,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	}
 
 	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+		creature->removeCondition(condition.get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);

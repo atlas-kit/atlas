@@ -4,12 +4,12 @@
 #ifndef FS_CREATURE_H
 #define FS_CREATURE_H
 
+#include "condition.h"
 #include "const.h"
 #include "enums.h"
 #include "position.h"
 #include "tile.h"
 
-class Condition;
 class Container;
 class Item;
 class Monster;
