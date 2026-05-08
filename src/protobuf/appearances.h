@@ -76,6 +76,7 @@ struct AppearanceInfo
 	uint8_t defaultAction = 0;
 	uint8_t lensHelp = 0;
 	uint8_t classification = 0;
+	uint8_t hookDirection = 0;
 
 	// Market info
 	uint16_t marketCategory = 0;

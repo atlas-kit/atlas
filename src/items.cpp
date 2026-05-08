@@ -1946,16 +1946,17 @@ bool Items::loadFromAppearances(const std::string& file)
 		iType.moveable = !appearance.isUnmovable;
 		iType.stackable = appearance.isStackable;
 		iType.alwaysOnTop = appearance.isOnTop;
-		iType.isVertical = false;   // Not in appearances
-		iType.isHorizontal = false; // Not in appearances
+		iType.isVertical = (appearance.hookDirection == 1);
+		iType.isHorizontal = (appearance.hookDirection == 2);
 		iType.isHangable = appearance.isHangable;
-		iType.allowDistRead = false; // Not in appearances
+		iType.allowDistRead = false;
 		iType.rotatable = appearance.isRotatable;
 		iType.canReadText = appearance.isWritable || appearance.isWritableOnce;
 		iType.canWriteText = appearance.isWritable;
-		iType.lookThrough = appearance.isTranslucent;
+		iType.lookThrough = appearance.isIgnoreLook;
 		iType.isAnimation = appearance.isAnimateAlways;
 		iType.forceUse = appearance.isForceUse;
+		iType.wrapContainer = appearance.isWrap || appearance.isUnwrap;
 
 		// Light properties
 		if (appearance.hasLight) {
@@ -2016,17 +2017,12 @@ bool Items::loadFromAppearances(const std::string& file)
 			iType.wareId = appearance.marketTradeAs > 0 ? appearance.marketTradeAs : id;
 		}
 
-		// Elevation
-		if (appearance.hasElevation) {
-			iType.hasHeight = true;
-		}
-
 		// AlwaysOnTop order
-		if (appearance.isOnTop) {
+		if (appearance.isGroundBorder) {
 			iType.alwaysOnTopOrder = 1;
 		} else if (appearance.isOnBottom) {
 			iType.alwaysOnTopOrder = 2;
-		} else if (appearance.isGroundBorder) {
+		} else if (appearance.isOnTop) {
 			iType.alwaysOnTopOrder = 3;
 		}
 	}

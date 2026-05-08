@@ -20,13 +20,8 @@ bool Appearances::loadFromFile(const std::string& filename)
 		return false;
 	}
 
-	// Read file content
-	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	file.close();
-
-	// Parse protobuf
 	atlas::protobuf::appearances::Appearances proto;
-	if (!proto.ParseFromString(content)) {
+	if (!proto.ParseFromIstream(&file)) {
 		std::cout << "[Error - Appearances::loadFromFile] Failed to parse protobuf from: " << filename << std::endl;
 		return false;
 	}
@@ -151,6 +146,9 @@ void Appearances::parseFlags(const atlas::protobuf::appearances::AppearanceFlags
 	info.isPickupable = flags.has_take() && flags.take();
 	info.isFluidContainer = flags.has_liquidcontainer() && flags.liquidcontainer();
 	info.isHangable = flags.has_hang() && flags.hang();
+	if (flags.has_hook() && flags.hook().has_direction()) {
+		info.hookDirection = static_cast<uint8_t>(flags.hook().direction());
+	}
 	info.isRotatable = flags.has_rotate() && flags.rotate();
 	info.isDontHide = flags.has_dont_hide() && flags.dont_hide();
 	info.isTranslucent = flags.has_translucent() && flags.translucent();
