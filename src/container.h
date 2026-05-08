@@ -7,6 +7,7 @@
 #include "item.h"
 
 class Container;
+class DepotChest;
 class DepotLocker;
 class StoreInbox;
 
