@@ -82,8 +82,6 @@ struct AppearanceInfo
 	uint16_t marketCategory = 0;
 	uint16_t marketTradeAs = 0;
 	uint16_t marketShowAs = 0;
-	uint16_t marketMinLevel = 0;
-	uint32_t marketProfessionMask = 0;
 
 	std::string name;
 	std::string description;
@@ -120,7 +118,8 @@ public:
 	uint16_t tibiaCoinId = 0;
 	uint16_t stampedLetterId = 0;
 	uint16_t supplyStashId = 0;
-	uint16_t rewardChestId = 0;
+	uint16_t standardRewardChestId = 0;
+	uint16_t blankImbuementScrollId = 0;
 
 private:
 	void parseAppearance(const atlas::protobuf::appearances::Appearance& proto, AppearanceInfo& info);

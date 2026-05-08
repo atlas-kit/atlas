@@ -89,8 +89,11 @@ bool Appearances::loadFromFile(const std::string& filename)
 		if (special.has_supply_stash_id()) {
 			supplyStashId = static_cast<uint16_t>(special.supply_stash_id());
 		}
-		if (special.has_reward_chest_id()) {
-			rewardChestId = static_cast<uint16_t>(special.reward_chest_id());
+		if (special.has_standard_reward_chest_id()) {
+			standardRewardChestId = static_cast<uint16_t>(special.standard_reward_chest_id());
+		}
+		if (special.has_blank_imbuement_scroll_id()) {
+			blankImbuementScrollId = static_cast<uint16_t>(special.blank_imbuement_scroll_id());
 		}
 	}
 
@@ -254,16 +257,6 @@ void Appearances::parseFlags(const atlas::protobuf::appearances::AppearanceFlags
 		}
 		if (market.has_show_as_object_id()) {
 			info.marketShowAs = static_cast<uint16_t>(market.show_as_object_id());
-		}
-		if (market.has_minimum_level()) {
-			info.marketMinLevel = static_cast<uint16_t>(market.minimum_level());
-		}
-		// Profession mask
-		for (int i = 0; i < market.restrict_to_profession_size(); ++i) {
-			int prof = market.restrict_to_profession(i);
-			if (prof > 0) {
-				info.marketProfessionMask |= (1 << prof);
-			}
 		}
 	}
 
