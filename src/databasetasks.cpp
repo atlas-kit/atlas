@@ -5,9 +5,8 @@
 
 #include "databasetasks.h"
 
-#include "tasks.h"
+#include "app_loop.h"
 
-extern Dispatcher g_dispatcher;
 
 DatabaseTasks g_databaseTasks;
 
@@ -67,7 +66,7 @@ void DatabaseTasks::runTask(const DatabaseTask& task)
 	}
 
 	if (task.callback) {
-		g_dispatcher.addTask([=, callback = task.callback]() { callback(result, success); });
+		g_appLoop.enqueue([=, callback = task.callback]() { callback(result, success); });
 	}
 }
 

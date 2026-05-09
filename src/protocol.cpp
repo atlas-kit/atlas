@@ -87,7 +87,7 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 
 std::shared_ptr<OutputMessage> Protocol::getOutputBuffer(int32_t size)
 {
-	// dispatcher thread
+	// main thread
 	if (!outputBuffer) {
 		outputBuffer = tfs::net::make_output_message();
 	} else if ((outputBuffer->getLength() + size) > NetworkMessage::MAX_PROTOCOL_BODY_LENGTH) {

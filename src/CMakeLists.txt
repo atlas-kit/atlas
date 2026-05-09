@@ -1,5 +1,6 @@
 set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/actions.cpp
+	${CMAKE_CURRENT_LIST_DIR}/application/app.cpp
 	${CMAKE_CURRENT_LIST_DIR}/ban.cpp
 	${CMAKE_CURRENT_LIST_DIR}/base64.cpp
 	${CMAKE_CURRENT_LIST_DIR}/baseevents.cpp
@@ -35,6 +36,8 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.cpp
 	${CMAKE_CURRENT_LIST_DIR}/monster.cpp
 	${CMAKE_CURRENT_LIST_DIR}/monsters.cpp
+	${CMAKE_CURRENT_LIST_DIR}/modules/app_loop/module.cpp
+	${CMAKE_CURRENT_LIST_DIR}/modules/server/module.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mounts.cpp
 	${CMAKE_CURRENT_LIST_DIR}/movement.cpp
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
@@ -49,7 +52,7 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/protocolgame.cpp
 	${CMAKE_CURRENT_LIST_DIR}/protocolstatus.cpp
 	${CMAKE_CURRENT_LIST_DIR}/rsa.cpp
-	${CMAKE_CURRENT_LIST_DIR}/scheduler.cpp
+	${CMAKE_CURRENT_LIST_DIR}/app_loop.cpp
 	${CMAKE_CURRENT_LIST_DIR}/script.cpp
 	${CMAKE_CURRENT_LIST_DIR}/scriptmanager.cpp
 	${CMAKE_CURRENT_LIST_DIR}/server.cpp
@@ -58,7 +61,7 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/spells.cpp
 	${CMAKE_CURRENT_LIST_DIR}/storeinbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/talkaction.cpp
-	${CMAKE_CURRENT_LIST_DIR}/tasks.cpp
+	${CMAKE_CURRENT_LIST_DIR}/pending_app_loop_events.cpp
 	${CMAKE_CURRENT_LIST_DIR}/teleport.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tile.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tools.cpp
@@ -72,6 +75,24 @@ set(tfs_SRC
 set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/otpch.h
 	${CMAKE_CURRENT_LIST_DIR}/actions.h
+	${CMAKE_CURRENT_LIST_DIR}/application/app.h
+	${CMAKE_CURRENT_LIST_DIR}/application/clock.h
+	${CMAKE_CURRENT_LIST_DIR}/application/context.h
+	${CMAKE_CURRENT_LIST_DIR}/application/event.h
+	${CMAKE_CURRENT_LIST_DIR}/application/events.h
+	${CMAKE_CURRENT_LIST_DIR}/application/module.h
+	${CMAKE_CURRENT_LIST_DIR}/application/prelude.h
+	${CMAKE_CURRENT_LIST_DIR}/application/resource.h
+	${CMAKE_CURRENT_LIST_DIR}/application/resources.h
+	${CMAKE_CURRENT_LIST_DIR}/application/runtime.h
+	${CMAKE_CURRENT_LIST_DIR}/application/schedule.h
+	${CMAKE_CURRENT_LIST_DIR}/application/systems.h
+	${CMAKE_CURRENT_LIST_DIR}/application/type_name.h
+	${CMAKE_CURRENT_LIST_DIR}/application/timing/fixed_time.h
+	${CMAKE_CURRENT_LIST_DIR}/application/timing/real_time.h
+	${CMAKE_CURRENT_LIST_DIR}/application/timing/time.h
+	${CMAKE_CURRENT_LIST_DIR}/application/timing/timer.h
+	${CMAKE_CURRENT_LIST_DIR}/application/timing/virtual_time.h
 	${CMAKE_CURRENT_LIST_DIR}/ban.h
 	${CMAKE_CURRENT_LIST_DIR}/base64.h
 	${CMAKE_CURRENT_LIST_DIR}/baseevents.h
@@ -113,6 +134,8 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.h
 	${CMAKE_CURRENT_LIST_DIR}/monster.h
 	${CMAKE_CURRENT_LIST_DIR}/monsters.h
+	${CMAKE_CURRENT_LIST_DIR}/modules/app_loop/module.h
+	${CMAKE_CURRENT_LIST_DIR}/modules/server/module.h
 	${CMAKE_CURRENT_LIST_DIR}/mounts.h
 	${CMAKE_CURRENT_LIST_DIR}/movement.h
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.h
@@ -128,7 +151,7 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/protocolstatus.h
 	${CMAKE_CURRENT_LIST_DIR}/pugicast.h
 	${CMAKE_CURRENT_LIST_DIR}/rsa.h
-	${CMAKE_CURRENT_LIST_DIR}/scheduler.h
+	${CMAKE_CURRENT_LIST_DIR}/app_loop.h
 	${CMAKE_CURRENT_LIST_DIR}/script.h
 	${CMAKE_CURRENT_LIST_DIR}/scriptmanager.h
 	${CMAKE_CURRENT_LIST_DIR}/server.h
@@ -137,7 +160,7 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/spells.h
 	${CMAKE_CURRENT_LIST_DIR}/storeinbox.h
 	${CMAKE_CURRENT_LIST_DIR}/talkaction.h
-	${CMAKE_CURRENT_LIST_DIR}/tasks.h
+	${CMAKE_CURRENT_LIST_DIR}/pending_app_loop_events.h
 	${CMAKE_CURRENT_LIST_DIR}/teleport.h
 	${CMAKE_CURRENT_LIST_DIR}/thing.h
 	${CMAKE_CURRENT_LIST_DIR}/thread_holder_base.h

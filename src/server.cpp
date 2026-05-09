@@ -6,10 +6,10 @@
 #include "server.h"
 
 #include "configmanager.h"
-#include "scheduler.h"
+#include "app_loop.h"
 #include "tools.h"
 
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 
 namespace {
 
@@ -162,7 +162,7 @@ void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::
 		if (!pendingStart) {
 			close();
 			pendingStart = true;
-			g_scheduler.addEvent(createSchedulerTask(
+			g_appLoop.schedule(createDelayedAppLoopEvent(
 			    15000, [serverPort = this->serverPort, service = std::weak_ptr<ServicePort>(shared_from_this())]() {
 				    openAcceptor(service, serverPort);
 			    }));
@@ -217,7 +217,7 @@ void ServicePort::open(uint16_t port)
 		std::cout << "[ServicePort::open] Error: " << e.what() << std::endl;
 
 		pendingStart = true;
-		g_scheduler.addEvent(createSchedulerTask(
+		g_appLoop.schedule(createDelayedAppLoopEvent(
 		    15000,
 		    [port, service = std::weak_ptr<ServicePort>(shared_from_this())]() { openAcceptor(service, port); }));
 	}

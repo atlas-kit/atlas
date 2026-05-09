@@ -9,7 +9,7 @@
 #include "../../npc.h"
 #include "../../script.h"
 #include "../../spells.h"
-#include "../../tasks.h"
+#include "../../app_loop.h"
 #include "../api.h"
 #include "../env.h"
 #include "../meta.h"
@@ -22,7 +22,6 @@ extern LuaEnvironment g_luaEnvironment;
 extern Spells* g_spells;
 extern Monsters g_monsters;
 extern Scripts* g_scripts;
-extern Dispatcher g_dispatcher;
 extern Vocations g_vocations;
 
 namespace {
@@ -102,7 +101,7 @@ int luaGameLoadMap(lua_State* L)
 {
 	// Game.loadMap(path)
 	const std::string& path = tfs::lua::getString(L, 1);
-	g_dispatcher.addTask([path]() {
+	g_appLoop.enqueue([path]() {
 		try {
 			g_game.loadMap(path, true);
 		} catch (const std::invalid_argument& e) {
@@ -693,7 +692,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	registerEnum(lsi, GAME_STATE_CLOSING);
 	registerEnum(lsi, GAME_STATE_MAINTAIN);
 
-	registerEnum(lsi, SCHEDULER_MINTICKS);
+	registerEnum(lsi, APP_LOOP_MINTICKS);
 
 	registerEnum(lsi, WORLD_TYPE_NO_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP);

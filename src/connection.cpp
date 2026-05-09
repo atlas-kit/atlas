@@ -9,11 +9,10 @@
 #include "outputmessage.h"
 #include "protocol.h"
 #include "server.h"
-#include "tasks.h"
+#include "app_loop.h"
 
 #include <print>
 
-extern Dispatcher g_dispatcher;
 
 std::shared_ptr<Connection> ConnectionManager::createConnection(boost::asio::io_context& io_context,
                                                                 std::shared_ptr<const ServicePort> servicePort)
@@ -70,7 +69,7 @@ void Connection::close(bool force)
 	connectionState = CONNECTION_STATE_DISCONNECTED;
 
 	if (protocol) {
-		g_dispatcher.addTask([protocol = protocol]() { protocol->release(); });
+		g_appLoop.enqueue([protocol = protocol]() { protocol->release(); });
 	}
 
 	if (messageQueue.empty() || force) {
@@ -101,7 +100,7 @@ Connection::~Connection() { closeSocket(); }
 void Connection::accept(std::shared_ptr<Protocol> protocol)
 {
 	this->protocol = protocol;
-	g_dispatcher.addTask([=]() { protocol->onConnect(); });
+	g_appLoop.enqueue([=]() { protocol->onConnect(); });
 	connectionState = CONNECTION_STATE_GAMEWORLD_AUTH;
 	accept();
 }
@@ -252,9 +251,15 @@ void Connection::parsePacket(const boost::system::error_code& error)
 			msg.skipBytes(2); // Skip enter-game opcode (u16 in 15.24, was u8)
 		}
 
-		protocol->onRecvFirstMessage(msg);
+		auto packet = std::make_unique<NetworkMessage>(msg);
+		g_appLoop.enqueue([protocol = protocol, packet = std::move(packet)]() mutable {
+			protocol->onRecvFirstMessage(*packet);
+		});
 	} else {
-		protocol->onRecvMessage(msg); // Send the packet to the current protocol
+		auto packet = std::make_unique<NetworkMessage>(msg);
+		g_appLoop.enqueue([protocol = protocol, packet = std::move(packet)]() mutable {
+			protocol->onRecvMessage(*packet);
+		});
 	}
 
 	try {

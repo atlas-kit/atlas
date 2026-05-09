@@ -8,10 +8,10 @@
 #include "lua/api.h"
 #include "lua/env.h"
 #include "pugicast.h"
-#include "scheduler.h"
+#include "app_loop.h"
 #include "tools.h"
 
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 
 GlobalEvents::GlobalEvents() : scriptInterface("GlobalEvent Interface") { scriptInterface.initState(); }
 
@@ -30,9 +30,9 @@ void GlobalEvents::clearMap(GlobalEventMap& map, bool fromLua)
 
 void GlobalEvents::clear(bool fromLua)
 {
-	g_scheduler.stopEvent(thinkEventId);
+	g_appLoop.cancel(thinkEventId);
 	thinkEventId = 0;
-	g_scheduler.stopEvent(timerEventId);
+	g_appLoop.cancel(timerEventId);
 	timerEventId = 0;
 
 	clearMap(thinkMap, fromLua);
@@ -56,7 +56,7 @@ bool GlobalEvents::registerEvent(std::unique_ptr<BaseEvent> event, const pugi::x
 		auto result = timerMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {
 			if (timerEventId == 0) {
-				timerEventId = g_scheduler.addEvent(createSchedulerTask(SCHEDULER_MINTICKS, [this]() { timer(); }));
+				timerEventId = g_appLoop.schedule(createDelayedAppLoopEvent(APP_LOOP_MINTICKS, [this]() { timer(); }));
 			}
 			return true;
 		}
@@ -64,7 +64,7 @@ bool GlobalEvents::registerEvent(std::unique_ptr<BaseEvent> event, const pugi::x
 		auto result = thinkMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {
 			if (thinkEventId == 0) {
-				thinkEventId = g_scheduler.addEvent(createSchedulerTask(SCHEDULER_MINTICKS, [this]() { think(); }));
+				thinkEventId = g_appLoop.schedule(createDelayedAppLoopEvent(APP_LOOP_MINTICKS, [this]() { think(); }));
 			}
 			return true;
 		}
@@ -82,7 +82,7 @@ bool GlobalEvents::registerLuaEvent(GlobalEvent* event)
 		auto result = timerMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {
 			if (timerEventId == 0) {
-				timerEventId = g_scheduler.addEvent(createSchedulerTask(SCHEDULER_MINTICKS, [this]() { timer(); }));
+				timerEventId = g_appLoop.schedule(createDelayedAppLoopEvent(APP_LOOP_MINTICKS, [this]() { timer(); }));
 			}
 			return true;
 		}
@@ -90,7 +90,7 @@ bool GlobalEvents::registerLuaEvent(GlobalEvent* event)
 		auto result = thinkMap.emplace(globalEvent->getName(), std::move(*globalEvent));
 		if (result.second) {
 			if (thinkEventId == 0) {
-				thinkEventId = g_scheduler.addEvent(createSchedulerTask(SCHEDULER_MINTICKS, [this]() { think(); }));
+				thinkEventId = g_appLoop.schedule(createDelayedAppLoopEvent(APP_LOOP_MINTICKS, [this]() { think(); }));
 			}
 			return true;
 		}
@@ -133,7 +133,7 @@ void GlobalEvents::timer()
 	}
 
 	if (nextScheduledTime != std::numeric_limits<int64_t>::max()) {
-		timerEventId = g_scheduler.addEvent(createSchedulerTask(nextScheduledTime, [this]() { timer(); }));
+		timerEventId = g_appLoop.schedule(createDelayedAppLoopEvent(nextScheduledTime, [this]() { timer(); }));
 	}
 }
 
@@ -165,7 +165,7 @@ void GlobalEvents::think()
 	}
 
 	if (nextScheduledTime != std::numeric_limits<int64_t>::max()) {
-		thinkEventId = g_scheduler.addEvent(createSchedulerTask(nextScheduledTime, [this]() { think(); }));
+		thinkEventId = g_appLoop.schedule(createDelayedAppLoopEvent(nextScheduledTime, [this]() { think(); }));
 	}
 }
 
@@ -242,7 +242,7 @@ bool GlobalEvent::configureEvent(const pugi::xml_node& node)
 		nextExecution = (current_time + difference) * 1000;
 		eventType = GLOBALEVENT_TIMER;
 	} else if ((attr = node.attribute("interval"))) {
-		interval = std::max<int32_t>(SCHEDULER_MINTICKS, pugi::cast<int32_t>(attr.value()));
+		interval = std::max<int32_t>(APP_LOOP_MINTICKS, pugi::cast<int32_t>(attr.value()));
 		nextExecution = OTSYS_TIME() + interval;
 	} else {
 		std::cout << "[Error - GlobalEvent::configureEvent] No interval for globalevent with name " << name

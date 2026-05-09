@@ -12,9 +12,8 @@
 #include "lua/env.h"
 #include "lua/meta.h"
 #include "spells.h"
-#include "tasks.h"
+#include "app_loop.h"
 
-extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Monsters g_monsters;
 
@@ -615,7 +614,7 @@ bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)
 		setAttackedCreature(creature);
 	} else if (isHostile()) {
 		setAttackedCreature(creature);
-		g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
+		g_appLoop.enqueue([id = getID()]() { g_game.checkCreatureAttack(id); });
 	}
 
 	setFollowCreature(creature);

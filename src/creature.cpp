@@ -10,15 +10,14 @@
 #include "events.h"
 #include "game.h"
 #include "party.h"
-#include "scheduler.h"
+#include "app_loop.h"
 
 double Creature::speedA = 857.36;
 double Creature::speedB = 261.29;
 double Creature::speedC = -4795.01;
 
-extern Dispatcher g_dispatcher;
 extern Game g_game;
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 
 Creature::Creature() { onIdleStatus(); }
 
@@ -143,7 +142,7 @@ void Creature::forceUpdatePath()
 	}
 
 	lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
-	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
+	g_appLoop.enqueue([id = getID()]() { g_game.updateCreatureWalk(id); });
 }
 
 void Creature::onIdleStatus()
@@ -191,7 +190,7 @@ void Creature::onWalk()
 
 	if (!attackedCreature.expired() || !followCreature.expired()) {
 		if (lastPathUpdate < OTSYS_TIME()) {
-			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
+			g_appLoop.enqueue([id = getID()]() { g_game.updateCreatureWalk(id); });
 			lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
 		}
 	}
@@ -282,13 +281,13 @@ void Creature::addEventWalk(bool firstStep)
 		g_game.checkCreatureWalk(getID());
 	}
 
-	eventWalk = g_scheduler.addEvent(createSchedulerTask(ticks, [id = getID()]() { g_game.checkCreatureWalk(id); }));
+	eventWalk = g_appLoop.schedule(createDelayedAppLoopEvent(ticks, [id = getID()]() { g_game.checkCreatureWalk(id); }));
 }
 
 void Creature::stopEventWalk()
 {
 	if (eventWalk != 0) {
-		g_scheduler.stopEvent(eventWalk);
+		g_appLoop.cancel(eventWalk);
 		eventWalk = 0;
 	}
 }
@@ -441,7 +440,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 		} else {
 			if (hasExtraSwing()) {
 				// our target is moving lets see if we can get in hit
-				g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
+				g_appLoop.enqueue([id = getID()]() { g_game.checkCreatureAttack(id); });
 			}
 
 			if (newTile->getZone() != oldTile->getZone()) {
@@ -649,7 +648,7 @@ void Creature::changeHealth(int32_t healthChange, bool sendHealthChange /* = tru
 	}
 
 	if (isDead()) {
-		g_dispatcher.addTask([id = getID()]() { g_game.executeDeath(id); });
+		g_appLoop.enqueue([id = getID()]() { g_game.executeDeath(id); });
 	}
 }
 
@@ -821,7 +820,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 			player->setFollowCreature(nullptr);
 		}
 
-		g_dispatcher.addTask([id = player->getID()]() { g_game.checkCreatureAttack(id); });
+		g_appLoop.enqueue([id = player->getID()]() { g_game.checkCreatureAttack(id); });
 	}
 }
 
@@ -902,7 +901,7 @@ void Creature::updateFollowersPaths()
 			continue;
 		}
 
-		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
+		g_appLoop.enqueue([id = follower->getID()]() { g_game.updateCreatureWalk(id); });
 		follower->lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
 	}
 }
@@ -1082,8 +1081,8 @@ bool Creature::addCondition(Condition* condition, bool force /* = false*/)
 	if (!force && condition->getType() == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)) {
 		int64_t walkDelay = getWalkDelay();
 		if (walkDelay > 0) {
-			g_scheduler.addEvent(
-			    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceAddCondition(id, condition); }));
+			g_appLoop.schedule(
+			    createDelayedAppLoopEvent(walkDelay, [=, id = getID()]() { g_game.forceAddCondition(id, condition); }));
 			return false;
 		}
 	}
@@ -1131,8 +1130,8 @@ void Creature::removeCondition(ConditionType_t type, bool force /* = false*/)
 		if (!force && type == CONDITION_PARALYZE) {
 			int64_t walkDelay = getWalkDelay();
 			if (walkDelay > 0) {
-				g_scheduler.addEvent(
-				    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
+				g_appLoop.schedule(
+				    createDelayedAppLoopEvent(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
 				return;
 			}
 		}
@@ -1159,8 +1158,8 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t conditionId, 
 		if (!force && type == CONDITION_PARALYZE) {
 			int64_t walkDelay = getWalkDelay();
 			if (walkDelay > 0) {
-				g_scheduler.addEvent(
-				    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
+				g_appLoop.schedule(
+				    createDelayedAppLoopEvent(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
 				return;
 			}
 		}
@@ -1198,7 +1197,7 @@ void Creature::removeCondition(Condition* condition, bool force /* = false*/)
 	if (!force && condition->getType() == CONDITION_PARALYZE) {
 		int64_t walkDelay = getWalkDelay();
 		if (walkDelay > 0) {
-			g_scheduler.addEvent(createSchedulerTask(
+			g_appLoop.schedule(createDelayedAppLoopEvent(
 			    walkDelay, [id = getID(), type = condition->getType()]() { g_game.forceRemoveCondition(id, type); }));
 			return;
 		}

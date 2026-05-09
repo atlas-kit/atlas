@@ -16,15 +16,14 @@
 #include "movement.h"
 #include "outfit.h"
 #include "party.h"
-#include "scheduler.h"
+#include "app_loop.h"
 #include "tools.h"
 #include "weapons.h"
 
 extern Chat g_chat;
-extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 
@@ -1228,7 +1227,7 @@ bool Player::closeShopWindow(bool sendCloseShopWindow /*= true*/)
 void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
-	setNextActionTask(nullptr);
+	setNextActionEvent(nullptr);
 	setNextAction(OTSYS_TIME() + getStepDuration(dir));
 }
 
@@ -1240,7 +1239,7 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 
 	if (const auto& followCreature = getFollowCreature();
 	    hasFollowPath && (creature == followCreature || (creature.get() == this && followCreature))) {
-		g_dispatcher.addTask([id = getID()]() { g_game.updateCreatureWalk(id); });
+		g_appLoop.enqueue([id = getID()]() { g_game.updateCreatureWalk(id); });
 	}
 
 	if (creature.get() != this) {
@@ -1396,29 +1395,29 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(std::unique_ptr<SchedulerTask> task)
+void Player::setNextWalkActionEvent(std::unique_ptr<DelayedAppLoopEvent> event)
 {
-	if (walkTaskEvent != 0) {
-		g_scheduler.stopEvent(walkTaskEvent);
-		walkTaskEvent = 0;
+	if (walkEventId != 0) {
+		g_appLoop.cancel(walkEventId);
+		walkEventId = 0;
 	}
 
-	walkTask = std::move(task);
+	walkEvent = std::move(event);
 }
 
-void Player::setNextActionTask(std::unique_ptr<SchedulerTask> task)
+void Player::setNextActionEvent(std::unique_ptr<DelayedAppLoopEvent> event)
 {
-	if (actionTaskEvent != 0) {
-		g_scheduler.stopEvent(actionTaskEvent);
-		actionTaskEvent = 0;
+	if (actionEventId != 0) {
+		g_appLoop.cancel(actionEventId);
+		actionEventId = 0;
 	}
 
-	if (task) {
-		actionTaskEvent = g_scheduler.addEvent(std::move(task));
+	if (event) {
+		actionEventId = g_appLoop.schedule(std::move(event));
 	}
 }
 
-uint32_t Player::getNextActionTime() const { return std::max<int64_t>(SCHEDULER_MINTICKS, nextAction - OTSYS_TIME()); }
+uint32_t Player::getNextActionTime() const { return std::max<int64_t>(APP_LOOP_MINTICKS, nextAction - OTSYS_TIME()); }
 
 void Player::onThink(uint32_t interval)
 {
@@ -1483,13 +1482,13 @@ void Player::onAttacking(uint32_t)
 		result = Weapon::useFist(asPlayer(), getAttackedCreature());
 	}
 
-	auto task = createSchedulerTask(std::max<uint32_t>(SCHEDULER_MINTICKS, delay),
-	                                [id = getID()]() { g_game.checkCreatureAttack(id); });
+	auto event = createDelayedAppLoopEvent(std::max<uint32_t>(APP_LOOP_MINTICKS, delay),
+	                                 [id = getID()]() { g_game.checkCreatureAttack(id); });
 	if (!classicSpeed) {
-		setNextActionTask(std::move(task));
+		setNextActionEvent(std::move(event));
 	} else {
-		g_scheduler.stopEvent(classicAttackEvent);
-		classicAttackEvent = g_scheduler.addEvent(std::move(task));
+		g_appLoop.cancel(classicAttackEvent);
+		classicAttackEvent = g_appLoop.schedule(std::move(event));
 	}
 
 	if (result) {
@@ -3215,7 +3214,7 @@ void Player::internalAddThing(uint32_t index, const std::shared_ptr<Thing>& thin
 void Player::goToFollowCreature()
 {
 	const auto& followCreature = getFollowCreature();
-	if (walkTask || !followCreature) {
+	if (walkEvent || !followCreature) {
 		return;
 	}
 
@@ -3272,14 +3271,14 @@ void Player::setChaseMode(bool mode)
 
 void Player::onWalkAborted()
 {
-	setNextWalkActionTask(nullptr);
+	setNextWalkActionEvent(nullptr);
 	sendCancelWalk();
 }
 
 void Player::onWalkComplete()
 {
-	if (walkTask) {
-		walkTaskEvent = g_scheduler.addEvent(std::move(walkTask));
+	if (walkEvent) {
+		walkEventId = g_appLoop.schedule(std::move(walkEvent));
 	}
 }
 

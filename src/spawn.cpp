@@ -9,11 +9,11 @@
 #include "events.h"
 #include "game.h"
 #include "pugicast.h"
-#include "scheduler.h"
+#include "app_loop.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 
 static constexpr int32_t MINSPAWN_INTERVAL = 10 * 1000;           // 10 seconds to match RME
 static constexpr int32_t MAXSPAWN_INTERVAL = 24 * 60 * 60 * 1000; // 1 day
@@ -238,7 +238,7 @@ bool Spawns::isInZone(const Position& centerPos, int32_t radius, const Position&
 void Spawn::startSpawnCheck()
 {
 	if (checkSpawnEvent == 0) {
-		checkSpawnEvent = g_scheduler.addEvent(createSchedulerTask(getInterval(), [this]() { checkSpawn(); }));
+		checkSpawnEvent = g_appLoop.schedule(createDelayedAppLoopEvent(getInterval(), [this]() { checkSpawn(); }));
 	}
 }
 
@@ -364,7 +364,7 @@ void Spawn::checkSpawn()
 	}
 
 	if (spawnedMap.size() < spawnMap.size()) {
-		checkSpawnEvent = g_scheduler.addEvent(createSchedulerTask(getInterval(), [this]() { checkSpawn(); }));
+		checkSpawnEvent = g_appLoop.schedule(createDelayedAppLoopEvent(getInterval(), [this]() { checkSpawn(); }));
 	}
 }
 
@@ -419,7 +419,7 @@ void Spawn::removeMonster(const std::shared_ptr<Monster>& monster)
 void Spawn::stopEvent()
 {
 	if (checkSpawnEvent != 0) {
-		g_scheduler.stopEvent(checkSpawnEvent);
+		g_appLoop.cancel(checkSpawnEvent);
 		checkSpawnEvent = 0;
 	}
 }

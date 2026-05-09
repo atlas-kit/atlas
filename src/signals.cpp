@@ -14,17 +14,15 @@
 #include "monsters.h"
 #include "mounts.h"
 #include "movement.h"
-#include "scheduler.h"
+#include "app_loop.h"
 #include "spells.h"
 #include "talkaction.h"
-#include "tasks.h"
 #include "weapons.h"
 
 #include <csignal>
 
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 extern DatabaseTasks g_databaseTasks;
-extern Dispatcher g_dispatcher;
 
 extern Actions* g_actions;
 extern Monsters g_monsters;
@@ -42,7 +40,7 @@ namespace {
 #ifndef _WIN32
 void sigusr1Handler()
 {
-	// Dispatcher thread
+	// Main thread
 	std::cout << "SIGUSR1 received, saving the game state..." << std::endl;
 	tfs::events::game::onSave();
 	g_game.saveGameState();
@@ -50,7 +48,7 @@ void sigusr1Handler()
 
 void sighupHandler()
 {
-	// Dispatcher thread
+	// Main thread
 	std::cout << "SIGHUP received, reloading config files..." << std::endl;
 
 	g_actions->reload();
@@ -100,7 +98,7 @@ void sighupHandler()
 #else
 void sigbreakHandler()
 {
-	// Dispatcher thread
+	// Main thread
 	std::cout << "SIGBREAK received, shutting game server down..." << std::endl;
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
 }
@@ -108,14 +106,14 @@ void sigbreakHandler()
 
 void sigtermHandler()
 {
-	// Dispatcher thread
+	// Main thread
 	std::cout << "SIGTERM received, shutting game server down..." << std::endl;
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
 }
 
 void sigintHandler()
 {
-	// Dispatcher thread
+	// Main thread
 	std::cout << "SIGINT received, shutting game server down..." << std::endl;
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
 }
@@ -127,25 +125,24 @@ void dispatchSignalHandler(int signal)
 {
 	switch (signal) {
 		case SIGINT: // Shuts the server down
-			g_dispatcher.addTask(sigintHandler);
+			g_appLoop.enqueue(sigintHandler);
 			break;
 		case SIGTERM: // Shuts the server down
-			g_dispatcher.addTask(sigtermHandler);
+			g_appLoop.enqueue(sigtermHandler);
 			break;
 #ifndef _WIN32
 		case SIGHUP: // Reload config/data
-			g_dispatcher.addTask(sighupHandler);
+			g_appLoop.enqueue(sighupHandler);
 			break;
 		case SIGUSR1: // Saves game state
-			g_dispatcher.addTask(sigusr1Handler);
+			g_appLoop.enqueue(sigusr1Handler);
 			break;
 #else
 		case SIGBREAK: // Shuts the server down
-			g_dispatcher.addTask(sigbreakHandler);
+			g_appLoop.enqueue(sigbreakHandler);
 			// hold the thread until other threads end
-			g_scheduler.join();
+			g_appLoop.shutdown();
 			g_databaseTasks.join();
-			g_dispatcher.join();
 			break;
 #endif
 		default:

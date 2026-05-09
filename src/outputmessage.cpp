@@ -7,9 +7,9 @@
 
 #include "lockfree.h"
 #include "protocol.h"
-#include "scheduler.h"
+#include "app_loop.h"
 
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 
 namespace {
 
@@ -24,12 +24,12 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols);
 
 void scheduleSendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 {
-	g_scheduler.addEvent(createSchedulerTask(OUTPUTMESSAGE_AUTOSEND_DELAY.count(), [&]() { sendAll(protocols); }));
+	g_appLoop.schedule(createDelayedAppLoopEvent(OUTPUTMESSAGE_AUTOSEND_DELAY.count(), [&]() { sendAll(protocols); }));
 }
 
 void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 {
-	// dispatcher thread
+	// main thread
 	for (auto& protocol : protocols) {
 		if (auto& msg = protocol->getCurrentBuffer()) {
 			protocol->send(std::move(msg));
@@ -52,7 +52,7 @@ std::shared_ptr<OutputMessage> tfs::net::make_output_message()
 
 void tfs::net::insert_protocol_to_autosend(const std::shared_ptr<Protocol>& protocol)
 {
-	// dispatcher thread
+	// main thread
 	if (bufferedProtocols.empty()) {
 		scheduleSendAll(bufferedProtocols);
 	}
@@ -61,7 +61,7 @@ void tfs::net::insert_protocol_to_autosend(const std::shared_ptr<Protocol>& prot
 
 void tfs::net::remove_protocol_from_autosend(const std::shared_ptr<Protocol>& protocol)
 {
-	// dispatcher thread
+	// main thread
 	auto it = std::find(bufferedProtocols.begin(), bufferedProtocols.end(), protocol);
 	if (it != bufferedProtocols.end()) {
 		std::swap(*it, bufferedProtocols.back());

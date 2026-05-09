@@ -8,9 +8,8 @@
 #include "configmanager.h"
 #include "game.h"
 #include "outputmessage.h"
-#include "tasks.h"
+#include "app_loop.h"
 
-extern Dispatcher g_dispatcher;
 extern Game g_game;
 
 std::map<Connection::Address, int64_t> ProtocolStatus::ipConnectMap;
@@ -48,7 +47,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 		// XML info protocol
 		case 0xFF: {
 			if (msg.getString(4) == "info") {
-				g_dispatcher.addTask([thisPtr = std::static_pointer_cast<ProtocolStatus>(shared_from_this())]() {
+				g_appLoop.enqueue([thisPtr = std::static_pointer_cast<ProtocolStatus>(shared_from_this())]() {
 					thisPtr->sendStatusString();
 				});
 				return;
@@ -63,7 +62,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 			if (requestedInfo & REQUEST_PLAYER_STATUS_INFO) {
 				characterName = msg.getString();
 			}
-			g_dispatcher.addTask(
+			g_appLoop.enqueue(
 			    [=, thisPtr = std::static_pointer_cast<ProtocolStatus>(shared_from_this()),
 			     characterName = std::move(characterName)]() { thisPtr->sendInfo(requestedInfo, characterName); });
 			return;

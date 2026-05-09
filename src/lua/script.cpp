@@ -12,7 +12,7 @@
 #include "../movement.h"
 #include "../player.h"
 #include "../protocolstatus.h"
-#include "../scheduler.h"
+#include "../app_loop.h"
 #include "../spells.h"
 #include "../weapons.h"
 #include "api.h"
@@ -31,7 +31,7 @@ extern Vocations g_vocations;
 extern Spells* g_spells;
 extern Actions* g_actions;
 extern TalkActions* g_talkActions;
-extern Scheduler g_scheduler;
+extern AppLoop g_appLoop;
 extern Scripts* g_scripts;
 
 LuaEnvironment g_luaEnvironment;
@@ -326,7 +326,7 @@ int luaIsScriptsInterface(lua_State* L)
 
 int luaAddEvent(lua_State* L)
 {
-	// addEvent(callback, delay, ...)
+	// schedule(callback, delay, ...)
 	int parameters = lua_gettop(L);
 	if (parameters < 2) {
 		tfs::lua::reportError(L, std::format("Not enough parameters: {:d}.", parameters));
@@ -437,7 +437,7 @@ int luaAddEvent(lua_State* L)
 
 	uint32_t timerId = g_luaEnvironment.lastEventTimerId++;
 	eventDesc.eventId =
-	    g_scheduler.addEvent(createSchedulerTask(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
+	    g_appLoop.schedule(createDelayedAppLoopEvent(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
 
 	g_luaEnvironment.timerEvents.emplace(timerId, std::move(eventDesc));
 	tfs::lua::pushNumber(L, timerId);
@@ -446,7 +446,7 @@ int luaAddEvent(lua_State* L)
 
 int luaStopEvent(lua_State* L)
 {
-	// stopEvent(eventid)
+	// cancel(eventid)
 	uint32_t eventId = tfs::lua::getNumber<uint32_t>(L, 1);
 
 	auto& events = g_luaEnvironment.timerEvents;
@@ -459,7 +459,7 @@ int luaStopEvent(lua_State* L)
 	LuaTimerEventDesc timerEventDesc = std::move(it->second);
 	events.erase(it);
 
-	g_scheduler.stopEvent(timerEventDesc.eventId);
+	g_appLoop.cancel(timerEventDesc.eventId);
 	luaL_unref(L, LUA_REGISTRYINDEX, timerEventDesc.function);
 
 	for (auto parameter : timerEventDesc.parameters) {
@@ -857,10 +857,10 @@ void LuaScriptInterface::registerFunctions()
 	// doChallengeCreature(cid, target[, force = false])
 	lua_register(L, "doChallengeCreature", luaDoChallengeCreature);
 
-	// addEvent(callback, delay, ...)
+	// schedule(callback, delay, ...)
 	lua_register(L, "addEvent", luaAddEvent);
 
-	// stopEvent(eventid)
+	// cancel(eventid)
 	lua_register(L, "stopEvent", luaStopEvent);
 
 	// saveServer()

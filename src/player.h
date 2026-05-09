@@ -12,7 +12,7 @@
 #include "guild.h"
 #include "inbox.h"
 #include "protocolgame.h"
-#include "scheduler.h"
+#include "app_loop.h"
 #include "storeinbox.h"
 #include "town.h"
 #include "vocation.h"
@@ -1258,8 +1258,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
-	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextWalkActionEvent(std::unique_ptr<DelayedAppLoopEvent> event);
+	void setNextActionEvent(std::unique_ptr<DelayedAppLoopEvent> event);
 
 	void setNextAction(int64_t time)
 	{
@@ -1393,7 +1393,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	std::unique_ptr<SchedulerTask> walkTask;
+	std::unique_ptr<DelayedAppLoopEvent> walkEvent;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;
@@ -1406,8 +1406,8 @@ private:
 	uint32_t conditionSuppressions = 0;
 	uint32_t level = 1;
 	uint32_t magLevel = 0;
-	uint32_t actionTaskEvent = 0;
-	uint32_t walkTaskEvent = 0;
+	uint32_t actionEventId = 0;
+	uint32_t walkEventId = 0;
 	uint32_t classicAttackEvent = 0;
 	uint32_t MessageBufferTicks = 0;
 	uint32_t accountNumber = 0;
