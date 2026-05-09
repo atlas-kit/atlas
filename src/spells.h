@@ -217,7 +217,7 @@ private:
 class InstantSpell final : public TalkAction, public Spell
 {
 public:
-	explicit InstantSpell(LuaScriptInterface* interface) : TalkAction(interface) {}
+	explicit InstantSpell(LuaScriptInterface* luaInterface) : TalkAction(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node& node) override;
 
@@ -261,7 +261,7 @@ private:
 class RuneSpell final : public Action, public Spell
 {
 public:
-	explicit RuneSpell(LuaScriptInterface* interface) : Action(interface) {}
+	explicit RuneSpell(LuaScriptInterface* luaInterface) : Action(luaInterface) {}
 
 	bool configureEvent(const pugi::xml_node& node) override;
 
