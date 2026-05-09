@@ -52,8 +52,14 @@
     <Filter Include="Header Files\modules\app_loop">
       <UniqueIdentifier>{ce95d77e-bf40-4888-8c2a-a0c820eeb444}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\modules\market">
+      <UniqueIdentifier>{37f8989a-4cbd-410f-9e03-0183ac7a8560}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\modules\server">
       <UniqueIdentifier>{7f535639-c1f3-4fb8-9d74-dc4f64368cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\modules\market">
+      <UniqueIdentifier>{fa421ecd-6dca-498e-bf04-32159f97c24e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -201,9 +207,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\iomapserialize.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\iomarket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\item.cpp">
@@ -428,6 +431,9 @@
     <ClCompile Include="..\src\lua\modules\stdlib.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\modules\market\module.cpp">
+      <Filter>Source Files\modules\market</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\application\app.h">
@@ -610,9 +616,6 @@
     <ClInclude Include="..\src\iomapserialize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\iomarket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -697,6 +700,12 @@
     <ClInclude Include="..\src\modules\app_loop\module.h">
       <Filter>Header Files\modules\app_loop</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\modules\market\module.h">
+      <Filter>Header Files\modules\market</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\modules\market\resources.h">
+      <Filter>Header Files\modules\market</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\modules\server\module.h">
       <Filter>Header Files\modules\server</Filter>
     </ClInclude>
@@ -773,7 +782,7 @@
       <Filter>Header Files\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\modules\register.h">
-      <Filter>Header Files\lua\modules</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

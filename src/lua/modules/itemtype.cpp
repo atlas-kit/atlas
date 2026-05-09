@@ -1,6 +1,6 @@
 #include "../../otpch.h"
 
-#include "../../iomarket.h"
+#include "../../modules/market/module.h"
 #include "../../item.h"
 #include "../../items.h"
 #include "../api.h"
@@ -795,7 +795,8 @@ int luaItemTypeGetMarketBuyStatistics(lua_State* L)
 	// itemType:getMarketBuyStatistics()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		MarketStatistics* statistics = tfs::iomarket::getPurchaseStatistics(itemType->id);
+		MarketStatistics* statistics =
+		    tfs::modules::market::getPurchaseStatistics(*g_marketPurchaseStatistics, itemType->id);
 		if (statistics) {
 			lua_createtable(L, 4, 0);
 			tfs::lua::setField(L, "numTransactions", statistics->numTransactions);
@@ -816,7 +817,8 @@ int luaItemTypeGetMarketSellStatistics(lua_State* L)
 	// itemType:getMarketSellStatistics()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		MarketStatistics* statistics = tfs::iomarket::getSaleStatistics(itemType->id);
+		MarketStatistics* statistics =
+		    tfs::modules::market::getSaleStatistics(*g_marketSaleStatistics, itemType->id);
 		if (statistics) {
 			lua_createtable(L, 4, 0);
 			tfs::lua::setField(L, "numTransactions", statistics->numTransactions);

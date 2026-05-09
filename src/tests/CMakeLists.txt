@@ -9,6 +9,7 @@ set(tests_SRC
     ${CMAKE_CURRENT_LIST_DIR}/test_scope_exit.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_application.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_app_loop.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_market_module.cpp
     )
 
 foreach(test_src ${tests_SRC})

@@ -28,7 +28,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/iologindata.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomap.cpp
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.cpp
-	${CMAKE_CURRENT_LIST_DIR}/iomarket.cpp
 	${CMAKE_CURRENT_LIST_DIR}/item.cpp
 	${CMAKE_CURRENT_LIST_DIR}/items.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mailbox.cpp
@@ -37,6 +36,7 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/monster.cpp
 	${CMAKE_CURRENT_LIST_DIR}/monsters.cpp
 	${CMAKE_CURRENT_LIST_DIR}/modules/app_loop/module.cpp
+	${CMAKE_CURRENT_LIST_DIR}/modules/market/module.cpp
 	${CMAKE_CURRENT_LIST_DIR}/modules/server/module.cpp
 	${CMAKE_CURRENT_LIST_DIR}/mounts.cpp
 	${CMAKE_CURRENT_LIST_DIR}/movement.cpp
@@ -123,7 +123,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/iologindata.h
 	${CMAKE_CURRENT_LIST_DIR}/iomap.h
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.h
-	${CMAKE_CURRENT_LIST_DIR}/iomarket.h
 	${CMAKE_CURRENT_LIST_DIR}/item.h
 	${CMAKE_CURRENT_LIST_DIR}/itemloader.h
 	${CMAKE_CURRENT_LIST_DIR}/items.h
@@ -135,6 +134,8 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/monster.h
 	${CMAKE_CURRENT_LIST_DIR}/monsters.h
 	${CMAKE_CURRENT_LIST_DIR}/modules/app_loop/module.h
+	${CMAKE_CURRENT_LIST_DIR}/modules/market/module.h
+	${CMAKE_CURRENT_LIST_DIR}/modules/market/resources.h
 	${CMAKE_CURRENT_LIST_DIR}/modules/server/module.h
 	${CMAKE_CURRENT_LIST_DIR}/mounts.h
 	${CMAKE_CURRENT_LIST_DIR}/movement.h

@@ -11,7 +11,6 @@
 #include "../../databasetasks.h"
 #include "../../game.h"
 #include "../../http/http.h"
-#include "../../iomarket.h"
 #include "../../monsters.h"
 #include "../../outfit.h"
 #include "../../protocolstatus.h"
@@ -229,9 +228,6 @@ bool mainLoader(ServiceManager* services)
 	}
 
 	g_game.payHouses(rentPeriod);
-
-	tfs::iomarket::checkExpiredOffers();
-	tfs::iomarket::updateStatistics();
 
 	std::cout << ">> Loaded all modules, server starting up..." << std::endl;
 

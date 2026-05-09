@@ -6,6 +6,7 @@
 #include "application/app.h"
 #include "configmanager.h"
 #include "modules/app_loop/module.h"
+#include "modules/market/module.h"
 #include "modules/server/module.h"
 #include "tools.h"
 
@@ -68,5 +69,6 @@ int main(int argc, const char** argv)
 	auto app = std::make_unique<tfs::application::App>();
 	app->add_module<tfs::modules::app_loop::AppLoopModule>();
 	app->add_module<tfs::modules::server::ServerModule>();
+	app->add_module<tfs::modules::market::MarketModule>();
 	return app->run();
 }

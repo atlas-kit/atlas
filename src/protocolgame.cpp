@@ -12,7 +12,7 @@
 #include "events.h"
 #include "game.h"
 #include "iologindata.h"
-#include "iomarket.h"
+#include "modules/market/module.h"
 #include "outfit.h"
 #include "outputmessage.h"
 #include "player.h"
@@ -2100,7 +2100,9 @@ void ProtocolGame::sendMarketEnter()
 	NetworkMessage msg;
 	msg.addByte(0xF6);
 	msg.addByte(
-	    std::min<uint32_t>(tfs::iomarket::getPlayerOfferCount(player->getGUID()), std::numeric_limits<uint8_t>::max()));
+	    std::min<uint32_t>(
+	        tfs::modules::market::getPlayerOfferCount(player->getGUID()),
+	        std::numeric_limits<uint8_t>::max()));
 
 	player->setInMarket(true);
 
