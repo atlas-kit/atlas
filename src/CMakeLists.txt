@@ -161,10 +161,6 @@ target_link_libraries(tfslib PRIVATE
 	${MYSQL_CLIENT_LIBS}
 	)
 
-if (APPLE)
-	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
-endif()
-
 if (ENABLE_HTTP)
 	add_subdirectory(http)
 	target_link_libraries(tfslib PRIVATE http)

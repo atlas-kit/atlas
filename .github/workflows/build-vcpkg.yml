@@ -27,16 +27,14 @@ on:
       - vcpkg.json
 
 jobs:
-  build-vcpkg:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-latest
-    strategy:
-      matrix:
-        os: [ubuntu, windows]
+  build-linux:
+    name: Linux
+    runs-on: ubuntu-latest
 
     env:
+      CXX: g++-14
       VCPKG_BUILD_TYPE: release
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
@@ -47,9 +45,6 @@ jobs:
         run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
         shell: bash
 
-      - run: echo CXX=g++-14 >> $GITHUB_ENV
-        if: ${{ matrix.os == 'ubuntu' }}
-
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
 
@@ -57,9 +52,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-binary-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-linux-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
           restore-keys: |
-            vcpkg-binary-${{ matrix.os }}-
+            vcpkg-linux-
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v11
@@ -69,29 +64,72 @@ jobs:
       - name: Build with CMake
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: vcpkg
-          buildPreset: vcpkg
-          buildPresetAdditionalArgs: "['--config', 'Debug']"
+          configurePreset: linux-release
+          buildPreset: linux-release
 
       - name: Upload build logs
         uses: actions/upload-artifact@v7
         with:
-          name: logs-${{ matrix.os }}-${{ github.sha }}
+          name: logs-linux-${{ github.sha }}
           path: ${{ github.workspace }}/vcpkg/buildtrees/**/*.log
         if: ${{ failure() }}
 
       - name: Upload artifact binary
         uses: actions/upload-artifact@v7
-        if: ${{ !startsWith(matrix.os, 'windows') }}
         with:
-          name: tfs-${{ matrix.os }}-${{ github.sha }}
-          path: ${{ github.workspace }}/build/Debug/tfs
+          name: tfs-linux-${{ github.sha }}
+          path: ${{ github.workspace }}/build/linux-release/tfs
 
-      - name: Upload artifact binary (exe)
-        uses: actions/upload-artifact@v7
-        if: ${{ startsWith(matrix.os, 'windows') }}
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BUILD_TYPE: release
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows-static-release
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v5
         with:
-          name: tfs-${{ matrix.os }}-${{ github.sha }}
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-windows-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          restore-keys: |
+            vcpkg-windows-
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          doNotCache: false
+
+      - name: Build with CMake
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: windows-release
+          buildPreset: windows-release
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v7
+        with:
+          name: logs-windows-${{ github.sha }}
+          path: ${{ github.workspace }}/vcpkg/buildtrees/**/*.log
+        if: ${{ failure() }}
+
+      - name: Upload artifact binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: tfs-windows-${{ github.sha }}
           path: |
-            ${{ github.workspace }}/build/Debug/tfs.exe
-            ${{ github.workspace }}/build/Debug/*.dll
+            ${{ github.workspace }}/build/windows-release/tfs.exe
+            ${{ github.workspace }}/build/windows-release/*.dll

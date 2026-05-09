@@ -17,7 +17,8 @@ COPY cmake /usr/src/atlas/cmake/
 COPY src /usr/src/atlas/src/
 COPY CMakeLists.txt CMakePresets.json /usr/src/atlas/
 WORKDIR /usr/src/atlas
-RUN cmake --preset default && cmake --build --config RelWithDebInfo --preset default
+RUN cmake -G Ninja -B build/docker-release -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  && cmake --build build/docker-release
 
 FROM debian:forky-slim
 RUN apt-get update -q && apt-get install -yq \
@@ -31,7 +32,7 @@ RUN apt-get update -q && apt-get install -yq \
   libssl3t64 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /usr/src/atlas/build/RelWithDebInfo/tfs /bin/tfs
+COPY --from=build /usr/src/atlas/build/docker-release/tfs /bin/tfs
 COPY LICENSE key.pem /srv/
 
 EXPOSE 7171 7172

@@ -7,10 +7,6 @@
     "boost-lockfree",
     "boost-stacktrace",
     "boost-system",
-    {
-      "name": "libiconv",
-      "platform": "osx"
-    },
     "lua",
     "openssl",
     "pugixml",
