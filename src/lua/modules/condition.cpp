@@ -15,9 +15,9 @@ int luaConditionCreate(lua_State* L)
 	ConditionType_t conditionType = tfs::lua::getNumber<ConditionType_t>(L, 2);
 	ConditionId_t conditionId = tfs::lua::getNumber<ConditionId_t>(L, 3, CONDITIONID_COMBAT);
 
-	Condition* condition = Condition::createCondition(conditionId, conditionType, std::chrono::milliseconds::zero(), 0);
+	auto condition = Condition::createCondition(conditionId, conditionType, std::chrono::milliseconds::zero(), 0);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition);
+		tfs::lua::pushUserdata(L, condition.release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);
@@ -102,7 +102,7 @@ int luaConditionClone(lua_State* L)
 	// condition:clone()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition->clone());
+		tfs::lua::pushUserdata(L, condition->clone().release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);
@@ -183,7 +183,8 @@ int luaConditionSetFormula(lua_State* L)
 	double maxa = tfs::lua::getNumber<double>(L, 4);
 	double minb = tfs::lua::getNumber<double>(L, 3);
 	double mina = tfs::lua::getNumber<double>(L, 2);
-	ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionSpeed* condition = conditionBase ? conditionBase->getConditionSpeed() : nullptr;
 	if (condition) {
 		condition->setFormulaVars(mina, minb, maxa, maxb);
 		tfs::lua::pushBoolean(L, true);
@@ -211,7 +212,8 @@ int luaConditionSetOutfit(lua_State* L)
 		outfit.lookTypeEx = tfs::lua::getNumber<uint16_t>(L, 2);
 	}
 
-	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionOutfit* condition = conditionBase ? conditionBase->getConditionOutfit() : nullptr;
 	if (condition) {
 		condition->setOutfit(outfit);
 		tfs::lua::pushBoolean(L, true);
@@ -227,7 +229,8 @@ int luaConditionAddDamage(lua_State* L)
 	int32_t value = tfs::lua::getNumber<int32_t>(L, 4);
 	auto time = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)};
 	int32_t rounds = tfs::lua::getNumber<int32_t>(L, 2);
-	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionDamage* condition = conditionBase ? conditionBase->getConditionDamage() : nullptr;
 	if (condition) {
 		tfs::lua::pushBoolean(L, condition->addDamage(rounds, time, value));
 	} else {

@@ -15,9 +15,6 @@ class InstantSpell;
 class RuneSpell;
 class Spell;
 
-using InstantSpell_ptr = std::unique_ptr<InstantSpell>;
-using RuneSpell_ptr = std::unique_ptr<RuneSpell>;
-
 class Spells final : public BaseEvents
 {
 public:
@@ -29,7 +26,7 @@ public:
 	Spells& operator=(const Spells&) = delete;
 
 	Spell* getSpellByName(const std::string& name);
-	RuneSpell* getRuneSpell(uint32_t id);
+	RuneSpell* getRuneSpell(uint16_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 
 	InstantSpell* getInstantSpell(const std::string& words);
@@ -45,13 +42,13 @@ public:
 
 	void clearMaps(bool fromLua);
 	void clear(bool fromLua) override final;
-	bool registerInstantLuaEvent(InstantSpell* event);
-	bool registerRuneLuaEvent(RuneSpell* event);
+	bool registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant);
+	bool registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune);
 
 private:
 	LuaScriptInterface& getScriptInterface() override;
-	Event_ptr getEvent(const std::string& nodeName) override;
-	bool registerEvent(Event_ptr event, const pugi::xml_node& node) override;
+	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
 
 	std::map<uint16_t, RuneSpell> runes;
 	std::map<std::string, InstantSpell> instants;
@@ -73,7 +70,7 @@ public:
 class CombatSpell final : public Event, public BaseSpell
 {
 public:
-	CombatSpell(Combat_ptr combat, bool needTarget, bool needDirection);
+	CombatSpell(std::shared_ptr<Combat> combat, bool needTarget, bool needDirection);
 
 	// non-copyable
 	CombatSpell(const CombatSpell&) = delete;
@@ -87,12 +84,12 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var);
 
 	bool loadScriptCombat();
-	Combat_ptr getCombat() { return combat; }
+	std::shared_ptr<Combat> getCombat() { return combat; }
 
 private:
 	std::string_view getScriptEventName() const override { return "onCastSpell"; }
 
-	Combat_ptr combat;
+	std::shared_ptr<Combat> combat;
 
 	bool needDirection;
 	bool needTarget;
@@ -106,8 +103,8 @@ public:
 	bool configureSpell(const pugi::xml_node& node);
 	const std::string& getName() const { return name; }
 	void setName(std::string n) { name = std::move(n); }
-	uint8_t getId() const { return spellId; }
-	void setId(uint8_t id) { spellId = id; }
+	uint16_t getId() const { return spellId; }
+	void setId(uint16_t id) { spellId = id; }
 
 	void postCastSpell(const std::shared_ptr<Player>& player, bool finishedCast = true, bool payCost = true) const;
 	static void postCastSpell(const std::shared_ptr<Player>& player, uint32_t manaCost, uint32_t soulCost);
@@ -129,6 +126,10 @@ public:
 	void setEnabled(bool e) { enabled = e; }
 
 	virtual bool isInstant() const = 0;
+	virtual InstantSpell* getInstantSpell() { return nullptr; }
+	virtual const InstantSpell* getInstantSpell() const { return nullptr; }
+	virtual RuneSpell* getRuneSpell() { return nullptr; }
+	virtual const RuneSpell* getRuneSpell() const { return nullptr; }
 	bool isLearnable() const { return learnable; }
 	void setLearnable(bool l) { learnable = l; }
 
@@ -191,7 +192,7 @@ protected:
 	uint32_t magLevel = 0;
 	int32_t range = -1;
 
-	uint8_t spellId = 0;
+	uint16_t spellId = 0;
 
 	bool selfTarget = false;
 	bool needTarget = false;
@@ -229,6 +230,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var);
 
 	bool isInstant() const override { return true; }
+	InstantSpell* getInstantSpell() override { return this; }
+	const InstantSpell* getInstantSpell() const override { return this; }
 	bool getHasParam() const { return hasParam; }
 	void setHasParam(bool p) { hasParam = p; }
 	bool getHasPlayerNameParam() const { return hasPlayerNameParam; }
@@ -281,6 +284,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var, bool isHotkey);
 
 	bool isInstant() const override { return false; }
+	RuneSpell* getRuneSpell() override { return this; }
+	const RuneSpell* getRuneSpell() const override { return this; }
 	uint16_t getRuneItemId() const { return runeId; }
 	void setRuneItemId(uint16_t i) { runeId = i; }
 	uint32_t getCharges() const { return charges; }

@@ -7,7 +7,6 @@
 #include "../configmanager.h"
 #include "../events.h"
 #include "../game.h"
-#include "../globalevent.h"
 #include "../item.h"
 #include "../movement.h"
 #include "../player.h"
@@ -25,7 +24,6 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern Spells* g_spells;
@@ -145,7 +143,7 @@ int luaDoAreaCombat(lua_State* L)
 
 		CombatParams params;
 		params.combatType = combatType;
-		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
+		params.impactEffect = tfs::lua::getNumber<uint16_t>(L, 7);
 
 		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
 		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
@@ -187,7 +185,7 @@ int luaDoTargetCombat(lua_State* L)
 
 	CombatParams params{
 	    .combatType = combatType,
-	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
+	    .impactEffect = tfs::lua::getNumber<uint16_t>(L, 6),
 	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
 	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
 	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),
@@ -435,12 +433,12 @@ int luaAddEvent(lua_State* L)
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
 	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
 
-	auto& lastTimerEventId = g_luaEnvironment.lastEventTimerId;
-	eventDesc.eventId = g_scheduler.addEvent(
-	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
+	uint32_t timerId = g_luaEnvironment.lastEventTimerId++;
+	eventDesc.eventId =
+	    g_scheduler.addEvent(createSchedulerTask(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
 
-	g_luaEnvironment.timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
-	tfs::lua::pushNumber(L, lastTimerEventId++);
+	g_luaEnvironment.timerEvents.emplace(timerId, std::move(eventDesc));
+	tfs::lua::pushNumber(L, timerId);
 	return 1;
 }
 
@@ -971,7 +969,7 @@ LuaScriptInterface* LuaEnvironment::getTestInterface()
 	return testInterface;
 }
 
-Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
+std::shared_ptr<Combat> LuaEnvironment::getCombatObject(uint32_t id) const
 {
 	auto it = combatMap.find(id);
 	if (it == combatMap.end()) {
@@ -980,9 +978,9 @@ Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
 	return it->second;
 }
 
-Combat_ptr LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
+std::shared_ptr<Combat> LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
 {
-	Combat_ptr combat = std::make_shared<Combat>();
+	const auto combat = std::make_shared<Combat>();
 	combatMap[++lastCombatId] = combat;
 	combatIdMap[interface].push_back(lastCombatId);
 	return combat;

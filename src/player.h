@@ -18,7 +18,6 @@
 #include "vocation.h"
 
 class House;
-struct Mount;
 class NetworkMessage;
 class Npc;
 class Party;
@@ -95,7 +94,7 @@ public:
 	static uint32_t playerAutoID;
 	static uint32_t playerIDLimit;
 
-	explicit Player(ProtocolGame_ptr p);
+	explicit Player(std::shared_ptr<ProtocolGame> protocol);
 	~Player() = default;
 
 	// non-copyable
@@ -121,23 +120,6 @@ public:
 	std::string getDescription(int32_t lookDistance) const override;
 
 	CreatureType_t getType() const override { return CREATURETYPE_PLAYER; }
-
-	uint16_t getRandomMount() const;
-	uint16_t getCurrentMount() const;
-	void setCurrentMount(uint16_t mountId);
-	bool isMounted() const { return defaultOutfit.lookMount != 0; }
-	bool toggleMount(bool mount);
-	bool tameMount(uint16_t mountId);
-	bool untameMount(uint16_t mountId);
-	bool hasMount(const Mount* mount) const;
-	bool hasMounts() const;
-	void dismount();
-
-	bool wasMounted() const { return wasMounted_; }
-	void setWasMounted(bool wasMounted) { wasMounted_ = wasMounted; }
-
-	bool getRandomizeMount() const { return randomizeMount; }
-	void setRandomizeMount(bool mode) { randomizeMount = mode; }
 
 	void sendFYIBox(const std::string& message)
 	{
@@ -216,7 +198,7 @@ public:
 		return storeInbox;
 	}
 
-	uint32_t getClientIcons() const;
+	uint64_t getClientIcons() const;
 
 	const GuildWarVector& getGuildWarVector() const { return guildWarVector; }
 
@@ -453,11 +435,7 @@ public:
 	bool editVIP(uint32_t vipGuid, const std::string& description, uint32_t icon, bool notify);
 
 	// follow functions
-	void setFollowCreature(const std::shared_ptr<Creature>& creature) override;
 	void goToFollowCreature() override;
-
-	// follow events
-	void onUnfollowCreature() override;
 
 	// walk events
 	void onWalk(Direction& dir) override;
@@ -478,8 +456,6 @@ public:
 	void setSecureMode(bool mode) { secureMode = mode; }
 
 	// combat functions
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature) override;
-	void removeAttackedCreature() override;
 	bool isImmune(CombatType_t type) const override;
 	bool isImmune(ConditionType_t type) const override;
 	bool hasShield() const;
@@ -552,7 +528,6 @@ public:
 	void onAttackedCreatureBlockHit(BlockType_t blockType) override;
 	void onBlockHit() override;
 	void onChangeZone(ZoneType_t zone) override;
-	void onAttackedCreatureChangeZone(ZoneType_t zone) override;
 	void onIdleStatus() override;
 
 	LightInfo getCreatureLight() const override;
@@ -573,12 +548,6 @@ public:
 			client->sendCreatureSkull(creature);
 		}
 	}
-	bool canWear(uint32_t lookType, uint8_t addons) const;
-	bool hasOutfit(uint32_t lookType, uint8_t addons);
-	void addOutfit(uint16_t lookType, uint8_t addons);
-	bool removeOutfit(uint16_t lookType);
-	bool removeOutfitAddon(uint16_t lookType, uint8_t addons);
-	bool getOutfitAddons(const Outfit& outfit, uint8_t& addons) const;
 
 	size_t getMaxVIPEntries() const;
 	size_t getMaxDepotItems() const;
@@ -751,7 +720,7 @@ public:
 			client->sendCreatureShield(creature);
 		}
 	}
-	void sendSpellCooldown(uint8_t spellId, std::chrono::milliseconds time)
+	void sendSpellCooldown(uint16_t spellId, std::chrono::milliseconds time)
 	{
 		if (client) {
 			client->sendSpellCooldown(spellId, time);
@@ -844,9 +813,6 @@ public:
 	                    const Position& newPos, const std::shared_ptr<const Tile>& oldTile, const Position& oldPos,
 	                    bool teleport) override;
 
-	void onAttackedCreatureDisappear(bool isLogout) override;
-	void onFollowCreatureDisappear(bool isLogout) override;
-
 	// container
 	void onAddContainerItem(const std::shared_ptr<const Item>& item);
 	void onUpdateContainerItem(const std::shared_ptr<const Container>& container,
@@ -872,6 +838,102 @@ public:
 	{
 		if (client) {
 			client->sendItemClasses();
+		}
+	}
+	void sendAllowBugReport() const
+	{
+		if (client) {
+			client->sendAllowBugReport();
+		}
+	}
+	void sendDisableLoginMusic() const
+	{
+		if (client) {
+			client->sendDisableLoginMusic();
+		}
+	}
+	void sendBlessStatus() const
+	{
+		if (client) {
+			client->sendBlessStatus();
+		}
+	}
+	void sendPremiumTrigger() const
+	{
+		if (client) {
+			client->sendPremiumTrigger();
+		}
+	}
+	void sendClientCheck() const
+	{
+		if (client) {
+			client->sendClientCheck();
+		}
+	}
+	void sendGameNews() const
+	{
+		if (client) {
+			client->sendGameNews();
+		}
+	}
+	void sendInventoryIds() const
+	{
+		if (client) {
+			client->sendInventoryIds();
+		}
+	}
+	void sendBosstiaryCooldownTimer() const
+	{
+		if (client) {
+			client->sendBosstiaryCooldownTimer();
+		}
+	}
+	void sendItemsPrice() const
+	{
+		if (client) {
+			client->sendItemsPrice();
+		}
+	}
+	void sendPreyPrices() const
+	{
+		if (client) {
+			client->sendPreyPrices();
+		}
+	}
+	void sendPreyData() const
+	{
+		if (client) {
+			client->sendPreyData();
+		}
+	}
+	void sendTaskHuntingData() const
+	{
+		if (client) {
+			client->sendTaskHuntingData();
+		}
+	}
+	void sendForgingData() const
+	{
+		if (client) {
+			client->sendForgingData();
+		}
+	}
+	void sendVIPGroups() const
+	{
+		if (client) {
+			client->sendVIPGroups();
+		}
+	}
+	void sendLootContainers() const
+	{
+		if (client) {
+			client->sendLootContainers();
+		}
+	}
+	void sendHousesInfo() const
+	{
+		if (client) {
+			client->sendHousesInfo();
 		}
 	}
 	void sendClientFeatures() const
@@ -923,10 +985,11 @@ public:
 			client->sendCreatureHealth(creature);
 		}
 	}
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type,
+	                       SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendDistanceShoot(from, to, type);
+			client->sendDistanceShoot(from, to, type, source);
 		}
 	}
 	void sendHouseWindow(const std::shared_ptr<House>& house, uint32_t listId) const;
@@ -943,16 +1006,16 @@ public:
 			client->sendIcons(getClientIcons());
 		}
 	}
-	void sendMagicEffect(uint8_t type) const
+	void sendMagicEffect(uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(getPosition(), type);
+			client->sendMagicEffect(getPosition(), type, source);
 		}
 	}
-	void sendMagicEffect(const Position& pos, uint8_t type) const
+	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL) const
 	{
 		if (client) {
-			client->sendMagicEffect(pos, type);
+			client->sendMagicEffect(pos, type, source);
 		}
 	}
 	void sendStats();
@@ -1100,18 +1163,6 @@ public:
 			client->sendOpenPrivateChannel(receiver);
 		}
 	}
-	void sendOutfitWindow()
-	{
-		if (client) {
-			client->sendOutfitWindow();
-		}
-	}
-	void sendPodiumWindow(const std::shared_ptr<const Item>& item)
-	{
-		if (client) {
-			client->sendPodiumWindow(item);
-		}
-	}
 	void sendCloseContainer(uint8_t cid)
 	{
 		if (client) {
@@ -1178,8 +1229,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(SchedulerTask_ptr task);
-	void setNextActionTask(SchedulerTask_ptr task);
+	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
 	void setNextAction(std::chrono::steady_clock::time_point time) { nextAction = std::max(nextAction, time); }
 	bool canDoAction() const { return nextAction <= std::chrono::steady_clock::now(); }
@@ -1261,8 +1312,6 @@ private:
 	std::map<uint8_t, OpenContainer> openContainers;
 	std::map<uint32_t, std::shared_ptr<DepotChest>> depotChests;
 
-	std::map<uint16_t, uint8_t> outfits;
-	std::unordered_set<uint16_t> mounts;
 	GuildWarVector guildWarVector;
 
 	std::list<ShopInfo> shopItemList;
@@ -1270,7 +1319,7 @@ private:
 	std::forward_list<std::weak_ptr<Party>> invitePartyList;
 	std::forward_list<uint32_t> modalWindows;
 	std::forward_list<std::string> learnedInstantSpellList;
-	std::forward_list<Condition*>
+	std::forward_list<std::unique_ptr<Condition>>
 	    storedConditionList; // TODO: This variable is only temporarily used when logging in, get rid of it somehow
 
 	std::string name;
@@ -1295,7 +1344,7 @@ private:
 	std::chrono::steady_clock::time_point lastToggleMount = std::chrono::steady_clock::time_point::min();
 	std::chrono::steady_clock::time_point nextAction = std::chrono::steady_clock::time_point::min();
 
-	ProtocolGame_ptr client;
+	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
@@ -1308,7 +1357,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	SchedulerTask_ptr walkTask;
+	std::unique_ptr<SchedulerTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;
@@ -1368,12 +1417,10 @@ private:
 	bool chaseMode = false;
 	bool secureMode = false;
 	bool inMarket = false;
-	bool wasMounted_ = false;
 	bool ghostMode = false;
 	bool pzLocked = false;
 	bool addAttackSkillPoint = false;
 	bool inventoryAbilities[CONST_SLOT_LAST + 1] = {};
-	bool randomizeMount = false;
 
 	void updateItemsLight(bool internal = false);
 	int32_t getStepSpeed() const override

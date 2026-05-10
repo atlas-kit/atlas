@@ -67,21 +67,21 @@ jobs:
           buildPresetAdditionalArgs: "['--config', 'Debug']"
 
       - name: Upload build logs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: logs-${{ matrix.os }}-${{ github.sha }}
           path: ${{ github.workspace }}/vcpkg/buildtrees/**/*.log
         if: ${{ failure() }}
 
       - name: Upload artifact binary
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ !startsWith(matrix.os, 'windows') }}
         with:
           name: tfs-${{ matrix.os }}-${{ github.sha }}
           path: ${{ github.workspace }}/build/Debug/tfs
 
       - name: Upload artifact binary (exe)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ startsWith(matrix.os, 'windows') }}
         with:
           name: tfs-${{ matrix.os }}-${{ github.sha }}

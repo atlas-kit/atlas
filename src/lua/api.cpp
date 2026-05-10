@@ -5,7 +5,6 @@
 #include "../game.h"
 #include "../monster.h"
 #include "../monsters.h"
-#include "../mounts.h"
 #include "../npc.h"
 #include "../podium.h"
 #include "../spells.h"
@@ -182,19 +181,6 @@ Outfit_t getOutfit(lua_State* L, int32_t arg)
 	return outfit;
 }
 
-Outfit getOutfitClass(lua_State* L, int32_t arg)
-{
-	Outfit outfit{
-	    .name = getFieldString(L, arg, "name"),
-	    .lookType = getField<uint16_t>(L, arg, "lookType"),
-	    .premium = getField<uint8_t>(L, arg, "premium") == 1,
-	    .unlocked = getField<uint8_t>(L, arg, "unlocked") == 1,
-	};
-
-	lua_pop(L, 4);
-	return outfit;
-}
-
 LuaVariant getVariant(lua_State* L, int32_t arg)
 {
 	LuaVariant var;
@@ -343,16 +329,6 @@ void pushOutfit(lua_State* L, const Outfit_t& outfit)
 	setField(L, "lookMountBody", outfit.lookMountBody);
 	setField(L, "lookMountLegs", outfit.lookMountLegs);
 	setField(L, "lookMountFeet", outfit.lookMountFeet);
-}
-
-void pushOutfit(lua_State* L, const Outfit* outfit)
-{
-	lua_createtable(L, 0, 4);
-	setField(L, "lookType", outfit->lookType);
-	setField(L, "name", outfit->name);
-	setField(L, "premium", outfit->premium);
-	setField(L, "unlocked", outfit->unlocked);
-	setMetatable(L, -1, "Outfit");
 }
 
 void pushLoot(lua_State* L, const std::vector<LootBlock>& lootList)

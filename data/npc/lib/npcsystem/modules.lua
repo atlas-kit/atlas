@@ -508,7 +508,7 @@ if not Modules then
 		local msg = "I can bring you to "
 		--local i = 1
 		local maxn = #module.destinations
-		for i, destination in pairs(module.destinations) do
+		for i, destination in ipairs(module.destinations) do
 			msg = msg .. destination
 			if i == maxn - 1 then
 				msg = msg .. " and "
@@ -517,7 +517,6 @@ if not Modules then
 			else
 				msg = msg .. ", "
 			end
-			i = i + 1
 		end
 
 		module.npcHandler:say(msg, cid)

@@ -9,9 +9,6 @@
 
 inline constexpr auto SCHEDULER_MINTICKS = 50ms;
 
-class SchedulerTask;
-using SchedulerTask_ptr = std::unique_ptr<SchedulerTask>;
-
 class SchedulerTask : public Task
 {
 public:
@@ -25,14 +22,16 @@ public:
 private:
 	uint32_t eventId = 0;
 	std::chrono::milliseconds delay = std::chrono::milliseconds::zero();
+
+	friend std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds, TaskFunc&&);
 };
 
-SchedulerTask_ptr createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f);
+std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f);
 
 class Scheduler : public ThreadHolder<Scheduler>
 {
 public:
-	uint32_t addEvent(SchedulerTask_ptr&& task);
+	uint32_t addEvent(std::unique_ptr<SchedulerTask>&& task);
 	void stopEvent(uint32_t eventId);
 
 	void shutdown();

@@ -42,17 +42,17 @@ void Actions::clear(bool fromLua)
 
 LuaScriptInterface& Actions::getScriptInterface() { return scriptInterface; }
 
-Event_ptr Actions::getEvent(const std::string& nodeName)
+std::unique_ptr<Event> Actions::getEvent(const std::string& nodeName)
 {
 	if (!boost::iequals(nodeName, "action")) {
 		return nullptr;
 	}
-	return Event_ptr(new Action(&scriptInterface));
+	return std::make_unique<Action>(&scriptInterface);
 }
 
 bool Actions::registerLuaEvent(Action* event)
 {
-	Action_ptr action{event};
+	const std::unique_ptr<Action> action{event};
 	if (isValid(ids, event)) {
 		const auto& range = getItemIdRange(event);
 		for (auto& id : range) {

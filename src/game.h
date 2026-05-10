@@ -7,7 +7,6 @@
 #include "groups.h"
 #include "map.h"
 #include "monster.h"
-#include "mounts.h"
 #include "npc.h"
 #include "player.h"
 #include "wildcardtree.h"
@@ -80,7 +79,7 @@ public:
 
 	void start(ServiceManager* manager);
 
-	void forceAddCondition(uint32_t creatureId, Condition* condition);
+	void forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition);
 	void forceRemoveCondition(uint32_t creatureId, ConditionType_t type);
 
 	void loadMainMap(const std::string& filename);
@@ -368,21 +367,18 @@ public:
 	void playerRequestRemoveVip(uint32_t playerId, uint32_t guid);
 	void playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::string& description, uint32_t icon,
 	                          bool notify);
-	void playerTurn(uint32_t playerId, Direction dir);
 	void playerRequestEditPodium(uint32_t playerId, const Position& position, uint8_t stackPos,
 	                             const uint16_t spriteId);
 	void playerEditPodium(uint32_t playerId, Outfit_t outfit, const Position& position, uint8_t stackPos,
 	                      const uint16_t spriteId, bool podiumVisible, Direction direction);
 	void playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, const std::string& receiver,
 	               const std::string& text);
-	void playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomizeMount = false);
 	void playerInviteToParty(uint32_t playerId, uint32_t invitedId);
 	void playerJoinParty(uint32_t playerId, uint32_t leaderId);
 	void playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
 	void playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
 	void playerLeaveParty(uint32_t playerId);
 	void playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpActive);
-	void playerToggleMount(uint32_t playerId, bool mount);
 	void playerLeaveMarket(uint32_t playerId);
 	void playerBrowseMarket(uint32_t playerId, uint16_t spriteId);
 	void playerBrowseMarketOwnOffers(uint32_t playerId);
@@ -394,7 +390,7 @@ public:
 	                             uint16_t amount);
 
 	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
-	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
+	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
 
@@ -431,7 +427,7 @@ public:
 	                    bool ignoreResistances = false);
 
 	void combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-	                       uint8_t& effect);
+	                       uint16_t& effect);
 
 	bool combatChangeHealth(const std::shared_ptr<Creature>& attacker, const std::shared_ptr<Creature>& target,
 	                        CombatDamage& damage);
@@ -441,11 +437,11 @@ public:
 	// animation help functions
 	void addCreatureHealth(const std::shared_ptr<const Creature>& target);
 	static void addCreatureHealth(const SpectatorVec& spectators, const std::shared_ptr<const Creature>& target);
-	void addMagicEffect(const Position& pos, uint8_t effect);
-	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect);
-	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect);
+	void addMagicEffect(const Position& pos, uint16_t effect);
+	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect);
+	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect);
 	static void addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-	                              uint8_t effect);
+	                              uint16_t effect);
 
 	void startDecay(const std::shared_ptr<Item>& item);
 
@@ -471,7 +467,6 @@ public:
 
 	Groups groups;
 	Map map;
-	Mounts mounts;
 
 	std::vector<std::shared_ptr<Item>> toDecayItems;
 
