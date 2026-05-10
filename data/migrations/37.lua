@@ -13,6 +13,7 @@ function onUpdateDatabase()
     end
 
     local query = DBInsert("INSERT INTO `player_storage` (`player_id`, `key`, `value`) VALUES ")
+    local rows = 0
 
     do
         local resultId = db.storeQuery("SELECT `player_id`, `outfit_id`, `addons` FROM `player_outfits`")
@@ -24,6 +25,7 @@ function onUpdateDatabase()
 
                 local storageKey = OUTFITS_BASE + outfitId
                 query:addRow(string.format("%d, %d, %d", playerId, storageKey, addons))
+                rows = rows + 1
             until not result.next(resultId)
             result.free(resultId)
         end
@@ -38,6 +40,7 @@ function onUpdateDatabase()
 
                 local storageKey = MOUNTS_BASE + mountId
                 query:addRow(string.format("%d, %d, %d", playerId, storageKey, 1))
+                rows = rows + 1
             until not result.next(resultId)
             result.free(resultId)
         end
@@ -55,17 +58,19 @@ function onUpdateDatabase()
 
                 if currentMount > 0 then
                     query:addRow(string.format("%d, %d, %d", playerId, CURRENT_MOUNT, currentMount))
+                    rows = rows + 1
                 end
 
                 if randomizeMount > 0 then
                     query:addRow(string.format("%d, %d, %d", playerId, RANDOMIZE_MOUNT, randomizeMount))
+                    rows = rows + 1
                 end
             until not result.next(resultId)
             result.free(resultId)
         end
     end
 
-    if not query:execute() then
+    if rows > 0 and not query:execute() then
         tx.rollback()
         return false
     end

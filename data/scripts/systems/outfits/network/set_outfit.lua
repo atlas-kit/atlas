@@ -70,7 +70,7 @@ function handler.onReceive(player, msg)
             player:setCurrentMount(nil)
         end
 
-        player:setOutfit(outfit)
+        player:setOutfitWithMountSpeed(outfit)
         player:setRandomizeMount(randomizeMount)
     elseif outfitType == 1 then -- try outfit from store window
         outfit.lookMount = 0

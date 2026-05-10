@@ -30,6 +30,58 @@ do
     end
 end
 
+do
+    local changingMountOutfit = {}
+    function Player.isChangingMountOutfit(self)
+        return changingMountOutfit[self:getId()] or false
+    end
+
+    function Player.setChangingMountOutfit(self, changing)
+        changingMountOutfit[self:getId()] = changing or nil
+    end
+end
+
+function Player.syncMountSpeed(self, oldLookMount, newLookMount)
+    oldLookMount = oldLookMount or 0
+    newLookMount = newLookMount or 0
+
+    if oldLookMount == newLookMount then
+        return
+    end
+
+    local oldMount = Game.getMountByLookType(oldLookMount)
+    if oldMount ~= nil then
+        self:changeSpeed(-oldMount.speed)
+    end
+
+    local newMount = Game.getMountByLookType(newLookMount)
+    if newMount ~= nil then
+        self:changeSpeed(newMount.speed)
+    end
+end
+
+function Player.setOutfitWithMountSpeed(self, outfit)
+    local oldLookMount = self:getOutfit().lookMount
+
+    self:setChangingMountOutfit(true)
+    local result = self:setOutfit(outfit)
+    self:setChangingMountOutfit(false)
+
+    if result then
+        self:syncMountSpeed(oldLookMount, outfit.lookMount)
+    end
+
+    return result
+end
+
+function Player.restoreMountSpeed(self)
+    local lookMount = self:getOutfit().lookMount
+    local mount = Game.getMountByLookType(lookMount)
+    if mount ~= nil then
+        self:changeSpeed(mount.speed)
+    end
+end
+
 function Player.addMount(self, mountId)
     return self:setStorageValue(PlayerStorageKeys.mountsBase + mountId, 1)
 end
@@ -129,22 +181,14 @@ function Player.mount(self, mount)
 
     local outfit = self:getDefaultOutfit()
     outfit.lookMount = mount.lookType
-    self:setOutfit(outfit)
-    self:changeSpeed(mount.speed)
-    return true
+    return self:setOutfitWithMountSpeed(outfit)
 end
 
 -- Dismounts the current mount: clears outfit mount + removes speed bonus.
 function Player.dismount(self)
     local outfit = self:getDefaultOutfit()
-    local lookMount = outfit.lookMount
     outfit.lookMount = 0
-    self:setOutfit(outfit)
-
-    local mount = Game.getMountByLookType(lookMount)
-    if mount ~= nil then
-        self:changeSpeed(-mount.speed)
-    end
+    return self:setOutfitWithMountSpeed(outfit)
 end
 
 local function getRandomMount(player)
@@ -172,7 +216,7 @@ end
 -- Enforces cooldown when mounting, protection-zone restriction, premium/ownership rules, and CONDITION_OUTFIT.
 function Player.toggleMount(self, mounted)
     if mounted then
-        if not self:getGroup():getAccess() and self:getWasMounted() then
+        if not self:getGroup():getAccess() and not self:getWasMounted() then
             local lastMountToggle = self:getLastMountToggle()
             if os.mtime() - lastMountToggle < Outfits.ToggleMountCooldown then
                 return false
@@ -227,7 +271,6 @@ function Player.toggleMount(self, mounted)
         self:dismount()
     end
 
-    self:setOutfit(self:getDefaultOutfit())
     self:setLastMountToggle(os.mtime())
     return true
 end
