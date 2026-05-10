@@ -1,11 +1,15 @@
 ScheduleEvent = {}
 ScheduleEvent.__index = ScheduleEvent
+ScheduleEvent._events = {}
 
 function ScheduleEvent.new(time)
 	local self = setmetatable({}, ScheduleEvent)
 	self.time = time
 	self.callback = nil
+	self._eventIds = {}
 	self._lastTrigger = {}
+	self._registered = false
+	self._tracked = false
 	return self
 end
 
@@ -35,11 +39,47 @@ local function parseTime(str)
 	return h, m, s
 end
 
-local function safeCall(callback)
-	local success, err = pcall(callback)
+local function safeCall(callback, ...)
+	local success, result = pcall(callback, ...)
 	if not success then
-		print("[Error - ScheduleEvent] Callback failed: " .. tostring(err))
+		print("[Error - ScheduleEvent] Callback failed: " .. tostring(result))
+		return false
 	end
+	return true, result
+end
+
+local function clearEventId(self, eventId)
+	for index, id in ipairs(self._eventIds) do
+		if id == eventId then
+			table.remove(self._eventIds, index)
+			return
+		end
+	end
+end
+
+local function schedule(self, callback, delay, ...)
+	local eventId
+	eventId = addEvent(function(...)
+		clearEventId(self, eventId)
+		callback(...)
+	end, math.max(SCHEDULER_MINTICKS, delay), ...)
+	table.insert(self._eventIds, eventId)
+	return eventId
+end
+
+local function nextDailyDelay(h, m, s)
+	local now = os.time()
+	local nextTime = os.date("*t", now)
+	nextTime.hour = h
+	nextTime.min = m
+	nextTime.sec = s
+
+	local timestamp = os.time(nextTime)
+	if timestamp <= now then
+		timestamp = timestamp + 24 * 60 * 60
+	end
+
+	return (timestamp - now) * 1000
 end
 
 function ScheduleEvent:scheduleInterval(interval)
@@ -48,78 +88,105 @@ function ScheduleEvent:scheduleInterval(interval)
 		return false
 	end
 
+	local nextExecution = os.mtime() + interval
+
 	local function loop()
-		safeCall(self.callback)
-		addEvent(loop, interval)
+		if not self._registered then
+			return
+		end
+
+		safeCall(self.callback, interval)
+
+		nextExecution = nextExecution + interval
+		local delay = nextExecution - os.mtime()
+		while delay < SCHEDULER_MINTICKS do
+			nextExecution = nextExecution + interval
+			delay = nextExecution - os.mtime()
+		end
+
+		schedule(self, function()
+			loop()
+		end, delay)
 	end
 
-	addEvent(loop, interval)
+	schedule(self, function()
+		loop()
+	end, interval)
 	return true
 end
 
 function ScheduleEvent:scheduleTime(h, m, s)
-	local function check()
-		local now = os.date("*t")
-		if not self._lastYear or self._lastYear ~= now.year then
-			self._lastTrigger = {}
-			self._lastYear = now.year
+	local function scheduleNext()
+		if not self._registered then
+			return
 		end
 
-		for stamp in pairs(self._lastTrigger) do
-			local stampYear, stampDay = stamp:match("^(%d+)%-(%d+)%-")
-			stampYear, stampDay = tonumber(stampYear), tonumber(stampDay)
-			if stampYear ~= now.year or stampDay ~= now.yday then
-				self._lastTrigger[stamp] = nil
+		schedule(self, function()
+			if not self._registered then
+				return
 			end
-		end
 
-		local stamp = now.year .. "-" .. now.yday .. "-" .. h .. "-" .. m .. "-" .. s
-		if now.hour == h and now.min == m and now.sec == s and not self._lastTrigger[stamp] then
-			self._lastTrigger[stamp] = true
-			safeCall(self.callback)
-		end
+			local success, result = safeCall(self.callback, self.time)
+			if success and result == false then
+				self:stop()
+				return
+			end
 
-		addEvent(check, 1000)
+			scheduleNext()
+		end, nextDailyDelay(h, m, s))
 	end
 
-	addEvent(check, 1000)
+	scheduleNext()
 	return true
 end
 
 function ScheduleEvent:scheduleDays(dayTimes, dayIntervals)
 	for day, times in pairs(dayTimes) do
 		local function checkTimes()
-			local now = os.date("*t")
-			if now.wday ~= day then
-				addEvent(checkTimes, 1000)
+			if not self._registered then
 				return
 			end
+
+			local now = os.date("*t")
+			if now.wday ~= day then
+				schedule(self, checkTimes, 1000)
+				return
+			end
+
 			for _, t in ipairs(times) do
 				local h, m, s = t[1], t[2], t[3]
 				local stamp = now.yday .. "-" .. h .. "-" .. m .. "-" .. s
 				if now.hour == h and now.min == m and now.sec == s and not self._lastTrigger[stamp] then
 					self._lastTrigger[stamp] = true
-					safeCall(self.callback)
+					safeCall(self.callback, self.time)
 				end
 			end
-			addEvent(checkTimes, 1000)
+			schedule(self, checkTimes, 1000)
 		end
-		addEvent(checkTimes, 1000)
+		schedule(self, checkTimes, 1000)
 	end
 
 	for day, interval in pairs(dayIntervals) do
 		local function loop()
-			if os.date("*t").wday == day then
-				safeCall(self.callback)
+			if not self._registered then
+				return
 			end
-			addEvent(loop, interval)
+
+			if os.date("*t").wday == day then
+				safeCall(self.callback, interval)
+			end
+			schedule(self, loop, interval)
 		end
 
 		local function scheduleInitial()
+			if not self._registered then
+				return
+			end
+
 			if os.date("*t").wday == day then
-				addEvent(loop, interval)
+				schedule(self, loop, interval)
 			else
-				addEvent(scheduleInitial, interval)
+				schedule(self, scheduleInitial, interval)
 			end
 		end
 
@@ -135,16 +202,25 @@ function ScheduleEvent:register()
 		return false
 	end
 
+	self:stop()
+	self._registered = true
+	if not self._tracked then
+		table.insert(ScheduleEvent._events, self)
+		self._tracked = true
+	end
+
+	local registered = false
 	if type(self.time) == "number" then
-		return self:scheduleInterval(self.time)
+		registered = self:scheduleInterval(self.time)
 	elseif type(self.time) == "string" then
 		local h, m, s = parseTime(self.time)
 		if not h then
 			print("[Warning - ScheduleEvent] Invalid time format, expected HH:MM:SS")
+			self:stop()
 			return false
 		end
 
-		return self:scheduleTime(h, m, s)
+		registered = self:scheduleTime(h, m, s)
 	elseif type(self.time) == "table" then
 		local dayTimes, dayIntervals = {}, {}
 		for day, value in pairs(self.time) do
@@ -154,6 +230,7 @@ function ScheduleEvent:register()
 					local h, m, s = parseTime(t)
 					if not h then
 						print("[Warning - ScheduleEvent] Invalid time: " .. tostring(t))
+						self:stop()
 						return false
 					end
 					table.insert(dayTimes[day], {h, m, s})
@@ -162,12 +239,35 @@ function ScheduleEvent:register()
 				dayIntervals[day] = value
 			else
 				print("[Warning - ScheduleEvent] Invalid value for weekday " .. day)
+				self:stop()
 				return false
 			end
 		end
-		return self:scheduleDays(dayTimes, dayIntervals)
+		registered = self:scheduleDays(dayTimes, dayIntervals)
+	else
+		print("[Warning - ScheduleEvent] Invalid time type")
 	end
 
-	print("[Warning - ScheduleEvent] Invalid time type")
-	return false
+	if not registered then
+		self:stop()
+	end
+	return registered
+end
+
+function ScheduleEvent:stop()
+	for _, eventId in ipairs(self._eventIds) do
+		stopEvent(eventId)
+	end
+
+	self._eventIds = {}
+	self._registered = false
+end
+
+function ScheduleEvent.clear()
+	for _, event in ipairs(ScheduleEvent._events) do
+		event:stop()
+		event._tracked = false
+	end
+
+	ScheduleEvent._events = {}
 end
