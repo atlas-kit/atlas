@@ -66,8 +66,6 @@ MarketOfferList getOwnOffers(MarketAction_t action, uint32_t playerId)
 		return offerList;
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
-
 	do {
 		MarketOffer offer;
 		offer.amount = result->getNumber<uint16_t>("amount");

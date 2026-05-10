@@ -92,8 +92,6 @@ bool Monster::canWalkOnFieldType(CombatType_t combatType) const
 	}
 }
 
-void Monster::onAttackedCreatureDisappear(bool) { attackTicks = std::chrono::milliseconds::zero(); }
-
 void Monster::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, MagicEffectClasses)
 {
 	if (creature.get() == this) {

@@ -153,7 +153,7 @@ public:
 
 	static uint32_t monsterAutoID;
 
-	void resetAttackTicks() { attackTicks = 0; }
+	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
 
 private:
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
