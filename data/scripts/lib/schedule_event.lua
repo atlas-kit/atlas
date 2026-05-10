@@ -7,7 +7,6 @@ function ScheduleEvent.new(time)
 	self.time = time
 	self.callback = nil
 	self._eventIds = {}
-	self._lastTrigger = {}
 	self._registered = false
 	self._tracked = false
 	return self
@@ -82,6 +81,22 @@ local function nextDailyDelay(h, m, s)
 	return (timestamp - now) * 1000
 end
 
+local function nextWeekdayDelay(day, h, m, s)
+	local now = os.time()
+	local nextTime = os.date("*t", now)
+	nextTime.hour = h
+	nextTime.min = m
+	nextTime.sec = s
+
+	local daysUntil = (day - nextTime.wday) % 7
+	local timestamp = os.time(nextTime) + daysUntil * 24 * 60 * 60
+	if timestamp <= now then
+		timestamp = timestamp + 7 * 24 * 60 * 60
+	end
+
+	return (timestamp - now) * 1000
+end
+
 local function isValidWeekday(day)
 	return type(day) == "number"
 		and type(SUNDAY) == "number"
@@ -150,28 +165,31 @@ end
 
 function ScheduleEvent:scheduleDays(dayTimes, dayIntervals)
 	for day, times in pairs(dayTimes) do
-		local function checkTimes()
-			if not self._registered then
-				return
-			end
+		for _, time in ipairs(times) do
+			local h, m, s = time[1], time[2], time[3]
 
-			local now = os.date("*t")
-			if now.wday ~= day then
-				schedule(self, checkTimes, 1000)
-				return
-			end
-
-			for _, t in ipairs(times) do
-				local h, m, s = t[1], t[2], t[3]
-				local stamp = now.yday .. "-" .. h .. "-" .. m .. "-" .. s
-				if now.hour == h and now.min == m and now.sec == s and not self._lastTrigger[stamp] then
-					self._lastTrigger[stamp] = true
-					safeCall(self.callback, self.time)
+			local function scheduleNext()
+				if not self._registered then
+					return
 				end
+
+				schedule(self, function()
+					if not self._registered then
+						return
+					end
+
+					local success, result = safeCall(self.callback, self.time)
+					if success and result == false then
+						self:stop()
+						return
+					end
+
+					scheduleNext()
+				end, nextWeekdayDelay(day, h, m, s))
 			end
-			schedule(self, checkTimes, 1000)
+
+			scheduleNext()
 		end
-		schedule(self, checkTimes, 1000)
 	end
 
 	-- A weekday interval runs repeatedly at the configured interval, but only while that weekday is active.
