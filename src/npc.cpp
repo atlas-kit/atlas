@@ -664,14 +664,8 @@ int NpcScriptInterface::luaActionFollow(lua_State* L)
 		return 1;
 	}
 
-	const auto& followedPlayer = tfs::lua::getPlayer(L, 1);
-	if (followedPlayer) {
-		npc->setFollowCreature(followedPlayer);
-		tfs::lua::pushBoolean(L, npc->canFollowCreature(followedPlayer));
-	} else {
-		npc->removeFollowCreature();
-		tfs::lua::pushBoolean(L, true);
-	}
+	npc->setFollowCreature(tfs::lua::getPlayer(L, 1));
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 

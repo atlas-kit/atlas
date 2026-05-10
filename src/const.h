@@ -4,7 +4,7 @@
 #ifndef FS_CONST_H
 #define FS_CONST_H
 
-static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 24590;
+static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
 static constexpr int32_t MIN_MARKET_FEE = 20;
 static constexpr int32_t MAX_MARKET_FEE = 100000;
 
@@ -13,12 +13,14 @@ enum MagicEffectsType_t : uint8_t
 	MAGIC_EFFECTS_END_LOOP = 0,              // ends the magic effect loop
 	MAGIC_EFFECTS_DELTA = 1,                 // needs uint8_t delta after type to adjust position
 	MAGIC_EFFECTS_DELAY = 2,                 // needs uint16_t delay after type to delay in miliseconds effect display
-	MAGIC_EFFECTS_CREATE_EFFECT = 3,         // needs uint8_t effectid after type
-	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT = 4, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
-	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED = 5, // needs uint8_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_EFFECT = 3,         // needs uint16_t effectid after type (changed from uint8_t in 13.20)
+	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT = 4, // needs uint16_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED = 5, // needs uint16_t and deltaX(int8_t), deltaY(int8_t) after type
+	MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT = 6,       // needs uint16_t soundId after type (added in 13.00)
+	MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT = 7,  // needs uint8_t and uint16_t after type (added in 13.00)
 };
 
-enum MagicEffectClasses : uint8_t
+enum MagicEffectClasses : uint16_t
 {
 	CONST_ME_NONE,
 
@@ -175,7 +177,7 @@ enum MagicEffectClasses : uint8_t
 	CONST_ME_FOAM = 241,
 };
 
-enum ShootType_t : uint8_t
+enum ShootType_t : uint16_t
 {
 	CONST_ANI_NONE,
 
@@ -298,8 +300,8 @@ enum MessageClasses : uint8_t
 	// MESSAGE_THANK_YOU = 41, // not working (?)
 	MESSAGE_MARKET = 42, // Window "Market Message" + "Ok" button
 	// MESSAGE_MANA = 43, // not working (?)
-	MESSAGE_BEYOND_LAST = 44,     // White, console only
-	MESSAGE_TOURNAMENT_INFO = 45, // Window "Tournament" + "Ok" button
+	MESSAGE_BEYOND_LAST = 44, // White, console only
+	// unused 45, old window "Tournament" + "Ok" button
 	// unused 46?
 	// unused 47?
 	MESSAGE_ATTENTION = 48,        // White, console only
@@ -407,7 +409,7 @@ enum TextColor_t : uint8_t
 	TEXTCOLOR_NONE = 255,
 };
 
-enum Icons_t
+enum Icons_t : uint64_t
 {
 	ICON_POISON = 1 << 0,
 	ICON_BURN = 1 << 1,
@@ -436,6 +438,8 @@ enum Icons_t
 	ICON_GOSHNAR4 = 1 << 24,
 	ICON_GOSHNAR5 = 1 << 25,
 	ICON_MANASHIELD_BREAKABLE = 1 << 26,
+	ICON_AGONY = 1 << 27,
+	ICON_POWERLESS = 1 << 28,
 };
 
 enum WeaponType_t : uint8_t
@@ -602,9 +606,20 @@ enum ResourceTypes_t : uint8_t
 {
 	RESOURCE_BANK_BALANCE = 0x00,
 	RESOURCE_GOLD_EQUIPPED = 0x01,
+	RESOURCE_INVENTORY_CURRENCY_CUSTOM = 0x02,
 	RESOURCE_PREY_WILDCARDS = 0x0A,
 	RESOURCE_DAILYREWARD_STREAK = 0x14,
 	RESOURCE_DAILYREWARD_JOKERS = 0x15,
+	RESOURCE_TASK_HUNTING = 0x32,
+	RESOURCE_FORGE_DUST = 0x46,
+	RESOURCE_FORGE_SLIVER = 0x47,
+	RESOURCE_FORGE_CORES = 0x48,
+	RESOURCE_LESSER_GEMS = 0x51,
+	RESOURCE_REGULAR_GEMS = 0x52,
+	RESOURCE_GREATER_GEMS = 0x53,
+	RESOURCE_LESSER_FRAGMENT = 0x54,
+	RESOURCE_GREATER_FRAGMENT = 0x55,
+	RESOURCE_WHEEL_OF_DESTINY = 0x56,
 };
 
 enum PlayerFlags : uint64_t

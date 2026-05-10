@@ -23,7 +23,20 @@ enum SessionEndTypes_t : uint8_t
 	SESSION_END_UNKNOWN2 = 3, // unknown, no difference from logout
 };
 
-using ProtocolGame_ptr = std::shared_ptr<ProtocolGame>;
+enum class DisconnectClient_t : uint8_t
+{
+	Default = 0,
+	Notice = 1,
+	Outdated = 2,
+};
+
+enum class SourceEffect_t : uint8_t
+{
+	GLOBAL = 0,
+	OWN = 1,
+	OTHERS = 2,
+	CREATURES = 3,
+};
 
 struct TextMessage
 {
@@ -59,7 +72,7 @@ public:
 	};
 	static const char* protocol_name() { return "gameworld protocol"; }
 
-	explicit ProtocolGame(Connection_ptr connection) : Protocol(connection) {}
+	explicit ProtocolGame(std::shared_ptr<Connection> connection) : Protocol(std::move(connection)) {}
 
 	void login(uint32_t characterId, uint32_t accountId, OperatingSystem_t operatingSystem);
 	void forceLogout(bool displayEffect);
@@ -68,9 +81,8 @@ public:
 	uint16_t getVersion() const { return version; }
 
 private:
-	ProtocolGame_ptr getThis() { return std::static_pointer_cast<ProtocolGame>(shared_from_this()); }
 	void connect(uint32_t playerId, OperatingSystem_t operatingSystem);
-	void disconnectClient(const std::string& message) const;
+	void disconnectClient(const std::string& message, DisconnectClient_t reason = DisconnectClient_t::Default) const;
 	void writeToOutputBuffer(const NetworkMessage& msg);
 
 	void release() override;
@@ -162,11 +174,12 @@ private:
 	void sendToChannel(const std::shared_ptr<const Creature>& creature, SpeakClasses type, const std::string& text,
 	                   uint16_t channelId);
 	void sendPrivateMessage(const std::shared_ptr<const Player>& speaker, SpeakClasses type, const std::string& text);
-	void sendIcons(uint32_t icons);
+	void sendIcons(uint64_t icons);
 	void sendFYIBox(const std::string& message);
 
-	void sendDistanceShoot(const Position& from, const Position& to, uint8_t type);
-	void sendMagicEffect(const Position& pos, uint8_t type);
+	void sendDistanceShoot(const Position& from, const Position& to, uint16_t type,
+	                       SourceEffect_t source = SourceEffect_t::GLOBAL);
+	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL);
 	void sendCreatureHealth(const std::shared_ptr<const Creature>& creature);
 	void sendSkills();
 	void sendCreatureTurn(const std::shared_ptr<const Creature>& creature, uint32_t stackpos);
@@ -222,13 +235,33 @@ private:
 	void sendPendingStateEntered();
 	void sendEnterWorld();
 
+	// New 15.11 login packets
+	void sendAllowBugReport();
+	void sendDisableLoginMusic();
+	void sendBlessStatus();
+	void sendPremiumTrigger();
+	void sendClientCheck();
+	void sendGameNews();
+	void sendInventoryIds();
+
+	// Stubs for systems not yet implemented
+	void sendBosstiaryCooldownTimer();
+	void sendItemsPrice();
+	void sendPreyPrices();
+	void sendPreyData();
+	void sendTaskHuntingData();
+	void sendForgingData();
+	void sendVIPGroups();
+	void sendLootContainers();
+	void sendHousesInfo();
+
 	void sendFightModes();
 
 	void sendCreatureLight(const std::shared_ptr<const Creature>& creature);
 
 	void sendCreatureSquare(const std::shared_ptr<const Creature>& creature, SquareColor_t color);
 
-	void sendSpellCooldown(uint8_t spellId, uint32_t time);
+	void sendSpellCooldown(uint16_t spellId, uint32_t time);
 	void sendSpellGroupCooldown(SpellGroup_t groupId, uint32_t time);
 	void sendUseItemCooldown(uint32_t time);
 	void sendSupplyUsed(const uint16_t clientId);
@@ -302,6 +335,10 @@ private:
 	// shop
 	void AddShopItem(NetworkMessage& msg, const ShopInfo& item);
 
+	// New 15.11 parse stubs
+	void parseImbuementWindow(NetworkMessage& msg);
+	void parseWeaponProficiency(NetworkMessage& msg);
+
 	// otclient
 	void parseExtendedOpcode(NetworkMessage& msg);
 
@@ -312,11 +349,15 @@ private:
 
 	uint32_t eventConnect = 0;
 	uint32_t challengeTimestamp = 0;
+	int32_t clientVersion = 0;
 	uint16_t version = CLIENT_VERSION_MIN;
+	uint16_t otclientV8 = 0;
 
 	uint8_t challengeRandom = 0;
 
 	bool acceptPackets = false;
+	bool isOTC = false;
+	bool loggedIn = false;
 };
 
 #endif // FS_PROTOCOLGAME_H

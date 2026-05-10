@@ -560,7 +560,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	}
 
 	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+		creature->removeCondition(condition.get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -3159,14 +3159,14 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	if (player->getAttackedCreature() && creatureId == 0) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
 
 	const auto& attackCreature = getCreatureByID(creatureId);
 	if (!attackCreature) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
@@ -3175,7 +3175,7 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	if (ret != RETURNVALUE_NOERROR) {
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		return;
 	}
 
@@ -3191,12 +3191,12 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 		return;
 	}
 
-	player->removeAttackedCreature();
+	player->setAttackedCreature(nullptr);
 
 	if (const auto& followCreature = getCreatureByID(creatureId)) {
 		player->setFollowCreature(followCreature);
 	} else {
-		player->removeFollowCreature();
+		player->setFollowCreature(nullptr);
 	}
 
 	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
@@ -3264,16 +3264,6 @@ void Game::playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::str
 {
 	if (const auto& player = getPlayerByID(playerId)) {
 		player->editVIP(guid, description, icon, notify);
-	}
-}
-
-void Game::playerTurn(uint32_t playerId, Direction dir)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		if (tfs::events::player::onTurn(player, dir)) {
-			player->resetIdleTime();
-			internalCreatureTurn(player, dir);
-		}
 	}
 }
 
@@ -3484,8 +3474,8 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -3801,7 +3791,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 		} else if (blockType == BLOCK_ARMOR) {
 			addMagicEffect(targetPos, CONST_ME_BLOCKHIT);
 		} else if (blockType == BLOCK_IMMUNITY) {
-			uint8_t hitEffect = 0;
+			uint16_t hitEffect = 0;
 			switch (combatType) {
 				case COMBAT_UNDEFINEDDAMAGE: {
 					return;
@@ -3866,7 +3856,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 }
 
 void Game::combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-                             uint8_t& effect)
+                             uint16_t& effect)
 {
 	switch (combatType) {
 		case COMBAT_PHYSICALDAMAGE: {
@@ -4237,7 +4227,7 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		message.primary.value = damage.primary.value;
 		message.secondary.value = damage.secondary.value;
 
-		uint8_t hitEffect;
+		uint16_t hitEffect;
 		if (message.primary.value) {
 			combatGetTypeInfo(damage.primary.type, target, message.primary.color, hitEffect);
 			if (hitEffect != CONST_ME_NONE) {
@@ -4474,14 +4464,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const std::shared_p
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4490,7 +4480,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4501,7 +4491,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 }
 
 void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-                             uint8_t effect)
+                             uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -5089,13 +5079,13 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		return;
 	}
 
-	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
-	if (offerAccountId == player->getAccount()) {
-		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
+	if (amount > offer.amount) {
 		return;
 	}
 
-	if (amount > offer.amount) {
+	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
+	if (offerAccountId == player->getAccount()) {
+		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
 		return;
 	}
 
@@ -5250,10 +5240,10 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::str
 	}
 }
 
-void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg)
+void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		tfs::events::player::onNetworkMessage(player, recvByte, msg);
+		tfs::events::player::onNetworkMessage(player, recvByte, std::move(msg));
 	}
 }
 
@@ -5306,15 +5296,14 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)

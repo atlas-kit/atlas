@@ -9,6 +9,8 @@
 #include "spawn.h"
 #include "town.h"
 
+#include <boost/container_hash/hash.hpp>
+
 class Creature;
 class Tile;
 
@@ -18,6 +20,18 @@ static constexpr uint16_t MAP_NORMALWALKCOST = 10;
 static constexpr uint16_t MAP_DIAGONALWALKCOST = 25;
 
 using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::owner_less<std::shared_ptr<Creature>>>;
+
+struct PositionHash
+{
+	[[nodiscard]] size_t operator()(const Position& position) const noexcept
+	{
+		size_t seed = 0;
+		boost::hash_combine(seed, position.x);
+		boost::hash_combine(seed, position.y);
+		boost::hash_combine(seed, position.z);
+		return seed;
+	}
+};
 
 struct FindPathParams;
 struct AStarNode
@@ -58,7 +72,7 @@ private:
 	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
 };
 
-using SpectatorCache = std::map<Position, SpectatorVec>;
+using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;
 
 static constexpr int32_t FLOOR_BITS = 3;
 static constexpr int32_t FLOOR_SIZE = (1 << FLOOR_BITS);
