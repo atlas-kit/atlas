@@ -1051,10 +1051,10 @@ Event = {}
 
 -- MARK: ScheduleEvent
 ---@class ScheduleEvent
----@field time number|string|table<number, number|string[]> Interval(ms), "HH:MM:SS" string, or table mapping weekday constants to intervals or time string arrays
+---@field time number|string|table<number, number|string|string[]> Interval(ms), "HH:MM:SS" string, or table mapping weekday constants to intervals or time string(s)
 ---@field onTrigger fun():nil Callback function executed when the event triggers
 ---@field register fun(self:ScheduleEvent):boolean Registers the event, returns true if successful
----@operator call(number|string|table):ScheduleEvent Creates a new ScheduleEvent instance
+---@operator call(number|string|table<number, number|string|string[]>):ScheduleEvent Creates a new ScheduleEvent instance
 ScheduleEvent = {}
 
 -- MARK: Thing

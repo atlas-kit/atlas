@@ -256,6 +256,15 @@ function ScheduleEvent:register()
 					end
 					table.insert(dayTimes[day], {h, m, s})
 				end
+			elseif type(value) == "string" then
+				local h, m, s = parseTime(value)
+				if not h then
+					print("[Warning - ScheduleEvent] Invalid time: " .. tostring(value))
+					self:stop()
+					return false
+				end
+
+				dayTimes[day] = {{h, m, s}}
 			elseif type(value) == "number" then
 				dayIntervals[day] = value
 			else
