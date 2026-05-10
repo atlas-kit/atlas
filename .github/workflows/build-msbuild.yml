@@ -1,0 +1,68 @@
+name: Build with MSBuild
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - dev
+      - v*
+
+    paths:
+      - .github/workflows/build-msbuild.yml
+      - src/**
+      - vc18/**
+      - vcpkg.json
+
+  pull_request:
+    paths:
+      - .github/workflows/build-msbuild.yml
+      - src/**
+      - vc18/**
+      - vcpkg.json
+
+jobs:
+  build-msbuild:
+    name: Visual Studio Solution
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BUILD_TYPE: release
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Cache vcpkg
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-msbuild-${{ hashFiles('vcpkg.json') }}
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          doNotCache: false
+
+      - name: Integrate vcpkg with MSBuild
+        run: ${{ github.workspace }}\vcpkg\vcpkg.exe integrate install
+
+      - name: Build solution
+        working-directory: vc18
+        # PlatformToolset override: the project pins v145 which is only available
+        # in newer Visual Studio versions. Fall back to whatever the runner ships
+        # with, so the CI does not lag behind preview toolsets.
+        run: msbuild atlas.vcxproj /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /p:VcpkgManifestInstall=true /p:PlatformToolset=v143 /m
+
+      - name: Upload artifact binary (exe)
+        uses: actions/upload-artifact@v7
+        with:
+          name: tfs-msbuild-${{ github.sha }}
+          path: |
+            ${{ github.workspace }}/vc18/x64/Release/*.exe
+            ${{ github.workspace }}/vc18/x64/Release/*.dll
