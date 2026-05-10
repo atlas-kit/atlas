@@ -82,6 +82,14 @@ local function nextDailyDelay(h, m, s)
 	return (timestamp - now) * 1000
 end
 
+local function isValidWeekday(day)
+	return type(day) == "number"
+		and type(SUNDAY) == "number"
+		and type(SATURDAY) == "number"
+		and day >= SUNDAY
+		and day <= SATURDAY
+end
+
 function ScheduleEvent:scheduleInterval(interval)
 	if interval < SCHEDULER_MINTICKS then
 		print("[Warning - ScheduleEvent] Interval must be >= " .. SCHEDULER_MINTICKS .. "ms")
@@ -166,6 +174,7 @@ function ScheduleEvent:scheduleDays(dayTimes, dayIntervals)
 		schedule(self, checkTimes, 1000)
 	end
 
+	-- A weekday interval runs repeatedly at the configured interval, but only while that weekday is active.
 	for day, interval in pairs(dayIntervals) do
 		local function loop()
 			if not self._registered then
@@ -224,7 +233,19 @@ function ScheduleEvent:register()
 	elseif type(self.time) == "table" then
 		local dayTimes, dayIntervals = {}, {}
 		for day, value in pairs(self.time) do
+			if not isValidWeekday(day) then
+				print("[Warning - ScheduleEvent] Invalid weekday: " .. tostring(day))
+				self:stop()
+				return false
+			end
+
 			if type(value) == "table" then
+				if #value == 0 then
+					print("[Warning - ScheduleEvent] Weekday " .. day .. " has no configured times")
+					self:stop()
+					return false
+				end
+
 				dayTimes[day] = {}
 				for _, t in ipairs(value) do
 					local h, m, s = parseTime(t)
