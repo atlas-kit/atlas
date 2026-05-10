@@ -164,8 +164,9 @@ bool Condition::executeCondition(const std::shared_ptr<Creature>&, int32_t inter
 	return getEndTime() >= OTSYS_TIME();
 }
 
-Condition* Condition::createCondition(ConditionId_t id, ConditionType_t type, int32_t ticks, int32_t param /* = 0*/,
-                                      bool buff /* = false*/, uint32_t subId /* = 0*/, bool aggressive /* = false */)
+std::unique_ptr<Condition> Condition::createCondition(ConditionId_t id, ConditionType_t type, int32_t ticks,
+                                                      int32_t param /* = 0*/, bool buff /* = false*/,
+                                                      uint32_t subId /* = 0*/, bool aggressive /* = false */)
 {
 	switch (type) {
 		case CONDITION_POISON:
@@ -176,38 +177,39 @@ Condition* Condition::createCondition(ConditionId_t id, ConditionType_t type, in
 		case CONDITION_DAZZLED:
 		case CONDITION_CURSED:
 		case CONDITION_BLEEDING:
-			return new ConditionDamage(id, type, buff, subId, aggressive);
+			return std::make_unique<ConditionDamage>(id, type, buff, subId, aggressive);
 
 		case CONDITION_HASTE:
 		case CONDITION_PARALYZE:
-			return new ConditionSpeed(id, type, ticks, buff, subId, param, aggressive);
+			return std::make_unique<ConditionSpeed>(id, type, ticks, buff, subId, param, aggressive);
 
 		case CONDITION_INVISIBLE:
-			return new ConditionInvisible(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionInvisible>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_OUTFIT:
-			return new ConditionOutfit(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionOutfit>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_LIGHT:
-			return new ConditionLight(id, type, ticks, buff, subId, param & 0xFF, (param & 0xFF00) >> 8, aggressive);
+			return std::make_unique<ConditionLight>(id, type, ticks, buff, subId, param & 0xFF, (param & 0xFF00) >> 8,
+			                                        aggressive);
 
 		case CONDITION_REGENERATION:
-			return new ConditionRegeneration(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionRegeneration>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_SOUL:
-			return new ConditionSoul(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionSoul>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_ATTRIBUTES:
-			return new ConditionAttributes(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionAttributes>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_SPELLCOOLDOWN:
-			return new ConditionSpellCooldown(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionSpellCooldown>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_SPELLGROUPCOOLDOWN:
-			return new ConditionSpellGroupCooldown(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionSpellGroupCooldown>(id, type, ticks, buff, subId, aggressive);
 
 		case CONDITION_DRUNK:
-			return new ConditionDrunk(id, type, ticks, buff, subId, param, aggressive);
+			return std::make_unique<ConditionDrunk>(id, type, ticks, buff, subId, param, aggressive);
 
 		case CONDITION_INFIGHT:
 		case CONDITION_EXHAUST_WEAPON:
@@ -218,18 +220,18 @@ Condition* Condition::createCondition(ConditionId_t id, ConditionType_t type, in
 		case CONDITION_YELLTICKS:
 		case CONDITION_PACIFIED:
 		case CONDITION_MANASHIELD:
-			return new ConditionGeneric(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionGeneric>(id, type, ticks, buff, subId, aggressive);
 		case CONDITION_ROOT:
-			return new ConditionGeneric(id, type, ticks, buff, subId, aggressive);
+			return std::make_unique<ConditionGeneric>(id, type, ticks, buff, subId, aggressive);
 		case CONDITION_MANASHIELD_BREAKABLE:
-			return new ConditionManaShield(id, type, ticks, buff, subId);
+			return std::make_unique<ConditionManaShield>(id, type, ticks, buff, subId);
 
 		default:
 			return nullptr;
 	}
 }
 
-Condition* Condition::createCondition(PropStream& propStream)
+std::unique_ptr<Condition> Condition::createCondition(PropStream& propStream)
 {
 	uint8_t attr;
 	if (!propStream.read<uint8_t>(attr) || attr != CONDITIONATTR_TYPE) {
