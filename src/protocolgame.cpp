@@ -26,7 +26,7 @@ extern Scheduler g_scheduler;
 namespace {
 
 std::deque<std::pair<std::chrono::steady_clock::time_point, uint32_t>> waitList; // (timeout, player guid)
-auto priorityEnd = waitList.end();
+std::size_t premiumCount = 0;
 
 auto findClient(uint32_t guid)
 {
@@ -68,11 +68,16 @@ std::size_t clientLogin(const Player& player)
 	auto time = std::chrono::steady_clock::now();
 
 	auto it = waitList.begin();
+	std::size_t index = 0;
 	while (it != waitList.end()) {
 		if ((it->first - time) <= std::chrono::seconds::zero()) {
+			if (index < premiumCount) {
+				--premiumCount;
+			}
 			it = waitList.erase(it);
 		} else {
 			++it;
+			++index;
 		}
 	}
 
@@ -81,6 +86,9 @@ std::size_t clientLogin(const Player& player)
 	if (it != waitList.end()) {
 		// If server has capacity for this client, let him in even though his current slot might be higher than 0.
 		if ((g_game.getPlayersOnline() + slot) <= maxPlayers) {
+			if (slot <= premiumCount) {
+				--premiumCount;
+			}
 			waitList.erase(it);
 			return 0;
 		}
@@ -91,8 +99,10 @@ std::size_t clientLogin(const Player& player)
 	}
 
 	if (player.isPremium()) {
-		priorityEnd = waitList.emplace(priorityEnd, time + getTimeout(slot + 1), player.getGUID());
-		return std::distance(waitList.begin(), priorityEnd);
+		const std::size_t premiumSlot = premiumCount + 1;
+		waitList.emplace(waitList.begin() + premiumCount, time + getTimeout(premiumSlot), player.getGUID());
+		++premiumCount;
+		return premiumSlot;
 	}
 
 	waitList.emplace_back(time + getTimeout(waitList.size() + 1), player.getGUID());
