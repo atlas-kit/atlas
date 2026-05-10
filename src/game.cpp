@@ -49,7 +49,7 @@ void Game::start(ServiceManager* manager)
 	serviceManager = manager;
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
-	g_scheduler.addEvent(createSchedulerTask(std::chrono::seconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
 	                                         [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 }

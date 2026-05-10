@@ -403,8 +403,8 @@ void Item::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator&
 		}
 
 		case ATTR_DURATION: {
-			auto duration = std::chrono::seconds{OTB::read<int32_t>(first, last)};
-			setDuration(std::max(std::chrono::seconds::zero(), duration));
+			auto duration = std::chrono::milliseconds{OTB::read<int32_t>(first, last)};
+			setDuration(std::max(std::chrono::milliseconds::zero(), duration));
 			break;
 		}
 
@@ -629,7 +629,7 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 
 	if (hasAttribute(ITEM_ATTRIBUTE_DURATION)) {
 		propWriteStream.write<uint8_t>(ATTR_DURATION);
-		propWriteStream.write<uint32_t>(duration_cast<std::chrono::seconds>(getDuration()).count());
+		propWriteStream.write<uint32_t>(getDuration().count());
 	}
 
 	ItemDecayState_t decayState = getDecaying();

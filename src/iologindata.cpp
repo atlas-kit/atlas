@@ -658,7 +658,8 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	query << "`lastlogout` = "
 	      << duration_cast<std::chrono::seconds>(player->getLastLogout().time_since_epoch()).count() << ',';
 	query << "`balance` = " << player->bankBalance << ',';
-	query << "`offlinetraining_time` = " << player->getOfflineTrainingTime() / 1000 << ',';
+	query << "`offlinetraining_time` = "
+	      << duration_cast<std::chrono::seconds>(player->getOfflineTrainingTime()).count() << ',';
 	query << "`offlinetraining_skill` = " << player->getOfflineTrainingSkill() << ',';
 	query << "`stamina` = " << player->getStaminaMinutes() << ',';
 

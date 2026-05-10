@@ -487,7 +487,7 @@ void ProtocolGame::onConnect()
 	output->addByte(0x1F);
 
 	// Add timestamp & random number
-	challengeTimestamp = std::chrono::system_clock::now();
+	challengeTimestamp = floor<std::chrono::seconds>(std::chrono::system_clock::now());
 	output->add<uint32_t>(duration_cast<std::chrono::seconds>(challengeTimestamp.time_since_epoch()).count());
 
 	challengeRandom = randNumber(generator);
@@ -3243,7 +3243,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
 	msg.add<uint16_t>(condition ? condition->getTicks().count() / 1000 : 0x00);
 
-	msg.add<uint16_t>(floor<std::chrono::seconds>(player->getOfflineTrainingTime()).count());
+	msg.add<uint16_t>(floor<std::chrono::minutes>(player->getOfflineTrainingTime()).count());
 
 	msg.add<uint16_t>(0); // xp boost time (seconds)
 	msg.addByte(0x01);    // 15.11: always enable exp boost in store
