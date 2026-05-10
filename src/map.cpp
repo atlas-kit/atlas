@@ -54,6 +54,10 @@ bool loadHousesXML(const std::filesystem::path& filename)
 		house->setTownId(pugi::cast<uint32_t>(houseNode.attribute("townid").value()));
 
 		house->setOwner(0, false);
+
+		if (auto attr = houseNode.attribute("maxbeds")) {
+			house->setMaxBeds(pugi::cast<uint8_t>(attr.value()));
+		}
 	}
 	return true;
 }
@@ -306,6 +310,7 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 	spectators.insert(newPosSpectators.begin(), newPosSpectators.end());
 
 	std::vector<int32_t> oldStackPosVector;
+	oldStackPosVector.reserve(spectators.size());
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
 			if (tmpPlayer->canSeeCreature(creature)) {
@@ -449,12 +454,11 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 		if (onlyPlayers) {
 			auto it = playersSpectatorCache.find(centerPos);
 			if (it != playersSpectatorCache.end()) {
-				if (!spectators.empty()) {
-					spectators.insert(it->second.begin(), it->second.end());
-				} else {
+				if (spectators.empty()) {
 					spectators = it->second;
+				} else {
+					spectators.insert(it->second.begin(), it->second.end());
 				}
-
 				foundCache = true;
 			}
 		}
@@ -463,13 +467,13 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 			auto it = spectatorCache.find(centerPos);
 			if (it != spectatorCache.end()) {
 				if (!onlyPlayers) {
-					if (!spectators.empty()) {
-						const SpectatorVec& cachedSpectators = it->second;
-						spectators.insert(cachedSpectators.begin(), cachedSpectators.end());
-					} else {
+					if (spectators.empty()) {
 						spectators = it->second;
+					} else {
+						spectators.insert(it->second.begin(), it->second.end());
 					}
 				} else {
+					// Filter players from cached spectators
 					const SpectatorVec& cachedSpectators = it->second;
 					for (const auto& spectator : cachedSpectators) {
 						if (spectator->asPlayer()) {
@@ -477,7 +481,6 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 						}
 					}
 				}
-
 				foundCache = true;
 			} else {
 				cacheResult = true;

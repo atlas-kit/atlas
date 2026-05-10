@@ -3,6 +3,7 @@
 #include "../../configmanager.h"
 #include "../../const.h"
 #include "../../enums.h"
+#include "../../scheduler.h"
 #include "../../script.h"
 #include "../../tools.h"
 #include "../api.h"
@@ -86,7 +87,6 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, MESSAGE_HOTKEY_PRESSED);
 	registerEnum(lsi, MESSAGE_MARKET);
 	registerEnum(lsi, MESSAGE_BEYOND_LAST);
-	registerEnum(lsi, MESSAGE_TOURNAMENT_INFO);
 	registerEnum(lsi, MESSAGE_ATTENTION);
 	registerEnum(lsi, MESSAGE_BOOSTED_CREATURE);
 	registerEnum(lsi, MESSAGE_OFFLINE_TRAINING);
@@ -325,6 +325,8 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, RELOAD_TYPE_SPELLS);
 	registerEnum(lsi, RELOAD_TYPE_TALKACTIONS);
 	registerEnum(lsi, RELOAD_TYPE_WEAPONS);
+
+	registerEnum(lsi, SCHEDULER_MINTICKS);
 
 	lsi.registerGlobalBoolean("VIRTUAL_PARENT", true);
 

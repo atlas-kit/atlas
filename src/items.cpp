@@ -10,7 +10,7 @@
 #include "weapons.h"
 
 extern MoveEvents* g_moveEvents;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {
 
@@ -254,12 +254,7 @@ const std::unordered_map<std::string, ItemParseAttributes_t> ItemParseAttributes
     {"suppresscurse", ITEM_PARSE_SUPPRESSCURSE},
     {"field", ITEM_PARSE_FIELD},
     {"replaceable", ITEM_PARSE_REPLACEABLE},
-    {"partnerdirection", ITEM_PARSE_PARTNERDIRECTION},
     {"leveldoor", ITEM_PARSE_LEVELDOOR},
-    {"maletransformto", ITEM_PARSE_MALETRANSFORMTO},
-    {"malesleeper", ITEM_PARSE_MALETRANSFORMTO},
-    {"femaletransformto", ITEM_PARSE_FEMALETRANSFORMTO},
-    {"femalesleeper", ITEM_PARSE_FEMALETRANSFORMTO},
     {"transformto", ITEM_PARSE_TRANSFORMTO},
     {"destroyto", ITEM_PARSE_DESTROYTO},
     {"elementice", ITEM_PARSE_ELEMENTICE},
@@ -274,6 +269,7 @@ const std::unordered_map<std::string, ItemParseAttributes_t> ItemParseAttributes
     {"storeitem", ITEM_PARSE_STOREITEM},
     {"worth", ITEM_PARSE_WORTH},
     {"supply", ITEM_PARSE_SUPPLY},
+    {"wrapcontainer", ITEM_PARSE_WRAPCONTAINER},
 };
 
 const std::unordered_map<std::string, ItemTypes_t> ItemTypesMap = {{"key", ITEM_TYPE_KEY},
@@ -327,50 +323,6 @@ const std::unordered_map<std::string, FluidTypes_t> FluidTypesMap = {
     {"mead", FLUID_MEAD},
     {"ink", FLUID_INK},
 };
-
-const std::unordered_map<std::string_view, Direction> DirectionsMap = {
-    {"north", DIRECTION_NORTH},
-    {"n", DIRECTION_NORTH},
-    {"0", DIRECTION_NORTH},
-    {"east", DIRECTION_EAST},
-    {"e", DIRECTION_EAST},
-    {"1", DIRECTION_EAST},
-    {"south", DIRECTION_SOUTH},
-    {"s", DIRECTION_SOUTH},
-    {"2", DIRECTION_SOUTH},
-    {"west", DIRECTION_WEST},
-    {"w", DIRECTION_WEST},
-    {"3", DIRECTION_WEST},
-    {"southwest", DIRECTION_SOUTHWEST},
-    {"south west", DIRECTION_SOUTHWEST},
-    {"south-west", DIRECTION_SOUTHWEST},
-    {"sw", DIRECTION_SOUTHWEST},
-    {"4", DIRECTION_SOUTHWEST},
-    {"southeast", DIRECTION_SOUTHEAST},
-    {"south east", DIRECTION_SOUTHEAST},
-    {"south-east", DIRECTION_SOUTHEAST},
-    {"se", DIRECTION_SOUTHEAST},
-    {"5", DIRECTION_SOUTHEAST},
-    {"northwest", DIRECTION_NORTHWEST},
-    {"north west", DIRECTION_NORTHWEST},
-    {"north-west", DIRECTION_NORTHWEST},
-    {"nw", DIRECTION_NORTHWEST},
-    {"6", DIRECTION_NORTHWEST},
-    {"northeast", DIRECTION_NORTHEAST},
-    {"north east", DIRECTION_NORTHEAST},
-    {"north-east", DIRECTION_NORTHEAST},
-    {"ne", DIRECTION_NORTHEAST},
-    {"7", DIRECTION_NORTHEAST},
-};
-
-Direction getDirection(std::string_view string)
-{
-	if (auto it = DirectionsMap.find(string); it != DirectionsMap.end()) {
-		return it->second;
-	}
-	std::println("[Warning - getDirection] Invalid direction: {}", string);
-	return DIRECTION_NORTH;
-}
 
 } // namespace
 
@@ -752,6 +704,11 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 				case ITEM_PARSE_SUPPLY: {
 					it.supply = valueAttribute.as_bool();
+					break;
+				}
+
+				case ITEM_PARSE_WRAPCONTAINER: {
+					it.wrapContainer = valueAttribute.as_bool();
 					break;
 				}
 
@@ -1693,23 +1650,23 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 					it.type = ITEM_TYPE_MAGICFIELD;
 
 					CombatType_t combatType = COMBAT_NONE;
-					ConditionDamage* conditionDamage = nullptr;
+					std::unique_ptr<ConditionDamage> conditionDamage;
 
 					tmpStrValue = boost::algorithm::to_lower_copy<std::string>(valueAttribute.as_string());
 					if (tmpStrValue == "fire") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_FIRE);
 						combatType = COMBAT_FIREDAMAGE;
 					} else if (tmpStrValue == "energy") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_ENERGY);
 						combatType = COMBAT_ENERGYDAMAGE;
 					} else if (tmpStrValue == "poison") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_POISON);
 						combatType = COMBAT_EARTHDAMAGE;
 					} else if (tmpStrValue == "drown") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_DROWN);
 						combatType = COMBAT_DROWNDAMAGE;
 					} else if (tmpStrValue == "physical") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_BLEEDING);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_BLEEDING);
 						combatType = COMBAT_PHYSICALDAMAGE;
 					} else {
 						std::cout << "[Warning - Items::parseItemNode] Unknown field value: "
@@ -1718,7 +1675,6 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 					if (combatType != COMBAT_NONE) {
 						it.combatType = combatType;
-						it.conditionDamage.reset(conditionDamage);
 
 						uint32_t ticks = 0;
 						int32_t start = 0;
@@ -1775,6 +1731,8 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 						if (conditionDamage->getTotalDamage() > 0) {
 							conditionDamage->setParam(CONDITION_PARAM_FORCEUPDATE, 1);
 						}
+
+						it.conditionDamage = std::move(conditionDamage);
 					}
 					break;
 				}
@@ -1784,47 +1742,8 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 					break;
 				}
 
-				case ITEM_PARSE_PARTNERDIRECTION: {
-					it.bedPartnerDir = getDirection(valueAttribute.as_string());
-					break;
-				}
-
 				case ITEM_PARSE_LEVELDOOR: {
 					it.levelDoor = pugi::cast<uint32_t>(valueAttribute.value());
-					break;
-				}
-
-				case ITEM_PARSE_MALETRANSFORMTO: {
-					uint16_t value = pugi::cast<uint16_t>(valueAttribute.value());
-					it.transformToOnUse[PLAYERSEX_MALE] = value;
-					ItemType& other = getItemType(value);
-					if (other.transformToFree == 0) {
-						other.transformToFree = it.id;
-					}
-
-					if (it.transformToOnUse[PLAYERSEX_FEMALE] == 0) {
-						it.transformToOnUse[PLAYERSEX_FEMALE] = value;
-					}
-					break;
-				}
-
-				case ITEM_PARSE_FEMALETRANSFORMTO: {
-					uint16_t value = pugi::cast<uint16_t>(valueAttribute.value());
-					it.transformToOnUse[PLAYERSEX_FEMALE] = value;
-
-					ItemType& other = getItemType(value);
-					if (other.transformToFree == 0) {
-						other.transformToFree = it.id;
-					}
-
-					if (it.transformToOnUse[PLAYERSEX_MALE] == 0) {
-						it.transformToOnUse[PLAYERSEX_MALE] = value;
-					}
-					break;
-				}
-
-				case ITEM_PARSE_TRANSFORMTO: {
-					it.transformToFree = pugi::cast<uint16_t>(valueAttribute.value());
 					break;
 				}
 
@@ -1913,13 +1832,6 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 			std::cout << "[Warning - Items::parseItemNode] Unknown key value: " << keyAttribute.as_string()
 			          << std::endl;
 		}
-	}
-
-	// check bed items
-	if ((it.transformToFree != 0 || it.transformToOnUse[PLAYERSEX_FEMALE] != 0 ||
-	     it.transformToOnUse[PLAYERSEX_MALE] != 0) &&
-	    it.type != ITEM_TYPE_BED) {
-		std::cout << "[Warning - Items::parseItemNode] Item " << it.id << " is not set as a bed-type" << std::endl;
 	}
 }
 

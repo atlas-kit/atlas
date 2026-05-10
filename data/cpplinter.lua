@@ -221,6 +221,7 @@ ModalWindow = {}
 ---@field transform fun(self: Item, newItem: number|string, count?: number)
 ---@field decay fun(self: Item)
 ---@field getSpecialDescription fun(self: Item): string
+---@field setSpecialDescription fun(self: Item, description: string)
 ---@field hasProperty fun(self: Item, property: number): boolean
 ---@field isLoadedFromMap fun(self: Item): boolean
 ---@field setStoreItem fun(self: Item, store: boolean)
@@ -740,6 +741,7 @@ Outfit = {}
 ---@field canWalkOnPoison fun(self: MonsterType): boolean
 ---@field name fun(self: MonsterType): string
 ---@field nameDescription fun(self: MonsterType): string
+---@field monsterName fun(self: MonsterType): string
 ---@field health fun(self: MonsterType): number
 ---@field maxHealth fun(self: MonsterType): number
 ---@field runHealth fun(self: MonsterType): number
@@ -1032,7 +1034,6 @@ Weapon = {}
 ---@field onMonsterSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
 ---@operator call():Event
 Event = {}
-EventCallback = Event()
 
 -- MARK: ScheduleEvent
 ---@class ScheduleEvent
@@ -1196,6 +1197,7 @@ storages = {}
 
 CREATURE_ID_MIN = 0x10000000
 ITEM_STACK_SIZE = 100
+MAX_STACKPOS = 10
 
 -- Constants: CONST_ANI
 CONST_ANI_NONE = 0
@@ -1586,7 +1588,7 @@ MESSAGE_HOTKEY_PRESSED = 39 -- Green, over player + console
 MESSAGE_MARKET = 42 -- Window "Market Message" + "Ok" button
 -- MESSAGE_MANA = 43 -- not working (?)
 MESSAGE_BEYOND_LAST = 44     -- White, console only
-MESSAGE_TOURNAMENT_INFO = 45 -- Window "Tournament" + "Ok" button
+-- unused 45, old window "Tournament" + "Ok" button
 -- unused 46?
 -- unused 47?
 MESSAGE_ATTENTION = 48        -- White, console only
@@ -1998,9 +2000,20 @@ ITEM_DOCUMENT_RO = 1968
 
 RESOURCE_BANK_BALANCE = 0
 RESOURCE_GOLD_EQUIPPED = 1
+RESOURCE_INVENTORY_CURRENCY_CUSTOM = 2
 RESOURCE_PREY_WILDCARDS = 10
 RESOURCE_DAILYREWARD_STREAK = 20
 RESOURCE_DAILYREWARD_JOKERS = 21
+RESOURCE_TASK_HUNTING = 50
+RESOURCE_FORGE_DUST = 70
+RESOURCE_FORGE_SLIVER = 71
+RESOURCE_FORGE_CORES = 72
+RESOURCE_LESSER_GEMS = 81
+RESOURCE_REGULAR_GEMS = 82
+RESOURCE_GREATER_GEMS = 83
+RESOURCE_LESSER_FRAGMENT = 84
+RESOURCE_GREATER_FRAGMENT = 85
+RESOURCE_WHEEL_OF_DESTINY = 86
 
 CLIENTOS_NONE = 0
 CLIENTOS_LINUX = 1

@@ -72,7 +72,7 @@ static constexpr uint8_t ITEM_STACK_SIZE = 100;
 class Game
 {
 public:
-	Game();
+	Game() = default;
 
 	// non-copyable
 	Game(const Game&) = delete;
@@ -80,7 +80,7 @@ public:
 
 	void start(ServiceManager* manager);
 
-	void forceAddCondition(uint32_t creatureId, Condition* condition);
+	void forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition);
 	void forceRemoveCondition(uint32_t creatureId, ConditionType_t type);
 
 	void loadMainMap(const std::string& filename);
@@ -299,8 +299,6 @@ public:
 
 	void sendGuildMotd(uint32_t playerId);
 	void kickPlayer(uint32_t playerId, bool displayEffect);
-	void playerDebugAssert(uint32_t playerId, const std::string& assertLine, const std::string& date,
-	                       const std::string& description, const std::string& comment);
 	void playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, uint8_t button, uint8_t choice);
 	void playerReportRuleViolation(uint32_t playerId, const std::string& targetName, uint8_t reportType,
 	                               uint8_t reportReason, const std::string& comment, const std::string& translation);
@@ -370,7 +368,6 @@ public:
 	void playerRequestRemoveVip(uint32_t playerId, uint32_t guid);
 	void playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::string& description, uint32_t icon,
 	                          bool notify);
-	void playerTurn(uint32_t playerId, Direction dir);
 	void playerRequestEditPodium(uint32_t playerId, const Position& position, uint8_t stackPos,
 	                             const uint16_t spriteId);
 	void playerEditPodium(uint32_t playerId, Outfit_t outfit, const Position& position, uint8_t stackPos,
@@ -395,7 +392,7 @@ public:
 	void playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
 
 	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
-	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg);
+	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
 
@@ -432,7 +429,7 @@ public:
 	                    bool ignoreResistances = false);
 
 	void combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-	                       uint8_t& effect);
+	                       uint16_t& effect);
 
 	bool combatChangeHealth(const std::shared_ptr<Creature>& attacker, const std::shared_ptr<Creature>& target,
 	                        CombatDamage& damage);
@@ -442,15 +439,13 @@ public:
 	// animation help functions
 	void addCreatureHealth(const std::shared_ptr<const Creature>& target);
 	static void addCreatureHealth(const SpectatorVec& spectators, const std::shared_ptr<const Creature>& target);
-	void addMagicEffect(const Position& pos, uint8_t effect);
-	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect);
-	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect);
+	void addMagicEffect(const Position& pos, uint16_t effect);
+	static void addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect);
+	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect);
 	static void addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-	                              uint8_t effect);
+	                              uint16_t effect);
 
 	void startDecay(const std::shared_ptr<Item>& item);
-
-	void sendOfflineTrainingDialog(const std::shared_ptr<Player>& player);
 
 	auto getPlayers() const { return players | std::views::values; }
 	auto getNpcs() const { return npcs | std::views::values; }
@@ -463,10 +458,6 @@ public:
 	std::unordered_map<Tile*, std::shared_ptr<Container>> browseFields;
 
 	void internalRemoveItems(const std::vector<std::shared_ptr<Item>>& itemList, uint32_t amount, bool stackable);
-
-	std::shared_ptr<BedItem> getBedBySleeper(uint32_t guid) const;
-	void setBedSleeper(std::shared_ptr<BedItem> bed, uint32_t guid) { bedSleepersMap[guid] = std::move(bed); }
-	void removeBedSleeper(uint32_t guid) { bedSleepersMap.erase(guid); }
 
 	void updatePodium(const std::shared_ptr<Podium>& podium);
 
@@ -533,13 +524,9 @@ private:
 	// list of items that are in trading state, mapped to the player holding them
 	std::map<std::shared_ptr<Item>, uint32_t> tradeItems;
 
-	std::map<uint32_t, std::shared_ptr<BedItem>> bedSleepersMap;
-
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 
 	std::set<std::shared_ptr<Party>> parties;
-
-	ModalWindow offlineTrainingWindow{std::numeric_limits<uint32_t>::max(), "Choose a Skill", "Please choose a skill:"};
 
 	GameState_t gameState = GAME_STATE_NORMAL;
 	WorldType_t worldType = WORLD_TYPE_PVP;

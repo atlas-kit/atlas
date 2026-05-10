@@ -5,7 +5,6 @@
 
 #include "player.h"
 
-#include "bed.h"
 #include "chat.h"
 #include "combat.h"
 #include "configmanager.h"
@@ -21,20 +20,20 @@
 #include "tools.h"
 #include "weapons.h"
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 MuteCountMap Player::muteCountMap;
 
 uint32_t Player::playerAutoID = 0x10000000;
 uint32_t Player::playerIDLimit = 0x20000000;
 
-Player::Player(ProtocolGame_ptr p) : Creature{}, client{std::move(p)} {}
+Player::Player(std::shared_ptr<ProtocolGame> protocol) : Creature{}, client{std::move(protocol)} {}
 
 void Player::setID()
 {
@@ -138,8 +137,12 @@ std::string Player::getDescription(int32_t lookDistance) const
 	}
 
 	const auto& guild = getGuild();
+	if (!guild) {
+		return s.str();
+	}
+
 	const auto& guildRank = getGuildRank();
-	if (!guild || !guildRank) {
+	if (!guildRank) {
 		return s.str();
 	}
 
@@ -186,37 +189,39 @@ std::shared_ptr<Item> Player::getWeapon(slots_t slot, bool ignoreAmmo) const
 		return nullptr;
 	}
 
-	if (!ignoreAmmo && weaponType == WEAPON_DISTANCE) {
-		const ItemType& itemType = Item::items[item->getID()];
-		if (itemType.ammoType != AMMO_NONE) {
-			const auto& ammoItem = inventory[CONST_SLOT_AMMO];
-			if (!ammoItem || ammoItem->getAmmoType() != itemType.ammoType) {
-				// no ammo item was found, search for quiver instead
-				const auto& quiver =
-				    inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->getContainer() : nullptr;
-				if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
-					// no quiver equipped
-					return nullptr;
-				}
+	if (ignoreAmmo || weaponType != WEAPON_DISTANCE) {
+		return item;
+	}
 
-				for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext();
-				     containerItem.advance()) {
-					if (itemType.ammoType == (*containerItem)->getAmmoType()) {
-						if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
-							if (weapon->ammoCheck(asPlayer())) {
-								return *containerItem;
-							}
-						}
-					}
-				}
+	const ItemType& itemType = Item::items[item->getID()];
+	if (itemType.ammoType == AMMO_NONE) {
+		return item;
+	}
 
-				// no valid ammo was found in quiver
-				return nullptr;
+	const auto& ammoItem = inventory[CONST_SLOT_AMMO];
+	if (ammoItem && ammoItem->getAmmoType() == itemType.ammoType) {
+		return ammoItem;
+	}
+
+	// no ammo item was found, search for quiver instead
+	const auto& quiver = inventory[CONST_SLOT_RIGHT] ? inventory[CONST_SLOT_RIGHT]->asContainer() : nullptr;
+	if (!quiver || quiver->getWeaponType() != WEAPON_QUIVER) {
+		// no quiver equipped
+		return nullptr;
+	}
+
+	for (ContainerIterator containerItem = quiver->iterator(); containerItem.hasNext(); containerItem.advance()) {
+		if (itemType.ammoType == (*containerItem)->getAmmoType()) {
+			if (const auto& weapon = g_weapons->getWeapon(*containerItem)) {
+				if (weapon->ammoCheck(asPlayer())) {
+					return *containerItem;
+				}
 			}
-			item = ammoItem;
 		}
 	}
-	return item;
+
+	// no valid ammo was found in quiver
+	return nullptr;
 }
 
 std::shared_ptr<Item> Player::getWeapon(bool ignoreAmmo /* = false*/) const
@@ -393,10 +398,10 @@ float Player::getDefenseFactor() const
 	}
 }
 
-uint32_t Player::getClientIcons() const
+uint64_t Player::getClientIcons() const
 {
-	uint32_t icons = 0;
-	for (Condition* condition : conditions) {
+	uint64_t icons = 0;
+	for (const auto& condition : conditions) {
 		if (!isSuppress(condition->getType())) {
 			icons |= condition->getIcons();
 		}
@@ -931,13 +936,13 @@ void Player::openSavedContainers()
 			continue;
 		}
 
-		if (const auto& itemContainer = item->getContainer()) {
+		if (const auto& itemContainer = item->asContainer()) {
 			uint8_t cid = item->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
 			if (cid > 0) {
 				openContainersList.emplace(cid, itemContainer);
 			}
 			for (auto it = itemContainer->iterator(); it.hasNext(); it.advance()) {
-				if (const auto& subContainer = (*it)->getContainer()) {
+				if (const auto& subContainer = (*it)->asContainer()) {
 					uint8_t subcid = subContainer->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
 					if (subcid > 0) {
 						openContainersList.emplace(subcid, subContainer);
@@ -945,12 +950,6 @@ void Player::openSavedContainers()
 				}
 			}
 		}
-	}
-
-	// fix broken containers when logged in from another location
-	for (uint8_t i = 0; i < 16; i++) {
-		client->sendEmptyContainer(i);
-		client->sendCloseContainer(i);
 	}
 
 	// send actual containers
@@ -986,7 +985,7 @@ void Player::onRemoveTileItem(const std::shared_ptr<const Tile>& tile, const Pos
 		checkTradeState(item);
 
 		if (const auto& tradeItem = getTradeItem()) {
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				if (container->isHoldingItem(tradeItem)) {
 					g_game.internalCloseTrade(asPlayer());
 				}
@@ -1006,8 +1005,8 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 	if (isLogin) {
 		// Restore conditions stored during previous logout
-		for (Condition* condition : storedConditionList) {
-			addCondition(condition);
+		for (auto& condition : storedConditionList) {
+			addCondition(std::move(condition));
 		}
 		storedConditionList.clear();
 
@@ -1042,10 +1041,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		IOLoginData::updateOnlineStatus(guid, true);
 
-		if (const auto& bed = g_game.getBedBySleeper(guid)) {
-			bed->wakeUp(asPlayer());
-		}
-
 		if (const auto& guild = getGuild()) {
 			guild->addMember(asPlayer());
 		}
@@ -1070,58 +1065,60 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 	}
 
+	// login packet sequence
 	sendClientFeatures();
+	sendAllowBugReport();
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
-	sendStats();
-	sendSkills();
-	sendIcons();
-	sendBasicData();
-	sendItems();
-	sendLight();
-	sendVIPEntries();
-	sendItemClasses();
 
+	if (magicEffect != CONST_ME_NONE) {
+		sendMagicEffect(magicEffect);
+	}
+	sendDisableLoginMusic();
+
+	// Inventory slots
 	for (int i = CONST_SLOT_FIRST; i <= CONST_SLOT_LAST; ++i) {
 		auto slot = static_cast<slots_t>(i);
 		sendInventoryItem(slot, getInventoryItem(slot));
 	}
 	sendInventoryItem(CONST_SLOT_STORE_INBOX, getStoreInbox()->asItem());
 
-	openSavedContainers();
+	sendStats();
+	sendSkills();
+	sendBlessStatus();
+	sendPremiumTrigger();
+	sendItemsPrice();
+	sendPreyPrices();
+	sendPreyData();
+	sendForgingData();
 
-	if (magicEffect != CONST_ME_NONE) {
-		sendMagicEffect(magicEffect);
-	}
+	// Player creature light
+	sendLight();
+
+	sendVIPGroups();
+	sendVIPEntries();
+	sendInventoryIds();
+	sendLootContainers();
+	sendBasicData();
+	sendHousesInfo();
+	sendClientCheck();
+	sendGameNews();
+	sendIcons();
+
+	openSavedContainers();
+	sendBosstiaryCooldownTimer();
 
 	tfs::events::player::onJoin(asPlayer());
-}
-
-void Player::onAttackedCreatureDisappear(bool isLogout)
-{
-	sendCancelTarget();
-
-	if (!isLogout) {
-		sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-	}
-}
-
-void Player::onFollowCreatureDisappear(bool isLogout)
-{
-	sendCancelTarget();
-
-	if (!isLogout) {
-		sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-	}
 }
 
 void Player::onChangeZone(ZoneType_t zone)
 {
 	if (zone == ZONE_PROTECTION) {
 		if (getAttackedCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			removeAttackedCreature();
-			onAttackedCreatureDisappear(false);
+			setAttackedCreature(nullptr);
+			sendCancelTarget();
+			sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 		}
 
 		if (!group->access && isMounted()) {
@@ -1140,31 +1137,6 @@ void Player::onChangeZone(ZoneType_t zone)
 	sendIcons();
 }
 
-void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
-{
-	if (zone == ZONE_PROTECTION) {
-		if (!hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			removeAttackedCreature();
-			onAttackedCreatureDisappear(false);
-		}
-	} else if (zone == ZONE_NOPVP) {
-		if (const auto& attackedCreature = getAttackedCreature(); attackedCreature->asPlayer()) {
-			if (!hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-				removeAttackedCreature();
-				onAttackedCreatureDisappear(false);
-			}
-		}
-	} else if (zone == ZONE_NORMAL) {
-		// attackedCreature can leave a pvp zone if not pzlocked
-		if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-			if (const auto& attackedCreature = getAttackedCreature(); attackedCreature->asPlayer()) {
-				removeAttackedCreature();
-				onAttackedCreatureDisappear(false);
-			}
-		}
-	}
-}
-
 void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
 {
 	Creature::onRemoveCreature(creature, isLogout);
@@ -1177,7 +1149,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 		lastLogout = time(nullptr);
 
 		if (eventWalk != 0) {
-			removeFollowCreature();
+			setFollowCreature(nullptr);
 		}
 
 		if (!tradePartner.expired()) {
@@ -1192,7 +1164,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 			party->leaveParty(asPlayer(), true);
 		}
 
-		g_chat->removeUserFromAllChannels(asPlayer());
+		g_chat.removeUserFromAllChannels(asPlayer());
 
 		if (const auto& guild = getGuild()) {
 			guild->removeMember(asPlayer());
@@ -1316,8 +1288,8 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 	if (teleport || oldPos.z != newPos.z) {
 		int32_t ticks = getNumber(ConfigManager::STAIRHOP_DELAY);
 		if (ticks > 0) {
-			if (Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, ticks, 0)) {
-				addCondition(condition);
+			if (auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED, ticks, 0)) {
+				addCondition(std::move(condition));
 			}
 		}
 	}
@@ -1397,7 +1369,7 @@ void Player::onRemoveInventoryItem(const std::shared_ptr<Item>& item)
 		checkTradeState(item);
 
 		if (const auto& tradeItem = getTradeItem()) {
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				if (container->isHoldingItem(tradeItem)) {
 					g_game.internalCloseTrade(asPlayer());
 				}
@@ -1428,7 +1400,7 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(SchedulerTask_ptr task)
+void Player::setNextWalkActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (walkTaskEvent != 0) {
 		g_scheduler.stopEvent(walkTaskEvent);
@@ -1438,7 +1410,7 @@ void Player::setNextWalkActionTask(SchedulerTask_ptr task)
 	walkTask = std::move(task);
 }
 
-void Player::setNextActionTask(SchedulerTask_ptr task)
+void Player::setNextActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (actionTaskEvent != 0) {
 		g_scheduler.stopEvent(actionTaskEvent);
@@ -1503,7 +1475,7 @@ void Player::onAttacking(uint32_t)
 	uint32_t delay = getAttackSpeed();
 	bool classicSpeed = getBoolean(ConfigManager::CLASSIC_ATTACK_SPEED);
 
-	if (const Weapon* weapon = g_weapons->getWeapon(tool)) {
+	if (const auto& weapon = g_weapons->getWeapon(tool)) {
 		if (!weapon->interruptSwing()) {
 			result = weapon->useWeapon(asPlayer(), tool, getAttackedCreature());
 		} else if (!classicSpeed && !canDoAction()) {
@@ -1536,7 +1508,7 @@ uint32_t Player::isMuted() const
 	}
 
 	int32_t muteTicks = 0;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getType() == CONDITION_MUTED && condition->getTicks() > muteTicks) {
 			muteTicks = condition->getTicks();
 		}
@@ -1569,8 +1541,8 @@ void Player::removeMessageBuffer()
 
 			uint32_t muteTime = 5 * muteCount * muteCount;
 			muteCountMap[guid] = muteCount + 1;
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
-			addCondition(condition);
+			auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
+			addCondition(std::move(condition));
 
 			sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are muted for {:d} seconds.", muteTime));
 		}
@@ -2113,13 +2085,11 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		auto it = conditions.begin();
 		while (it != conditions.end()) {
-			Condition* condition = *it;
+			auto& condition = *it;
 			if (condition->isPersistent()) {
-				it = conditions.erase(it);
-
 				condition->endCondition(asPlayer());
 				onEndCondition(condition->getType());
-				delete condition;
+				it = conditions.erase(it);
 			} else {
 				++it;
 			}
@@ -2129,13 +2099,11 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 
 		auto it = conditions.begin();
 		while (it != conditions.end()) {
-			Condition* condition = *it;
+			auto& condition = *it;
 			if (condition->isPersistent()) {
-				it = conditions.erase(it);
-
 				condition->endCondition(asPlayer());
 				onEndCondition(condition->getType());
-				delete condition;
+				it = conditions.erase(it);
 			} else {
 				++it;
 			}
@@ -2166,7 +2134,7 @@ std::shared_ptr<Item> Player::getCorpse(const std::shared_ptr<Creature>& lastHit
                                         const std::shared_ptr<Creature>& mostDamageCreature)
 {
 	const auto& corpse = Creature::getCorpse(lastHitCreature, mostDamageCreature);
-	if (corpse && corpse->getContainer()) {
+	if (corpse && corpse->asContainer()) {
 		auto killers = std::ranges::count_if(
 		    getDamageMap(),
 		    [this, now = OTSYS_TIME(), inFightTicks = getNumber(ConfigManager::PZ_LOCKED)](const auto& pair) {
@@ -2219,9 +2187,9 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 		pzLocked = true;
 	}
 
-	Condition* condition =
+	auto condition =
 	    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, getNumber(ConfigManager::PZ_LOCKED), 0);
-	addCondition(condition);
+	addCondition(std::move(condition));
 }
 
 void Player::kickPlayer(bool displayEffect)
@@ -2339,7 +2307,7 @@ bool Player::hasCapacity(const std::shared_ptr<const Item>& item, uint32_t count
 		return true;
 	}
 
-	uint32_t itemWeight = item->getContainer() ? item->getWeight() : item->getBaseWeight();
+	uint32_t itemWeight = item->asContainer() ? item->getWeight() : item->getBaseWeight();
 	if (item->isStackable()) {
 		itemWeight *= count;
 	}
@@ -2613,14 +2581,14 @@ ReturnValue Player::queryMaxCount(int32_t index, const std::shared_ptr<const Thi
 		uint32_t n = 0;
 		for (int32_t slotIndex = CONST_SLOT_FIRST; slotIndex <= CONST_SLOT_LAST; ++slotIndex) {
 			if (const auto& inventoryItem = inventory[slotIndex]) {
-				if (const auto& subContainer = inventoryItem->getContainer()) {
+				if (const auto& subContainer = inventoryItem->asContainer()) {
 					uint32_t queryCount = 0;
 					subContainer->queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), queryCount, flags);
 					n += queryCount;
 
 					// iterate through all items, including sub-containers (deep search)
 					for (ContainerIterator it = subContainer->iterator(); it.hasNext(); it.advance()) {
-						if (const auto& tmpContainer = (*it)->getContainer()) {
+						if (const auto& tmpContainer = (*it)->asContainer()) {
 							queryCount = 0;
 							tmpContainer->queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), queryCount, flags);
 							n += queryCount;
@@ -2734,10 +2702,10 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 						}
 					}
 
-					if (const auto& subContainer = inventoryItem->getContainer()) {
+					if (const auto& subContainer = inventoryItem->asContainer()) {
 						containers.push_back(subContainer);
 					}
-				} else if (const auto& subContainer = inventoryItem->getContainer()) {
+				} else if (const auto& subContainer = inventoryItem->asContainer()) {
 					containers.push_back(subContainer);
 				}
 			} else if (queryAdd(slotIndex, item, item->getItemCount(), flags) == RETURNVALUE_NOERROR) { // empty slot
@@ -2766,7 +2734,7 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 				}
 
 				for (const auto& tmpContainerItem : tmpContainer->getItemList()) {
-					if (const auto& subContainer = tmpContainerItem->getContainer()) {
+					if (const auto& subContainer = tmpContainerItem->asContainer()) {
 						containers.push_back(subContainer);
 					}
 				}
@@ -2792,7 +2760,7 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 					return tmpContainer;
 				}
 
-				if (const auto& subContainer = tmpItem->getContainer()) {
+				if (const auto& subContainer = tmpItem->asContainer()) {
 					containers.push_back(subContainer);
 				}
 
@@ -2820,7 +2788,7 @@ std::shared_ptr<Thing> Player::queryDestination(int32_t& index, const std::share
 		return asPlayer();
 	}
 
-	const auto& receiver = item->getReceiver();
+	const auto& receiver = item->asReceiver();
 	if (!receiver) {
 		destItem = item;
 		return asPlayer();
@@ -2964,7 +2932,7 @@ uint32_t Player::getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) con
 			count += Item::countByType(item, subType);
 		}
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
 				if ((*it)->getID() == itemId) {
 					count += Item::countByType(*it, subType);
@@ -3003,7 +2971,7 @@ bool Player::removeItemOfType(uint16_t itemId, uint32_t amount, int32_t subType,
 				g_game.internalRemoveItems(itemList, amount, Item::items[itemId].stackable);
 				return true;
 			}
-		} else if (const auto& container = item->getContainer()) {
+		} else if (const auto& container = item->asContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
 				if (const auto& containerItem = *it; containerItem->getID() == itemId) {
 					uint32_t itemCount = Item::countByType(containerItem, subType);
@@ -3035,7 +3003,7 @@ std::map<uint32_t, uint32_t>& Player::getAllItemTypeCount(std::map<uint32_t, uin
 
 		countMap[item->getID()] += Item::countByType(item, -1);
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			for (ContainerIterator it = container->iterator(); it.hasNext(); it.advance()) {
 				countMap[(*it)->getID()] += Item::countByType(*it, -1);
 			}
@@ -3068,7 +3036,7 @@ void Player::postAddNotification(const std::shared_ptr<Thing>& thing, const std:
 
 		// Check if we owned the old container too, so we don't need to do anything,
 		// as the list was updated in postRemoveNotification
-		assert(i ? i->getContainer() != nullptr : true);
+		assert(i ? i->asContainer() != nullptr : true);
 
 		if (i) {
 			requireListUpdate = std::static_pointer_cast<const Container>(i)->getHoldingPlayer().get() != this;
@@ -3083,7 +3051,7 @@ void Player::postAddNotification(const std::shared_ptr<Thing>& thing, const std:
 	}
 
 	if (const auto& item = thing->asItem()) {
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			onSendContainer(container);
 		}
 
@@ -3124,7 +3092,7 @@ void Player::postRemoveNotification(const std::shared_ptr<Thing>& thing, const s
 
 		// Check if we owned the old container too, so we don't need to do anything,
 		// as the list was updated in postRemoveNotification
-		assert(i ? i->getContainer() != nullptr : true);
+		assert(i ? i->asContainer() != nullptr : true);
 
 		if (i) {
 			requireListUpdate = std::static_pointer_cast<const Container>(i)->getHoldingPlayer().get() != this;
@@ -3145,7 +3113,7 @@ void Player::postRemoveNotification(const std::shared_ptr<Thing>& thing, const s
 			}
 		}
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			if (container->isRemoved() || !getPosition().isInRange(container->getPosition(), 1, 1, 0)) {
 				autoCloseContainers(container);
 			} else if (container->getTopParent().get() == this) {
@@ -3200,7 +3168,7 @@ bool Player::updateSaleShopList(const std::shared_ptr<const Item>& item)
 			return shopInfo.itemId == itemId && shopInfo.sellPrice != 0;
 		});
 		if (it == shopItemList.end()) {
-			const auto& container = item->getContainer();
+			const auto& container = item->asContainer();
 			if (!container) {
 				return false;
 			}
@@ -3244,60 +3212,6 @@ void Player::internalAddThing(uint32_t index, const std::shared_ptr<Thing>& thin
 	}
 }
 
-void Player::setFollowCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (isFollowingCreature(creature)) {
-		return;
-	}
-
-	if (!canFollowCreature(creature)) {
-		removeFollowCreature();
-		removeAttackedCreature();
-		sendCancelTarget();
-		sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-		stopWalk();
-		return;
-	}
-
-	Creature::setFollowCreature(creature);
-}
-
-void Player::setAttackedCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (isAttackingCreature(creature)) {
-		return;
-	}
-
-	if (!canAttackCreature(creature)) {
-		removeAttackedCreature();
-		sendCancelTarget();
-		return;
-	}
-
-	Creature::setAttackedCreature(creature);
-
-	const auto& followCreature = getFollowCreature();
-	if (chaseMode) {
-		if (followCreature != creature) {
-			// chase opponent
-			setFollowCreature(creature);
-		}
-	} else if (followCreature) {
-		removeFollowCreature();
-	}
-
-	g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
-}
-
-void Player::removeAttackedCreature()
-{
-	Creature::removeAttackedCreature();
-
-	if (getFollowCreature()) {
-		removeFollowCreature();
-	}
-}
-
 void Player::goToFollowCreature()
 {
 	const auto& followCreature = getFollowCreature();
@@ -3338,13 +3252,6 @@ uint64_t Player::getGainedExperience(const std::shared_ptr<Creature>& attacker) 
 	return 0;
 }
 
-void Player::onUnfollowCreature()
-{
-	Creature::onUnfollowCreature();
-
-	stopWalk();
-}
-
 void Player::setChaseMode(bool mode)
 {
 	bool prevChaseMode = chaseMode;
@@ -3357,7 +3264,7 @@ void Player::setChaseMode(bool mode)
 				setFollowCreature(attackedCreature);
 			}
 		} else {
-			removeFollowCreature();
+			setFollowCreature(nullptr);
 			cancelNextWalk = true;
 		}
 	}
@@ -3654,9 +3561,9 @@ bool Player::onKilledCreature(const std::shared_ptr<Creature>& target, bool last
 
 			if (lastHit && hasCondition(CONDITION_INFIGHT)) {
 				pzLocked = true;
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-				                                                  getNumber(ConfigManager::WHITE_SKULL_TIME) * 1000, 0);
-				addCondition(condition);
+				auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+				                                            getNumber(ConfigManager::WHITE_SKULL_TIME) * 1000, 0);
+				addCondition(std::move(condition));
 			}
 		}
 	}
@@ -4033,8 +3940,12 @@ bool Player::hasLearnedInstantSpell(const std::string& spellName) const
 
 bool Player::isInWar(const std::shared_ptr<const Player>& player) const
 {
+	if (!player) {
+		return false;
+	}
+
 	const auto& guild = getGuild();
-	if (!player || !guild) {
+	if (!guild) {
 		return false;
 	}
 
@@ -4522,10 +4433,10 @@ void Player::sendModalWindow(const ModalWindow& modalWindow)
 
 void Player::clearModalWindows() { modalWindows.clear(); }
 
-void Player::sendClosePrivate(uint16_t channelId)
+void Player::sendClosePrivate(uint16_t channelId) const
 {
 	if (channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY) {
-		g_chat->removeUserFromChannel(asPlayer(), channelId);
+		g_chat.removeUserFromChannel(asPlayer(), channelId);
 	}
 
 	if (client) {
@@ -4544,7 +4455,7 @@ uint64_t Player::getMoney() const
 			continue;
 		}
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			containers.push_back(container);
 		} else {
 			moneyCount += item->getWorth();
@@ -4555,7 +4466,7 @@ uint64_t Player::getMoney() const
 	while (i < containers.size()) {
 		const auto& container = containers[i++];
 		for (const auto& item : container->getItemList()) {
-			if (const auto& childContainer = item->getContainer()) {
+			if (const auto& childContainer = item->asContainer()) {
 				containers.push_back(childContainer);
 			} else {
 				moneyCount += item->getWorth();
@@ -4586,7 +4497,7 @@ size_t Player::getMaxDepotItems() const
 std::forward_list<Condition*> Player::getMuteConditions() const
 {
 	std::forward_list<Condition*> muteConditions;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getTicks() <= 0) {
 			continue;
 		}
@@ -4596,7 +4507,7 @@ std::forward_list<Condition*> Player::getMuteConditions() const
 			continue;
 		}
 
-		muteConditions.push_front(condition);
+		muteConditions.push_front(condition.get());
 	}
 	return muteConditions;
 }

@@ -6,7 +6,6 @@
 #include "game.h"
 
 #include "actions.h"
-#include "bed.h"
 #include "configmanager.h"
 #include "creature.h"
 #include "databasetasks.h"
@@ -32,7 +31,7 @@
 #include <fstream>
 
 extern Actions* g_actions;
-extern Chat* g_chat;
+extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern Monsters g_monsters;
@@ -42,23 +41,9 @@ extern Scripts* g_scripts;
 extern Spells* g_spells;
 extern TalkActions* g_talkActions;
 extern Vocations g_vocations;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 
 Game g_game;
-
-Game::Game()
-{
-	offlineTrainingWindow.defaultEnterButton = 0;
-	offlineTrainingWindow.defaultEscapeButton = 1;
-	offlineTrainingWindow.choices.emplace_back("Sword Fighting and Shielding", SKILL_SWORD);
-	offlineTrainingWindow.choices.emplace_back("Axe Fighting and Shielding", SKILL_AXE);
-	offlineTrainingWindow.choices.emplace_back("Club Fighting and Shielding", SKILL_CLUB);
-	offlineTrainingWindow.choices.emplace_back("Distance Fighting and Shielding", SKILL_DISTANCE);
-	offlineTrainingWindow.choices.emplace_back("Magic Level and Shielding", SKILL_MAGLEVEL);
-	offlineTrainingWindow.buttons.emplace_back("Okay", offlineTrainingWindow.defaultEnterButton);
-	offlineTrainingWindow.buttons.emplace_back("Cancel", offlineTrainingWindow.defaultEscapeButton);
-	offlineTrainingWindow.priority = true;
-}
 
 void Game::start(ServiceManager* manager)
 {
@@ -88,7 +73,7 @@ void Game::setGameState(GameState_t newState)
 	switch (newState) {
 		case GAME_STATE_INIT: {
 			groups.load();
-			g_chat->load();
+			g_chat.load();
 
 			map.spawns.startup();
 
@@ -541,10 +526,11 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 
 	const auto& tile = creature->getTile();
 
-	std::vector<int32_t> oldStackPosVector;
-
 	SpectatorVec spectators;
 	map.getSpectators(spectators, tile->getPosition(), true);
+
+	std::vector<int32_t> oldStackPosVector;
+	oldStackPosVector.reserve(spectators.size());
 	for (const auto& spectator : spectators) {
 		if (const auto& player = spectator->asPlayer()) {
 			oldStackPosVector.push_back(
@@ -575,7 +561,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	}
 
 	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+		creature->removeCondition(condition.get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -1479,7 +1465,7 @@ std::shared_ptr<Item> Game::findItemOfType(const std::shared_ptr<Thing>& fromThi
 		}
 
 		if (depthSearch) {
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				containers.push_back(container);
 			}
 		}
@@ -1493,7 +1479,7 @@ std::shared_ptr<Item> Game::findItemOfType(const std::shared_ptr<Thing>& fromThi
 				return item;
 			}
 
-			if (const auto& subContainer = item->getContainer()) {
+			if (const auto& subContainer = item->asContainer()) {
 				containers.push_back(subContainer);
 			}
 		}
@@ -1527,7 +1513,7 @@ bool Game::removeMoney(const std::shared_ptr<Thing>& fromThing, uint64_t money, 
 			continue;
 		}
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			containers.push_back(container);
 		} else {
 			const uint32_t worth = item->getWorth();
@@ -1542,7 +1528,7 @@ bool Game::removeMoney(const std::shared_ptr<Thing>& fromThing, uint64_t money, 
 	while (i < containers.size()) {
 		const auto container = containers[i++];
 		for (const auto& item : container->getItemList()) {
-			if (const auto& tmpContainer = item->getContainer()) {
+			if (const auto& tmpContainer = item->asContainer()) {
 				containers.push_back(tmpContainer);
 			} else {
 				const uint32_t worth = item->getWorth();
@@ -1827,7 +1813,7 @@ void Game::playerEquipItem(uint32_t playerId, uint16_t spriteId)
 		return;
 	}
 
-	const auto& backpack = item->getContainer();
+	const auto& backpack = item->asContainer();
 	if (!backpack) {
 		return;
 	}
@@ -1898,7 +1884,7 @@ void Game::playerCreatePrivateChannel(uint32_t playerId)
 		return;
 	}
 
-	ChatChannel* channel = g_chat->createChannel(player, CHANNEL_PRIVATE);
+	const auto& channel = g_chat.createChannel(player, CHANNEL_PRIVATE);
 	if (!channel || !channel->addUser(player)) {
 		return;
 	}
@@ -1913,7 +1899,7 @@ void Game::playerChannelInvite(uint32_t playerId, const std::string& name)
 		return;
 	}
 
-	PrivateChatChannel* channel = g_chat->getPrivateChannel(player);
+	const auto& channel = g_chat.getPrivateChannel(player);
 	if (!channel) {
 		return;
 	}
@@ -1932,7 +1918,7 @@ void Game::playerChannelExclude(uint32_t playerId, const std::string& name)
 		return;
 	}
 
-	PrivateChatChannel* channel = g_chat->getPrivateChannel(player);
+	const auto& channel = g_chat.getPrivateChannel(player);
 	if (!channel) {
 		return;
 	}
@@ -1958,7 +1944,7 @@ void Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return;
 	}
 
-	ChatChannel* channel = g_chat->addUserToChannel(player, channelId);
+	const auto& channel = g_chat.addUserToChannel(player, channelId);
 	if (!channel) {
 		return;
 	}
@@ -1977,7 +1963,7 @@ void Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 void Game::playerCloseChannel(uint32_t playerId, uint16_t channelId)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		g_chat->removeUserFromChannel(player, channelId);
+		g_chat.removeUserFromChannel(player, channelId);
 	}
 }
 
@@ -2303,7 +2289,7 @@ static auto createBrowseField(const std::shared_ptr<Tile>& tile)
 
 	if (TileItemVector* itemVector = tile->getItemList()) {
 		for (const auto& item : *itemVector) {
-			if ((item->getContainer() || item->hasProperty(CONST_PROP_MOVEABLE)) &&
+			if ((item->asContainer() || item->hasProperty(CONST_PROP_MOVEABLE)) &&
 			    !item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
 				browseField->addItem(item);
 			}
@@ -2394,7 +2380,7 @@ void Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return;
 	}
 
-	if (const auto& podium = item->getPodium()) {
+	if (const auto& podium = item->asPodium()) {
 		podium->setDirection(static_cast<Direction>((podium->getDirection() + 1) % 4));
 		updatePodium(podium);
 	} else {
@@ -2631,7 +2617,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 
 	if (getBoolean(ConfigManager::ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS)) {
 		if (const auto& tile = tradeItem->getTile()) {
-			if (const auto& houseTile = tile->getHouseTile()) {
+			if (const auto& houseTile = tile->asHouseTile()) {
 				if (!tradeItem->getTopParent()->asCreature() && !houseTile->getHouse()->isInvited(player)) {
 					player->sendCancelMessage(RETURNVALUE_PLAYERISNOTINVITED);
 					return;
@@ -2664,7 +2650,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 		return;
 	}
 
-	if (const auto& tradeItemContainer = tradeItem->getContainer()) {
+	if (const auto& tradeItemContainer = tradeItem->asContainer()) {
 		for (auto&& item : tradeItems | std::views::keys | std::views::as_const) {
 			if (tradeItem == item) {
 				player->sendCancelMessage("This item is already being traded.");
@@ -2676,7 +2662,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 				return;
 			}
 
-			const auto& container = item->getContainer();
+			const auto& container = item->asContainer();
 			if (container && container->isHoldingItem(tradeItem)) {
 				player->sendCancelMessage("This item is already being traded.");
 				return;
@@ -2689,7 +2675,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 				return;
 			}
 
-			const auto& container = item->getContainer();
+			const auto& container = item->asContainer();
 			if (container && container->isHoldingItem(tradeItem)) {
 				player->sendCancelMessage("This item is already being traded.");
 				return;
@@ -2697,7 +2683,7 @@ void Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 		}
 	}
 
-	if (const auto& tradeContainer = tradeItem->getContainer()) {
+	if (const auto& tradeContainer = tradeItem->asContainer()) {
 		if (tradeContainer->getItemHoldingCount() + 1 > ITEM_STACK_SIZE) {
 			player->sendCancelMessage(std::format("You can only trade up to {} objects at once.", ITEM_STACK_SIZE));
 			return;
@@ -2910,7 +2896,7 @@ void Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, uint8_t
 		return;
 	}
 
-	const auto& tradeContainer = tradeItem->getContainer();
+	const auto& tradeContainer = tradeItem->asContainer();
 	if (!tradeContainer) {
 		return;
 	}
@@ -2920,7 +2906,7 @@ void Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, uint8_t
 	while (i < containers.size()) {
 		const auto container = containers[i++];
 		for (const auto& item : container->getItemList()) {
-			if (const auto& childContainer = item->getContainer()) {
+			if (const auto& childContainer = item->asContainer()) {
 				containers.push_back(childContainer);
 			}
 
@@ -3173,14 +3159,14 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	if (player->getAttackedCreature() && creatureId == 0) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
 
 	const auto& attackCreature = getCreatureByID(creatureId);
 	if (!attackCreature) {
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		player->sendCancelTarget();
 		return;
 	}
@@ -3189,7 +3175,7 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	if (ret != RETURNVALUE_NOERROR) {
 		player->sendCancelMessage(ret);
 		player->sendCancelTarget();
-		player->removeAttackedCreature();
+		player->setAttackedCreature(nullptr);
 		return;
 	}
 
@@ -3205,12 +3191,12 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 		return;
 	}
 
-	player->removeAttackedCreature();
+	player->setAttackedCreature(nullptr);
 
 	if (const auto& followCreature = getCreatureByID(creatureId)) {
 		player->setFollowCreature(followCreature);
 	} else {
-		player->removeFollowCreature();
+		player->setFollowCreature(nullptr);
 	}
 
 	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
@@ -3278,16 +3264,6 @@ void Game::playerRequestEditVip(uint32_t playerId, uint32_t guid, const std::str
 {
 	if (const auto& player = getPlayerByID(playerId)) {
 		player->editVIP(guid, description, icon, notify);
-	}
-}
-
-void Game::playerTurn(uint32_t playerId, Direction dir)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		if (tfs::events::player::onTurn(player, dir)) {
-			player->resetIdleTime();
-			internalCreatureTurn(player, dir);
-		}
 	}
 }
 
@@ -3491,7 +3467,7 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		case TALKTYPE_CHANNEL_O:
 		case TALKTYPE_CHANNEL_Y:
 		case TALKTYPE_CHANNEL_R1:
-			g_chat->talkToChannel(player, type, text, channelId);
+			g_chat.talkToChannel(player, type, text, channelId);
 			break;
 
 		case TALKTYPE_BROADCAST:
@@ -3574,8 +3550,8 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -3891,7 +3867,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 		} else if (blockType == BLOCK_ARMOR) {
 			addMagicEffect(targetPos, CONST_ME_BLOCKHIT);
 		} else if (blockType == BLOCK_IMMUNITY) {
-			uint8_t hitEffect = 0;
+			uint16_t hitEffect = 0;
 			switch (combatType) {
 				case COMBAT_UNDEFINEDDAMAGE: {
 					return;
@@ -3956,7 +3932,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 }
 
 void Game::combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-                             uint8_t& effect)
+                             uint16_t& effect)
 {
 	switch (combatType) {
 		case COMBAT_PHYSICALDAMAGE: {
@@ -4327,7 +4303,7 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		message.primary.value = damage.primary.value;
 		message.secondary.value = damage.secondary.value;
 
-		uint8_t hitEffect;
+		uint16_t hitEffect;
 		if (message.primary.value) {
 			combatGetTypeInfo(damage.primary.type, target, message.primary.color, hitEffect);
 			if (hitEffect != CONST_ME_NONE) {
@@ -4564,14 +4540,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const std::shared_p
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4580,7 +4556,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4591,7 +4567,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 }
 
 void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-                             uint8_t effect)
+                             uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4935,18 +4911,6 @@ void Game::playerReportRuleViolation(uint32_t playerId, const std::string& targe
 	}
 }
 
-void Game::playerDebugAssert(uint32_t playerId, const std::string& assertLine, const std::string& date,
-                             const std::string& description, const std::string& comment)
-{
-	if (const auto& player = getPlayerByID(playerId)) {
-		// TODO: move debug assertions to database
-		auto fs = std::ofstream{"client_assertions.txt", std::ios::app};
-		std::println(fs, "----- {:%d/%m/%Y %T} - {:s} ({:s}) -----\n{:s}\n{:s}\n{:s}\n{:s}\n",
-		             std::chrono::system_clock::now(), player->getName(), player->getIP().to_string(), assertLine, date,
-		             description, comment);
-	}
-}
-
 void Game::playerLeaveMarket(uint32_t playerId)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
@@ -5191,13 +5155,13 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		return;
 	}
 
-	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
-	if (offerAccountId == player->getAccount()) {
-		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
+	if (amount > offer.amount) {
 		return;
 	}
 
-	if (amount > offer.amount) {
+	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
+	if (offerAccountId == player->getAccount()) {
+		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
 		return;
 	}
 
@@ -5352,10 +5316,10 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::str
 	}
 }
 
-void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, NetworkMessage_ptr msg)
+void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		tfs::events::player::onNetworkMessage(player, recvByte, msg);
+		tfs::events::player::onNetworkMessage(player, recvByte, std::move(msg));
 	}
 }
 
@@ -5377,7 +5341,7 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 		containers.pop_front();
 
 		for (const auto& item : container->getItemList()) {
-			const auto& containerItem = item->getContainer();
+			const auto& containerItem = item->asContainer();
 			if (containerItem && !containerItem->empty()) {
 				containers.push_back(containerItem);
 				continue;
@@ -5408,32 +5372,20 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
 		creature->removeCondition(type, true);
-	}
-}
-
-void Game::sendOfflineTrainingDialog(const std::shared_ptr<Player>& player)
-{
-	if (!player) {
-		return;
-	}
-
-	if (!player->hasModalWindowOpen(offlineTrainingWindow.id)) {
-		player->sendModalWindow(offlineTrainingWindow);
 	}
 }
 
@@ -5450,26 +5402,7 @@ void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, ui
 
 	player->onModalWindowHandled(modalWindowId);
 
-	// offline training, hard-coded
-	if (modalWindowId == std::numeric_limits<uint32_t>::max()) {
-		if (button == offlineTrainingWindow.defaultEnterButton) {
-			if (choice == SKILL_SWORD || choice == SKILL_AXE || choice == SKILL_CLUB || choice == SKILL_DISTANCE ||
-			    choice == SKILL_MAGLEVEL) {
-				if (const auto& bedItem = player->getBedItem()) {
-					if (bedItem->hasParent() && bedItem->sleep(player)) {
-						player->setOfflineTrainingSkill(choice);
-						return;
-					}
-				}
-			}
-		} else {
-			player->sendTextMessage(MESSAGE_EVENT_ADVANCE, "Offline training aborted.");
-		}
-
-		player->setBedItem(nullptr);
-	} else {
-		tfs::events::player::onModalWindow(player, modalWindowId, button, choice);
-	}
+	tfs::events::player::onModalWindow(player, modalWindowId, button, choice);
 }
 
 std::shared_ptr<Guild> Game::getGuild(uint32_t id) const
@@ -5498,15 +5431,6 @@ void Game::internalRemoveItems(const std::vector<std::shared_ptr<Item>>& itemLis
 			internalRemoveItem(item);
 		}
 	}
-}
-
-std::shared_ptr<BedItem> Game::getBedBySleeper(uint32_t guid) const
-{
-	auto it = bedSleepersMap.find(guid);
-	if (it == bedSleepersMap.end()) {
-		return nullptr;
-	}
-	return it->second;
 }
 
 void Game::updatePodium(const std::shared_ptr<Podium>& podium)
@@ -5549,7 +5473,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 		case RELOAD_TYPE_ACTIONS:
 			return g_actions->reload();
 		case RELOAD_TYPE_CHAT:
-			return g_chat->load();
+			return g_chat.load();
 		case RELOAD_TYPE_CONFIG:
 			return ConfigManager::load();
 		case RELOAD_TYPE_EVENTS:
@@ -5602,7 +5526,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 			mounts.reload();
 			ConfigManager::reload();
 			tfs::events::load();
-			g_chat->load();
+			g_chat.load();
 			*/
 			return true;
 		}
@@ -5627,7 +5551,7 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_weapons->loadDefaults();
 			mounts.reload();
 			tfs::events::reload();
-			g_chat->load();
+			g_chat.load();
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);

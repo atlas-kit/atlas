@@ -39,7 +39,7 @@ enum ItemTypes_t
 	ITEM_TYPE_DOOR,
 	ITEM_TYPE_MAGICFIELD,
 	ITEM_TYPE_TELEPORT,
-	ITEM_TYPE_BED,
+	ITEM_TYPE_BED, // unused
 	ITEM_TYPE_KEY,
 	ITEM_TYPE_RUNE,
 	ITEM_TYPE_PODIUM,
@@ -155,10 +155,7 @@ enum ItemParseAttributes_t
 	ITEM_PARSE_SUPPRESSCURSE,
 	ITEM_PARSE_FIELD,
 	ITEM_PARSE_REPLACEABLE,
-	ITEM_PARSE_PARTNERDIRECTION,
 	ITEM_PARSE_LEVELDOOR,
-	ITEM_PARSE_MALETRANSFORMTO,
-	ITEM_PARSE_FEMALETRANSFORMTO,
 	ITEM_PARSE_TRANSFORMTO,
 	ITEM_PARSE_DESTROYTO,
 	ITEM_PARSE_ELEMENTICE,
@@ -215,6 +212,7 @@ enum ItemParseAttributes_t
 	ITEM_PARSE_BOOSTPERCENTPHYSICAL,
 	ITEM_PARSE_BOOSTPERCENTHEALING,
 	ITEM_PARSE_SUPPLY,
+	ITEM_PARSE_WRAPCONTAINER,
 };
 
 struct Abilities
@@ -280,7 +278,6 @@ public:
 	bool isDepot() const { return (type == ITEM_TYPE_DEPOT); }
 	bool isMailbox() const { return (type == ITEM_TYPE_MAILBOX); }
 	bool isTrashHolder() const { return (type == ITEM_TYPE_TRASHHOLDER); }
-	bool isBed() const { return (type == ITEM_TYPE_BED); }
 	bool isRune() const { return (type == ITEM_TYPE_RUNE); }
 	bool isPodium() const { return (type == ITEM_TYPE_PODIUM); }
 	bool isPickupable() const { return (allowPickupable || pickupable); }
@@ -356,8 +353,6 @@ public:
 
 	CombatType_t combatType = COMBAT_NONE;
 
-	uint16_t transformToOnUse[2] = {0, 0};
-	uint16_t transformToFree = 0;
 	uint16_t destroyTo = 0;
 	uint16_t maxTextLen = 0;
 	uint16_t writeOnceItemId = 0;
@@ -369,7 +364,6 @@ public:
 	uint16_t wareId = 0;
 
 	MagicEffectClasses magicEffect = CONST_ME_NONE;
-	Direction bedPartnerDir = DIRECTION_NONE;
 	WeaponType_t weaponType = WEAPON_NONE;
 	Ammo_t ammoType = AMMO_NONE;
 	ShootType_t shootType = CONST_ANI_NONE;
@@ -415,6 +409,7 @@ public:
 	bool supply = false;
 	bool showClientCharges = false;
 	bool showClientDuration = false;
+	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
 };
 
 class Items
@@ -450,6 +445,8 @@ public:
 	bool loadFromXml();
 	void parseItemNode(const pugi::xml_node& itemNode, uint16_t id);
 
+	auto begin() const { return items.begin(); }
+	auto end() const { return items.end(); }
 	size_t size() const { return items.size(); }
 
 	NameMap nameToItems;

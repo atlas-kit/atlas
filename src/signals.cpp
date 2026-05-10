@@ -30,9 +30,9 @@ extern Monsters g_monsters;
 extern TalkActions* g_talkActions;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
-extern Weapons* g_weapons;
+extern std::unique_ptr<Weapons> g_weapons;
 extern Game g_game;
-extern Chat* g_chat;
+extern Chat g_chat;
 extern LuaEnvironment g_luaEnvironment;
 
 namespace {
@@ -84,7 +84,7 @@ void sighupHandler()
 	tfs::events::reload();
 	std::cout << "Reloaded events." << std::endl;
 
-	g_chat->load();
+	g_chat.load();
 	std::cout << "Reloaded chatchannels." << std::endl;
 
 	g_luaEnvironment.loadFile("data/global.lua");

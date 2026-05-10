@@ -191,12 +191,10 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	PropStream propStream;
 	propStream.init(conditions.data(), conditions.size());
 
-	Condition* condition = Condition::createCondition(propStream);
+	auto condition = Condition::createCondition(propStream);
 	while (condition) {
 		if (condition->unserialize(propStream)) {
-			player->storedConditionList.push_front(condition);
-		} else {
-			delete condition;
+			player->storedConditionList.push_front(std::move(condition));
 		}
 		condition = Condition::createCondition(propStream);
 	}
@@ -359,7 +357,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 		loadItems(itemMap, playerItemsRes);
 
 		for (auto&& [item, pid] : itemMap | std::views::reverse | std::views::values) {
-			if (const auto& itemContainer = item->getContainer()) {
+			if (const auto& itemContainer = item->asContainer()) {
 				uint8_t cid = item->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER);
 				if (cid > 0) {
 					openContainersList.emplace(cid, itemContainer);
@@ -374,7 +372,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 					continue;
 				}
 
-				if (const auto& container = it2->second.first->getContainer()) {
+				if (const auto& container = it2->second.first->asContainer()) {
 					container->internalAddThing(item);
 				}
 			}
@@ -405,7 +403,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 					continue;
 				}
 
-				if (const auto& container = it2->second.first->getContainer()) {
+				if (const auto& container = it2->second.first->asContainer()) {
 					container->internalAddThing(item);
 				}
 			}
@@ -429,7 +427,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 					continue;
 				}
 
-				if (const auto& container = it2->second.first->getContainer()) {
+				if (const auto& container = it2->second.first->asContainer()) {
 					container->internalAddThing(item);
 				}
 			}
@@ -453,7 +451,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 					continue;
 				}
 
-				if (const auto& container = it2->second.first->getContainer()) {
+				if (const auto& container = it2->second.first->asContainer()) {
 					container->internalAddThing(item);
 				}
 			}
@@ -513,7 +511,7 @@ bool IOLoginData::saveItems(const std::shared_ptr<const Player>& player, const I
 	for (auto&& [pid, item] : itemList | std::views::as_const) {
 		++runningId;
 
-		if (const auto& container = item->getContainer()) {
+		if (const auto& container = item->asContainer()) {
 			if (container->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
 				container->setIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER, 0);
 			}
@@ -543,12 +541,12 @@ bool IOLoginData::saveItems(const std::shared_ptr<const Player>& player, const I
 	}
 
 	for (size_t i = 0; i < containers.size(); ++i) {
-		const auto& [container, parentId] = containers[i];
+		const auto [container, parentId] = containers[i];
 
 		for (const auto& item : container->getItemList()) {
 			++runningId;
 
-			if (const auto& subContainer = item->getContainer()) {
+			if (const auto& subContainer = item->asContainer()) {
 				containers.emplace_back(subContainer, runningId);
 
 				if (subContainer->getIntAttr(ITEM_ATTRIBUTE_OPENCONTAINER)) {
@@ -602,7 +600,7 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 
 	// serialize conditions
 	PropWriteStream propWriteStream;
-	for (Condition* condition : player->conditions) {
+	for (const auto& condition : player->conditions) {
 		if (condition->isPersistent()) {
 			condition->serialize(propWriteStream);
 			propWriteStream.write<uint8_t>(CONDITIONATTR_END);

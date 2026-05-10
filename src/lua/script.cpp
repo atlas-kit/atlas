@@ -2,7 +2,6 @@
 
 #include "../script.h"
 
-#include "../bed.h"
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
@@ -23,7 +22,7 @@
 
 #include <string>
 
-extern Chat* g_chat;
+extern Chat g_chat;
 extern Game g_game;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
@@ -32,14 +31,10 @@ extern Actions* g_actions;
 extern TalkActions* g_talkActions;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
-extern Weapons* g_weapons;
 
 LuaEnvironment g_luaEnvironment;
 
 namespace {
-
-std::unordered_map<uint32_t, LuaTimerEventDesc> timerEvents;
-uint32_t lastEventTimerId = 1;
 
 bool getArea(lua_State* L, std::vector<uint32_t>& vec, uint32_t& rows)
 {
@@ -148,7 +143,7 @@ int luaDoAreaCombat(lua_State* L)
 
 		CombatParams params;
 		params.combatType = combatType;
-		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
+		params.impactEffect = tfs::lua::getNumber<uint16_t>(L, 7);
 
 		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
 		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
@@ -190,7 +185,7 @@ int luaDoTargetCombat(lua_State* L)
 
 	CombatParams params{
 	    .combatType = combatType,
-	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
+	    .impactEffect = tfs::lua::getNumber<uint16_t>(L, 6),
 	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
 	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
 	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),
@@ -285,7 +280,7 @@ int luaSendChannelMessage(lua_State* L)
 {
 	// sendChannelMessage(channelId, type, message)
 	uint32_t channelId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getChannelById(channelId);
+	const auto& channel = g_chat.getChannelById(channelId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -302,7 +297,7 @@ int luaSendGuildChannelMessage(lua_State* L)
 {
 	// sendGuildChannelMessage(guildId, type, message)
 	uint32_t guildId = tfs::lua::getNumber<uint32_t>(L, 1);
-	ChatChannel* channel = g_chat->getGuildChannelById(guildId);
+	const auto& channel = g_chat.getGuildChannelById(guildId);
 	if (!channel) {
 		tfs::lua::pushBoolean(L, false);
 		return 1;
@@ -438,12 +433,12 @@ int luaAddEvent(lua_State* L)
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
 	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
 
-	auto& lastTimerEventId = lastEventTimerId;
-	eventDesc.eventId = g_scheduler.addEvent(
-	    createSchedulerTask(delay, [=]() { g_luaEnvironment.executeTimerEvent(lastTimerEventId); }));
+	uint32_t timerId = g_luaEnvironment.lastEventTimerId++;
+	eventDesc.eventId =
+	    g_scheduler.addEvent(createSchedulerTask(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
 
-	timerEvents.emplace(lastTimerEventId, std::move(eventDesc));
-	tfs::lua::pushNumber(L, lastTimerEventId++);
+	g_luaEnvironment.timerEvents.emplace(timerId, std::move(eventDesc));
+	tfs::lua::pushNumber(L, timerId);
 	return 1;
 }
 
@@ -452,7 +447,7 @@ int luaStopEvent(lua_State* L)
 	// stopEvent(eventid)
 	uint32_t eventId = tfs::lua::getNumber<uint32_t>(L, 1);
 
-	auto& events = timerEvents;
+	auto& events = g_luaEnvironment.timerEvents;
 	auto it = events.find(eventId);
 	if (it == events.end()) {
 		tfs::lua::pushBoolean(L, false);
@@ -522,7 +517,7 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, const std::shared_
 	// execute it
 	ret = tfs::lua::protectedCall(L, 0, 0);
 	if (ret != 0) {
-		tfs::lua::reportError(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 		tfs::lua::resetScriptEnv();
 		return -1;
 	}
@@ -673,14 +668,14 @@ bool LuaScriptInterface::callFunction(int params)
 	bool result = false;
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 1) != 0) {
-		tfs::lua::reportError(L, tfs::lua::getString(L, -1));
+		tfs::lua::reportError(L, tfs::lua::getString(L, -1), true);
 	} else {
 		result = tfs::lua::getBoolean(L, -1);
 	}
 
 	lua_pop(L, 1);
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -691,11 +686,11 @@ void LuaScriptInterface::callVoidFunction(int params)
 {
 	int size = lua_gettop(L);
 	if (tfs::lua::protectedCall(L, params, 0) != 0) {
-		tfs::lua::reportError(L, tfs::lua::popString(L));
+		tfs::lua::reportError(L, tfs::lua::popString(L), true);
 	}
 
 	if ((lua_gettop(L) + params + 1) != size) {
-		tfs::lua::reportError(L, "Stack size changed!");
+		tfs::lua::reportError(L, "Stack size changed!", true);
 	}
 
 	tfs::lua::resetScriptEnv();
@@ -974,7 +969,7 @@ LuaScriptInterface* LuaEnvironment::getTestInterface()
 	return testInterface;
 }
 
-Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
+std::shared_ptr<Combat> LuaEnvironment::getCombatObject(uint32_t id) const
 {
 	auto it = combatMap.find(id);
 	if (it == combatMap.end()) {
@@ -983,9 +978,9 @@ Combat_ptr LuaEnvironment::getCombatObject(uint32_t id) const
 	return it->second;
 }
 
-Combat_ptr LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
+std::shared_ptr<Combat> LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
 {
-	Combat_ptr combat = std::make_shared<Combat>();
+	const auto combat = std::make_shared<Combat>();
 	combatMap[++lastCombatId] = combat;
 	combatIdMap[interface].push_back(lastCombatId);
 	return combat;

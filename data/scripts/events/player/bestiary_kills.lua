@@ -33,7 +33,12 @@ event.onCreatureKill = function(self, target)
 		return true
 	end
 
-	local raceId = monster:getType():getBestiaryInfo().raceId
+	local monsterType = monster:getType()
+	if not monsterType then
+		return true
+	end
+
+	local raceId = monsterType:getBestiaryInfo().raceId
 	if raceId == 0 then
 		return true
 	end
@@ -42,7 +47,7 @@ event.onCreatureKill = function(self, target)
 		killer:addBestiaryKills(raceId)
 
 		if killer:isBestiaryTracked(raceId) then
-			killer:sendTrackedBestiary()
+			killer:sendTrackedBestiary(monsterType:isBoss())
 		end
 	end
 	return true

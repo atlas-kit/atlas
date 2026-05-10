@@ -5,7 +5,6 @@
 
 #include "iomapserialize.h"
 
-#include "bed.h"
 #include "database.h"
 #include "game.h"
 #include "house.h"
@@ -31,7 +30,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 		// create a new item
 		if (const auto& item = Item::CreateItem(id)) {
 			item->unserializeAttr(first, last);
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				loadContainer(first, last, container);
 			}
 
@@ -39,17 +38,14 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 			item->startDecaying();
 		}
 	} else {
-		// Stationary items like doors/beds/blackboards/bookcases
+		// Stationary items like doors/blackboards/bookcases
 		std::shared_ptr<Item> item = nullptr;
 		if (const TileItemVector* items = tile->getItemList()) {
 			for (const auto& findItem : *items) {
 				if (findItem->getID() == id) {
 					item = findItem;
 					break;
-				} else if (iType.isDoor() && findItem->getDoor()) {
-					item = findItem;
-					break;
-				} else if (iType.isBed() && findItem->getBed()) {
+				} else if (iType.isDoor() && findItem->asDoor()) {
 					item = findItem;
 					break;
 				}
@@ -59,7 +55,7 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 		if (item) {
 			item->unserializeAttr(first, last);
 
-			if (const auto& container = item->getContainer()) {
+			if (const auto& container = item->asContainer()) {
 				loadContainer(first, last, container);
 			}
 
@@ -68,12 +64,8 @@ void loadItem(OTB::iterator& first, const OTB::iterator& last, const std::shared
 			// The map changed since the last save, just read the attributes
 			if (const auto& dummy = Item::CreateItem(id)) {
 				dummy->unserializeAttr(first, last);
-				if (const auto& container = dummy->getContainer()) {
+				if (const auto& container = dummy->asContainer()) {
 					loadContainer(first, last, container);
-				} else if (const auto& bedItem = dummy->getBed()) {
-					if (uint32_t sleeperGUID = bedItem->getSleeper(); sleeperGUID != 0) {
-						g_game.removeBedSleeper(sleeperGUID);
-					}
 				}
 			}
 		}
@@ -146,7 +138,6 @@ bool IOMapSerialize::saveHouseItems()
 	if (!db.executeQuery("DELETE FROM `tile_store`")) {
 		return false;
 	}
-
 	DBInsert stmt("INSERT INTO `tile_store` (`house_id`, `data`) VALUES ");
 
 	PropWriteStream stream;
@@ -176,7 +167,7 @@ bool IOMapSerialize::saveHouseItems()
 
 void IOMapSerialize::saveItem(PropWriteStream& stream, const std::shared_ptr<const Item>& item)
 {
-	const auto& container = item->getContainer();
+	const auto& container = item->asContainer();
 
 	// Write ID & props
 	stream.write<uint16_t>(item->getID());
@@ -207,8 +198,8 @@ void IOMapSerialize::saveTile(PropWriteStream& stream, const std::shared_ptr<con
 		const ItemType& it = Item::items[item->getID()];
 
 		// Note that these are NEGATED, ie. these are the items that will be saved.
-		if (!(it.moveable || it.forceSerialize || item->getDoor() ||
-		      (item->getContainer() && !item->getContainer()->empty()) || it.canWriteText || item->getBed())) {
+		if (!(it.moveable || it.forceSerialize || item->asDoor() ||
+		      (item->asContainer() && !item->asContainer()->empty()) || it.canWriteText)) {
 			continue;
 		}
 
@@ -276,13 +267,13 @@ bool IOMapSerialize::saveHouseInfo()
 			    "UPDATE `houses` SET `owner` = {:d}, `paid` = {:d}, `warnings` = {:d}, `name` = {:s}, `town_id` = {:d}, `rent` = {:d}, `size` = {:d}, `beds` = {:d} WHERE `id` = {:d}",
 			    house->getOwner(), house->getPaidUntil(), house->getPayRentWarnings(),
 			    db.escapeString(house->getName()), house->getTownId(), house->getRent(), house->getTiles().size(),
-			    house->getBedCount(), house->getId()));
+			    house->getMaxBeds(), house->getId()));
 		} else {
 			db.executeQuery(std::format(
 			    "INSERT INTO `houses` (`id`, `owner`, `paid`, `warnings`, `name`, `town_id`, `rent`, `size`, `beds`) VALUES ({:d}, {:d}, {:d}, {:d}, {:s}, {:d}, {:d}, {:d}, {:d})",
 			    house->getId(), house->getOwner(), house->getPaidUntil(), house->getPayRentWarnings(),
 			    db.escapeString(house->getName()), house->getTownId(), house->getRent(), house->getTiles().size(),
-			    house->getBedCount()));
+			    house->getMaxBeds()));
 		}
 	}
 
