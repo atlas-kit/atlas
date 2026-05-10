@@ -95,7 +95,7 @@ bool IOLoginData::loadPlayerById(const std::shared_ptr<Player>& player, uint32_t
 	return loadPlayer(
 	    player,
 	    db.storeQuery(std::format(
-	        "SELECT `id`, `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `blessings`, `mana`, `manamax`, `manaspent`, `soul`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `lookmounthead`, `lookmountbody`, `lookmountlegs`, `lookmountfeet`, `currentmount`, `randomizemount`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skulltime`, `skull`, `town_id`, `balance`, `offlinetraining_time`, `offlinetraining_skill`, `stamina`, `skill_fist`, `skill_fist_tries`, `skill_club`, `skill_club_tries`, `skill_sword`, `skill_sword_tries`, `skill_axe`, `skill_axe_tries`, `skill_dist`, `skill_dist_tries`, `skill_shielding`, `skill_shielding_tries`, `skill_fishing`, `skill_fishing_tries`, `direction` FROM `players` WHERE `id` = {:d}",
+	        "SELECT `id`, `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `blessings`, `mana`, `manamax`, `manaspent`, `soul`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `lookmounthead`, `lookmountbody`, `lookmountlegs`, `lookmountfeet`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skulltime`, `skull`, `town_id`, `balance`, `offlinetraining_time`, `offlinetraining_skill`, `stamina`, `skill_fist`, `skill_fist_tries`, `skill_club`, `skill_club_tries`, `skill_sword`, `skill_sword_tries`, `skill_axe`, `skill_axe_tries`, `skill_dist`, `skill_dist_tries`, `skill_shielding`, `skill_shielding_tries`, `skill_fishing`, `skill_fishing_tries`, `direction` FROM `players` WHERE `id` = {:d}",
 	        id)));
 }
 
@@ -105,7 +105,7 @@ bool IOLoginData::loadPlayerByName(const std::shared_ptr<Player>& player, const 
 	return loadPlayer(
 	    player,
 	    db.storeQuery(std::format(
-	        "SELECT `id`, `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `blessings`, `mana`, `manamax`, `manaspent`, `soul`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `lookmounthead`, `lookmountbody`, `lookmountlegs`, `lookmountfeet`, `currentmount`, `randomizemount`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skulltime`, `skull`, `town_id`, `balance`, `offlinetraining_time`, `offlinetraining_skill`, `stamina`, `skill_fist`, `skill_fist_tries`, `skill_club`, `skill_club_tries`, `skill_sword`, `skill_sword_tries`, `skill_axe`, `skill_axe_tries`, `skill_dist`, `skill_dist_tries`, `skill_shielding`, `skill_shielding_tries`, `skill_fishing`, `skill_fishing_tries`, `direction` FROM `players` WHERE `name` = {:s}",
+	        "SELECT `id`, `name`, `account_id`, `group_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, `healthmax`, `blessings`, `mana`, `manamax`, `manaspent`, `soul`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `lookmounthead`, `lookmountbody`, `lookmountlegs`, `lookmountfeet`, `posx`, `posy`, `posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skulltime`, `skull`, `town_id`, `balance`, `offlinetraining_time`, `offlinetraining_skill`, `stamina`, `skill_fist`, `skill_fist_tries`, `skill_club`, `skill_club_tries`, `skill_sword`, `skill_sword_tries`, `skill_axe`, `skill_axe_tries`, `skill_dist`, `skill_dist_tries`, `skill_shielding`, `skill_shielding_tries`, `skill_fishing`, `skill_fishing_tries`, `direction` FROM `players` WHERE `name` = {:s}",
 	        db.escapeString(name))));
 }
 
@@ -233,9 +233,7 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	player->defaultOutfit.lookMountLegs = result->getNumber<uint16_t>("lookmountlegs");
 	player->defaultOutfit.lookMountFeet = result->getNumber<uint16_t>("lookmountfeet");
 	player->currentOutfit = player->defaultOutfit;
-	player->currentMount = result->getNumber<uint16_t>("currentmount");
 	player->setDirection(static_cast<Direction>(result->getNumber<uint16_t>("direction")));
-	player->randomizeMount = result->getNumber<uint8_t>("randomizemount") != 0;
 
 	if (g_game.getWorldType() != WORLD_TYPE_PVP_ENFORCED) {
 		const time_t skullSeconds = result->getNumber<time_t>("skulltime") - time(nullptr);
@@ -475,22 +473,6 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 		} while (vipRes->next());
 	}
 
-	// load outfits & addons
-	if (const auto& outfitsRes = db.storeQuery(std::format(
-	        "SELECT `outfit_id`, `addons` FROM `player_outfits` WHERE `player_id` = {:d}", player->getGUID()))) {
-		do {
-			player->addOutfit(outfitsRes->getNumber<uint16_t>("outfit_id"), outfitsRes->getNumber<uint8_t>("addons"));
-		} while (outfitsRes->next());
-	}
-
-	// load mounts
-	if (const auto& mountsRes = db.storeQuery(
-	        std::format("SELECT `mount_id` FROM `player_mounts` WHERE `player_id` = {:d}", player->getGUID()))) {
-		do {
-			player->tameMount(mountsRes->getNumber<uint16_t>("mount_id"));
-		} while (mountsRes->next());
-	}
-
 	player->updateBaseSpeed();
 	player->updateInventoryWeight();
 	player->updateItemsLight(true);
@@ -627,8 +609,6 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	query << "`lookmountbody` = " << static_cast<uint32_t>(player->defaultOutfit.lookMountBody) << ',';
 	query << "`lookmountlegs` = " << static_cast<uint32_t>(player->defaultOutfit.lookMountLegs) << ',';
 	query << "`lookmountfeet` = " << static_cast<uint32_t>(player->defaultOutfit.lookMountFeet) << ',';
-	query << "`currentmount` = " << static_cast<uint16_t>(player->currentMount) << ',';
-	query << "`randomizemount` = " << player->randomizeMount << ",";
 	query << "`maglevel` = " << player->magLevel << ',';
 	query << "`mana` = " << player->mana << ',';
 	query << "`manamax` = " << player->manaMax << ',';
@@ -810,40 +790,6 @@ bool IOLoginData::savePlayer(const std::shared_ptr<Player>& player)
 	}
 
 	if (!storageQuery.execute()) {
-		return false;
-	}
-
-	// save outfits & addons
-	if (!db.executeQuery(std::format("DELETE FROM `player_outfits` WHERE `player_id` = {:d}", player->getGUID()))) {
-		return false;
-	}
-
-	DBInsert outfitQuery("INSERT INTO `player_outfits` (`player_id`, `outfit_id`, `addons`) VALUES ");
-
-	for (auto&& [outfitId, addons] : player->outfits | std::views::as_const) {
-		if (!outfitQuery.addRow(std::format("{:d}, {:d}, {:d}", player->getGUID(), outfitId, addons))) {
-			return false;
-		}
-	}
-
-	if (!outfitQuery.execute()) {
-		return false;
-	}
-
-	// save mounts
-	if (!db.executeQuery(std::format("DELETE FROM `player_mounts` WHERE `player_id` = {:d}", player->getGUID()))) {
-		return false;
-	}
-
-	DBInsert mountQuery("INSERT INTO `player_mounts` (`player_id`, `mount_id`) VALUES ");
-
-	for (const auto& it : player->mounts) {
-		if (!mountQuery.addRow(std::format("{:d}, {:d}", player->getGUID(), it))) {
-			return false;
-		}
-	}
-
-	if (!mountQuery.execute()) {
 		return false;
 	}
 

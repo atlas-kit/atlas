@@ -1518,17 +1518,6 @@ do
 	end
 end
 
-do
-	local mounts = {}
-	for _, mountData in pairs(Game.getMounts()) do
-		mounts[mountData.clientId] = mountData.name
-	end
-
-	function getMountNameByLookType(lookType)
-		return mounts[lookType]
-	end
-end
-
 function indexToCombatType(idx)
 	return 1 << idx
 end

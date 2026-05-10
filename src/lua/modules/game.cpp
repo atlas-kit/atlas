@@ -222,22 +222,6 @@ int luaGameGetItemTypeByClientId(lua_State* L)
 	return 1;
 }
 
-int luaGameGetMountIdByLookType(lua_State* L)
-{
-	// Game.getMountIdByLookType(lookType)
-	Mount* mount = nullptr;
-	if (tfs::lua::isNumber(L, 1)) {
-		mount = g_game.mounts.getMountByClientID(tfs::lua::getNumber<uint16_t>(L, 1));
-	}
-
-	if (mount) {
-		tfs::lua::pushNumber(L, mount->id);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 int luaGameGetParties(lua_State* L)
 {
 	// Game.getParties()
@@ -279,54 +263,6 @@ int luaGameGetHouses(lua_State* L)
 		tfs::lua::setMetatable(L, -1, "House");
 		lua_rawseti(L, -2, ++index);
 	}
-	return 1;
-}
-
-int luaGameGetOutfits(lua_State* L)
-{
-	// Game.getOutfits(playerSex)
-	if (!tfs::lua::isNumber(L, 1)) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	PlayerSex_t playerSex = tfs::lua::getNumber<PlayerSex_t>(L, 1);
-	if (playerSex > PLAYERSEX_LAST) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	const auto& outfits = Outfits::getInstance().getOutfits(playerSex);
-	lua_createtable(L, outfits.size(), 0);
-
-	int index = 0;
-	for (const auto& outfit : outfits) {
-		tfs::lua::pushOutfit(L, &outfit);
-		lua_rawseti(L, -2, ++index);
-	}
-
-	return 1;
-}
-
-int luaGameGetMounts(lua_State* L)
-{
-	// Game.getMounts()
-	const auto& mounts = g_game.mounts.getMounts();
-	lua_createtable(L, mounts.size(), 0);
-
-	int index = 0;
-	for (const auto& mount : mounts) {
-		lua_createtable(L, 0, 5);
-
-		tfs::lua::setField(L, "name", mount.name);
-		tfs::lua::setField(L, "speed", mount.speed);
-		tfs::lua::setField(L, "clientId", mount.clientId);
-		tfs::lua::setField(L, "id", mount.id);
-		tfs::lua::setField(L, "premium", mount.premium);
-
-		lua_rawseti(L, -2, ++index);
-	}
-
 	return 1;
 }
 
@@ -716,13 +652,10 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "getBestiary", luaGameGetBestiary);
 	lsi.registerMethod("Game", "getCurrencyItems", luaGameGetCurrencyItems);
 	lsi.registerMethod("Game", "getItemTypeByClientId", luaGameGetItemTypeByClientId);
-	lsi.registerMethod("Game", "getMountIdByLookType", luaGameGetMountIdByLookType);
 
 	lsi.registerMethod("Game", "getParties", luaGameGetParties);
 	lsi.registerMethod("Game", "getTowns", luaGameGetTowns);
 	lsi.registerMethod("Game", "getHouses", luaGameGetHouses);
-	lsi.registerMethod("Game", "getOutfits", luaGameGetOutfits);
-	lsi.registerMethod("Game", "getMounts", luaGameGetMounts);
 	lsi.registerMethod("Game", "getVocations", luaGameGetVocations);
 	lsi.registerMethod("Game", "getRuneSpells", luaGameGetRuneSpells);
 	lsi.registerMethod("Game", "getInstantSpells", luaGameGetInstantSpells);

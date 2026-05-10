@@ -63,12 +63,13 @@ configManager = {}
 ---@field getBestiary fun(): table
 ---@field getCurrencyItems fun(): table
 ---@field getItemTypeByClientId fun(clientId: number): ItemType
----@field getMountIdByLookType fun(lookType: number): number
 ---@field getParties fun(): table
 ---@field getTowns fun(): table
 ---@field getHouses fun(): table
 ---@field getOutfits fun(sex: number): table
+---@field getOutfitByLookType fun(lookType: number): Outfit_t
 ---@field getMounts fun(): table
+---@field getMountByLookType fun(lookType: number): table
 ---@field getVocations fun(): table
 ---@field getGameState fun(): string
 ---@field setGameState fun(state: string): boolean
@@ -191,6 +192,8 @@ ModalWindow = {}
 ---@field create fun(): Item
 ---@field __eq fun(self: Item, other: Item): boolean
 ---@field isItem fun(self: Item): boolean
+---@field isPodium fun(self: Item): boolean
+---@field getPodium fun(self: Item): Podium
 ---@field getParent fun(self: Item): Item
 ---@field getTopParent fun(self: Item): Item
 ---@field getId fun(self: Item): number
@@ -422,12 +425,23 @@ Creature = {}
 ---@field removeOutfitAddon fun(self: Player, outfitId: number, addonId: number)
 ---@field hasOutfit fun(self: Player, outfitId: number, addon?: number): boolean
 ---@field canWearOutfit fun(self: Player, outfitId: number, addonId?: number): boolean
+---@field getCurrentOutfit fun(self: Player): Outfit
+---@field setCurrentOutfit fun(self: Player, outfit: Outfit)
+---@field getDefaultOutfit fun(self: Player): Outfit
+---@field setDefaultOutfit fun(self: Player, outfit: Outfit)
 ---@field sendOutfitWindow fun(self: Player)
----@field sendEditPodium fun(self: Player, item: Item)
+---@field getRandomizeMount fun(self: Player): boolean
+---@field setRandomizeMount fun(self: Player, randomize: boolean)
+---@field getLastMountToggle fun(self: Player): number
+---@field setLastMountToggle fun(self: Player, timestamp: number)
+---@field getCurrentMount fun(self: Player): number
+---@field mount fun(self: Player, mountId: number)
+---@field dismount fun(self: Player)
+---@field sendPodiumWindow fun(self: Player, item: Item)
 ---@field addMount fun(self: Player, mountId: number)
 ---@field removeMount fun(self: Player, mountId: number)
 ---@field hasMount fun(self: Player, mountId: number): boolean
----@field toggleMount fun(self: Player, active: boolean)
+---@field toggleMount fun(self: Player, active: boolean): boolean
 ---@field getPremiumEndsAt fun(self: Player): number
 ---@field setPremiumEndsAt fun(self: Player, timestamp: number)
 ---@field hasBlessing fun(self: Player, blessingId: number): boolean
@@ -1856,14 +1870,13 @@ RELOAD_TYPE_GLOBAL = 5
 RELOAD_TYPE_GLOBALEVENTS = 6
 RELOAD_TYPE_ITEMS = 7
 RELOAD_TYPE_MONSTERS = 8
-RELOAD_TYPE_MOUNTS = 9
-RELOAD_TYPE_MOVEMENTS = 10
-RELOAD_TYPE_NPCS = 11
-RELOAD_TYPE_QUESTS = 12
-RELOAD_TYPE_SCRIPTS = 13
-RELOAD_TYPE_SPELLS = 14
-RELOAD_TYPE_TALKACTIONS = 15
-RELOAD_TYPE_WEAPONS = 16
+RELOAD_TYPE_MOVEMENTS = 9
+RELOAD_TYPE_NPCS = 10
+RELOAD_TYPE_QUESTS = 11
+RELOAD_TYPE_SCRIPTS = 12
+RELOAD_TYPE_SPELLS = 13
+RELOAD_TYPE_TALKACTIONS = 14
+RELOAD_TYPE_WEAPONS = 15
 
 PlayerFlag_CannotUseCombat = 1 * 2 ^ 0
 PlayerFlag_CannotAttackPlayer = 1 * 2 ^ 1
@@ -2051,44 +2064,43 @@ SKILL_LAST = SKILL_FISHING
 ---@type table<string, any>
 configKeys = {
 	-- ConfigKeysBoolean
-	ALLOW_CHANGEOUTFIT = 0,
-	ONE_PLAYER_ON_ACCOUNT = 1,
-	AIMBOT_HOTKEY_ENABLED = 2,
-	REMOVE_RUNE_CHARGES = 3,
-	REMOVE_WEAPON_AMMO = 4,
-	REMOVE_WEAPON_CHARGES = 5,
-	REMOVE_POTION_CHARGES = 6,
-	EXPERIENCE_FROM_PLAYERS = 7,
-	FREE_PREMIUM = 8,
-	REPLACE_KICK_ON_LOGIN = 9,
-	ALLOW_CLONES = 10,
-	ALLOW_WALKTHROUGH = 11,
-	BIND_ONLY_GLOBAL_ADDRESS = 12,
-	OPTIMIZE_DATABASE = 13,
-	MARKET_PREMIUM = 14,
-	EMOTE_SPELLS = 15,
-	STAMINA_SYSTEM = 16,
-	WARN_UNSAFE_SCRIPTS = 17,
-	CONVERT_UNSAFE_SCRIPTS = 18,
-	CLASSIC_EQUIPMENT_SLOTS = 19,
-	CLASSIC_ATTACK_SPEED = 20,
-	SCRIPTS_CONSOLE_LOGS = 21,
-	SERVER_SAVE_NOTIFY_MESSAGE = 22,
-	SERVER_SAVE_CLEAN_MAP = 23,
-	SERVER_SAVE_CLOSE = 24,
-	SERVER_SAVE_SHUTDOWN = 25,
-	ONLINE_OFFLINE_CHARLIST = 26,
-	YELL_ALLOW_PREMIUM = 27,
-	PREMIUM_TO_SEND_PRIVATE = 28,
-	HOUSE_OWNED_BY_ACCOUNT = 29,
-	CLEAN_PROTECTION_ZONES = 30,
-	HOUSE_DOOR_SHOW_PRICE = 31,
-	ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS = 32,
-	REMOVE_ON_DESPAWN = 33,
-	TWO_FACTOR_AUTH = 34,
-	MANASHIELD_BREAKABLE = 35,
-	CHECK_DUPLICATE_STORAGE_KEYS = 36,
-	MONSTER_OVERSPAWN = 37,
+	ONE_PLAYER_ON_ACCOUNT = 0,
+	AIMBOT_HOTKEY_ENABLED = 1,
+	REMOVE_RUNE_CHARGES = 2,
+	REMOVE_WEAPON_AMMO = 3,
+	REMOVE_WEAPON_CHARGES = 4,
+	REMOVE_POTION_CHARGES = 5,
+	EXPERIENCE_FROM_PLAYERS = 6,
+	FREE_PREMIUM = 7,
+	REPLACE_KICK_ON_LOGIN = 8,
+	ALLOW_CLONES = 9,
+	ALLOW_WALKTHROUGH = 10,
+	BIND_ONLY_GLOBAL_ADDRESS = 11,
+	OPTIMIZE_DATABASE = 12,
+	MARKET_PREMIUM = 13,
+	EMOTE_SPELLS = 14,
+	STAMINA_SYSTEM = 15,
+	WARN_UNSAFE_SCRIPTS = 16,
+	CONVERT_UNSAFE_SCRIPTS = 17,
+	CLASSIC_EQUIPMENT_SLOTS = 18,
+	CLASSIC_ATTACK_SPEED = 19,
+	SCRIPTS_CONSOLE_LOGS = 20,
+	SERVER_SAVE_NOTIFY_MESSAGE = 21,
+	SERVER_SAVE_CLEAN_MAP = 22,
+	SERVER_SAVE_CLOSE = 23,
+	SERVER_SAVE_SHUTDOWN = 24,
+	ONLINE_OFFLINE_CHARLIST = 25,
+	YELL_ALLOW_PREMIUM = 26,
+	PREMIUM_TO_SEND_PRIVATE = 27,
+	HOUSE_OWNED_BY_ACCOUNT = 28,
+	CLEAN_PROTECTION_ZONES = 29,
+	HOUSE_DOOR_SHOW_PRICE = 30,
+	ONLY_INVITED_CAN_MOVE_HOUSE_ITEMS = 31,
+	REMOVE_ON_DESPAWN = 32,
+	TWO_FACTOR_AUTH = 33,
+	MANASHIELD_BREAKABLE = 34,
+	CHECK_DUPLICATE_STORAGE_KEYS = 35,
+	MONSTER_OVERSPAWN = 36,
 
 	-- ConfigKeysString
 	MAP_NAME = 0,

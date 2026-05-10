@@ -197,9 +197,6 @@
     <ClCompile Include="..\src\monsters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\mounts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\movement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -210,9 +207,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\otserv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\outfit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\outputmessage.cpp">
@@ -300,9 +294,6 @@
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\modules\party.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\outfit.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\modules\condition.cpp">
@@ -550,9 +541,6 @@
     <ClInclude Include="..\src\monsters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mounts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\movement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -566,9 +554,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\otserv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\outfit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\outputmessage.h">

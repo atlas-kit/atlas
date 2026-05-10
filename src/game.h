@@ -7,7 +7,6 @@
 #include "groups.h"
 #include "map.h"
 #include "monster.h"
-#include "mounts.h"
 #include "npc.h"
 #include "player.h"
 #include "wildcardtree.h"
@@ -374,14 +373,12 @@ public:
 	                      const uint16_t spriteId, bool podiumVisible, Direction direction);
 	void playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, const std::string& receiver,
 	               const std::string& text);
-	void playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomizeMount = false);
 	void playerInviteToParty(uint32_t playerId, uint32_t invitedId);
 	void playerJoinParty(uint32_t playerId, uint32_t leaderId);
 	void playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
 	void playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
 	void playerLeaveParty(uint32_t playerId);
 	void playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpActive);
-	void playerToggleMount(uint32_t playerId, bool mount);
 	void playerLeaveMarket(uint32_t playerId);
 	void playerBrowseMarket(uint32_t playerId, uint16_t spriteId);
 	void playerBrowseMarketOwnOffers(uint32_t playerId);
@@ -469,7 +466,6 @@ public:
 
 	Groups groups;
 	Map map;
-	Mounts mounts;
 
 	std::vector<std::shared_ptr<Item>> toDecayItems;
 

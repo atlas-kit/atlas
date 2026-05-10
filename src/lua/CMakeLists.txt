@@ -29,7 +29,6 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/modules/moveevent.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/networkmessage.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/npc.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/modules/outfit.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/party.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/player.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/podium.cpp

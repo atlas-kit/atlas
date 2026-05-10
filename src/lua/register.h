@@ -25,7 +25,6 @@ void registerMonsters(LuaScriptInterface& i);
 void registerMoveEvent(LuaScriptInterface& i);
 void registerNetworkMessage(LuaScriptInterface& i);
 void registerNpc(LuaScriptInterface& i);
-void registerOutfit(LuaScriptInterface& i);
 void registerParty(LuaScriptInterface& i);
 void registerPlayer(LuaScriptInterface& i);
 void registerPodium(LuaScriptInterface& i);

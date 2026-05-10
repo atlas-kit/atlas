@@ -18,7 +18,6 @@
 #include "vocation.h"
 
 class House;
-struct Mount;
 class NetworkMessage;
 class Npc;
 class Party;
@@ -121,23 +120,6 @@ public:
 	std::string getDescription(int32_t lookDistance) const override;
 
 	CreatureType_t getType() const override { return CREATURETYPE_PLAYER; }
-
-	uint16_t getRandomMount() const;
-	uint16_t getCurrentMount() const;
-	void setCurrentMount(uint16_t mountId);
-	bool isMounted() const { return defaultOutfit.lookMount != 0; }
-	bool toggleMount(bool mount);
-	bool tameMount(uint16_t mountId);
-	bool untameMount(uint16_t mountId);
-	bool hasMount(const Mount* mount) const;
-	bool hasMounts() const;
-	void dismount();
-
-	bool wasMounted() const { return wasMounted_; }
-	void setWasMounted(bool wasMounted) { wasMounted_ = wasMounted; }
-
-	bool getRandomizeMount() const { return randomizeMount; }
-	void setRandomizeMount(bool mode) { randomizeMount = mode; }
 
 	void sendFYIBox(const std::string& message)
 	{
@@ -559,12 +541,6 @@ public:
 			client->sendCreatureSkull(creature);
 		}
 	}
-	bool canWear(uint32_t lookType, uint8_t addons) const;
-	bool hasOutfit(uint32_t lookType, uint8_t addons);
-	void addOutfit(uint16_t lookType, uint8_t addons);
-	bool removeOutfit(uint16_t lookType);
-	bool removeOutfitAddon(uint16_t lookType, uint8_t addons);
-	bool getOutfitAddons(const Outfit& outfit, uint8_t& addons) const;
 
 	size_t getMaxVIPEntries() const;
 	size_t getMaxDepotItems() const;
@@ -1180,18 +1156,6 @@ public:
 			client->sendOpenPrivateChannel(receiver);
 		}
 	}
-	void sendOutfitWindow()
-	{
-		if (client) {
-			client->sendOutfitWindow();
-		}
-	}
-	void sendPodiumWindow(const std::shared_ptr<const Item>& item)
-	{
-		if (client) {
-			client->sendPodiumWindow(item);
-		}
-	}
 	void sendCloseContainer(uint8_t cid)
 	{
 		if (client) {
@@ -1346,8 +1310,6 @@ private:
 	std::map<uint8_t, OpenContainer> openContainers;
 	std::map<uint32_t, std::shared_ptr<DepotChest>> depotChests;
 
-	std::map<uint16_t, uint8_t> outfits;
-	std::unordered_set<uint16_t> mounts;
 	GuildWarVector guildWarVector;
 
 	std::list<ShopInfo> shopItemList;
@@ -1453,12 +1415,10 @@ private:
 	bool chaseMode = false;
 	bool secureMode = false;
 	bool inMarket = false;
-	bool wasMounted_ = false;
 	bool ghostMode = false;
 	bool pzLocked = false;
 	bool addAttackSkillPoint = false;
 	bool inventoryAbilities[CONST_SLOT_LAST + 1] = {};
-	bool randomizeMount = false;
 
 	void updateItemsLight(bool internal = false);
 	int32_t getStepSpeed() const override

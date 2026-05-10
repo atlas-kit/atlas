@@ -1537,192 +1537,53 @@ int luaPlayerGetParty(lua_State* L)
 	return 1;
 }
 
-int luaPlayerAddOutfit(lua_State* L)
+int luaPlayerGetCurrentOutfit(lua_State* L)
 {
-	// player:addOutfit(lookType)
+	// player:getCurrentOutfit()
 	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		player->addOutfit(tfs::lua::getNumber<uint16_t>(L, 2), 0);
-		tfs::lua::pushBoolean(L, true);
+		tfs::lua::pushOutfit(L, player->getCurrentOutfit());
 	} else {
 		lua_pushnil(L);
 	}
 	return 1;
 }
 
-int luaPlayerAddOutfitAddon(lua_State* L)
+int luaPlayerSetCurrentOutfit(lua_State* L)
 {
-	// player:addOutfitAddon(lookType, addon)
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		uint16_t lookType = tfs::lua::getNumber<uint16_t>(L, 2);
-		uint8_t addon = tfs::lua::getNumber<uint8_t>(L, 3);
-		player->addOutfit(lookType, addon);
-		tfs::lua::pushBoolean(L, true);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerRemoveOutfit(lua_State* L)
-{
-	// player:removeOutfit(lookType)
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		uint16_t lookType = tfs::lua::getNumber<uint16_t>(L, 2);
-		tfs::lua::pushBoolean(L, player->removeOutfit(lookType));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerRemoveOutfitAddon(lua_State* L)
-{
-	// player:removeOutfitAddon(lookType, addon)
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		uint16_t lookType = tfs::lua::getNumber<uint16_t>(L, 2);
-		uint8_t addon = tfs::lua::getNumber<uint8_t>(L, 3);
-		tfs::lua::pushBoolean(L, player->removeOutfitAddon(lookType, addon));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerHasOutfit(lua_State* L)
-{
-	// player:hasOutfit(lookType[, addon = 0])
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		uint16_t lookType = tfs::lua::getNumber<uint16_t>(L, 2);
-		uint8_t addon = tfs::lua::getNumber<uint8_t>(L, 3, 0);
-		tfs::lua::pushBoolean(L, player->hasOutfit(lookType, addon));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerCanWearOutfit(lua_State* L)
-{
-	// player:canWearOutfit(lookType[, addon = 0])
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		uint16_t lookType = tfs::lua::getNumber<uint16_t>(L, 2);
-		uint8_t addon = tfs::lua::getNumber<uint8_t>(L, 3, 0);
-		tfs::lua::pushBoolean(L, player->canWear(lookType, addon));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerSendOutfitWindow(lua_State* L)
-{
-	// player:sendOutfitWindow()
-	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
-		player->sendOutfitWindow();
-		tfs::lua::pushBoolean(L, true);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerSendEditPodium(lua_State* L)
-{
-	// player:sendEditPodium(item)
-	auto player = tfs::lua::getSharedPtr<Player>(L, 1);
-	const auto& item = tfs::lua::getSharedPtr<Item>(L, 2);
-	if (player && item) {
-		player->sendPodiumWindow(item);
-		tfs::lua::pushBoolean(L, true);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerAddMount(lua_State* L)
-{
-	// player:addMount(mountId or mountName)
+	// player:setCurrentOutfit(outfit)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	uint16_t mountId;
-	if (tfs::lua::isNumber(L, 2)) {
-		mountId = tfs::lua::getNumber<uint16_t>(L, 2);
-	} else {
-		Mount* mount = g_game.mounts.getMountByName(tfs::lua::getString(L, 2));
-		if (!mount) {
-			lua_pushnil(L);
-			return 1;
-		}
-		mountId = mount->id;
-	}
-	tfs::lua::pushBoolean(L, player->tameMount(mountId));
+	player->setCurrentOutfit(tfs::lua::getOutfit(L, 2));
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
-int luaPlayerRemoveMount(lua_State* L)
+int luaPlayerGetDefaultOutfit(lua_State* L)
 {
-	// player:removeMount(mountId or mountName)
+	// player:getDefaultOutfit()
+	if (const auto& player = tfs::lua::getSharedPtr<Player>(L, 1)) {
+		tfs::lua::pushOutfit(L, player->getDefaultOutfit());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaPlayerSetDefaultOutfit(lua_State* L)
+{
+	// player:setDefaultOutfit(outfit)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	uint16_t mountId;
-	if (tfs::lua::isNumber(L, 2)) {
-		mountId = tfs::lua::getNumber<uint16_t>(L, 2);
-	} else {
-		Mount* mount = g_game.mounts.getMountByName(tfs::lua::getString(L, 2));
-		if (!mount) {
-			lua_pushnil(L);
-			return 1;
-		}
-		mountId = mount->id;
-	}
-	tfs::lua::pushBoolean(L, player->untameMount(mountId));
-	return 1;
-}
-
-int luaPlayerHasMount(lua_State* L)
-{
-	// player:hasMount(mountId or mountName)
-	const auto& player = tfs::lua::getSharedPtr<const Player>(L, 1);
-	if (!player) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	Mount* mount = nullptr;
-	if (tfs::lua::isNumber(L, 2)) {
-		mount = g_game.mounts.getMountByID(tfs::lua::getNumber<uint16_t>(L, 2));
-	} else {
-		mount = g_game.mounts.getMountByName(tfs::lua::getString(L, 2));
-	}
-
-	if (mount) {
-		tfs::lua::pushBoolean(L, player->hasMount(mount));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaPlayerToggleMount(lua_State* L)
-{
-	// player:toggleMount(mount)
-	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
-	if (!player) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	bool mount = tfs::lua::getBoolean(L, 2);
-	tfs::lua::pushBoolean(L, player->toggleMount(mount));
+	player->setDefaultOutfit(tfs::lua::getOutfit(L, 2));
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
@@ -2599,20 +2460,10 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Player", "getParty", luaPlayerGetParty);
 
-	lsi.registerMethod("Player", "addOutfit", luaPlayerAddOutfit);
-	lsi.registerMethod("Player", "addOutfitAddon", luaPlayerAddOutfitAddon);
-	lsi.registerMethod("Player", "removeOutfit", luaPlayerRemoveOutfit);
-	lsi.registerMethod("Player", "removeOutfitAddon", luaPlayerRemoveOutfitAddon);
-	lsi.registerMethod("Player", "hasOutfit", luaPlayerHasOutfit);
-	lsi.registerMethod("Player", "canWearOutfit", luaPlayerCanWearOutfit);
-	lsi.registerMethod("Player", "sendOutfitWindow", luaPlayerSendOutfitWindow);
-
-	lsi.registerMethod("Player", "sendEditPodium", luaPlayerSendEditPodium);
-
-	lsi.registerMethod("Player", "addMount", luaPlayerAddMount);
-	lsi.registerMethod("Player", "removeMount", luaPlayerRemoveMount);
-	lsi.registerMethod("Player", "hasMount", luaPlayerHasMount);
-	lsi.registerMethod("Player", "toggleMount", luaPlayerToggleMount);
+	lsi.registerMethod("Player", "getCurrentOutfit", luaPlayerGetCurrentOutfit);
+	lsi.registerMethod("Player", "setCurrentOutfit", luaPlayerSetCurrentOutfit);
+	lsi.registerMethod("Player", "getDefaultOutfit", luaPlayerGetDefaultOutfit);
+	lsi.registerMethod("Player", "setDefaultOutfit", luaPlayerSetDefaultOutfit);
 
 	lsi.registerMethod("Player", "getPremiumEndsAt", luaPlayerGetPremiumEndsAt);
 	lsi.registerMethod("Player", "setPremiumEndsAt", luaPlayerSetPremiumEndsAt);
