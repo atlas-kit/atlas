@@ -22,9 +22,6 @@ local reloadTypes = {
 	["monster"] = RELOAD_TYPE_MONSTERS,
 	["monsters"] = RELOAD_TYPE_MONSTERS,
 
-	["mount"] = RELOAD_TYPE_MOUNTS,
-	["mounts"] = RELOAD_TYPE_MOUNTS,
-
 	["move"] = RELOAD_TYPE_MOVEMENTS,
 	["movement"] = RELOAD_TYPE_MOVEMENTS,
 	["movements"] = RELOAD_TYPE_MOVEMENTS,

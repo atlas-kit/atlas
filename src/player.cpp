@@ -14,7 +14,6 @@
 #include "house.h"
 #include "iologindata.h"
 #include "movement.h"
-#include "outfit.h"
 #include "party.h"
 #include "scheduler.h"
 #include "tools.h"
@@ -1027,18 +1026,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		onChangeZone(getZone());
 
-		uint16_t currentMountId = currentOutfit.lookMount;
-		if (currentMountId != 0) {
-			if (Mount* currentMount = g_game.mounts.getMountByClientID(currentMountId)) {
-				if (hasMount(currentMount)) {
-					g_game.changeSpeed(asPlayer(), currentMount->speed);
-				} else {
-					defaultOutfit.lookMount = 0;
-					g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-				}
-			}
-		}
-
 		IOLoginData::updateOnlineStatus(guid, true);
 
 		if (const auto& guild = getGuild()) {
@@ -1119,17 +1106,6 @@ void Player::onChangeZone(ZoneType_t zone)
 			setAttackedCreature(nullptr);
 			sendCancelTarget();
 			sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-
-		if (!group->access && isMounted()) {
-			dismount();
-			g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-			wasMounted_ = true;
-		}
-	} else {
-		if (wasMounted_) {
-			toggleMount(true);
-			wasMounted_ = false;
 		}
 	}
 
@@ -3320,10 +3296,6 @@ void Player::onAddCondition(ConditionType_t type)
 {
 	Creature::onAddCondition(type);
 
-	if (type == CONDITION_OUTFIT && isMounted()) {
-		dismount();
-	}
-
 	sendIcons();
 }
 
@@ -3665,119 +3637,6 @@ void Player::changeSoul(int32_t soulChange)
 	}
 
 	sendStats();
-}
-
-bool Player::canWear(uint32_t lookType, uint8_t addons) const
-{
-	if (group->access) {
-		return true;
-	}
-
-	const Outfit* outfit = Outfits::getInstance().getOutfitByLookType(sex, lookType);
-	if (!outfit) {
-		return false;
-	}
-
-	if (outfit->premium && !isPremium()) {
-		return false;
-	}
-
-	if (outfit->unlocked && addons == 0) {
-		return true;
-	}
-
-	for (const auto& [outfitType, addon] : outfits) {
-		if (outfitType == lookType) {
-			if (addon == addons || addon == 3 || addons == 0) {
-				return true;
-			}
-			return false; // have lookType on list and addons don't match
-		}
-	}
-	return false;
-}
-
-bool Player::hasOutfit(uint32_t lookType, uint8_t addons)
-{
-	const Outfit* outfit = Outfits::getInstance().getOutfitByLookType(sex, lookType);
-	if (!outfit) {
-		return false;
-	}
-
-	if (outfit->unlocked && addons == 0) {
-		return true;
-	}
-
-	for (const auto& [outfitType, addon] : outfits) {
-		if (outfitType == lookType) {
-			if (addon == addons || addon == 3 || addons == 0) {
-				return true;
-			}
-			return false; // have lookType on list and addons don't match
-		}
-	}
-	return false;
-}
-
-void Player::addOutfit(uint16_t lookType, uint8_t addons)
-{
-	for (auto& [outfit, addon] : outfits) {
-		if (outfit == lookType) {
-			addon |= addons;
-			return;
-		}
-	}
-	outfits.insert(std::pair(lookType, addons));
-}
-
-bool Player::removeOutfit(uint16_t lookType)
-{
-	for (const auto& [outfit, addon] : outfits) {
-		if (outfit == lookType) {
-			outfits.erase(outfit);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Player::removeOutfitAddon(uint16_t lookType, uint8_t addons)
-{
-	for (auto& [outfit, addon] : outfits) {
-		if (outfit == lookType) {
-			addon &= ~addons;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Player::getOutfitAddons(const Outfit& outfit, uint8_t& addons) const
-{
-	if (group->access) {
-		addons = 3;
-		return true;
-	}
-
-	if (outfit.premium && !isPremium()) {
-		return false;
-	}
-
-	for (const auto& [lookType, addon] : outfits) {
-		if (lookType != outfit.lookType) {
-			continue;
-		}
-
-		addons = addon;
-		return true;
-	}
-
-	if (!outfit.unlocked) {
-		return false;
-	}
-
-	addons = 0;
-	return true;
 }
 
 void Player::setSex(PlayerSex_t newSex) { sex = newSex; }
@@ -4128,158 +3987,6 @@ GuildEmblems_t Player::getGuildEmblem(const std::shared_ptr<const Player>& playe
 	}
 
 	return GUILDEMBLEM_NEUTRAL;
-}
-
-uint16_t Player::getRandomMount() const
-{
-	std::vector<uint16_t> mountsId;
-	for (const Mount& mount : g_game.mounts.getMounts()) {
-		if (hasMount(&mount)) {
-			mountsId.push_back(mount.id);
-		}
-	}
-
-	return mountsId[uniform_random(0, mountsId.size() - 1)];
-}
-
-uint16_t Player::getCurrentMount() const { return currentMount; }
-
-void Player::setCurrentMount(uint16_t mountId) { currentMount = mountId; }
-
-bool Player::toggleMount(bool mount)
-{
-	if ((OTSYS_TIME() - lastToggleMount) < 3000 && !wasMounted_) {
-		sendCancelMessage(RETURNVALUE_YOUAREEXHAUSTED);
-		return false;
-	}
-
-	if (mount) {
-		if (isMounted()) {
-			return false;
-		}
-
-		if (const auto& tile = getTile(); !group->access && tile->hasFlag(TILESTATE_PROTECTIONZONE)) {
-			sendCancelMessage(RETURNVALUE_ACTIONNOTPERMITTEDINPROTECTIONZONE);
-			return false;
-		}
-
-		const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(getSex(), defaultOutfit.lookType);
-		if (!playerOutfit) {
-			return false;
-		}
-
-		uint16_t currentMountId = getCurrentMount();
-		if (currentMountId == 0) {
-			sendOutfitWindow();
-			return false;
-		}
-
-		if (randomizeMount) {
-			currentMountId = getRandomMount();
-		}
-
-		Mount* currentMount = g_game.mounts.getMountByID(currentMountId);
-		if (!currentMount) {
-			return false;
-		}
-
-		if (!hasMount(currentMount)) {
-			setCurrentMount(0);
-			sendOutfitWindow();
-			return false;
-		}
-
-		if (currentMount->premium && !isPremium()) {
-			sendCancelMessage(RETURNVALUE_YOUNEEDPREMIUMACCOUNT);
-			return false;
-		}
-
-		if (hasCondition(CONDITION_OUTFIT)) {
-			sendCancelMessage(RETURNVALUE_NOTPOSSIBLE);
-			return false;
-		}
-
-		defaultOutfit.lookMount = currentMount->clientId;
-
-		if (currentMount->speed != 0) {
-			g_game.changeSpeed(asPlayer(), currentMount->speed);
-		}
-	} else {
-		if (!isMounted()) {
-			return false;
-		}
-
-		dismount();
-	}
-
-	g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-	lastToggleMount = OTSYS_TIME();
-	return true;
-}
-
-bool Player::tameMount(uint16_t mountId)
-{
-	Mount* mount = g_game.mounts.getMountByID(mountId);
-	if (!mount || hasMount(mount)) {
-		return false;
-	}
-
-	mounts.insert(mountId);
-	return true;
-}
-
-bool Player::untameMount(uint16_t mountId)
-{
-	Mount* mount = g_game.mounts.getMountByID(mountId);
-	if (!mount || !hasMount(mount)) {
-		return false;
-	}
-
-	mounts.erase(mountId);
-
-	if (getCurrentMount() == mountId) {
-		if (isMounted()) {
-			dismount();
-			g_game.internalCreatureChangeOutfit(asPlayer(), defaultOutfit);
-		}
-
-		setCurrentMount(0);
-	}
-
-	return true;
-}
-
-bool Player::hasMount(const Mount* mount) const
-{
-	if (isAccessPlayer()) {
-		return true;
-	}
-
-	if (mount->premium && !isPremium()) {
-		return false;
-	}
-
-	return mounts.find(mount->id) != mounts.end();
-}
-
-bool Player::hasMounts() const
-{
-	for (const Mount& mount : g_game.mounts.getMounts()) {
-		if (hasMount(&mount)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-void Player::dismount()
-{
-	Mount* mount = g_game.mounts.getMountByID(getCurrentMount());
-	if (mount && mount->speed > 0) {
-		g_game.changeSpeed(asPlayer(), -mount->speed);
-	}
-
-	defaultOutfit.lookMount = 0;
 }
 
 bool Player::addOfflineTrainingTries(skills_t skill, uint64_t tries)

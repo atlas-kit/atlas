@@ -100,7 +100,6 @@ private:
 
 	// Parse methods
 	void parseAutoWalk(NetworkMessage& msg);
-	void parseSetOutfit(NetworkMessage& msg);
 	void parseEditPodiumRequest(NetworkMessage& msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
@@ -225,9 +224,6 @@ private:
 	void sendHouseWindow(uint32_t windowTextId, const std::string& text);
 	void sendCombatAnalyzer(CombatType_t type, int32_t amount, DamageAnalyzerImpactType impactType,
 	                        const std::string& target);
-	void sendOutfitWindow();
-
-	void sendPodiumWindow(const std::shared_ptr<const Item>& item);
 
 	void sendUpdatedVIPStatus(uint32_t guid, VipStatus_t newStatus);
 	void sendVIP(uint32_t guid, const std::string& name, const std::string& description, uint32_t icon, bool notify,

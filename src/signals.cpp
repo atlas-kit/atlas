@@ -11,7 +11,6 @@
 #include "events.h"
 #include "game.h"
 #include "monsters.h"
-#include "mounts.h"
 #include "movement.h"
 #include "scheduler.h"
 #include "spells.h"
@@ -77,9 +76,6 @@ void sighupHandler()
 
 	g_weapons->loadDefaults();
 	std::cout << "Reloaded weapons." << std::endl;
-
-	g_game.mounts.reload();
-	std::cout << "Reloaded mounts." << std::endl;
 
 	tfs::events::reload();
 	std::cout << "Reloaded events." << std::endl;

@@ -39,7 +39,6 @@ void importModules(LuaScriptInterface& lsi)
 	registerMonsters(lsi);
 	registerMoveEvent(lsi);
 	registerNetworkMessage(lsi);
-	registerOutfit(lsi);
 	registerParty(lsi);
 	registerPosition(lsi);
 	registerSpell(lsi);
