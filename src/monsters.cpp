@@ -67,11 +67,11 @@ bool Monsters::reload()
 	return loadFromXml(true);
 }
 
-ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType, int32_t maxDamage, int32_t minDamage,
-                                              int32_t startDamage, uint32_t tickInterval)
+std::unique_ptr<ConditionDamage> Monsters::getDamageCondition(ConditionType_t conditionType, int32_t maxDamage,
+                                                              int32_t minDamage, int32_t startDamage,
+                                                              uint32_t tickInterval)
 {
-	ConditionDamage* condition =
-	    static_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
+	auto condition = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, conditionType);
 	condition->setParam(CONDITION_PARAM_TICKINTERVAL, tickInterval);
 	condition->setParam(CONDITION_PARAM_MINVALUE, minDamage);
 	condition->setParam(CONDITION_PARAM_MAXVALUE, maxDamage);
@@ -291,8 +291,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			}
 
 			if (conditionType != CONDITION_NONE) {
-				Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, 0, tickInterval);
-				combat->addCondition(condition);
+				combat->addCondition(getDamageCondition(conditionType, maxDamage, minDamage, 0, tickInterval));
 			}
 
 			sb.range = 1;
@@ -370,10 +369,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				conditionType = CONDITION_PARALYZE;
 			}
 
-			ConditionSpeed* condition = static_cast<ConditionSpeed*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
+			auto condition = std::make_unique<ConditionSpeed>(CONDITIONID_COMBAT, conditionType, duration, false, 0, 0);
 			condition->setFormulaVars(minSpeedChange / 1000.0, 0, maxSpeedChange / 1000.0, 0);
-			combat->addCondition(condition);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "outfit") {
 			int32_t duration = 10000;
 
@@ -384,21 +382,19 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			if ((attr = node.attribute("monster"))) {
 				MonsterType* mType = g_monsters.getMonsterType(attr.as_string());
 				if (mType) {
-					ConditionOutfit* condition = static_cast<ConditionOutfit*>(
-					    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
+					auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 					condition->setOutfit(mType->info.outfit);
 					combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
-					combat->addCondition(condition);
+					combat->addCondition(std::move(condition));
 				}
 			} else if ((attr = node.attribute("item"))) {
 				Outfit_t outfit;
 				outfit.lookTypeEx = pugi::cast<uint16_t>(attr.value());
 
-				ConditionOutfit* condition = static_cast<ConditionOutfit*>(
-				    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
+				auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 				condition->setOutfit(outfit);
 				combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
-				combat->addCondition(condition);
+				combat->addCondition(std::move(condition));
 			}
 		} else if (tmpName == "invisible") {
 			int32_t duration = 10000;
@@ -407,9 +403,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				duration = pugi::cast<int32_t>(attr.value());
 			}
 
-			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
+			auto condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
-			combat->addCondition(condition);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "drunk") {
 			int32_t duration = 10000;
 			uint8_t drunkenness = 25;
@@ -422,9 +418,8 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				drunkenness = pugi::cast<uint8_t>(attr.value());
 			}
 
-			Condition* condition =
-			    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, drunkenness);
-			combat->addCondition(condition);
+			auto condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, drunkenness);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "firefield") {
 			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_FIREFIELD_PVP_FULL);
 		} else if (tmpName == "poisonfield") {
@@ -483,8 +478,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				}
 			}
 
-			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
+			combat->addCondition(getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval));
 		} else if (tmpName == "strength") {
 			//
 		} else if (tmpName == "effect") {
@@ -629,9 +623,8 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			int32_t conMaxDamage = std::abs(spell->conditionMaxDamage);
 			int32_t startDamage = std::abs(spell->conditionStartDamage);
 
-			Condition* condition =
-			    getDamageCondition(conditionType, conMaxDamage, conMinDamage, startDamage, tickInterval);
-			combat->addCondition(condition);
+			combat->addCondition(
+			    getDamageCondition(conditionType, conMaxDamage, conMinDamage, startDamage, tickInterval));
 		}
 
 		std::string tmpName = boost::algorithm::to_lower_copy(spell->name);
@@ -701,10 +694,9 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				conditionType = CONDITION_PARALYZE;
 			}
 
-			ConditionSpeed* condition = static_cast<ConditionSpeed*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
+			auto condition = std::make_unique<ConditionSpeed>(CONDITIONID_COMBAT, conditionType, duration, false, 0, 0);
 			condition->setFormulaVars(minSpeedChange / 1000.0, 0, maxSpeedChange / 1000.0, 0);
-			combat->addCondition(condition);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "outfit") {
 			int32_t duration = 10000;
 
@@ -712,11 +704,10 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				duration = spell->duration;
 			}
 
-			ConditionOutfit* condition = static_cast<ConditionOutfit*>(
-			    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
+			auto condition = std::make_unique<ConditionOutfit>(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration);
 			condition->setOutfit(spell->outfit);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
-			combat->addCondition(condition);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "invisible") {
 			int32_t duration = 10000;
 
@@ -724,9 +715,9 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				duration = spell->duration;
 			}
 
-			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
+			auto condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
 			combat->setParam(COMBAT_PARAM_AGGRESSIVE, 0);
-			combat->addCondition(condition);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "drunk") {
 			int32_t duration = 10000;
 			uint8_t drunkenness = 25;
@@ -739,9 +730,8 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 				drunkenness = spell->drunkenness;
 			}
 
-			Condition* condition =
-			    Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, drunkenness);
-			combat->addCondition(condition);
+			auto condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, drunkenness);
+			combat->addCondition(std::move(condition));
 		} else if (tmpName == "firefield") {
 			combat->setParam(COMBAT_PARAM_CREATEITEM, ITEM_FIREFIELD_PVP_FULL);
 		} else if (tmpName == "poisonfield") {
