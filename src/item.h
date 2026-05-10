@@ -108,9 +108,18 @@ public:
 	void resetText() { removeAttribute(ITEM_ATTRIBUTE_TEXT); }
 	const std::string& getText() const { return getStrAttr(ITEM_ATTRIBUTE_TEXT); }
 
-	void setDate(int32_t n) { setIntAttr(ITEM_ATTRIBUTE_DATE, n); }
+	void setDate(std::chrono::system_clock::time_point n)
+	{
+		setIntAttr(ITEM_ATTRIBUTE_DATE, duration_cast<std::chrono::seconds>(n.time_since_epoch()).count());
+	}
 	void resetDate() { removeAttribute(ITEM_ATTRIBUTE_DATE); }
-	time_t getDate() const { return static_cast<time_t>(getIntAttr(ITEM_ATTRIBUTE_DATE)); }
+	std::optional<std::chrono::system_clock::time_point> getDate() const
+	{
+		if (hasAttribute(ITEM_ATTRIBUTE_DATE)) {
+			return std::chrono::system_clock::time_point{std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DATE)}};
+		}
+		return std::nullopt;
+	}
 
 	void setWriter(const std::string& writer) { setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 	void resetWriter() { removeAttribute(ITEM_ATTRIBUTE_WRITER); }
@@ -568,13 +577,13 @@ public:
 
 	void setDate(std::chrono::system_clock::time_point n)
 	{
-		setIntAttr(ITEM_ATTRIBUTE_DATE, std::chrono::system_clock::to_time_t(n));
+		setIntAttr(ITEM_ATTRIBUTE_DATE, duration_cast<std::chrono::seconds>(n.time_since_epoch()).count());
 	}
 	void resetDate() { removeAttribute(ITEM_ATTRIBUTE_DATE); }
 	std::optional<std::chrono::system_clock::time_point> getDate() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_DATE)) {
-			return std::chrono::system_clock::from_time_t(getIntAttr(ITEM_ATTRIBUTE_DATE));
+			return std::chrono::system_clock::time_point{std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DATE)}};
 		}
 		return std::nullopt;
 	}

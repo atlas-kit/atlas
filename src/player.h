@@ -266,8 +266,8 @@ public:
 	bool isInMarket() const { return inMarket; }
 
 	auto getIdleTime() const { return idleTime; }
-	void setIdleTime(uint32_t ms) { this->idleTime = ms; }
-	void resetIdleTime() { idleTime = 0; }
+	void setIdleTime(std::chrono::milliseconds ms) { idleTime = ms; }
+	void resetIdleTime() { idleTime = std::chrono::milliseconds::zero(); }
 
 	bool isInGhostMode() const override { return ghostMode; }
 	bool canSeeGhostMode(const std::shared_ptr<const Creature>& creature) const override;
@@ -1382,7 +1382,7 @@ private:
 	uint32_t manaMax = 0;
 	uint16_t manaShieldBar = 0;
 	uint16_t maxManaShieldBar = 0;
-	uint32_t idleTime = 0;
+	std::chrono::milliseconds idleTime = std::chrono::milliseconds::zero();
 	int32_t varSkills[SKILL_LAST + 1] = {};
 	int32_t varSpecialSkills[SPECIALSKILL_LAST + 1] = {};
 	int32_t varStats[STAT_LAST + 1] = {};

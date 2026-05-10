@@ -992,7 +992,7 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 				case ITEM_PARSE_HEALTHTICKS: {
 					abilities.regeneration = true;
-					abilities.healthTicks = pugi::cast<uint32_t>(valueAttribute.value());
+					abilities.healthTicks = std::chrono::milliseconds{pugi::cast<uint32_t>(valueAttribute.value())};
 					break;
 				}
 
@@ -1004,7 +1004,7 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 				case ITEM_PARSE_MANATICKS: {
 					abilities.regeneration = true;
-					abilities.manaTicks = pugi::cast<uint32_t>(valueAttribute.value());
+					abilities.manaTicks = std::chrono::milliseconds{pugi::cast<uint32_t>(valueAttribute.value())};
 					break;
 				}
 

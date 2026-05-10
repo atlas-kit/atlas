@@ -385,7 +385,8 @@ void Item::readAttr(AttrTypes_t attr, OTB::iterator& first, const OTB::iterator&
 		}
 
 		case ATTR_WRITTENDATE: {
-			auto writtenDate = std::chrono::system_clock::from_time_t(OTB::read<uint32_t>(first, last));
+			auto writtenDate =
+			    std::chrono::system_clock::time_point{std::chrono::seconds{OTB::read<uint32_t>(first, last)}};
 			setDate(writtenDate);
 			break;
 		}
@@ -612,7 +613,7 @@ void Item::serializeAttr(PropWriteStream& propWriteStream) const
 
 	if (const auto writtenDate = getDate()) {
 		propWriteStream.write<uint8_t>(ATTR_WRITTENDATE);
-		propWriteStream.write<uint32_t>(std::chrono::system_clock::to_time_t(*writtenDate));
+		propWriteStream.write<uint32_t>(duration_cast<std::chrono::seconds>(writtenDate->time_since_epoch()).count());
 	}
 
 	const std::string& writer = getWriter();

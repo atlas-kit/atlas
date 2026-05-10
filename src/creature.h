@@ -375,7 +375,6 @@ protected:
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
-	uint32_t walkUpdateTicks = 0;
 	uint32_t blockCount = 0;
 	std::chrono::milliseconds blockTicks = std::chrono::milliseconds::zero();
 	uint32_t lastStepCost = 1;

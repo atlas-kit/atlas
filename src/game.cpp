@@ -4560,7 +4560,9 @@ void Game::checkDecay()
 			internalDecayItem(item);
 		} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			it = decayItems[bucket].erase(it);
-			size_t newBucket = (bucket + ((duration + EVENT_DECAYINTERVAL / 2) / 1000).count()) % EVENT_DECAY_BUCKETS;
+			size_t newBucket =
+			    (bucket + duration_cast<std::chrono::seconds>(duration + EVENT_DECAYINTERVAL / 2).count()) %
+			    EVENT_DECAY_BUCKETS;
 			if (newBucket == bucket) {
 				internalDecayItem(item);
 			} else {
@@ -4602,7 +4604,8 @@ void Game::cleanup()
 		if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			decayItems[lastBucket].push_back(item);
 		} else {
-			decayItems[(lastBucket + 1 + dur.count() / 1000) % EVENT_DECAY_BUCKETS].push_back(item);
+			decayItems[(lastBucket + 1 + duration_cast<std::chrono::seconds>(dur).count()) % EVENT_DECAY_BUCKETS]
+			    .push_back(item);
 		}
 	}
 	toDecayItems.clear();

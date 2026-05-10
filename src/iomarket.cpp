@@ -184,12 +184,13 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool)
 
 void checkExpiredOffers()
 {
-	const time_t lastExpireDate = time(nullptr) - getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto lastExpireDate =
+	    std::chrono::system_clock::now() - std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	g_databaseTasks.addTask(
 	    std::format(
 	        "SELECT `id`, `amount`, `price`, `itemtype`, `player_id`, `sale` FROM `market_offers` WHERE `created` <= {:d}",
-	        lastExpireDate),
+	        duration_cast<std::chrono::seconds>(lastExpireDate.time_since_epoch()).count()),
 	    processExpiredOffers, true);
 
 	auto checkExpiredMarketOffersEachMinutes =

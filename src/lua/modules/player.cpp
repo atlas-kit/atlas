@@ -1610,7 +1610,7 @@ int luaPlayerSetPremiumEndsAt(lua_State* L)
 		return 1;
 	}
 
-	auto timestamp = std::chrono::system_clock::from_time_t(tfs::lua::getNumber<time_t>(L, 2));
+	auto timestamp = std::chrono::system_clock::time_point{std::chrono::seconds{tfs::lua::getNumber<int64_t>(L, 2)}};
 
 	player->setPremiumTime(timestamp);
 	IOLoginData::updatePremiumTime(player->getAccount(), timestamp);
@@ -2144,7 +2144,7 @@ int luaPlayerGetIdleTime(lua_State* L)
 		return 1;
 	}
 
-	tfs::lua::pushNumber(L, player->getIdleTime());
+	tfs::lua::pushNumber(L, player->getIdleTime().count());
 	return 1;
 }
 
@@ -2157,7 +2157,7 @@ int luaPlayerSetIdleTime(lua_State* L)
 		return 1;
 	}
 
-	player->setIdleTime(tfs::lua::getNumber<uint32_t>(L, 2));
+	player->setIdleTime(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }

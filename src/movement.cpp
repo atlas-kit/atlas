@@ -738,16 +738,16 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 			condition->setParam(CONDITION_PARAM_HEALTHGAIN, it.abilities->healthGain);
 		}
 
-		if (it.abilities->healthTicks != 0) {
-			condition->setParam(CONDITION_PARAM_HEALTHTICKS, it.abilities->healthTicks);
+		if (it.abilities->healthTicks != std::chrono::milliseconds::zero()) {
+			condition->setParam(CONDITION_PARAM_HEALTHTICKS, it.abilities->healthTicks.count());
 		}
 
 		if (it.abilities->manaGain != 0) {
 			condition->setParam(CONDITION_PARAM_MANAGAIN, it.abilities->manaGain);
 		}
 
-		if (it.abilities->manaTicks != 0) {
-			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks);
+		if (it.abilities->manaTicks != std::chrono::milliseconds::zero()) {
+			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks.count());
 		}
 
 		player->addCondition(std::move(condition));

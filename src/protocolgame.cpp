@@ -193,8 +193,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 				if (banInfo->expiresAt != std::chrono::system_clock::time_point::min()) {
 					disconnectClient(
 					    std::format("Your account has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
-					                formatDateShort(clock_cast<std::chrono::system_clock>(banInfo->expiresAt)),
-					                banInfo->bannedBy, banInfo->reason));
+					                formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
 				} else {
 					disconnectClient(
 					    std::format("Your account has been permanently banned by {:s}.\n\nReason specified:\n{:s}",
@@ -246,7 +245,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 			eventConnect = g_scheduler.addEvent(createSchedulerTask(
 			    1s, [=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
-			           playerID = foundPlayer->getID()]() { self->connect(playerID, operatingSystem); }));
+			         playerID = foundPlayer->getID()]() { self->connect(playerID, operatingSystem); }));
 		} else {
 			connect(foundPlayer->getID(), operatingSystem);
 		}
@@ -407,7 +406,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	}
 
 	auto characterName = msg.getString();
-	auto timeStamp = std::chrono::system_clock::from_time_t(msg.get<uint32_t>());
+	auto timeStamp = std::chrono::system_clock::time_point{std::chrono::seconds{msg.get<uint32_t>()}};
 	uint8_t randNumber = msg.getByte();
 	if (challengeTimestamp != timeStamp || challengeRandom != randNumber) {
 		disconnect();
@@ -440,8 +439,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	auto ip = getIP();
 	if (const auto& banInfo = IOBan::getIpBanInfo(ip)) {
 		disconnectClient(std::format("Your IP has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
-		                             formatDateShort(clock_cast<std::chrono::system_clock>(banInfo->expiresAt)),
-		                             banInfo->bannedBy, banInfo->reason));
+		                             formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
 		return;
 	}
 
@@ -1445,7 +1443,7 @@ void ProtocolGame::parseMarketCreateOffer(NetworkMessage& msg)
 
 void ProtocolGame::parseMarketCancelOffer(NetworkMessage& msg)
 {
-	auto timestamp = std::chrono::system_clock::from_time_t(msg.get<uint32_t>());
+	auto timestamp = std::chrono::system_clock::time_point{std::chrono::seconds{msg.get<uint32_t>()}};
 	uint16_t counter = msg.get<uint16_t>();
 
 	g_dispatcher.addTask(
@@ -1457,7 +1455,7 @@ void ProtocolGame::parseMarketCancelOffer(NetworkMessage& msg)
 
 void ProtocolGame::parseMarketAcceptOffer(NetworkMessage& msg)
 {
-	auto timestamp = std::chrono::system_clock::from_time_t(msg.get<uint32_t>());
+	auto timestamp = std::chrono::system_clock::time_point{std::chrono::seconds{msg.get<uint32_t>()}};
 	uint16_t counter = msg.get<uint16_t>();
 	uint16_t amount = msg.get<uint16_t>();
 	g_dispatcher.addTask(
@@ -3241,7 +3239,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint16_t>(player->getBaseSpeed());
 
 	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
-	msg.add<uint16_t>(condition ? condition->getTicks().count() / 1000 : 0x00);
+	msg.add<uint16_t>(condition ? duration_cast<std::chrono::seconds>(condition->getTicks()).count() : 0x00);
 
 	msg.add<uint16_t>(floor<std::chrono::minutes>(player->getOfflineTrainingTime()).count());
 

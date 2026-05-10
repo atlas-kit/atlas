@@ -25,9 +25,9 @@ public:
 	uint32_t getManaGain() const { return gainMana; }
 	uint32_t getCapGain() const { return gainCap; }
 
-	uint32_t getManaGainTicks() const { return gainManaTicks; }
+	std::chrono::seconds getManaGainTicks() const { return gainManaTicks; }
 	uint32_t getManaGainAmount() const { return gainManaAmount; }
-	uint32_t getHealthGainTicks() const { return gainHealthTicks; }
+	std::chrono::seconds getHealthGainTicks() const { return gainHealthTicks; }
 	uint32_t getHealthGainAmount() const { return gainHealthAmount; }
 
 	uint8_t getSoulMax() const { return soulMax; }
@@ -38,7 +38,7 @@ public:
 
 	uint32_t getFromVocation() const { return fromVocation; }
 
-	uint32_t getNoPongKickTime() const { return noPongKickTime; }
+	std::chrono::milliseconds getNoPongKickTime() const { return noPongKickTime; }
 
 	bool allowsPvp() const { return allowPvp; }
 
@@ -64,9 +64,9 @@ private:
 	double skillMultipliers[SKILL_LAST + 1] = {1.5, 2.0, 2.0, 2.0, 2.0, 1.5, 1.1};
 	float manaMultiplier = 4.0f;
 
-	uint32_t gainHealthTicks = 6;
+	std::chrono::seconds gainHealthTicks = 6s;
 	uint32_t gainHealthAmount = 1;
-	uint32_t gainManaTicks = 6;
+	std::chrono::seconds gainManaTicks = 6s;
 	uint32_t gainManaAmount = 1;
 	uint32_t gainCap = 500;
 	uint32_t gainMana = 5;
@@ -74,7 +74,7 @@ private:
 	uint32_t fromVocation = VOCATION_NONE;
 	std::chrono::milliseconds attackSpeed = 1500ms;
 	uint32_t baseSpeed = 220;
-	uint32_t noPongKickTime = 60000;
+	std::chrono::milliseconds noPongKickTime = 60s;
 
 	uint16_t id;
 	uint16_t gainSoulTicks = 120;

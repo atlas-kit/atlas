@@ -89,8 +89,14 @@ int luaConditionGetEndTime(lua_State* L)
 	// condition:getEndTime()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushNumber(L,
-		                     duration_cast<std::chrono::seconds>(condition->getEndTime().time_since_epoch()).count());
+		const auto endTime = condition->getEndTime();
+		if (endTime == std::chrono::steady_clock::time_point::min() ||
+		    endTime == std::chrono::steady_clock::time_point::max()) {
+			tfs::lua::pushNumber(L, 0);
+		} else {
+			const auto wallEndTime = std::chrono::system_clock::now() + (endTime - std::chrono::steady_clock::now());
+			tfs::lua::pushNumber(L, duration_cast<std::chrono::milliseconds>(wallEndTime.time_since_epoch()).count());
+		}
 	} else {
 		lua_pushnil(L);
 	}

@@ -201,8 +201,7 @@ DBResult::DBResult(tfs::detail::MysqlResult_ptr&& res) : handle{std::move(res)}
 
 std::chrono::system_clock::time_point DBResult::getDateTime(std::string_view column) const
 {
-	time_t ctime = getNumber<time_t>(column);
-	return std::chrono::system_clock::from_time_t(ctime);
+	return std::chrono::system_clock::time_point{std::chrono::seconds{getNumber<int64_t>(column)}};
 }
 
 std::string_view DBResult::getString(std::string_view column) const

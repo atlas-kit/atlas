@@ -2168,9 +2168,8 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 		pzLocked = true;
 	}
 
-	auto condition =
-	    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-	                               std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
+	auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+	                                            std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
 	addCondition(std::move(condition));
 }
 
@@ -3539,10 +3538,9 @@ bool Player::onKilledCreature(const std::shared_ptr<Creature>& target, bool last
 
 			if (lastHit && hasCondition(CONDITION_INFIGHT)) {
 				pzLocked = true;
-				auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
-				                                            std::chrono::seconds{
-				                                                getNumber(ConfigManager::WHITE_SKULL_TIME)},
-				                                            0);
+				auto condition =
+				    Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
+				                               std::chrono::seconds{getNumber(ConfigManager::WHITE_SKULL_TIME)}, 0);
 				addCondition(std::move(condition));
 			}
 		}
@@ -4264,8 +4262,10 @@ void Player::updateRegeneration()
 	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
 	if (condition) {
 		condition->setParam(CONDITION_PARAM_HEALTHGAIN, vocation->getHealthGainAmount());
-		condition->setParam(CONDITION_PARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
+		condition->setParam(CONDITION_PARAM_HEALTHTICKS,
+		                    duration_cast<std::chrono::milliseconds>(vocation->getHealthGainTicks()).count());
 		condition->setParam(CONDITION_PARAM_MANAGAIN, vocation->getManaGainAmount());
-		condition->setParam(CONDITION_PARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+		condition->setParam(CONDITION_PARAM_MANATICKS,
+		                    duration_cast<std::chrono::milliseconds>(vocation->getManaGainTicks()).count());
 	}
 }

@@ -51,11 +51,11 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			} else if (boost::iequals(attrName, "gainmana")) {
 				voc.gainMana = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "gainhpticks")) {
-				voc.gainHealthTicks = pugi::cast<uint32_t>(attrNode.value());
+				voc.gainHealthTicks = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "gainhpamount")) {
 				voc.gainHealthAmount = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "gainmanaticks")) {
-				voc.gainManaTicks = pugi::cast<uint32_t>(attrNode.value());
+				voc.gainManaTicks = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "gainmanaamount")) {
 				voc.gainManaAmount = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "manamultiplier")) {
@@ -71,7 +71,7 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			} else if (boost::iequals(attrName, "fromvoc")) {
 				voc.fromVocation = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "nopongkicktime")) {
-				voc.noPongKickTime = pugi::cast<uint32_t>(attrNode.value()) * 1000;
+				voc.noPongKickTime = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else {
 				std::cout << "[Notice - Vocations::loadFromXml] Unknown attribute: \"" << attrName
 				          << "\" for vocation: " << voc.id << std::endl;

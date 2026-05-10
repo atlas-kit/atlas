@@ -125,7 +125,7 @@ int luaHouseGetPaidUntil(lua_State* L)
 int luaHouseSetPaidUntil(lua_State* L)
 {
 	// house:setPaidUntil(timestamp)
-	auto timestamp = std::chrono::system_clock::from_time_t(tfs::lua::getNumber<time_t>(L, 2));
+	auto timestamp = std::chrono::system_clock::time_point{std::chrono::seconds{tfs::lua::getNumber<int64_t>(L, 2)}};
 	const auto& house = tfs::lua::getSharedPtr<House>(L, 1);
 	if (house) {
 		house->setPaidUntil(timestamp);

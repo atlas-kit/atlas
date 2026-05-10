@@ -218,9 +218,9 @@ enum ItemParseAttributes_t
 struct Abilities
 {
 	uint32_t healthGain = 0;
-	uint32_t healthTicks = 0;
+	std::chrono::milliseconds healthTicks = std::chrono::milliseconds::zero();
 	uint32_t manaGain = 0;
-	uint32_t manaTicks = 0;
+	std::chrono::milliseconds manaTicks = std::chrono::milliseconds::zero();
 
 	uint32_t conditionImmunities = 0;
 	uint32_t conditionSuppressions = 0;
