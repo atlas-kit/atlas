@@ -75,7 +75,7 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		elseif item.type == FLUID_NONE then
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "It is empty.")
 		else
-			if toPosition.x == CONTAINER_POSITION then
+			if toPosition:isInventoryOrContainer() then
 				toPosition = player:getPosition()
 			end
 			Game.createItem(2016, item.type, toPosition):decay()

@@ -25,7 +25,7 @@ function destroyItem(player, target, toPosition)
 		return false
 	end
 
-	if toPosition.x == CONTAINER_POSITION then
+	if toPosition:isInventoryOrContainer() then
 		player:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
 		return true
 	end

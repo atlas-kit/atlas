@@ -43,6 +43,22 @@ int luaPositionIsSightClear(lua_State* L)
 	return 1;
 }
 
+int luaPositionIsHotkey(lua_State* L)
+{
+	// position:isHotkey()
+	const Position& position = tfs::lua::getPosition(L, 1);
+	tfs::lua::pushBoolean(L, position.isHotkey());
+	return 1;
+}
+
+int luaPositionIsInventoryOrContainer(lua_State* L)
+{
+	// position:isInventoryOrContainer()
+	const Position& position = tfs::lua::getPosition(L, 1);
+	tfs::lua::pushBoolean(L, position.isInventoryOrContainer());
+	return 1;
+}
+
 int luaPositionSendMagicEffect(lua_State* L)
 {
 	// position:sendMagicEffect(magicEffect[, player = nullptr])
@@ -109,6 +125,8 @@ void tfs::lua::registerPosition(LuaScriptInterface& lsi)
 	lsi.registerClass("Position", "", luaPositionCreate);
 
 	lsi.registerMethod("Position", "isSightClear", luaPositionIsSightClear);
+	lsi.registerMethod("Position", "isHotkey", luaPositionIsHotkey);
+	lsi.registerMethod("Position", "isInventoryOrContainer", luaPositionIsInventoryOrContainer);
 
 	lsi.registerMethod("Position", "sendMagicEffect", luaPositionSendMagicEffect);
 	lsi.registerMethod("Position", "sendDistanceEffect", luaPositionSendDistanceEffect);

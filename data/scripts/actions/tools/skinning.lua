@@ -190,7 +190,7 @@ function skinning.onUse(player, item, fromPosition, target, toPosition, isHotkey
 		player:addItem(skin[reward].newItem, skin[reward].amount or 1)
 		effect = CONST_ME_HITAREA
 	end
-	if toPosition.x == CONTAINER_POSITION then
+	if toPosition:isInventoryOrContainer() then
 		toPosition = player:getPosition()
 	end
 	toPosition:sendMagicEffect(effect)

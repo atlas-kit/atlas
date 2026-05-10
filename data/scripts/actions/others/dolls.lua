@@ -110,7 +110,7 @@ function dolls.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		return false
 	end
 
-	if fromPosition.x == CONTAINER_POSITION then
+	if fromPosition:isInventoryOrContainer() then
 		fromPosition = player:getPosition()
 	end
 

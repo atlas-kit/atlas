@@ -75,7 +75,7 @@ function carpets.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		return false
 	end
 
-	if fromPosition.x == CONTAINER_POSITION then
+	if fromPosition:isInventoryOrContainer() then
 		player:sendTextMessage(MESSAGE_STATUS_SMALL, "Put the item on the floor first.")
 		return true
 	end

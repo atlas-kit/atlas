@@ -293,7 +293,7 @@ static std::pair<Position, uint8_t> internalGetPosition(const std::shared_ptr<It
 	if (const auto& topParent = item->getTopParent()) {
 		if (const auto& creature = topParent->asCreature()) {
 			if (const auto& player = creature->asPlayer()) {
-				const uint16_t x = 0xFFFF;
+				const uint16_t x = Position::INVENTORY_X;
 
 				if (const auto& container = std::dynamic_pointer_cast<Container>(item->getTopParent())) {
 					const auto y = static_cast<uint16_t>(static_cast<uint16_t>(0x40) |
