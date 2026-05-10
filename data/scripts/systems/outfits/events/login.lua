@@ -3,7 +3,21 @@ local event = Event()
 
 function event.onPlayerLogin(player)
     if player:isMounted() then
-        player:restoreMountSpeed()
+        local outfit = player:getDefaultOutfit()
+        local lookMount = outfit.lookMount
+
+        if player:canRideMount(lookMount) then
+            if not player:getCurrentMount() then
+                player:setCurrentMount(lookMount)
+            end
+            player:restoreMountSpeed()
+            player:setWasMounted(true)
+        else
+            outfit.lookMount = 0
+            player:setDefaultOutfit(outfit)
+            player:setCurrentOutfit(outfit)
+            player:setWasMounted(false)
+        end
     end
 
     return true

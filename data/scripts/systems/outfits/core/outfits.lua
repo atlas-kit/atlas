@@ -129,6 +129,10 @@ function Player.canWearOutfit(self, lookType, addons)
         return false
     end
 
+    if outfit.sex ~= self:getSex() then
+        return false
+    end
+
     if outfit.premium and not self:isPremium() then
         return false
     end

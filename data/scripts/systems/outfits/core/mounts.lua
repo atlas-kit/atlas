@@ -83,6 +83,10 @@ function Player.restoreMountSpeed(self)
 end
 
 function Player.addMount(self, mountId)
+    if type(mountId) ~= "number" or mountId <= 0 or not Game.getMountByLookType(mountId) then
+        return false
+    end
+
     return self:setStorageValue(PlayerStorageKeys.mountsBase + mountId, 1)
 end
 
@@ -94,11 +98,19 @@ function Player.addAllMounts(self)
 end
 
 function Player.hasMount(self, mountId)
+    if type(mountId) ~= "number" or mountId <= 0 then
+        return false
+    end
+
     local value = self:getStorageValue(PlayerStorageKeys.mountsBase + mountId)
     return value ~= nil and value ~= -1
 end
 
 function Player.removeMount(self, mountId)
+    if type(mountId) ~= "number" or mountId <= 0 then
+        return false
+    end
+
     local value = self:removeStorageValue(PlayerStorageKeys.mountsBase + mountId)
     if self:getCurrentMount() == mountId and self:isMounted() then
         self:dismount()
@@ -132,11 +144,20 @@ function Player.setCurrentMount(self, mountId)
         return self:removeStorageValue(PlayerStorageKeys.currentMount)
     end
 
-    if not self:getGroup():getAccess() and not self:hasMount(mountId) then
+    if type(mountId) ~= "number" or mountId <= 0 then
         return false
     end
 
-    return self:setStorageValue(PlayerStorageKeys.currentMount, mountId)
+    local mount = Game.getMountByLookType(mountId)
+    if not mount then
+        return false
+    end
+
+    if not self:getGroup():getAccess() and not self:canRideMount(mount.lookType) then
+        return false
+    end
+
+    return self:setStorageValue(PlayerStorageKeys.currentMount, mount.lookType)
 end
 
 function Player.getRandomizeMount(self)
@@ -154,7 +175,11 @@ end
 -- Returns whether the player can ride the given mount lookType.
 function Player.canRideMount(self, mountId)
     if self:getGroup():getAccess() then
-        return true
+        return type(mountId) == "number" and mountId > 0 and Game.getMountByLookType(mountId) ~= nil
+    end
+
+    if type(mountId) ~= "number" or mountId <= 0 then
+        return false
     end
 
     local mount = Game.getMountByLookType(mountId)
@@ -175,20 +200,34 @@ end
 
 -- Mounts the given mount object (from Game.getMountByLookType): updates outfit + speed.
 function Player.mount(self, mount)
-    if mount == nil or mount.lookType == nil or mount.speed == nil then
+    if type(mount) ~= "table" or type(mount.lookType) ~= "number" or type(mount.speed) ~= "number" then
+        return false
+    end
+
+    if not self:canRideMount(mount.lookType) then
         return false
     end
 
     local outfit = self:getDefaultOutfit()
     outfit.lookMount = mount.lookType
-    return self:setOutfitWithMountSpeed(outfit)
+    local result = self:setOutfitWithMountSpeed(outfit)
+    if result then
+        self:setWasMounted(true)
+    end
+
+    return result
 end
 
 -- Dismounts the current mount: clears outfit mount + removes speed bonus.
-function Player.dismount(self)
+function Player.dismount(self, keepWasMounted)
     local outfit = self:getDefaultOutfit()
     outfit.lookMount = 0
-    return self:setOutfitWithMountSpeed(outfit)
+    local result = self:setOutfitWithMountSpeed(outfit)
+    if result and not keepWasMounted then
+        self:setWasMounted(false)
+    end
+
+    return result
 end
 
 local function getRandomMount(player)
@@ -214,7 +253,7 @@ end
 -- - When mounted is true: mounts using the selected mount (or a random owned mount if randomize is enabled).
 -- - When mounted is false: dismounts.
 -- Enforces cooldown when mounting, protection-zone restriction, premium/ownership rules, and CONDITION_OUTFIT.
-function Player.toggleMount(self, mounted)
+function Player.toggleMount(self, mounted, keepWasMounted)
     if mounted then
         if not self:getGroup():getAccess() and not self:getWasMounted() then
             local lastMountToggle = self:getLastMountToggle()
@@ -262,13 +301,17 @@ function Player.toggleMount(self, mounted)
             return false
         end
 
-        self:mount(currentMount)
+        if not self:mount(currentMount) then
+            return false
+        end
     else
         if not self:isMounted() then
             return false
         end
 
-        self:dismount()
+        if not self:dismount(keepWasMounted) then
+            return false
+        end
     end
 
     self:setLastMountToggle(os.mtime())

@@ -1595,7 +1595,11 @@ end
 function Game.getOutfit(param, sex)
     local lookType = tonumber(param)
     if lookType then
-        return Game.getOutfitByLookType(lookType)
+        local outfit = Game.getOutfitByLookType(lookType)
+        if outfit and (sex == nil or outfit.sex == sex) then
+            return outfit
+        end
+        return nil
     end
     return Game.getOutfitByName(param, sex)
 end

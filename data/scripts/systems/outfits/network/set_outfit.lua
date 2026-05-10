@@ -59,18 +59,18 @@ function handler.onReceive(player, msg)
             return
         end
 
-        if outfit.lookMount ~= 0 then
-            if not player:canRideMount(outfit.lookMount) then
+        if lookMount ~= 0 then
+            if not player:canRideMount(lookMount) then
                 player:setCurrentMount(nil)
                 return
             end
 
-            player:setCurrentMount(outfit.lookMount)
-        else
-            player:setCurrentMount(nil)
+            player:setCurrentMount(lookMount)
         end
 
-        player:setOutfitWithMountSpeed(outfit)
+        if player:setOutfitWithMountSpeed(outfit) then
+            player:setWasMounted(lookMount ~= 0)
+        end
         player:setRandomizeMount(randomizeMount)
     elseif outfitType == 1 then -- try outfit from store window
         outfit.lookMount = 0
@@ -112,9 +112,7 @@ function handler.onReceive(player, msg)
             return
         end
 
-        -- Verify item is at expected stack position
-        local thingAtPos = tile:getThing(stackpos)
-        if not thingAtPos or thingAtPos ~= item then
+        if tile:getThingIndex(item) ~= stackpos then
             return
         end
 

@@ -192,6 +192,8 @@ ModalWindow = {}
 ---@field create fun(): Item
 ---@field __eq fun(self: Item, other: Item): boolean
 ---@field isItem fun(self: Item): boolean
+---@field isPodium fun(self: Item): boolean
+---@field getPodium fun(self: Item): Podium
 ---@field getParent fun(self: Item): Item
 ---@field getTopParent fun(self: Item): Item
 ---@field getId fun(self: Item): number
