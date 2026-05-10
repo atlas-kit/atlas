@@ -101,8 +101,7 @@ public:
 
 	static std::unique_ptr<Condition> createCondition(ConditionId_t id, ConditionType_t type,
 	                                                  std::chrono::milliseconds ticks, int32_t param = 0,
-	                                                  bool buff = false, uint32_t subId = 0,
-	                                                  bool aggressive = false);
+	                                                  bool buff = false, uint32_t subId = 0, bool aggressive = false);
 	static std::unique_ptr<Condition> createCondition(PropStream& propStream);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
