@@ -4,12 +4,12 @@
 #ifndef FS_CREATURE_H
 #define FS_CREATURE_H
 
+#include "condition.h"
 #include "const.h"
 #include "enums.h"
 #include "position.h"
 #include "tile.h"
 
-class Condition;
 class Container;
 class Item;
 class Monster;
@@ -238,8 +238,8 @@ public:
 	virtual float getAttackFactor() const { return 1.0f; }
 	virtual float getDefenseFactor() const { return 1.0f; }
 
-	bool addCondition(Condition* condition, bool force = false);
-	bool addCombatCondition(Condition* condition);
+	bool addCondition(std::unique_ptr<Condition> condition, bool force = false);
+	bool addCombatCondition(std::unique_ptr<Condition> condition);
 	void removeCondition(ConditionType_t type, ConditionId_t conditionId, bool force = false);
 	void removeCondition(ConditionType_t type, bool force = false);
 	void removeCondition(Condition* condition, bool force = false);
@@ -365,7 +365,7 @@ protected:
 		int64_t ticks;
 	};
 
-	std::vector<Condition*> conditions;
+	std::vector<std::unique_ptr<Condition>> conditions;
 	CreatureIconHashMap creatureIcons;
 
 	std::vector<Direction> listWalkDir;
