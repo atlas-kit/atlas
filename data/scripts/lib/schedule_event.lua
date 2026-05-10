@@ -75,7 +75,8 @@ local function nextDailyDelay(h, m, s)
 
 	local timestamp = os.time(nextTime)
 	if timestamp <= now then
-		timestamp = timestamp + 24 * 60 * 60
+		nextTime.day = nextTime.day + 1
+		timestamp = os.time(nextTime)
 	end
 
 	return (timestamp - now) * 1000
@@ -89,9 +90,11 @@ local function nextWeekdayDelay(day, h, m, s)
 	nextTime.sec = s
 
 	local daysUntil = (day - nextTime.wday) % 7
-	local timestamp = os.time(nextTime) + daysUntil * 24 * 60 * 60
+	nextTime.day = nextTime.day + daysUntil
+	local timestamp = os.time(nextTime)
 	if timestamp <= now then
-		timestamp = timestamp + 7 * 24 * 60 * 60
+		nextTime.day = nextTime.day + 7
+		timestamp = os.time(nextTime)
 	end
 
 	return (timestamp - now) * 1000
@@ -266,6 +269,12 @@ function ScheduleEvent:register()
 
 				dayTimes[day] = {}
 				for _, t in ipairs(value) do
+					if type(t) ~= "string" then
+						print("[Warning - ScheduleEvent] Invalid time: " .. tostring(t))
+						self:stop()
+						return false
+					end
+
 					local h, m, s = parseTime(t)
 					if not h then
 						print("[Warning - ScheduleEvent] Invalid time: " .. tostring(t))
@@ -284,6 +293,12 @@ function ScheduleEvent:register()
 
 				dayTimes[day] = {{h, m, s}}
 			elseif type(value) == "number" then
+				if value < SCHEDULER_MINTICKS then
+					print("[Warning - ScheduleEvent] Interval must be >= " .. SCHEDULER_MINTICKS .. "ms")
+					self:stop()
+					return false
+				end
+
 				dayIntervals[day] = value
 			else
 				print("[Warning - ScheduleEvent] Invalid value for weekday " .. day)
