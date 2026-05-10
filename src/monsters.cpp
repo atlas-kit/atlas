@@ -80,6 +80,30 @@ std::unique_ptr<ConditionDamage> Monsters::getDamageCondition(ConditionType_t co
 	return condition;
 }
 
+static constexpr std::chrono::milliseconds getMeleeConditionTickInterval(ConditionType_t conditionType)
+{
+	switch (conditionType) {
+		case CONDITION_FIRE:
+			return 9000ms;
+		case CONDITION_POISON:
+			return 4000ms;
+		case CONDITION_ENERGY:
+			return 10000ms;
+		case CONDITION_DROWN:
+			return 5000ms;
+		case CONDITION_FREEZING:
+			return 8000ms;
+		case CONDITION_CURSED:
+			return 4000ms;
+		case CONDITION_BLEEDING:
+			return 4000ms;
+		case CONDITION_DAZZLED:
+			return 10000ms;
+		default:
+			return 2000ms;
+	}
+}
+
 static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 {
 	return static_cast<int32_t>(std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
@@ -241,46 +265,46 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 9000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("poison"))) {
 				conditionType = CONDITION_POISON;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 4000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("energy"))) {
 				conditionType = CONDITION_ENERGY;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 10000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("drown"))) {
 				conditionType = CONDITION_DROWN;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 5000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("freeze"))) {
 				conditionType = CONDITION_FREEZING;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 8000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("dazzle"))) {
 				conditionType = CONDITION_DAZZLED;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 10000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("curse"))) {
 				conditionType = CONDITION_CURSED;
 
 				minDamage = pugi::cast<int32_t>(attr.value());
 				maxDamage = minDamage;
-				tickInterval = 4000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			} else if ((attr = node.attribute("bleed")) || (attr = node.attribute("physical"))) {
 				conditionType = CONDITION_BLEEDING;
-				tickInterval = 4000ms;
+				tickInterval = getMeleeConditionTickInterval(conditionType);
 			}
 
 			if ((attr = node.attribute("tick"))) {
@@ -614,7 +638,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		if (spell->conditionType != CONDITION_NONE) {
 			ConditionType_t conditionType = spell->conditionType;
 
-			auto tickInterval = 2000ms;
+			auto tickInterval = getMeleeConditionTickInterval(conditionType);
 			if (spell->tickInterval != std::chrono::milliseconds::zero()) {
 				tickInterval = spell->tickInterval;
 			}
