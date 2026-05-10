@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Create vcpkg binary cache directory
-        run: mkdir -p ${{ github.workspace }}/vcpkg_cache
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
         shell: bash
 
       - run: echo CXX=g++-14 >> $GITHUB_ENV
