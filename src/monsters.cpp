@@ -68,8 +68,8 @@ bool Monsters::reload()
 }
 
 std::unique_ptr<ConditionDamage> Monsters::getDamageCondition(ConditionType_t conditionType, int32_t maxDamage,
-                                                               int32_t minDamage, int32_t startDamage,
-                                                               std::chrono::milliseconds tickInterval)
+                                                              int32_t minDamage, int32_t startDamage,
+                                                              std::chrono::milliseconds tickInterval)
 {
 	auto condition = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, conditionType);
 	condition->setParam(CONDITION_PARAM_TICKINTERVAL, tickInterval.count());
