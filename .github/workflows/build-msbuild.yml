@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
 
       - name: Cache vcpkg
         uses: actions/cache@v5
@@ -45,7 +45,7 @@ jobs:
           key: vcpkg-msbuild-${{ hashFiles('vcpkg.json') }}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1 # v11.5
         with:
           doNotCache: false
 
