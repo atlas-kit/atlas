@@ -138,7 +138,6 @@ bool IOMapSerialize::saveHouseItems()
 	if (!db.executeQuery("DELETE FROM `tile_store`")) {
 		return false;
 	}
-
 	DBInsert stmt("INSERT INTO `tile_store` (`house_id`, `data`) VALUES ");
 
 	PropWriteStream stream;

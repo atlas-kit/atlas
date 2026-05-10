@@ -1664,23 +1664,23 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 					it.type = ITEM_TYPE_MAGICFIELD;
 
 					CombatType_t combatType = COMBAT_NONE;
-					ConditionDamage* conditionDamage = nullptr;
+					std::unique_ptr<ConditionDamage> conditionDamage;
 
 					tmpStrValue = boost::algorithm::to_lower_copy<std::string>(valueAttribute.as_string());
 					if (tmpStrValue == "fire") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_FIRE);
 						combatType = COMBAT_FIREDAMAGE;
 					} else if (tmpStrValue == "energy") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_ENERGY);
 						combatType = COMBAT_ENERGYDAMAGE;
 					} else if (tmpStrValue == "poison") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_POISON);
 						combatType = COMBAT_EARTHDAMAGE;
 					} else if (tmpStrValue == "drown") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_DROWN);
 						combatType = COMBAT_DROWNDAMAGE;
 					} else if (tmpStrValue == "physical") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_BLEEDING);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_BLEEDING);
 						combatType = COMBAT_PHYSICALDAMAGE;
 					} else {
 						std::cout << "[Warning - Items::parseItemNode] Unknown field value: "
@@ -1689,7 +1689,6 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 					if (combatType != COMBAT_NONE) {
 						it.combatType = combatType;
-						it.conditionDamage.reset(conditionDamage);
 
 						uint32_t ticks = 0;
 						int32_t start = 0;
@@ -1746,6 +1745,8 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 						if (conditionDamage->getTotalDamage() > 0) {
 							conditionDamage->setParam(CONDITION_PARAM_FORCEUPDATE, 1);
 						}
+
+						it.conditionDamage = std::move(conditionDamage);
 					}
 					break;
 				}
