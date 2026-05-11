@@ -1,6 +1,6 @@
 # Compiling with Docker
 
-The repository ships a multi-stage `Dockerfile` based on Debian Bookworm Slim. It produces a small runtime image containing only the `tfs` binary and the libraries it needs.
+The repository ships a multi-stage `Dockerfile` based on Debian Forky Slim. It produces a small runtime image containing only the `tfs` binary and the libraries it needs.
 
 ## Building the image
 
@@ -31,10 +31,10 @@ docker run -d --rm \
 
 ## Pulling pre-built images
 
-CI publishes images on every push to `dev` and on every version tag at `ghcr.io/luanluciano93/atlas`:
+CI publishes images on every push to `dev` and on every version tag at `ghcr.io/atlas-kit/atlas`:
 
 ```bash
-docker pull ghcr.io/luanluciano93/atlas:dev
+docker pull ghcr.io/atlas-kit/atlas:dev
 ```
 
 See [`.github/workflows/docker-image.yml`](../.github/workflows/docker-image.yml) for the publishing logic.

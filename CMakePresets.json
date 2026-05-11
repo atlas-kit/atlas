@@ -120,7 +120,8 @@
       "description": "Linux Debug build with Address Sanitizer",
       "cacheVariables": {
         "ENABLE_ASAN": "ON",
-        "BUILD_TESTING": "ON"
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-debug-asan"
       }
     },
     {
@@ -203,11 +204,6 @@
       "name": "linux-debug-asan",
       "inherits": "base",
       "configurePreset": "linux-debug-asan"
-    },
-    {
-      "name": "vcpkg",
-      "inherits": "base",
-      "configurePreset": "vcpkg"
     }
   ]
 }
