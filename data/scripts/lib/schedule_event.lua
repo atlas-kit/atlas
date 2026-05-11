@@ -47,22 +47,13 @@ local function safeCall(callback, ...)
 	return true, result
 end
 
-local function clearEventId(self, eventId)
-	for index, id in ipairs(self._eventIds) do
-		if id == eventId then
-			table.remove(self._eventIds, index)
-			return
-		end
-	end
-end
-
 local function schedule(self, callback, delay, ...)
 	local eventId
 	eventId = addEvent(function(...)
-		clearEventId(self, eventId)
+		self._eventIds[eventId] = nil
 		callback(...)
 	end, math.max(SCHEDULER_MINTICKS, delay), ...)
-	table.insert(self._eventIds, eventId)
+	self._eventIds[eventId] = true
 	return eventId
 end
 
@@ -318,7 +309,7 @@ function ScheduleEvent:register()
 end
 
 function ScheduleEvent:stop()
-	for _, eventId in ipairs(self._eventIds) do
+	for eventId in pairs(self._eventIds) do
 		stopEvent(eventId)
 	end
 
