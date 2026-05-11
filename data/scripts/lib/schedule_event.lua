@@ -196,6 +196,7 @@ function ScheduleEvent:scheduleDays(dayTimes, dayIntervals)
 	end
 
 	-- A weekday interval runs repeatedly at the configured interval, but only while that weekday is active.
+	-- When the target day is not the current day, sleep until 00:00:00 of the next occurrence instead of polling.
 	for day, interval in pairs(dayIntervals) do
 		local function loop()
 			if not self._registered then
@@ -204,23 +205,17 @@ function ScheduleEvent:scheduleDays(dayTimes, dayIntervals)
 
 			if os.date("*t").wday == day then
 				safeCall(self.callback, interval)
-			end
-			schedule(self, loop, interval)
-		end
-
-		local function scheduleInitial()
-			if not self._registered then
-				return
-			end
-
-			if os.date("*t").wday == day then
 				schedule(self, loop, interval)
 			else
-				schedule(self, scheduleInitial, interval)
+				schedule(self, loop, nextWeekdayDelay(day, 0, 0, 0))
 			end
 		end
 
-		scheduleInitial()
+		if os.date("*t").wday == day then
+			schedule(self, loop, interval)
+		else
+			schedule(self, loop, nextWeekdayDelay(day, 0, 0, 0))
+		end
 	end
 
 	return true
