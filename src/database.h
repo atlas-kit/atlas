@@ -149,6 +149,7 @@ public:
 		return pugi::cast<T>(row[it->second]);
 	}
 
+	std::chrono::system_clock::time_point getDateTime(std::string_view column) const;
 	std::string_view getString(std::string_view column) const;
 
 	bool hasNext() const;

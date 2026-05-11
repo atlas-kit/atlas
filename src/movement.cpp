@@ -713,14 +713,13 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->invisible) {
-		Condition* condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1ms, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	if (it.abilities->manaShield) {
-		Condition* condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1ms, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	if (it.abilities->speed != 0) {
@@ -733,26 +732,25 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->regeneration) {
-		Condition* condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
+		auto condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1ms, 0);
 
 		if (it.abilities->healthGain != 0) {
 			condition->setParam(CONDITION_PARAM_HEALTHGAIN, it.abilities->healthGain);
 		}
 
-		if (it.abilities->healthTicks != 0) {
-			condition->setParam(CONDITION_PARAM_HEALTHTICKS, it.abilities->healthTicks);
+		if (it.abilities->healthTicks != std::chrono::milliseconds::zero()) {
+			condition->setParam(CONDITION_PARAM_HEALTHTICKS, it.abilities->healthTicks.count());
 		}
 
 		if (it.abilities->manaGain != 0) {
 			condition->setParam(CONDITION_PARAM_MANAGAIN, it.abilities->manaGain);
 		}
 
-		if (it.abilities->manaTicks != 0) {
-			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks);
+		if (it.abilities->manaTicks != std::chrono::milliseconds::zero()) {
+			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks.count());
 		}
 
-		player->addCondition(condition);
+		player->addCondition(std::move(condition));
 	}
 
 	// skill modifiers

@@ -15,8 +15,8 @@ extern Game g_game;
 extern Monsters g_monsters;
 extern Scheduler g_scheduler;
 
-static constexpr int32_t MINSPAWN_INTERVAL = 10 * 1000;           // 10 seconds to match RME
-static constexpr int32_t MAXSPAWN_INTERVAL = 24 * 60 * 60 * 1000; // 1 day
+static constexpr auto MINSPAWN_INTERVAL = 10s;           // 10 seconds to match RME
+static constexpr auto MAXSPAWN_INTERVAL = 24 * 60 * 60s; // 1 day
 
 bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByLua)
 {
@@ -57,14 +57,14 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 				Position pos(centerPos.x + pugi::cast<uint16_t>(childNode.attribute("x").value()),
 				             centerPos.y + pugi::cast<uint16_t>(childNode.attribute("y").value()), centerPos.z);
 
-				int32_t interval = pugi::cast<int32_t>(childNode.attribute("spawntime").value()) * 1000;
+				auto interval = std::chrono::seconds{pugi::cast<int32_t>(childNode.attribute("spawntime").value())};
 				if (interval < MINSPAWN_INTERVAL) {
 					std::cout << "[Warning - Spawns::loadFromXml] " << pos << " spawntime can not be less than "
-					          << MINSPAWN_INTERVAL / 1000 << " seconds." << std::endl;
+					          << MINSPAWN_INTERVAL.count() << " seconds." << std::endl;
 					continue;
 				} else if (interval > MAXSPAWN_INTERVAL) {
 					std::cout << "[Warning - Spawns::loadFromXml] " << pos << " spawntime can not be more than "
-					          << MAXSPAWN_INTERVAL / 1000 << " seconds." << std::endl;
+					          << MAXSPAWN_INTERVAL.count() << " seconds." << std::endl;
 					continue;
 				}
 
@@ -84,7 +84,7 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 					sb.direction = DIRECTION_NORTH;
 				}
 				sb.interval = interval;
-				sb.lastSpawn = 0;
+				sb.lastSpawn = std::chrono::steady_clock::time_point::min();
 
 				for (auto monsterNode : childNode.children()) {
 					pugi::xml_attribute nameAttribute = monsterNode.attribute("name");
@@ -148,17 +148,17 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 
 				Position pos(centerPos.x + pugi::cast<uint16_t>(childNode.attribute("x").value()),
 				             centerPos.y + pugi::cast<uint16_t>(childNode.attribute("y").value()), centerPos.z);
-				int32_t interval = pugi::cast<int32_t>(childNode.attribute("spawntime").value()) * 1000;
+				auto interval = std::chrono::seconds{pugi::cast<int32_t>(childNode.attribute("spawntime").value())};
 				if (interval >= MINSPAWN_INTERVAL && interval <= MAXSPAWN_INTERVAL) {
-					spawn.addMonster(nameAttribute.as_string(), pos, dir, static_cast<uint32_t>(interval));
+					spawn.addMonster(nameAttribute.as_string(), pos, dir, interval);
 				} else {
 					if (interval < MINSPAWN_INTERVAL) {
 						std::cout << "[Warning - Spawns::loadFromXml] " << nameAttribute.as_string() << ' ' << pos
-						          << " spawntime can not be less than " << MINSPAWN_INTERVAL / 1000 << " seconds."
+						          << " spawntime can not be less than " << MINSPAWN_INTERVAL.count() << " seconds."
 						          << std::endl;
 					} else {
 						std::cout << "[Warning - Spawns::loadFromXml] " << nameAttribute.as_string() << ' ' << pos
-						          << " spawntime can not be more than " << MAXSPAWN_INTERVAL / 1000 << " seconds."
+						          << " spawntime can not be more than " << MAXSPAWN_INTERVAL.count() << " seconds."
 						          << std::endl;
 					}
 				}
@@ -327,7 +327,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 	monster->setMasterPos(pos);
 
 	spawnedMap.insert({spawnId, monster});
-	spawnMap[spawnId].lastSpawn = OTSYS_TIME();
+	spawnMap[spawnId].lastSpawn = std::chrono::steady_clock::now();
 	return true;
 }
 
@@ -351,9 +351,9 @@ void Spawn::checkSpawn()
 			continue;
 		}
 
-		if (OTSYS_TIME() >= sb.lastSpawn + sb.interval) {
+		if (std::chrono::steady_clock::now() >= sb.lastSpawn + sb.interval) {
 			if (!spawnMonster(spawnId, sb)) {
-				sb.lastSpawn = OTSYS_TIME();
+				sb.lastSpawn = std::chrono::steady_clock::now();
 				continue;
 			}
 
@@ -388,7 +388,7 @@ bool Spawn::addBlock(spawnBlock_t sb)
 	return true;
 }
 
-bool Spawn::addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval)
+bool Spawn::addMonster(const std::string& name, const Position& pos, Direction dir, std::chrono::milliseconds interval)
 {
 	MonsterType* mType = g_monsters.getMonsterType(name);
 	if (!mType) {
@@ -401,7 +401,7 @@ bool Spawn::addMonster(const std::string& name, const Position& pos, Direction d
 	sb.pos = pos;
 	sb.direction = dir;
 	sb.interval = interval;
-	sb.lastSpawn = 0;
+	sb.lastSpawn = std::chrono::steady_clock::time_point::min();
 
 	return addBlock(sb);
 }

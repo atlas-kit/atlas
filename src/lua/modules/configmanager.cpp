@@ -48,7 +48,6 @@ void tfs::lua::registerConfigManager(LuaScriptInterface& lsi)
 
 	lsi.registerTable("configKeys");
 
-	registerEnumIn(lsi, "configKeys", ConfigManager::ALLOW_CHANGEOUTFIT);
 	registerEnumIn(lsi, "configKeys", ConfigManager::ONE_PLAYER_ON_ACCOUNT);
 	registerEnumIn(lsi, "configKeys", ConfigManager::AIMBOT_HOTKEY_ENABLED);
 	registerEnumIn(lsi, "configKeys", ConfigManager::REMOVE_RUNE_CHARGES);

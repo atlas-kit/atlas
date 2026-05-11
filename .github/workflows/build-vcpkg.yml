@@ -37,22 +37,29 @@ jobs:
     env:
       VCPKG_BUILD_TYPE: release
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
 
       - run: echo CXX=g++-14 >> $GITHUB_ENV
         if: ${{ matrix.os == 'ubuntu' }}
 
       - name: Get latest CMake
-        # Using 'latest' branch, the latest CMake is installed.
         uses: lukka/get-cmake@latest
 
-      - name: Cache vcpkg
+      - name: Cache vcpkg binary packages
         uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          key: vcpkg-binary-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-binary-${{ matrix.os }}-
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v11

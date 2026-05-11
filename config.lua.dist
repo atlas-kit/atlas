@@ -89,7 +89,6 @@ mysqlSock = ""
 -- intervals regardless of other actions such as item (potion) use. This setting
 -- may cause high CPU usage with many players and potentially affect performance!
 -- checkDuplicateStorageKeys checks the values stored in the variables for duplicates.
-allowChangeOutfit = true
 freePremium = false
 maxMessageBuffer = 4
 emoteSpells = false

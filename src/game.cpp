@@ -10,14 +10,12 @@
 #include "creature.h"
 #include "databasetasks.h"
 #include "events.h"
-#include "globalevent.h"
 #include "housetile.h"
 #include "http/http.h"
 #include "iologindata.h"
 #include "iomarket.h"
 #include "items.h"
 #include "movement.h"
-#include "outfit.h"
 #include "party.h"
 #include "podium.h"
 #include "scheduler.h"
@@ -35,7 +33,6 @@ extern Actions* g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
@@ -52,8 +49,8 @@ void Game::start(ServiceManager* manager)
 	serviceManager = manager;
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
-	g_scheduler.addEvent(
-	    createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL), [this]() { updateCreaturesPath(0); }));
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
+	                                         [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 }
 
@@ -78,8 +75,6 @@ void Game::setGameState(GameState_t newState)
 			g_chat.load();
 
 			map.spawns.startup();
-
-			mounts.loadFromXml();
 
 			tfs::events::game::onStartup();
 			break;
@@ -563,7 +558,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	}
 
 	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+		creature->removeCondition(condition.get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -587,6 +582,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		summon->setSkillLoss(false);
 		removeCreature(summon);
 	}
+
 	return true;
 }
 
@@ -677,13 +673,11 @@ void Game::playerMoveCreature(const std::shared_ptr<Player>& player, const std::
                               const Position& movingCreatureOrigPos, const std::shared_ptr<Tile>& toTile)
 {
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task =
-		    createSchedulerTask(delay, [=, this, playerID = player->getID(), movingCreatureID = movingCreature->getID(),
-		                                toPos = toTile->getPosition()]() {
+		player->setNextActionTask(createSchedulerTask(
+		    player->getNextActionTime(), [=, this, playerID = player->getID(),
+		                                  movingCreatureID = movingCreature->getID(), toPos = toTile->getPosition()]() {
 			    playerMoveCreatureByID(playerID, movingCreatureID, movingCreatureOrigPos, toPos);
-		    });
-		player->setNextActionTask(std::move(task));
+		    }));
 		player->resetIdleTime();
 		return;
 	}
@@ -893,11 +887,10 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
                           std::shared_ptr<Thing> toThing)
 {
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(delay, [=, this, playerID = player->getID()]() {
-			playerMoveItemByPlayerID(playerID, fromPos, spriteId, fromStackPos, toPos, count);
-		});
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(
+		    createSchedulerTask(player->getNextActionTime(), [=, this, playerID = player->getID()]() {
+			    playerMoveItemByPlayerID(playerID, fromPos, spriteId, fromStackPos, toPos, count);
+		    }));
 		player->resetIdleTime();
 		return;
 	}
@@ -1270,7 +1263,7 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 		return retMaxCount;
 	}
 
-	if (moveItem && moveItem->getDuration() > 0) {
+	if (moveItem && moveItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (moveItem->getDecaying() != DECAYING_TRUE) {
 			moveItem->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(moveItem);
@@ -1368,7 +1361,7 @@ ReturnValue Game::internalAddItem(const std::shared_ptr<Thing>& toThing, const s
 		}
 	}
 
-	if (item->getDuration() > 0) {
+	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		if (item->getDecaying() != DECAYING_TRUE) {
 			item->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(item);
@@ -1719,7 +1712,7 @@ std::shared_ptr<Item> Game::transformItem(const std::shared_ptr<Item>& item, uin
 	item->setParent(nullptr);
 	parent->postRemoveNotification(item, parent, itemIndex);
 
-	if (newItem->getDuration() > 0) {
+	if (newItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (newItem->getDecaying() != DECAYING_TRUE) {
 			newItem->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(newItem);
@@ -2099,11 +2092,9 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(delay, [=, this]() {
+		player->setNextActionTask(createSchedulerTask(player->getNextActionTime(), [=, this]() {
 			playerUseItemEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId);
-		});
-		player->setNextActionTask(std::move(task));
+		}));
 		return;
 	}
 
@@ -2160,10 +2151,8 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task =
-		    createSchedulerTask(delay, [=, this]() { playerUseItem(playerId, pos, stackPos, index, spriteId); });
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(createSchedulerTask(
+		    player->getNextActionTime(), [=, this]() { playerUseItem(playerId, pos, stackPos, index, spriteId); }));
 		return;
 	}
 
@@ -2261,10 +2250,9 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(
-		    delay, [=, this]() { playerUseWithCreature(playerId, fromPos, fromStackPos, creatureId, spriteId); });
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(createSchedulerTask(player->getNextActionTime(), [=, this]() {
+			playerUseWithCreature(playerId, fromPos, fromStackPos, creatureId, spriteId);
+		}));
 		return;
 	}
 
@@ -2329,7 +2317,7 @@ void Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
 		if (it == browseFields.end()) {
 			parentContainer = createBrowseField(tile);
 			browseFields[tile.get()] = parentContainer;
-			g_scheduler.addEvent(createSchedulerTask(30000, [this, tile]() { browseFields.erase(tile.get()); }));
+			g_scheduler.addEvent(createSchedulerTask(30s, [this, tile]() { browseFields.erase(tile.get()); }));
 		} else {
 			parentContainer = it->second;
 		}
@@ -2430,7 +2418,7 @@ void Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, std::string
 		if (writeItem->getText() != text) {
 			writeItem->setText(text);
 			writeItem->setWriter(player->getName());
-			writeItem->setDate(time(nullptr));
+			writeItem->setDate(std::chrono::system_clock::now());
 		}
 	} else {
 		writeItem->resetText();
@@ -2489,7 +2477,7 @@ void Game::playerBrowseField(uint32_t playerId, const Position& pos)
 	if (it == browseFields.end()) {
 		container = createBrowseField(tile);
 		browseFields[tile.get()] = container;
-		g_scheduler.addEvent(createSchedulerTask(30000, [this, tile]() { browseFields.erase(tile.get()); }));
+		g_scheduler.addEvent(createSchedulerTask(30s, [this, tile]() { browseFields.erase(tile.get()); }));
 	} else {
 		container = it->second;
 	}
@@ -3303,7 +3291,7 @@ void Game::playerRequestEditPodium(uint32_t playerId, const Position& position, 
 					playerAutoWalk(playerID, listDir);
 				});
 				auto task = createSchedulerTask(
-				    400, [=, this]() { playerRequestEditPodium(playerId, position, stackPos, spriteId); });
+				    400ms, [=, this]() { playerRequestEditPodium(playerId, position, stackPos, spriteId); });
 				player->setNextWalkActionTask(std::move(task));
 			} else {
 				player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
@@ -3341,82 +3329,6 @@ void Game::playerEditPodium(uint32_t playerId, Outfit_t outfit, const Position& 
 	tfs::events::player::onPodiumEdit(player, item, outfit, podiumVisible, direction);
 }
 
-void Game::playerToggleMount(uint32_t playerId, bool mount)
-{
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	player->toggleMount(mount);
-}
-
-void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomizeMount /* = false*/)
-{
-	if (!getBoolean(ConfigManager::ALLOW_CHANGEOUTFIT)) {
-		return;
-	}
-
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	player->setRandomizeMount(randomizeMount);
-
-	const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(player->getSex(), outfit.lookType);
-	if (!playerOutfit) {
-		outfit.lookMount = 0;
-	}
-
-	if (outfit.lookMount != 0) {
-		Mount* mount = mounts.getMountByClientID(outfit.lookMount);
-		if (!mount) {
-			return;
-		}
-
-		if (!player->hasMount(mount)) {
-			return;
-		}
-
-		int32_t speedChange = mount->speed;
-		if (player->isMounted()) {
-			Mount* prevMount = mounts.getMountByID(player->getCurrentMount());
-			if (prevMount) {
-				speedChange -= prevMount->speed;
-			}
-		}
-
-		changeSpeed(player, speedChange);
-		player->setCurrentMount(mount->id);
-	} else {
-		if (player->isMounted()) {
-			player->dismount();
-		}
-
-		player->setWasMounted(false);
-	}
-
-	if (player->canWear(outfit.lookType, outfit.lookAddons)) {
-		player->defaultOutfit = outfit;
-
-		if (player->hasCondition(CONDITION_OUTFIT)) {
-			return;
-		}
-
-		if (player->getRandomizeMount() && player->hasMounts()) {
-			const Mount* mount = mounts.getMountByID(player->getRandomMount());
-			outfit.lookMount = mount->clientId;
-		}
-
-		internalCreatureChangeOutfit(player, outfit);
-	}
-
-	if (player->isMounted()) {
-		player->onChangeZone(player->getZone());
-	}
-}
-
 void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, const std::string& receiver,
                      const std::string& text)
 {
@@ -3436,9 +3348,9 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		return;
 	}
 
-	uint32_t muteTime = player->isMuted();
-	if (muteTime > 0) {
-		player->sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are still muted for {:d} seconds.", muteTime));
+	auto muteTime = player->isMuted();
+	if (muteTime > std::chrono::seconds::zero()) {
+		player->sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are still muted for {:%Q} seconds.", muteTime));
 		return;
 	}
 
@@ -3552,8 +3464,8 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30s, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -3724,7 +3636,7 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
 		if (!creature->isDead()) {
-			creature->onAttacking(0);
+			creature->onAttacking(std::chrono::milliseconds::zero());
 		}
 	}
 }
@@ -3781,7 +3693,7 @@ void Game::checkCreatures(size_t index)
 
 void Game::updateCreaturesPath(size_t index)
 {
-	g_scheduler.addEvent(createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL),
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::PATHFINDING_INTERVAL)),
 	                                         [=, this]() { updateCreaturesPath((index + 1) % EVENT_CREATURECOUNT); }));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
@@ -4177,10 +4089,11 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 			}
 
 			if (getBoolean(ConfigManager::MANASHIELD_BREAKABLE) && targetPlayer) {
-				if (ConditionManaShield* conditionManaShield = dynamic_cast<ConditionManaShield*>(
-				        targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE))) {
-					if (int32_t remainingManaDamage =
-					        conditionManaShield->onDamageTaken(targetPlayer, manaDamage) != 0) {
+				Condition* condition = targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE);
+				if (ConditionManaShield* conditionManaShield =
+				        condition ? condition->getConditionManaShield() : nullptr) {
+					int32_t remainingManaDamage = conditionManaShield->onDamageTaken(targetPlayer, manaDamage);
+					if (remainingManaDamage != 0) {
 						manaDamage -= remainingManaDamage;
 						targetPlayer->removeCondition(CONDITION_MANASHIELD_BREAKABLE);
 					}
@@ -4589,7 +4502,7 @@ void Game::startDecay(const std::shared_ptr<Item>& item)
 		return;
 	}
 
-	if (item->getDuration() > 0) {
+	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		item->setDecaying(DECAYING_TRUE);
 		toDecayItems.push_back(item);
 	} else {
@@ -4636,18 +4549,20 @@ void Game::checkDecay()
 			continue;
 		}
 
-		int32_t duration = item->getDuration();
-		int32_t decreaseTime = std::min<int32_t>(EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS, duration);
+		auto duration = item->getDuration();
+		auto decreaseTime = std::min(EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS, duration);
 
 		duration -= decreaseTime;
 		item->decreaseDuration(decreaseTime);
 
-		if (duration <= 0) {
+		if (duration <= std::chrono::milliseconds::zero()) {
 			it = decayItems[bucket].erase(it);
 			internalDecayItem(item);
 		} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			it = decayItems[bucket].erase(it);
-			size_t newBucket = (bucket + ((duration + EVENT_DECAYINTERVAL / 2) / 1000)) % EVENT_DECAY_BUCKETS;
+			size_t newBucket =
+			    (bucket + duration_cast<std::chrono::seconds>(duration + EVENT_DECAYINTERVAL / 2).count()) %
+			    EVENT_DECAY_BUCKETS;
 			if (newBucket == bucket) {
 				internalDecayItem(item);
 			} else {
@@ -4685,11 +4600,12 @@ void Game::shutdown()
 void Game::cleanup()
 {
 	for (const auto& item : toDecayItems) {
-		const uint32_t dur = item->getDuration();
+		const auto dur = item->getDuration();
 		if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			decayItems[lastBucket].push_back(item);
 		} else {
-			decayItems[(lastBucket + 1 + dur / 1000) % EVENT_DECAY_BUCKETS].push_back(item);
+			decayItems[(lastBucket + 1 + duration_cast<std::chrono::seconds>(dur).count()) % EVENT_DECAY_BUCKETS]
+			    .push_back(item);
 		}
 	}
 	toDecayItems.clear();
@@ -5077,7 +4993,7 @@ void Game::playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spr
 	player->sendMarketBrowseItem(it.id, buyOffers, sellOffers);
 }
 
-void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter)
+void Game::playerCancelMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter)
 {
 	const auto& player = getPlayerByID(playerId);
 	if (!player) {
@@ -5132,12 +5048,13 @@ void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 
 	tfs::iomarket::moveOfferToHistory(offer.id, OFFERSTATE_CANCELLED);
 	offer.amount = 0;
-	offer.timestamp += getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	offer.timestamp += std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 	player->sendMarketCancelOffer(offer);
 	player->sendMarketEnter();
 }
 
-void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount)
+void Game::playerAcceptMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter,
+                                   uint16_t amount)
 {
 	if (amount == 0 || amount > 64000) {
 		return;
@@ -5157,13 +5074,13 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		return;
 	}
 
-	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
-	if (offerAccountId == player->getAccount()) {
-		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
+	if (amount > offer.amount) {
 		return;
 	}
 
-	if (amount > offer.amount) {
+	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
+	if (offerAccountId == player->getAccount()) {
+		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
 		return;
 	}
 
@@ -5289,7 +5206,7 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		player->onReceiveMail();
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto marketOfferDuration = std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	tfs::iomarket::appendHistory(player->getGUID(),
 	                             (offer.type == MARKETACTION_BUY ? MARKETACTION_SELL : MARKETACTION_BUY), offer.itemId,
@@ -5374,15 +5291,14 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)
@@ -5482,14 +5398,10 @@ bool Game::reload(ReloadTypes_t reloadType)
 		case RELOAD_TYPE_EVENTS:
 			tfs::events::reload();
 			return true;
-		case RELOAD_TYPE_GLOBALEVENTS:
-			return g_globalEvents->reload();
 		case RELOAD_TYPE_ITEMS:
 			return Item::items.reload();
 		case RELOAD_TYPE_MONSTERS:
 			return g_monsters.reload();
-		case RELOAD_TYPE_MOUNTS:
-			return mounts.reload();
 		case RELOAD_TYPE_MOVEMENTS:
 			return g_moveEvents->reload();
 		case RELOAD_TYPE_NPCS: {
@@ -5521,7 +5433,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
-			g_globalEvents->clear(true);
 			g_weapons->clear(true);
 			g_weapons->loadDefaults();
 			g_spells->clear(true);
@@ -5529,7 +5440,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 			/*
 			Npcs::reload();
 			Item::items.reload();
-			mounts.reload();
 			ConfigManager::reload();
 			tfs::events::load();
 			g_chat.load();
@@ -5555,14 +5465,11 @@ bool Game::reload(ReloadTypes_t reloadType)
 			Item::items.reload();
 			g_weapons->clear(true);
 			g_weapons->loadDefaults();
-			mounts.reload();
-			g_globalEvents->reload();
 			tfs::events::reload();
 			g_chat.load();
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
-			g_globalEvents->clear(true);
 			g_spells->clear(true);
 			g_scripts->loadScripts("scripts", false, true);
 			return true;
@@ -5606,7 +5513,7 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		return;
 	}
 
-	time_t currentTime = time(nullptr);
+	auto currentTime = std::chrono::system_clock::now();
 	for (auto&& house : houses | std::views::values | std::views::as_const) {
 		if (house->getOwner() == 0) {
 			continue;
@@ -5633,19 +5540,19 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		if (player->getBankBalance() >= rent) {
 			player->setBankBalance(player->getBankBalance() - rent);
 
-			time_t paidUntil = currentTime;
+			auto paidUntil = currentTime;
 			switch (rentPeriod) {
 				case RENTPERIOD_DAILY:
-					paidUntil += 24 * 60 * 60;
+					paidUntil += std::chrono::days(1);
 					break;
 				case RENTPERIOD_WEEKLY:
-					paidUntil += 24 * 60 * 60 * 7;
+					paidUntil += std::chrono::days(7);
 					break;
 				case RENTPERIOD_MONTHLY:
-					paidUntil += 24 * 60 * 60 * 30;
+					paidUntil += std::chrono::days(30);
 					break;
 				case RENTPERIOD_YEARLY:
-					paidUntil += 24 * 60 * 60 * 365;
+					paidUntil += std::chrono::days(365);
 					break;
 				default:
 					break;

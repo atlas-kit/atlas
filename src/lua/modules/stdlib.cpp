@@ -10,7 +10,8 @@ namespace {
 int luaSystemTime(lua_State* L)
 {
 	// os.mtime()
-	tfs::lua::pushNumber(L, OTSYS_TIME());
+	tfs::lua::pushNumber(
+	    L, duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 	return 1;
 }
 

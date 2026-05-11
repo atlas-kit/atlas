@@ -8,7 +8,6 @@ namespace ConfigManager {
 
 enum boolean_config_t
 {
-	ALLOW_CHANGEOUTFIT,
 	ONE_PLAYER_ON_ACCOUNT,
 	AIMBOT_HOTKEY_ENABLED,
 	REMOVE_RUNE_CHARGES,

@@ -15,9 +15,9 @@ int luaConditionCreate(lua_State* L)
 	ConditionType_t conditionType = tfs::lua::getNumber<ConditionType_t>(L, 2);
 	ConditionId_t conditionId = tfs::lua::getNumber<ConditionId_t>(L, 3, CONDITIONID_COMBAT);
 
-	Condition* condition = Condition::createCondition(conditionId, conditionType, 0, 0);
+	auto condition = Condition::createCondition(conditionId, conditionType, std::chrono::milliseconds::zero(), 0);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition);
+		tfs::lua::pushUserdata(L, condition.release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);
@@ -89,7 +89,14 @@ int luaConditionGetEndTime(lua_State* L)
 	// condition:getEndTime()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushNumber(L, condition->getEndTime());
+		const auto endTime = condition->getEndTime();
+		if (endTime == std::chrono::steady_clock::time_point::min() ||
+		    endTime == std::chrono::steady_clock::time_point::max()) {
+			tfs::lua::pushNumber(L, 0);
+		} else {
+			const auto wallEndTime = std::chrono::system_clock::now() + (endTime - std::chrono::steady_clock::now());
+			tfs::lua::pushNumber(L, duration_cast<std::chrono::milliseconds>(wallEndTime.time_since_epoch()).count());
+		}
 	} else {
 		lua_pushnil(L);
 	}
@@ -101,7 +108,7 @@ int luaConditionClone(lua_State* L)
 	// condition:clone()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushUserdata(L, condition->clone());
+		tfs::lua::pushUserdata(L, condition->clone().release());
 		tfs::lua::setMetatable(L, -1, "Condition");
 	} else {
 		lua_pushnil(L);
@@ -114,7 +121,7 @@ int luaConditionGetTicks(lua_State* L)
 	// condition:getTicks()
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
-		tfs::lua::pushNumber(L, condition->getTicks());
+		tfs::lua::pushNumber(L, condition->getTicks().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -124,7 +131,7 @@ int luaConditionGetTicks(lua_State* L)
 int luaConditionSetTicks(lua_State* L)
 {
 	// condition:setTicks(ticks)
-	int32_t ticks = tfs::lua::getNumber<int32_t>(L, 2);
+	auto ticks = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 2)};
 	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
 	if (condition) {
 		condition->setTicks(ticks);
@@ -182,7 +189,8 @@ int luaConditionSetFormula(lua_State* L)
 	double maxa = tfs::lua::getNumber<double>(L, 4);
 	double minb = tfs::lua::getNumber<double>(L, 3);
 	double mina = tfs::lua::getNumber<double>(L, 2);
-	ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionSpeed* condition = conditionBase ? conditionBase->getConditionSpeed() : nullptr;
 	if (condition) {
 		condition->setFormulaVars(mina, minb, maxa, maxb);
 		tfs::lua::pushBoolean(L, true);
@@ -210,7 +218,8 @@ int luaConditionSetOutfit(lua_State* L)
 		outfit.lookTypeEx = tfs::lua::getNumber<uint16_t>(L, 2);
 	}
 
-	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionOutfit* condition = conditionBase ? conditionBase->getConditionOutfit() : nullptr;
 	if (condition) {
 		condition->setOutfit(outfit);
 		tfs::lua::pushBoolean(L, true);
@@ -224,9 +233,10 @@ int luaConditionAddDamage(lua_State* L)
 {
 	// condition:addDamage(rounds, time, value)
 	int32_t value = tfs::lua::getNumber<int32_t>(L, 4);
-	int32_t time = tfs::lua::getNumber<int32_t>(L, 3);
+	auto time = std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)};
 	int32_t rounds = tfs::lua::getNumber<int32_t>(L, 2);
-	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(tfs::lua::getUserdata<Condition>(L, 1));
+	Condition* conditionBase = tfs::lua::getUserdata<Condition>(L, 1);
+	ConditionDamage* condition = conditionBase ? conditionBase->getConditionDamage() : nullptr;
 	if (condition) {
 		tfs::lua::pushBoolean(L, condition->addDamage(rounds, time, value));
 	} else {

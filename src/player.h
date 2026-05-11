@@ -18,7 +18,6 @@
 #include "vocation.h"
 
 class House;
-struct Mount;
 class NetworkMessage;
 class Npc;
 class Party;
@@ -122,23 +121,6 @@ public:
 
 	CreatureType_t getType() const override { return CREATURETYPE_PLAYER; }
 
-	uint16_t getRandomMount() const;
-	uint16_t getCurrentMount() const;
-	void setCurrentMount(uint16_t mountId);
-	bool isMounted() const { return defaultOutfit.lookMount != 0; }
-	bool toggleMount(bool mount);
-	bool tameMount(uint16_t mountId);
-	bool untameMount(uint16_t mountId);
-	bool hasMount(const Mount* mount) const;
-	bool hasMounts() const;
-	void dismount();
-
-	bool wasMounted() const { return wasMounted_; }
-	void setWasMounted(bool wasMounted) { wasMounted_ = wasMounted; }
-
-	bool getRandomizeMount() const { return randomizeMount; }
-	void setRandomizeMount(bool mode) { randomizeMount = mode; }
-
 	void sendFYIBox(const std::string& message)
 	{
 		if (client) {
@@ -162,15 +144,15 @@ public:
 
 	bool addOfflineTrainingTries(skills_t skill, uint64_t tries);
 
-	void addOfflineTrainingTime(int32_t addTime)
+	void addOfflineTrainingTime(std::chrono::milliseconds addTime)
 	{
-		offlineTrainingTime = std::min<int32_t>(12 * 3600 * 1000, offlineTrainingTime + addTime);
+		offlineTrainingTime = std::min(duration_cast<std::chrono::milliseconds>(12h), offlineTrainingTime + addTime);
 	}
-	void removeOfflineTrainingTime(int32_t removeTime)
+	void removeOfflineTrainingTime(std::chrono::milliseconds removeTime)
 	{
-		offlineTrainingTime = std::max<int32_t>(0, offlineTrainingTime - removeTime);
+		offlineTrainingTime = std::max(std::chrono::milliseconds::zero(), offlineTrainingTime - removeTime);
 	}
-	int32_t getOfflineTrainingTime() const { return offlineTrainingTime; }
+	auto getOfflineTrainingTime() const { return offlineTrainingTime; }
 
 	int32_t getOfflineTrainingSkill() const { return offlineTrainingSkill; }
 	void setOfflineTrainingSkill(int32_t skill) { offlineTrainingSkill = skill; }
@@ -193,7 +175,10 @@ public:
 	bool isInWarList(uint32_t guildId) const;
 
 	void setLoginPosition(Position pos) { loginPosition = pos; }
-	void setLastWalkthroughAttempt(int64_t walkthroughAttempt) { lastWalkthroughAttempt = walkthroughAttempt; }
+	void setLastWalkthroughAttempt(std::chrono::steady_clock::time_point walkthroughAttempt)
+	{
+		lastWalkthroughAttempt = walkthroughAttempt;
+	}
 	void setLastWalkthroughPosition(Position walkthroughPosition) { lastWalkthroughPosition = walkthroughPosition; }
 
 	std::shared_ptr<Inbox> getInbox()
@@ -281,8 +266,8 @@ public:
 	bool isInMarket() const { return inMarket; }
 
 	auto getIdleTime() const { return idleTime; }
-	void setIdleTime(uint32_t ms) { this->idleTime = ms; }
-	void resetIdleTime() { idleTime = 0; }
+	void setIdleTime(std::chrono::milliseconds ms) { idleTime = ms; }
+	void resetIdleTime() { idleTime = std::chrono::milliseconds::zero(); }
 
 	bool isInGhostMode() const override { return ghostMode; }
 	bool canSeeGhostMode(const std::shared_ptr<const Creature>& creature) const override;
@@ -303,7 +288,7 @@ public:
 	uint8_t getSoul() const { return soul; }
 	bool isAccessPlayer() const { return group->access; }
 	bool isPremium() const;
-	void setPremiumTime(time_t premiumEndsAt);
+	void setPremiumTime(std::chrono::system_clock::time_point premiumEndsAt);
 
 	bool setVocation(uint16_t vocId);
 	uint16_t getVocationId() const { return vocation->getId(); }
@@ -312,9 +297,9 @@ public:
 	void setSex(PlayerSex_t);
 	uint64_t getExperience() const { return experience; }
 
-	time_t getLastLoginSaved() const { return lastLoginSaved; }
-	time_t getLastLogout() const { return lastLogout; }
-	time_t getPremiumEndsAt() const { return premiumEndsAt; }
+	auto getLastLoginSaved() const { return lastLoginSaved; }
+	auto getLastLogout() const { return lastLogout; }
+	auto getPremiumEndsAt() const { return premiumEndsAt; }
 
 	const Position& getLoginPosition() const { return loginPosition; }
 	const Position& getTemplePosition() const { return town->templePosition; }
@@ -326,7 +311,7 @@ public:
 	void onModalWindowHandled(uint32_t modalWindowId);
 
 	bool isPushable() const override;
-	uint32_t isMuted() const;
+	std::chrono::seconds isMuted() const;
 	void addMessageBuffer();
 	void removeMessageBuffer();
 
@@ -485,7 +470,11 @@ public:
 	BlockType_t blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
 	                     bool checkDefense = false, bool checkArmor = false, bool field = false,
 	                     bool ignoreResistances = false) override;
-	bool hasExtraSwing() override { return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed()); }
+	bool hasExtraSwing() override
+	{
+		return lastAttack > std::chrono::steady_clock::time_point{} &&
+		       ((std::chrono::steady_clock::now() - lastAttack) >= getAttackSpeed());
+	}
 
 	uint16_t getSpecialSkill(uint8_t skill) const { return std::max<uint16_t>(0, varSpecialSkills[skill]); }
 	uint16_t getSkillLevel(uint8_t skill) const
@@ -545,8 +534,8 @@ public:
 
 	Skulls_t getCombatSkull(const std::shared_ptr<const Creature>& creature) const;
 	Skulls_t getSkull() const override;
-	int64_t getSkullTicks() const { return skullTicks; }
-	void setSkullTicks(int64_t ticks) { skullTicks = ticks; }
+	auto getSkullTicks() const { return skullTicks; }
+	void setSkullTicks(std::chrono::seconds ticks) { skullTicks = ticks; }
 
 	bool hasAttacked(const std::shared_ptr<const Player>& attacked) const;
 	void addAttacked(const std::shared_ptr<const Player>& attacked);
@@ -559,12 +548,6 @@ public:
 			client->sendCreatureSkull(creature);
 		}
 	}
-	bool canWear(uint32_t lookType, uint8_t addons) const;
-	bool hasOutfit(uint32_t lookType, uint8_t addons);
-	void addOutfit(uint16_t lookType, uint8_t addons);
-	bool removeOutfit(uint16_t lookType);
-	bool removeOutfitAddon(uint16_t lookType, uint8_t addons);
-	bool getOutfitAddons(const Outfit& outfit, uint8_t& addons) const;
 
 	size_t getMaxVIPEntries() const;
 	size_t getMaxDepotItems() const;
@@ -737,19 +720,19 @@ public:
 			client->sendCreatureShield(creature);
 		}
 	}
-	void sendSpellCooldown(uint16_t spellId, uint32_t time)
+	void sendSpellCooldown(uint16_t spellId, std::chrono::milliseconds time)
 	{
 		if (client) {
 			client->sendSpellCooldown(spellId, time);
 		}
 	}
-	void sendSpellGroupCooldown(SpellGroup_t groupId, uint32_t time)
+	void sendSpellGroupCooldown(SpellGroup_t groupId, std::chrono::milliseconds time)
 	{
 		if (client) {
 			client->sendSpellGroupCooldown(groupId, time);
 		}
 	}
-	void sendUseItemCooldown(uint32_t time)
+	void sendUseItemCooldown(std::chrono::milliseconds time)
 	{
 		if (client) {
 			client->sendUseItemCooldown(time);
@@ -1180,18 +1163,6 @@ public:
 			client->sendOpenPrivateChannel(receiver);
 		}
 	}
-	void sendOutfitWindow()
-	{
-		if (client) {
-			client->sendOutfitWindow();
-		}
-	}
-	void sendPodiumWindow(const std::shared_ptr<const Item>& item)
-	{
-		if (client) {
-			client->sendPodiumWindow(item);
-		}
-	}
 	void sendCloseContainer(uint8_t cid)
 	{
 		if (client) {
@@ -1250,8 +1221,8 @@ public:
 		}
 	}
 
-	void onThink(uint32_t interval) override;
-	void onAttacking(uint32_t) override;
+	void onThink(std::chrono::milliseconds interval) override;
+	void onAttacking(std::chrono::milliseconds) override;
 
 	void postAddNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& oldParent,
 	                         int32_t index, ReceiverLink_t link = LINK_OWNER) override;
@@ -1261,14 +1232,9 @@ public:
 	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
 	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
 
-	void setNextAction(int64_t time)
-	{
-		if (time > nextAction) {
-			nextAction = time;
-		}
-	}
-	bool canDoAction() const { return nextAction <= OTSYS_TIME(); }
-	uint32_t getNextActionTime() const;
+	void setNextAction(std::chrono::steady_clock::time_point time) { nextAction = std::max(nextAction, time); }
+	bool canDoAction() const { return nextAction <= std::chrono::steady_clock::now(); }
+	std::chrono::milliseconds getNextActionTime() const;
 
 	std::shared_ptr<Item> getWriteItem(uint32_t& windowTextId, uint16_t& maxWriteLen);
 	uint32_t setWriteItem(const std::shared_ptr<Item>& item, uint16_t maxWriteLen = 0);
@@ -1346,8 +1312,6 @@ private:
 	std::map<uint8_t, OpenContainer> openContainers;
 	std::map<uint32_t, std::shared_ptr<DepotChest>> depotChests;
 
-	std::map<uint16_t, uint8_t> outfits;
-	std::unordered_set<uint16_t> mounts;
 	GuildWarVector guildWarVector;
 
 	std::list<ShopInfo> shopItemList;
@@ -1355,7 +1319,7 @@ private:
 	std::forward_list<std::weak_ptr<Party>> invitePartyList;
 	std::forward_list<uint32_t> modalWindows;
 	std::forward_list<std::string> learnedInstantSpellList;
-	std::forward_list<Condition*>
+	std::forward_list<std::unique_ptr<Condition>>
 	    storedConditionList; // TODO: This variable is only temporarily used when logging in, get rid of it somehow
 
 	std::string name;
@@ -1366,19 +1330,19 @@ private:
 	Position loginPosition;
 	Position lastWalkthroughPosition;
 
-	time_t lastLoginSaved = 0;
-	time_t lastLogout = 0;
-	time_t premiumEndsAt = 0;
+	std::chrono::system_clock::time_point lastLoginSaved = std::chrono::system_clock::time_point::min();
+	std::chrono::system_clock::time_point lastLogout = std::chrono::system_clock::time_point::min();
+	std::chrono::system_clock::time_point premiumEndsAt = std::chrono::system_clock::time_point::min();
 
 	uint64_t experience = 0;
 	uint64_t manaSpent = 0;
-	uint64_t lastAttack = 0;
+	std::chrono::steady_clock::time_point lastAttack = std::chrono::steady_clock::time_point::min();
 	uint64_t bankBalance = 0;
-	int64_t lastFailedFollow = 0;
-	int64_t skullTicks = 0;
-	int64_t lastWalkthroughAttempt = 0;
-	int64_t lastToggleMount = 0;
-	int64_t nextAction = 0;
+	std::chrono::steady_clock::time_point lastFailedFollow = std::chrono::steady_clock::time_point::min();
+	std::chrono::seconds skullTicks = std::chrono::seconds::zero();
+	std::chrono::steady_clock::time_point lastWalkthroughAttempt = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastToggleMount = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point nextAction = std::chrono::steady_clock::time_point::min();
 
 	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};
@@ -1409,7 +1373,7 @@ private:
 	uint32_t actionTaskEvent = 0;
 	uint32_t walkTaskEvent = 0;
 	uint32_t classicAttackEvent = 0;
-	uint32_t MessageBufferTicks = 0;
+	std::chrono::milliseconds messageBufferTicks = std::chrono::milliseconds::zero();
 	uint32_t accountNumber = 0;
 	uint32_t guid = 0;
 	uint32_t windowTextId = 0;
@@ -1418,7 +1382,7 @@ private:
 	uint32_t manaMax = 0;
 	uint16_t manaShieldBar = 0;
 	uint16_t maxManaShieldBar = 0;
-	uint32_t idleTime = 0;
+	std::chrono::milliseconds idleTime = std::chrono::milliseconds::zero();
 	int32_t varSkills[SKILL_LAST + 1] = {};
 	int32_t varSpecialSkills[SPECIALSKILL_LAST + 1] = {};
 	int32_t varStats[STAT_LAST + 1] = {};
@@ -1429,9 +1393,9 @@ private:
 	int32_t bloodHitCount = 0;
 	int32_t shieldBlockCount = 0;
 	int32_t offlineTrainingSkill = -1;
-	int32_t offlineTrainingTime = 0;
+	std::chrono::milliseconds offlineTrainingTime = std::chrono::milliseconds::zero();
 
-	uint16_t lastStatsTrainingTime = 0;
+	std::chrono::minutes lastStatsTrainingTime = std::chrono::minutes::zero();
 	uint16_t staminaMinutes = 2520;
 	uint16_t maxWriteLen = 0;
 	uint16_t clientExpDisplay = 100;
@@ -1453,12 +1417,10 @@ private:
 	bool chaseMode = false;
 	bool secureMode = false;
 	bool inMarket = false;
-	bool wasMounted_ = false;
 	bool ghostMode = false;
 	bool pzLocked = false;
 	bool addAttackSkillPoint = false;
 	bool inventoryAbilities[CONST_SLOT_LAST + 1] = {};
-	bool randomizeMount = false;
 
 	void updateItemsLight(bool internal = false);
 	int32_t getStepSpeed() const override
@@ -1476,7 +1438,7 @@ private:
 
 	bool isPromoted() const;
 
-	uint32_t getAttackSpeed() const;
+	std::chrono::milliseconds getAttackSpeed() const;
 
 	static uint16_t getBasisPointLevel(uint64_t count, uint64_t nextLevelCount);
 

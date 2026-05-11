@@ -90,16 +90,14 @@ int luaSpellOnCastSpell(lua_State* L)
 	// spell:onCastSpell(callback)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
-		if (spell->spellType == SPELL_INSTANT) {
-			InstantSpell* instant = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+		if (InstantSpell* instant = spell->getInstantSpell()) {
 			if (!instant->loadCallback()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
 			instant->scripted = true;
 			tfs::lua::pushBoolean(L, true);
-		} else if (spell->spellType == SPELL_RUNE) {
-			RuneSpell* rune = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+		} else if (RuneSpell* rune = spell->getRuneSpell()) {
 			if (!rune->loadCallback()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
@@ -118,17 +116,14 @@ int luaSpellRegister(lua_State* L)
 	// spell:register()
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
-		if (spell->spellType == SPELL_INSTANT) {
-			auto instant =
-			    std::unique_ptr<InstantSpell>{dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1))};
+		if (InstantSpell* instant = spell->getInstantSpell()) {
 			if (!instant->isScripted()) {
 				tfs::lua::pushBoolean(L, false);
 				return 1;
 			}
 
-			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(std::move(instant)));
-		} else if (spell->spellType == SPELL_RUNE) {
-			auto rune = std::unique_ptr<RuneSpell>{dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1))};
+			tfs::lua::pushBoolean(L, g_spells->registerInstantLuaEvent(std::unique_ptr<InstantSpell>{instant}));
+		} else if (RuneSpell* rune = spell->getRuneSpell()) {
 			if (rune->getMagicLevel() != 0 || rune->getLevel() != 0) {
 				// Change information in the ItemType to get accurate description
 				ItemType& iType = Item::items.getItemType(rune->getRuneItemId());
@@ -143,7 +138,7 @@ int luaSpellRegister(lua_State* L)
 				return 1;
 			}
 
-			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(std::move(rune)));
+			tfs::lua::pushBoolean(L, g_spells->registerRuneLuaEvent(std::unique_ptr<RuneSpell>{rune}));
 		}
 	} else {
 		lua_pushnil(L);
@@ -259,9 +254,9 @@ int luaSpellCooldown(lua_State* L)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, spell->getCooldown());
+			tfs::lua::pushNumber(L, spell->getCooldown().count());
 		} else {
-			spell->setCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
+			spell->setCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {
@@ -276,15 +271,15 @@ int luaSpellGroupCooldown(lua_State* L)
 	Spell* spell = tfs::lua::getUserdata<Spell>(L, 1);
 	if (spell) {
 		if (lua_gettop(L) == 1) {
-			tfs::lua::pushNumber(L, spell->getGroupCooldown());
-			tfs::lua::pushNumber(L, spell->getSecondaryCooldown());
+			tfs::lua::pushNumber(L, spell->getGroupCooldown().count());
+			tfs::lua::pushNumber(L, spell->getSecondaryCooldown().count());
 			return 2;
 		} else if (lua_gettop(L) == 2) {
-			spell->setGroupCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
+			spell->setGroupCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
 			tfs::lua::pushBoolean(L, true);
 		} else {
-			spell->setGroupCooldown(tfs::lua::getNumber<uint32_t>(L, 2));
-			spell->setSecondaryCooldown(tfs::lua::getNumber<uint32_t>(L, 3));
+			spell->setGroupCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 2)});
+			spell->setSecondaryCooldown(std::chrono::milliseconds{tfs::lua::getNumber<uint32_t>(L, 3)});
 			tfs::lua::pushBoolean(L, true);
 		}
 	} else {
@@ -584,14 +579,9 @@ int luaSpellVocation(lua_State* L)
 int luaSpellWords(lua_State* L)
 {
 	// spell:words(words[, separator = ""])
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushString(L, spell->getWords());
 			tfs::lua::pushString(L, spell->getSeparator());
@@ -615,14 +605,9 @@ int luaSpellWords(lua_State* L)
 int luaSpellNeedDirection(lua_State* L)
 {
 	// spell:needDirection(bool)
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getNeedDirection());
 		} else {
@@ -639,14 +624,9 @@ int luaSpellNeedDirection(lua_State* L)
 int luaSpellHasParams(lua_State* L)
 {
 	// spell:hasParams(bool)
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getHasParam());
 		} else {
@@ -663,14 +643,9 @@ int luaSpellHasParams(lua_State* L)
 int luaSpellHasPlayerNameParam(lua_State* L)
 {
 	// spell:hasPlayerNameParam(bool)
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getHasPlayerNameParam());
 		} else {
@@ -687,14 +662,9 @@ int luaSpellHasPlayerNameParam(lua_State* L)
 int luaSpellNeedCasterTargetOrDirection(lua_State* L)
 {
 	// spell:needCasterTargetOrDirection(bool)
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getNeedCasterTargetOrDirection());
 		} else {
@@ -711,14 +681,9 @@ int luaSpellNeedCasterTargetOrDirection(lua_State* L)
 int luaSpellIsBlockingWalls(lua_State* L)
 {
 	// spell:blockWalls(bool)
-	InstantSpell* spell = dynamic_cast<InstantSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	InstantSpell* spell = spellBase ? spellBase->getInstantSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_INSTANT, it means that this actually is no InstantSpell, so we return nil
-		if (spell->spellType != SPELL_INSTANT) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getBlockWalls());
 		} else {
@@ -735,15 +700,10 @@ int luaSpellIsBlockingWalls(lua_State* L)
 int luaSpellRuneLevel(lua_State* L)
 {
 	// spell:runeLevel(level)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	int32_t level = tfs::lua::getNumber<int32_t>(L, 2);
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushNumber(L, spell->getLevel());
 		} else {
@@ -760,15 +720,10 @@ int luaSpellRuneLevel(lua_State* L)
 int luaSpellRuneMagicLevel(lua_State* L)
 {
 	// spell:runeMagicLevel(magLevel)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	int32_t magLevel = tfs::lua::getNumber<int32_t>(L, 2);
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushNumber(L, spell->getMagicLevel());
 		} else {
@@ -785,14 +740,9 @@ int luaSpellRuneMagicLevel(lua_State* L)
 int luaSpellRuneId(lua_State* L)
 {
 	// spell:runeId(id)
-	RuneSpell* rune = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* rune = spellBase ? spellBase->getRuneSpell() : nullptr;
 	if (rune) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (rune->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushNumber(L, rune->getRuneItemId());
 		} else {
@@ -809,14 +759,9 @@ int luaSpellRuneId(lua_State* L)
 int luaSpellCharges(lua_State* L)
 {
 	// spell:charges(charges)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushNumber(L, spell->getCharges());
 		} else {
@@ -833,14 +778,9 @@ int luaSpellCharges(lua_State* L)
 int luaSpellAllowFarUse(lua_State* L)
 {
 	// spell:allowFarUse(bool)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getAllowFarUse());
 		} else {
@@ -857,14 +797,9 @@ int luaSpellAllowFarUse(lua_State* L)
 int luaSpellBlockWalls(lua_State* L)
 {
 	// spell:blockWalls(bool)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getCheckLineOfSight());
 		} else {
@@ -881,14 +816,9 @@ int luaSpellBlockWalls(lua_State* L)
 int luaSpellCheckFloor(lua_State* L)
 {
 	// spell:checkFloor(bool)
-	RuneSpell* spell = dynamic_cast<RuneSpell*>(tfs::lua::getUserdata<Spell>(L, 1));
+	Spell* spellBase = tfs::lua::getUserdata<Spell>(L, 1);
+	RuneSpell* spell = spellBase ? spellBase->getRuneSpell() : nullptr;
 	if (spell) {
-		// if spell != SPELL_RUNE, it means that this actually is no RuneSpell, so we return nil
-		if (spell->spellType != SPELL_RUNE) {
-			lua_pushnil(L);
-			return 1;
-		}
-
 		if (lua_gettop(L) == 1) {
 			tfs::lua::pushBoolean(L, spell->getCheckFloor());
 		} else {

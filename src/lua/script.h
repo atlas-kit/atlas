@@ -14,7 +14,6 @@ class LuaVariant;
 class Npc;
 class Player;
 class Thing;
-struct Outfit;
 
 inline constexpr int32_t EVENT_ID_LOADING = 1;
 inline constexpr int32_t EVENT_ID_USER = 1000;

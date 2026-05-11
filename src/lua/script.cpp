@@ -7,7 +7,6 @@
 #include "../configmanager.h"
 #include "../events.h"
 #include "../game.h"
-#include "../globalevent.h"
 #include "../item.h"
 #include "../movement.h"
 #include "../player.h"
@@ -25,7 +24,6 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern Spells* g_spells;
@@ -72,7 +70,7 @@ int luaDebugPrint(lua_State* L)
 int luaGetWorldUpTime(lua_State* L)
 {
 	// getWorldUpTime()
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	auto uptime = duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count();
 	tfs::lua::pushNumber(L, uptime);
 	return 1;
 }
@@ -429,7 +427,7 @@ int luaAddEvent(lua_State* L)
 		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 
-	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
+	auto delay = std::chrono::milliseconds{std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2))};
 	lua_pop(L, 1);
 
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
