@@ -2803,8 +2803,8 @@ void Game::playerAcceptTrade(uint32_t playerId)
 		}
 
 		if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
-			tradePartnerRet = internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, 0, true);
-			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, 0, true);
+			tradePartnerRet = internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
+			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
 			if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
 				playerRet = internalRemoveItem(playerTradeItem, playerTradeItem->getItemCount(), true);
 				tradePartnerRet = internalRemoveItem(partnerTradeItem, partnerTradeItem->getItemCount(), true);
