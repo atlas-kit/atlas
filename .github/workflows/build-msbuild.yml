@@ -31,9 +31,15 @@ jobs:
       VCPKG_BUILD_TYPE: release
       VCPKG_DEFAULT_TRIPLET: x64-windows
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2

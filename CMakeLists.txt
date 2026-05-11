@@ -23,7 +23,6 @@ option(ENABLE_HTTP "Enable HTTP support" ON)
 if (ENABLE_HTTP)
     list(APPEND VCPKG_MANIFEST_FEATURES "http")
     set(BOOST_REQUIRED_VERSION 1.75.0)
-    add_compile_definitions(HTTP)
 endif ()
 
 option(USE_LIBMYSQL "Use libmysql instead of libmariadb (vcpkg only)" OFF)
@@ -39,6 +38,10 @@ if (BUILD_TESTING)
 endif ()
 
 project(tfs CXX)
+
+if (ENABLE_HTTP)
+    add_compile_definitions(HTTP)
+endif ()
 
 # *****************************************************************************
 # Append cmake search path
