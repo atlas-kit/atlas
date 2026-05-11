@@ -1,17 +1,17 @@
-function(log_info MSG)
-    message(STATUS "${MsgOk}${MSG}${MsgClr}")
+function(log_info)
+    message(STATUS "${MsgOk}${ARGV}${MsgClr}")
 endfunction()
 
-function(log_war MSG)
-    message(STATUS "${MsgWar}${MSG}${MsgClr}")
+function(log_war)
+    message(STATUS "${MsgWar}${ARGV}${MsgClr}")
 endfunction()
 
-function(log_err MSG)
-    message(SEND_ERROR "${MsgErr}${MSG}${MsgClr}")
+function(log_err)
+    message(SEND_ERROR "${MsgErr}${ARGV}${MsgClr}")
 endfunction()
 
-function(log_fatal MSG)
-    message(FATAL_ERROR "${MsgErr}${MSG}${MsgClr}")
+function(log_fatal)
+    message(FATAL_ERROR "${MsgErr}${ARGV}${MsgClr}")
 endfunction()
 
 function(log_option_enabled OPTION)

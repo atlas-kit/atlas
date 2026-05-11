@@ -81,11 +81,16 @@ else ()
     log_option_disabled("asan")
 endif ()
 
+if (OPTIONS_ENABLE_CCACHE AND OPTIONS_ENABLE_SCCACHE)
+    log_war("Both OPTIONS_ENABLE_CCACHE and OPTIONS_ENABLE_SCCACHE are ON; sccache will take precedence.")
+endif ()
+
 # === CCACHE ===
 if (OPTIONS_ENABLE_CCACHE)
     find_program(CCACHE ccache)
     if (CCACHE)
         log_option_enabled("ccache")
+        set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE})
         set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
     else ()
         log_option_disabled("ccache")

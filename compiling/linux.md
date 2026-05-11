@@ -15,12 +15,12 @@ Install the toolchain and dependencies:
 sudo apt update
 sudo apt install -y \
   build-essential cmake ninja-build pkg-config \
-  libboost-iostreams-dev libboost-json-dev libboost-system-dev \
+  libboost-dev libboost-iostreams-dev libboost-json-dev libboost-system-dev \
   liblua5.4-dev libmariadb-dev libpugixml-dev \
   libsimdutf-dev libspdlog-dev libssl-dev
 ```
 
-> Boost.Beast (header-only) is required when `ENABLE_HTTP=ON` (the default). It comes with `libboost-dev` on Debian.
+> `libboost-dev` is required when `ENABLE_HTTP=ON` (the default) because Boost.Beast is header-only and ships only with that package on Debian/Ubuntu.
 
 Configure and build:
 

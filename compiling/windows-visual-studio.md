@@ -30,8 +30,10 @@ From the *x64 Native Tools Command Prompt for VS 2022*:
 
 ```cmd
 cd vc18
-msbuild atlas.vcxproj /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnableManifest=true /m
+msbuild atlas.vcxproj /p:Configuration=Release /p:Platform=x64 /m
 ```
+
+> The `.vcxproj` already sets `VcpkgEnableManifest=true`, so passing it on the command line is unnecessary.
 
 ## Running
 

@@ -54,8 +54,6 @@ jobs:
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
-        with:
-          doNotCache: false
 
       - name: Integrate vcpkg with MSBuild
         run: ${{ github.workspace }}\vcpkg\vcpkg.exe integrate install

@@ -15,7 +15,7 @@ RUN apt-get update -q && apt-get install -yq \
 
 COPY cmake /usr/src/atlas/cmake/
 COPY src /usr/src/atlas/src/
-COPY CMakeLists.txt CMakePresets.json /usr/src/atlas/
+COPY CMakeLists.txt /usr/src/atlas/
 WORKDIR /usr/src/atlas
 RUN cmake -G Ninja -B build/docker-release -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   && cmake --build build/docker-release
