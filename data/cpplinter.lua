@@ -1054,6 +1054,8 @@ Event = {}
 ---@field time number|string|table<number, number|string|string[]> Interval(ms), "HH:MM:SS" string, or table mapping weekday constants to intervals or time string(s)
 ---@field onTrigger fun():nil Callback function executed when the event triggers
 ---@field register fun(self:ScheduleEvent):boolean Registers the event, returns true if successful
+---@field stop fun(self:ScheduleEvent):nil Stops the event's pending timers without removing it from tracking
+---@field unregister fun(self:ScheduleEvent):nil Stops the event and removes it from ScheduleEvent._events
 ---@operator call(number|string|table<number, number|string|string[]>):ScheduleEvent Creates a new ScheduleEvent instance
 ScheduleEvent = {}
 

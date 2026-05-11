@@ -326,6 +326,21 @@ function ScheduleEvent:stop()
 	self._registered = false
 end
 
+function ScheduleEvent:unregister()
+	self:stop()
+	if not self._tracked then
+		return
+	end
+
+	for index, event in ipairs(ScheduleEvent._events) do
+		if event == self then
+			table.remove(ScheduleEvent._events, index)
+			self._tracked = false
+			return
+		end
+	end
+end
+
 function ScheduleEvent.clear()
 	for _, event in ipairs(ScheduleEvent._events) do
 		event:stop()
