@@ -562,8 +562,8 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		creature->setMaster(nullptr);
 	}
 
-	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+	while (!creature->getConditions().empty()) {
+		creature->removeCondition(creature->getConditions().back().get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -3552,8 +3552,7 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		player->addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -5374,15 +5373,14 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)

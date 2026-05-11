@@ -713,14 +713,13 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->invisible) {
-		Condition* condition = Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1, 0);
-		player->addCondition(condition);
+		player->addCondition(
+		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_INVISIBLE, -1, 0));
 	}
 
 	if (it.abilities->manaShield) {
-		Condition* condition =
-		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0);
-		player->addCondition(condition);
+		player->addCondition(
+		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_MANASHIELD, -1, 0));
 	}
 
 	if (it.abilities->speed != 0) {
@@ -733,7 +732,7 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 	}
 
 	if (it.abilities->regeneration) {
-		Condition* condition =
+		auto condition =
 		    Condition::createCondition(static_cast<ConditionId_t>(slot), CONDITION_REGENERATION, -1, 0);
 
 		if (it.abilities->healthGain != 0) {
@@ -752,7 +751,7 @@ ReturnValue MoveEvent::EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Pla
 			condition->setParam(CONDITION_PARAM_MANATICKS, it.abilities->manaTicks);
 		}
 
-		player->addCondition(condition);
+		player->addCondition(std::move(condition));
 	}
 
 	// skill modifiers
