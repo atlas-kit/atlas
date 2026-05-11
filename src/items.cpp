@@ -1888,12 +1888,25 @@ uint16_t Items::getItemIdByName(const std::string& name)
 
 // The appearances.dat (protobuf) only contains client-side visual/behavioral flags.
 // Server-side gameplay data (armor, attack, defense, weight, decay, charges, abilities,
-// weapon/ammo/shoot types, corpse type, floor change, etc.) must still come from items.xml.
+// ammo/shoot types, corpse type, floor change, etc.) must still come from items.xml.
 //
-// Proto fields NOT mapped here because ItemType has no matching field:
-//   automapColor, isLyingObject, isDontHide, isTopEffect, defaultAction, elevation (value), lensHelp
+// Proto fields mapped to ItemType:
+//   weaponType → WeaponType_t (proto→server enum conversion)
+//   minimumLevel → minReqLevel + WIELDINFO_LEVEL
+//   restrictToVocation → wieldInfo WIELDINFO_VOCREQ (details come from items.xml)
+//   expireStop → stopTime
+//   imbueableSlotCount → imbuementSlots
+//   dualWielding → dualWielding
+//   gemQualityId/gemVocationId → gemQualityId/gemVocationId
+//   proficiencyId → proficiencyId
+//   cyclopediaType → cyclopediaType
 //
-// Proto fields NOT mapped here because proto data is insufficient:
+// Proto fields parsed into AppearanceInfo but NOT mapped to ItemType (no matching field):
+//   automapColor, isLyingObject, isDontHide, isTopEffect, defaultAction, elevation (value), lensHelp,
+//   noMovementAnimation, reverseAddons(E/W/S/N), wearout, clockExpire, expire, decoItemKit,
+//   formerObjectTypeId, npcSaleData (still accessible via g_appearances.getObjectAppearance(id))
+//
+// Proto fields NOT mapped because proto data is insufficient:
 //   isCorpse/isPlayerCorpse — proto is bool, but corpseType needs a RaceType_t enum (blood/fire/etc)
 //   isAmmo — proto is bool, but ammoType needs the specific Ammo_t enum
 //
@@ -2039,6 +2052,61 @@ bool Items::loadFromAppearances(const std::string& file)
 		} else if (appearance.isOnTop) {
 			iType.alwaysOnTopOrder = 3;
 		}
+
+		// Expiration flags
+		iType.stopTime = appearance.expireStop;
+
+		// Weapon type (proto enum → server enum)
+		if (appearance.weaponType > 0) {
+			switch (appearance.weaponType) {
+				case 1: // WEAPON_TYPE_SWORD
+					iType.weaponType = WEAPON_SWORD;
+					break;
+				case 2: // WEAPON_TYPE_AXE
+					iType.weaponType = WEAPON_AXE;
+					break;
+				case 3: // WEAPON_TYPE_CLUB
+					iType.weaponType = WEAPON_CLUB;
+					break;
+				case 5: // WEAPON_TYPE_BOW
+				case 6: // WEAPON_TYPE_CROSSBOW
+				case 8: // WEAPON_TYPE_THROW
+					iType.weaponType = WEAPON_DISTANCE;
+					break;
+				case 7: // WEAPON_TYPE_WAND_ROD
+					iType.weaponType = WEAPON_WAND;
+					break;
+				default:
+					break;
+			}
+		}
+
+		// Minimum level requirement
+		if (appearance.minimumLevel > 0) {
+			iType.minReqLevel = appearance.minimumLevel;
+			iType.wieldInfo |= WIELDINFO_LEVEL;
+		}
+
+		// Vocation restrictions
+		if (!appearance.restrictedVocations.empty()) {
+			iType.wieldInfo |= WIELDINFO_VOCREQ;
+		}
+
+		// Imbuement slots
+		iType.imbuementSlots = static_cast<uint8_t>(appearance.imbueableSlotCount);
+
+		// Dual wielding
+		iType.dualWielding = appearance.dualWielding;
+
+		// Skill wheel gem (server-side identifiers for gem system)
+		iType.gemQualityId = static_cast<uint16_t>(appearance.gemQualityId);
+		iType.gemVocationId = static_cast<uint16_t>(appearance.gemVocationId);
+
+		// Proficiency (proficiency system identifier)
+		iType.proficiencyId = static_cast<uint16_t>(appearance.proficiencyId);
+
+		// Cyclopedia entry type
+		iType.cyclopediaType = static_cast<uint16_t>(appearance.cyclopediaType);
 	}
 
 	items.shrink_to_fit();

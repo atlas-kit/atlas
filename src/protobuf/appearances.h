@@ -9,6 +9,16 @@
 #include <unordered_map>
 #include <vector>
 
+struct NpcSaleInfo
+{
+	std::string name;
+	std::string location;
+	uint32_t salePrice = 0;
+	uint32_t buyPrice = 0;
+	uint32_t currencyObjectTypeId = 0;
+	std::string currencyQuestFlagDisplayName;
+};
+
 // Forward declaration of protobuf types
 namespace atlas::protobuf::appearances {
 class Appearances;
@@ -62,6 +72,17 @@ struct AppearanceInfo
 	bool isAmmo = false;
 	bool isShowOffSocket = false;
 	bool isReportable = false;
+	bool noMovementAnimation = false;
+	bool reverseAddonsEast = false;
+	bool reverseAddonsWest = false;
+	bool reverseAddonsSouth = false;
+	bool reverseAddonsNorth = false;
+	bool wearout = false;
+	bool clockExpire = false;
+	bool expire = false;
+	bool expireStop = false;
+	bool decoItemKit = false;
+	bool dualWielding = false;
 
 	// Extended attributes
 	uint32_t groundSpeed = 0;
@@ -77,6 +98,16 @@ struct AppearanceInfo
 	uint8_t lensHelp = 0;
 	uint8_t classification = 0;
 	uint8_t hookDirection = 0;
+	uint8_t weaponType = 0;
+	uint32_t minimumLevel = 0;
+	uint32_t imbueableSlotCount = 0;
+	uint32_t gemQualityId = 0;
+	uint32_t gemVocationId = 0;
+	uint32_t proficiencyId = 0;
+	uint32_t cyclopediaType = 0;
+	uint32_t formerObjectTypeId = 0;
+	std::vector<int32_t> restrictedVocations;
+	std::vector<NpcSaleInfo> npcSaleData;
 
 	// Market info
 	uint16_t marketCategory = 0;

@@ -20,6 +20,15 @@ bool Appearances::loadFromFile(const std::string& filename)
 		return false;
 	}
 
+	// Validate file is not empty
+	file.seekg(0, std::ios::end);
+	auto fileSize = file.tellg();
+	if (fileSize <= 0) {
+		std::cout << "[Error - Appearances::loadFromFile] File is empty: " << filename << std::endl;
+		return false;
+	}
+	file.seekg(0, std::ios::beg);
+
 	atlas::protobuf::appearances::Appearances proto;
 	if (!proto.ParseFromIstream(&file)) {
 		std::cout << "[Error - Appearances::loadFromFile] Failed to parse protobuf from: " << filename << std::endl;
@@ -32,40 +41,50 @@ bool Appearances::loadFromFile(const std::string& filename)
 	effects.clear();
 	missiles.clear();
 
+	size_t skippedObjects = 0;
+
 	// Load objects (items)
 	for (const auto& appearance : proto.object()) {
-		if (appearance.has_id()) {
-			AppearanceInfo info;
-			parseAppearance(appearance, info);
-			objects[info.id] = std::move(info);
+		if (!appearance.has_id()) {
+			++skippedObjects;
+			continue;
 		}
+		AppearanceInfo info;
+		parseAppearance(appearance, info);
+		objects[info.id] = std::move(info);
 	}
 
 	// Load outfits
 	for (const auto& appearance : proto.outfit()) {
-		if (appearance.has_id()) {
-			AppearanceInfo info;
-			parseAppearance(appearance, info);
-			outfits[info.id] = std::move(info);
+		if (!appearance.has_id()) {
+			++skippedObjects;
+			continue;
 		}
+		AppearanceInfo info;
+		parseAppearance(appearance, info);
+		outfits[info.id] = std::move(info);
 	}
 
 	// Load effects
 	for (const auto& appearance : proto.effect()) {
-		if (appearance.has_id()) {
-			AppearanceInfo info;
-			parseAppearance(appearance, info);
-			effects[info.id] = std::move(info);
+		if (!appearance.has_id()) {
+			++skippedObjects;
+			continue;
 		}
+		AppearanceInfo info;
+		parseAppearance(appearance, info);
+		effects[info.id] = std::move(info);
 	}
 
 	// Load missiles
 	for (const auto& appearance : proto.missile()) {
-		if (appearance.has_id()) {
-			AppearanceInfo info;
-			parseAppearance(appearance, info);
-			missiles[info.id] = std::move(info);
+		if (!appearance.has_id()) {
+			++skippedObjects;
+			continue;
 		}
+		AppearanceInfo info;
+		parseAppearance(appearance, info);
+		missiles[info.id] = std::move(info);
 	}
 
 	// Load special meaning IDs
@@ -97,10 +116,37 @@ bool Appearances::loadFromFile(const std::string& filename)
 		}
 	}
 
+	// Log loading statistics
+	std::cout << ">> Loaded appearances from: " << filename
+	          << " (" << fileSize << " bytes)" << std::endl;
 	std::cout << ">> Loaded " << objects.size() << " object appearances" << std::endl;
 	std::cout << ">> Loaded " << outfits.size() << " outfit appearances" << std::endl;
 	std::cout << ">> Loaded " << effects.size() << " effect appearances" << std::endl;
 	std::cout << ">> Loaded " << missiles.size() << " missile appearances" << std::endl;
+
+	if (skippedObjects > 0) {
+		std::cout << ">> Warning: skipped " << skippedObjects
+		          << " appearances without ID" << std::endl;
+	}
+
+	// Log extended field statistics
+	size_t weaponCount = 0, levelReqCount = 0, vocationReqCount = 0;
+	size_t imbueableCount = 0, expireCount = 0, npcSaleCount = 0;
+	for (const auto& [id, info] : objects) {
+		if (info.weaponType > 0) ++weaponCount;
+		if (info.minimumLevel > 0) ++levelReqCount;
+		if (!info.restrictedVocations.empty()) ++vocationReqCount;
+		if (info.imbueableSlotCount > 0) ++imbueableCount;
+		if (info.wearout || info.clockExpire || info.expire) ++expireCount;
+		if (!info.npcSaleData.empty()) ++npcSaleCount;
+	}
+	std::cout << ">> Appearance flags: "
+	          << weaponCount << " weapons, "
+	          << levelReqCount << " level-restricted, "
+	          << vocationReqCount << " vocation-restricted, "
+	          << imbueableCount << " imbueable, "
+	          << expireCount << " expirable, "
+	          << npcSaleCount << " with NPC data" << std::endl;
 
 	return true;
 }
@@ -265,6 +311,103 @@ void Appearances::parseFlags(const atlas::protobuf::appearances::AppearanceFlags
 		if (flags.upgradeclassification().has_upgrade_classification()) {
 			info.classification = static_cast<uint8_t>(flags.upgradeclassification().upgrade_classification());
 		}
+	}
+
+	// Visual flags
+	info.noMovementAnimation = flags.has_no_movement_animation() && flags.no_movement_animation();
+	info.reverseAddonsEast = flags.has_reverse_addons_east() && flags.reverse_addons_east();
+	info.reverseAddonsWest = flags.has_reverse_addons_west() && flags.reverse_addons_west();
+	info.reverseAddonsSouth = flags.has_reverse_addons_south() && flags.reverse_addons_south();
+	info.reverseAddonsNorth = flags.has_reverse_addons_north() && flags.reverse_addons_north();
+
+	// Expiration flags
+	info.wearout = flags.has_wearout() && flags.wearout();
+	info.clockExpire = flags.has_clockexpire() && flags.clockexpire();
+	info.expire = flags.has_expire() && flags.expire();
+	info.expireStop = flags.has_expirestop() && flags.expirestop();
+
+	// Decoration kit
+	info.decoItemKit = flags.has_deco_item_kit() && flags.deco_item_kit();
+
+	// Dual wielding
+	info.dualWielding = flags.has_dual_wielding() && flags.dual_wielding();
+
+	// Weapon type
+	if (flags.has_weapon_type()) {
+		info.weaponType = static_cast<uint8_t>(flags.weapon_type());
+	}
+
+	// Minimum level
+	if (flags.has_minimum_level()) {
+		info.minimumLevel = flags.minimum_level();
+	}
+
+	// Vocation restrictions
+	for (int i = 0; i < flags.restrict_to_vocation_size(); ++i) {
+		info.restrictedVocations.push_back(static_cast<int32_t>(flags.restrict_to_vocation(i)));
+	}
+
+	// Imbueable
+	if (flags.has_imbueable()) {
+		if (flags.imbueable().has_slot_count()) {
+			info.imbueableSlotCount = flags.imbueable().slot_count();
+		}
+	}
+
+	// Skill wheel gem
+	if (flags.has_skillwheel_gem()) {
+		if (flags.skillwheel_gem().has_gem_quality_id()) {
+			info.gemQualityId = flags.skillwheel_gem().gem_quality_id();
+		}
+		if (flags.skillwheel_gem().has_vocation_id()) {
+			info.gemVocationId = flags.skillwheel_gem().vocation_id();
+		}
+	}
+
+	// Proficiency
+	if (flags.has_proficiency()) {
+		if (flags.proficiency().has_proficiency_id()) {
+			info.proficiencyId = flags.proficiency().proficiency_id();
+		}
+	}
+
+	// Changed to expire
+	if (flags.has_changedtoexpire()) {
+		if (flags.changedtoexpire().has_former_object_typeid()) {
+			info.formerObjectTypeId = flags.changedtoexpire().former_object_typeid();
+		}
+	}
+
+	// Cyclopedia
+	if (flags.has_cyclopediaitem()) {
+		if (flags.cyclopediaitem().has_cyclopedia_type()) {
+			info.cyclopediaType = flags.cyclopediaitem().cyclopedia_type();
+		}
+	}
+
+	// NPC sale data
+	for (int i = 0; i < flags.npcsaledata_size(); ++i) {
+		const auto& npc = flags.npcsaledata(i);
+		NpcSaleInfo sale;
+		if (npc.has_name()) {
+			sale.name = npc.name();
+		}
+		if (npc.has_location()) {
+			sale.location = npc.location();
+		}
+		if (npc.has_sale_price()) {
+			sale.salePrice = npc.sale_price();
+		}
+		if (npc.has_buy_price()) {
+			sale.buyPrice = npc.buy_price();
+		}
+		if (npc.has_currency_object_type_id()) {
+			sale.currencyObjectTypeId = npc.currency_object_type_id();
+		}
+		if (npc.has_currency_quest_flag_display_name()) {
+			sale.currencyQuestFlagDisplayName = npc.currency_quest_flag_display_name();
+		}
+		info.npcSaleData.push_back(std::move(sale));
 	}
 }
 

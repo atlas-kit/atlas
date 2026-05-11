@@ -376,7 +376,13 @@ public:
 	uint8_t lightColor = 0;
 	uint8_t shootRange = 1;
 	uint8_t classification = 0;
+	uint8_t imbuementSlots = 0;
 	int8_t hitChance = 0;
+
+	uint16_t gemQualityId = 0;
+	uint16_t gemVocationId = 0;
+	uint16_t proficiencyId = 0;
+	uint16_t cyclopediaType = 0;
 
 	bool storeItem = false;
 	bool forceUse = false;
@@ -410,6 +416,7 @@ public:
 	bool showClientCharges = false;
 	bool showClientDuration = false;
 	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
+	bool dualWielding = false;
 };
 
 class Items
