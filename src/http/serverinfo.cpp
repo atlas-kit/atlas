@@ -17,7 +17,7 @@ std::pair<beast::http::status, json::value> tfs::http::handle_serverinfo(const j
 	    beast::http::status::ok,
 	    {{
 	         "serverinfo",
-	         {{"uptime", duration_cast<std::chrono::seconds>(uptime()).count()},
+	         {{"uptime", duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count()},
 	          {"servername", getString(ConfigManager::SERVER_NAME)},
 	          {"port", getNumber(ConfigManager::HTTP_PORT)},
 	          {"location", getString(ConfigManager::LOCATION)},

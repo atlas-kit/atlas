@@ -1,38 +1,172 @@
 {
-  "$schema": "https://cmake.org/cmake/help/v3.30/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
-  "version": 9,
+  "version": 6,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 30,
+    "minor": 25,
     "patch": 0
   },
   "configurePresets": [
     {
       "name": "base",
       "hidden": true,
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build"
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "ENABLE_UNITY_BUILD": "ON",
+        "OPTIONS_ENABLE_SCCACHE": "ON"
+      }
     },
     {
-      "name": "default",
-      "description": "Generate Ninja project files",
-      "inherits": [
-        "base"
-      ]
+      "name": "windows-release",
+      "inherits": "base",
+      "displayName": "Windows - Release",
+      "description": "Windows Release build with static linking via vcpkg",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-release",
+        "VCPKG_HOST_TRIPLET": "x64-windows",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake/triplets",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-static-release",
+        "VCPKG_BUILD_TYPE": "release",
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "inherits": "windows-release",
+      "displayName": "Windows - Debug",
+      "description": "Windows Debug build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-debug",
+        "VCPKG_BUILD_TYPE": "debug",
+        "ENABLE_UNITY_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "windows-release-tests",
+      "inherits": "windows-release",
+      "displayName": "Windows - Release (with tests)",
+      "description": "Windows Release build with unit tests enabled",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-static-release-tests"
+      }
+    },
+    {
+      "name": "windows-release-asan",
+      "inherits": "windows-release",
+      "displayName": "Windows - Release + ASAN",
+      "description": "Windows Release build with Address Sanitizer",
+      "cacheVariables": {
+        "ENABLE_ASAN": "ON",
+        "BUILD_TESTING": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-asan"
+      }
+    },
+    {
+      "name": "linux-release",
+      "inherits": "base",
+      "displayName": "Linux - Release",
+      "description": "Linux Release build with vcpkg",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_HOST_TRIPLET": "x64-linux",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux",
+        "VCPKG_BUILD_TYPE": "release"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "inherits": "linux-release",
+      "displayName": "Linux - Debug",
+      "description": "Linux Debug build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-debug",
+        "VCPKG_BUILD_TYPE": "debug",
+        "ENABLE_UNITY_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "linux-release-tests",
+      "inherits": "linux-release",
+      "displayName": "Linux - Release (with tests)",
+      "description": "Linux Release build with unit tests enabled",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-tests"
+      }
+    },
+    {
+      "name": "linux-debug-asan",
+      "inherits": "linux-debug",
+      "displayName": "Linux - Debug + ASAN",
+      "description": "Linux Debug build with Address Sanitizer",
+      "cacheVariables": {
+        "ENABLE_ASAN": "ON",
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-debug-asan"
+      }
     },
     {
       "name": "vcpkg",
-      "description": "Configure with vcpkg toolchain and generate Ninja project files",
-      "inherits": [
-        "base"
-      ],
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      "description": "Legacy preset - configure with vcpkg toolchain (Ninja Multi-Config)",
+      "hidden": false,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "default",
-      "configurePreset": "default"
+      "name": "windows-release",
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release-tests",
+      "configurePreset": "windows-release-tests"
+    },
+    {
+      "name": "windows-release-asan",
+      "configurePreset": "windows-release-asan"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release-tests",
+      "configurePreset": "linux-release-tests"
+    },
+    {
+      "name": "linux-debug-asan",
+      "configurePreset": "linux-debug-asan"
     },
     {
       "name": "vcpkg",
@@ -45,21 +179,31 @@
       "hidden": true,
       "output": {
         "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "timeout": 120
       }
     },
     {
-      "name": "default",
-      "inherits": [
-        "base"
-      ],
-      "configurePreset": "default"
+      "name": "windows-release-tests",
+      "inherits": "base",
+      "configurePreset": "windows-release-tests"
     },
     {
-      "name": "vcpkg",
-      "inherits": [
-        "base"
-      ],
-      "configurePreset": "vcpkg"
+      "name": "windows-release-asan",
+      "inherits": "base",
+      "configurePreset": "windows-release-asan"
+    },
+    {
+      "name": "linux-release-tests",
+      "inherits": "base",
+      "configurePreset": "linux-release-tests"
+    },
+    {
+      "name": "linux-debug-asan",
+      "inherits": "base",
+      "configurePreset": "linux-debug-asan"
     }
   ]
 }

@@ -4,7 +4,6 @@
 
 #include "../../configmanager.h"
 #include "../../events.h"
-#include "../../globalevent.h"
 #include "../../monster.h"
 #include "../../npc.h"
 #include "../../script.h"
@@ -17,7 +16,6 @@
 #include "../script.h"
 
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern LuaEnvironment g_luaEnvironment;
 extern Spells* g_spells;
 extern Monsters g_monsters;
@@ -222,22 +220,6 @@ int luaGameGetItemTypeByClientId(lua_State* L)
 	return 1;
 }
 
-int luaGameGetMountIdByLookType(lua_State* L)
-{
-	// Game.getMountIdByLookType(lookType)
-	Mount* mount = nullptr;
-	if (tfs::lua::isNumber(L, 1)) {
-		mount = g_game.mounts.getMountByClientID(tfs::lua::getNumber<uint16_t>(L, 1));
-	}
-
-	if (mount) {
-		tfs::lua::pushNumber(L, mount->id);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 int luaGameGetParties(lua_State* L)
 {
 	// Game.getParties()
@@ -279,54 +261,6 @@ int luaGameGetHouses(lua_State* L)
 		tfs::lua::setMetatable(L, -1, "House");
 		lua_rawseti(L, -2, ++index);
 	}
-	return 1;
-}
-
-int luaGameGetOutfits(lua_State* L)
-{
-	// Game.getOutfits(playerSex)
-	if (!tfs::lua::isNumber(L, 1)) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	PlayerSex_t playerSex = tfs::lua::getNumber<PlayerSex_t>(L, 1);
-	if (playerSex > PLAYERSEX_LAST) {
-		lua_pushnil(L);
-		return 1;
-	}
-
-	const auto& outfits = Outfits::getInstance().getOutfits(playerSex);
-	lua_createtable(L, outfits.size(), 0);
-
-	int index = 0;
-	for (const auto& outfit : outfits) {
-		tfs::lua::pushOutfit(L, &outfit);
-		lua_rawseti(L, -2, ++index);
-	}
-
-	return 1;
-}
-
-int luaGameGetMounts(lua_State* L)
-{
-	// Game.getMounts()
-	const auto& mounts = g_game.mounts.getMounts();
-	lua_createtable(L, mounts.size(), 0);
-
-	int index = 0;
-	for (const auto& mount : mounts) {
-		lua_createtable(L, 0, 5);
-
-		tfs::lua::setField(L, "name", mount.name);
-		tfs::lua::setField(L, "speed", mount.speed);
-		tfs::lua::setField(L, "clientId", mount.clientId);
-		tfs::lua::setField(L, "id", mount.id);
-		tfs::lua::setField(L, "premium", mount.premium);
-
-		lua_rawseti(L, -2, ++index);
-	}
-
 	return 1;
 }
 
@@ -623,20 +557,6 @@ int luaGameCreateMonsterType(lua_State* L)
 	return 1;
 }
 
-int luaGameStartEvent(lua_State* L)
-{
-	// Game.startEvent(event)
-	const std::string& eventName = tfs::lua::getString(L, 1);
-
-	const auto& eventMap = g_globalEvents->getEventMap(GLOBALEVENT_TIMER);
-	if (auto it = eventMap.find(eventName); it != eventMap.end()) {
-		tfs::lua::pushBoolean(L, it->second.executeEvent());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 int luaGameGetClientVersion(lua_State* L)
 {
 	// Game.getClientVersion()
@@ -693,7 +613,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	registerEnum(lsi, GAME_STATE_CLOSING);
 	registerEnum(lsi, GAME_STATE_MAINTAIN);
 
-	registerEnum(lsi, SCHEDULER_MINTICKS);
+	lsi.registerGlobalVariable("SCHEDULER_MINTICKS", SCHEDULER_MINTICKS.count());
 
 	registerEnum(lsi, WORLD_TYPE_NO_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP);
@@ -716,13 +636,10 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "getBestiary", luaGameGetBestiary);
 	lsi.registerMethod("Game", "getCurrencyItems", luaGameGetCurrencyItems);
 	lsi.registerMethod("Game", "getItemTypeByClientId", luaGameGetItemTypeByClientId);
-	lsi.registerMethod("Game", "getMountIdByLookType", luaGameGetMountIdByLookType);
 
 	lsi.registerMethod("Game", "getParties", luaGameGetParties);
 	lsi.registerMethod("Game", "getTowns", luaGameGetTowns);
 	lsi.registerMethod("Game", "getHouses", luaGameGetHouses);
-	lsi.registerMethod("Game", "getOutfits", luaGameGetOutfits);
-	lsi.registerMethod("Game", "getMounts", luaGameGetMounts);
 	lsi.registerMethod("Game", "getVocations", luaGameGetVocations);
 	lsi.registerMethod("Game", "getRuneSpells", luaGameGetRuneSpells);
 	lsi.registerMethod("Game", "getInstantSpells", luaGameGetInstantSpells);
@@ -742,8 +659,6 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "createNpc", luaGameCreateNpc);
 	lsi.registerMethod("Game", "createTile", luaGameCreateTile);
 	lsi.registerMethod("Game", "createMonsterType", luaGameCreateMonsterType);
-
-	lsi.registerMethod("Game", "startEvent", luaGameStartEvent);
 
 	lsi.registerMethod("Game", "getClientVersion", luaGameGetClientVersion);
 

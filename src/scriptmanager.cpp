@@ -8,7 +8,6 @@
 #include "actions.h"
 #include "chat.h"
 #include "events.h"
-#include "globalevent.h"
 #include "movement.h"
 #include "script.h"
 #include "spells.h"
@@ -17,7 +16,6 @@
 
 Actions* g_actions = nullptr;
 Chat g_chat;
-GlobalEvents* g_globalEvents = nullptr;
 Spells* g_spells = nullptr;
 TalkActions* g_talkActions = nullptr;
 MoveEvents* g_moveEvents = nullptr;
@@ -33,7 +31,6 @@ ScriptingManager::~ScriptingManager()
 	delete g_actions;
 	delete g_talkActions;
 	delete g_moveEvents;
-	delete g_globalEvents;
 	delete g_scripts;
 }
 
@@ -65,12 +62,6 @@ bool ScriptingManager::loadScriptSystems()
 	g_moveEvents = new MoveEvents();
 	if (!g_moveEvents->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load move events!" << std::endl;
-		return false;
-	}
-
-	g_globalEvents = new GlobalEvents();
-	if (!g_globalEvents->loadFromXml()) {
-		std::cout << "> ERROR: Unable to load global events!" << std::endl;
 		return false;
 	}
 

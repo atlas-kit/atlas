@@ -15,7 +15,7 @@ using ActionFunction = std::function<bool(const std::shared_ptr<Player>& player,
 class Action : public Event
 {
 public:
-	explicit Action(LuaScriptInterface* interface);
+	explicit Action(LuaScriptInterface* luaInterface);
 
 	bool configureEvent(const pugi::xml_node&) override { return false; }
 

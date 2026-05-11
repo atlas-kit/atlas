@@ -535,9 +535,9 @@ int luaItemTypeGetAbilities(lua_State* L)
 		Abilities& abilities = itemType->getAbilities();
 		lua_createtable(L, 10, 12);
 		tfs::lua::setField(L, "healthGain", abilities.healthGain);
-		tfs::lua::setField(L, "healthTicks", abilities.healthTicks);
+		tfs::lua::setField(L, "healthTicks", abilities.healthTicks.count());
 		tfs::lua::setField(L, "manaGain", abilities.manaGain);
-		tfs::lua::setField(L, "manaTicks", abilities.manaTicks);
+		tfs::lua::setField(L, "manaTicks", abilities.manaTicks.count());
 		tfs::lua::setField(L, "conditionImmunities", abilities.conditionImmunities);
 		tfs::lua::setField(L, "conditionSuppressions", abilities.conditionSuppressions);
 		tfs::lua::setField(L, "speed", abilities.speed);
@@ -711,7 +711,7 @@ int luaItemTypeGetDurationMin(lua_State* L)
 	// itemType:getDurationMin()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		tfs::lua::pushNumber(L, itemType->decayTimeMin);
+		tfs::lua::pushNumber(L, duration_cast<std::chrono::seconds>(itemType->decayTimeMin).count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -723,7 +723,7 @@ int luaItemTypeGetDurationMax(lua_State* L)
 	// itemType:getDurationMax()
 	const ItemType* itemType = tfs::lua::getUserdata<const ItemType>(L, 1);
 	if (itemType) {
-		tfs::lua::pushNumber(L, itemType->decayTimeMax);
+		tfs::lua::pushNumber(L, duration_cast<std::chrono::seconds>(itemType->decayTimeMax).count());
 	} else {
 		lua_pushnil(L);
 	}

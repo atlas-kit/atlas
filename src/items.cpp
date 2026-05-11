@@ -269,6 +269,7 @@ const std::unordered_map<std::string, ItemParseAttributes_t> ItemParseAttributes
     {"storeitem", ITEM_PARSE_STOREITEM},
     {"worth", ITEM_PARSE_WORTH},
     {"supply", ITEM_PARSE_SUPPLY},
+    {"wrapcontainer", ITEM_PARSE_WRAPCONTAINER},
 };
 
 const std::unordered_map<std::string, ItemTypes_t> ItemTypesMap = {{"key", ITEM_TYPE_KEY},
@@ -706,6 +707,11 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 					break;
 				}
 
+				case ITEM_PARSE_WRAPCONTAINER: {
+					it.wrapContainer = valueAttribute.as_bool();
+					break;
+				}
+
 				case ITEM_PARSE_ARMOR: {
 					it.armor = pugi::cast<int32_t>(valueAttribute.value());
 					break;
@@ -927,12 +933,12 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 				}
 
 				case ITEM_PARSE_DURATION: {
-					it.decayTimeMin = pugi::cast<uint32_t>(valueAttribute.value());
+					it.decayTimeMin = std::chrono::seconds{pugi::cast<uint32_t>(valueAttribute.value())};
 
 					if (maxValueAttr) {
-						it.decayTimeMax = pugi::cast<uint32_t>(maxValueAttr.value());
+						it.decayTimeMax = std::chrono::seconds{pugi::cast<uint32_t>(maxValueAttr.value())};
 					} else {
-						it.decayTimeMax = pugi::cast<uint32_t>(valueAttribute.value());
+						it.decayTimeMax = std::chrono::seconds{pugi::cast<uint32_t>(valueAttribute.value())};
 					}
 					break;
 				}
@@ -986,7 +992,7 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 				case ITEM_PARSE_HEALTHTICKS: {
 					abilities.regeneration = true;
-					abilities.healthTicks = pugi::cast<uint32_t>(valueAttribute.value());
+					abilities.healthTicks = std::chrono::milliseconds{pugi::cast<uint32_t>(valueAttribute.value())};
 					break;
 				}
 
@@ -998,7 +1004,7 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 				case ITEM_PARSE_MANATICKS: {
 					abilities.regeneration = true;
-					abilities.manaTicks = pugi::cast<uint32_t>(valueAttribute.value());
+					abilities.manaTicks = std::chrono::milliseconds{pugi::cast<uint32_t>(valueAttribute.value())};
 					break;
 				}
 
@@ -1644,23 +1650,23 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 					it.type = ITEM_TYPE_MAGICFIELD;
 
 					CombatType_t combatType = COMBAT_NONE;
-					ConditionDamage* conditionDamage = nullptr;
+					std::unique_ptr<ConditionDamage> conditionDamage;
 
 					tmpStrValue = boost::algorithm::to_lower_copy<std::string>(valueAttribute.as_string());
 					if (tmpStrValue == "fire") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_FIRE);
 						combatType = COMBAT_FIREDAMAGE;
 					} else if (tmpStrValue == "energy") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_ENERGY);
 						combatType = COMBAT_ENERGYDAMAGE;
 					} else if (tmpStrValue == "poison") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_POISON);
 						combatType = COMBAT_EARTHDAMAGE;
 					} else if (tmpStrValue == "drown") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_DROWN);
 						combatType = COMBAT_DROWNDAMAGE;
 					} else if (tmpStrValue == "physical") {
-						conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_BLEEDING);
+						conditionDamage = std::make_unique<ConditionDamage>(CONDITIONID_COMBAT, CONDITION_BLEEDING);
 						combatType = COMBAT_PHYSICALDAMAGE;
 					} else {
 						std::cout << "[Warning - Items::parseItemNode] Unknown field value: "
@@ -1669,9 +1675,8 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 
 					if (combatType != COMBAT_NONE) {
 						it.combatType = combatType;
-						it.conditionDamage.reset(conditionDamage);
 
-						uint32_t ticks = 0;
+						auto ticks = std::chrono::milliseconds::zero();
 						int32_t start = 0;
 						int32_t count = 1;
 						int32_t initDamage = -1;
@@ -1691,7 +1696,7 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 							if (tmpStrValue == "initdamage") {
 								initDamage = pugi::cast<int32_t>(subValueAttribute.value());
 							} else if (tmpStrValue == "ticks") {
-								ticks = pugi::cast<uint32_t>(subValueAttribute.value());
+								ticks = std::chrono::milliseconds{pugi::cast<uint32_t>(subValueAttribute.value())};
 							} else if (tmpStrValue == "count") {
 								count = std::max<int32_t>(1, pugi::cast<int32_t>(subValueAttribute.value()));
 							} else if (tmpStrValue == "start") {
@@ -1726,6 +1731,8 @@ void Items::parseItemNode(const pugi::xml_node& itemNode, uint16_t id)
 						if (conditionDamage->getTotalDamage() > 0) {
 							conditionDamage->setParam(CONDITION_PARAM_FORCEUPDATE, 1);
 						}
+
+						it.conditionDamage = std::move(conditionDamage);
 					}
 					break;
 				}

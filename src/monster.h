@@ -95,15 +95,15 @@ public:
 	void goToFollowCreature() override;
 	void onFollowCreatureComplete();
 
-	void onThink(uint32_t interval) override;
-	void onAttacking(uint32_t interval) override;
+	void onThink(std::chrono::milliseconds interval) override;
+	void onAttacking(std::chrono::milliseconds interval) override;
 
 	bool challengeCreature(const std::shared_ptr<Creature>& creature, bool force = false) override;
 
 	void setNormalCreatureLight() override;
 	bool getCombatValues(int32_t& min, int32_t& max) override;
 
-	bool hasExtraSwing() override { return lastMeleeAttack == 0; }
+	bool hasExtraSwing() override { return lastMeleeAttack == std::chrono::steady_clock::time_point::min(); }
 
 	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(const std::shared_ptr<Creature>& creature);
@@ -114,7 +114,8 @@ public:
 	bool isTarget(const std::shared_ptr<const Creature>& creature) const;
 	bool isFleeing() const
 	{
-		return !isSummon() && getHealth() <= mType->info.runAwayHealth && challengeFocusDuration <= 0;
+		return !isSummon() && getHealth() <= mType->info.runAwayHealth &&
+		       challengeFocusDuration <= std::chrono::milliseconds::zero();
 	}
 
 	bool getDistanceStep(const Position& targetPos, Direction& direction, bool flee = false);
@@ -152,7 +153,7 @@ public:
 
 	static uint32_t monsterAutoID;
 
-	void resetAttackTicks() { attackTicks = 0; }
+	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
 
 private:
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
@@ -165,16 +166,16 @@ private:
 	MonsterType* mType;
 	Spawn* spawn = nullptr;
 
-	int64_t lastMeleeAttack = 0;
+	std::chrono::steady_clock::time_point lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 
-	uint32_t attackTicks = 0;
-	uint32_t targetChangeTicks = 0;
-	uint32_t defenseTicks = 0;
-	uint32_t yellTicks = 0;
+	std::chrono::milliseconds attackTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds targetChangeTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds defenseTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds yellTicks = std::chrono::milliseconds::zero();
 	int32_t minCombatValue = 0;
 	int32_t maxCombatValue = 0;
-	int32_t targetChangeCooldown = 0;
-	int32_t challengeFocusDuration = 0;
+	std::chrono::milliseconds targetChangeCooldown = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds challengeFocusDuration = std::chrono::milliseconds::zero();
 	int32_t stepDuration = 0;
 
 	Position masterPos;
@@ -205,16 +206,16 @@ private:
 	void onEndCondition(ConditionType_t type) override;
 
 	bool canUseAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const;
-	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval,
-	                 bool& inRange, bool& resetTicks);
+	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
+	                 std::chrono::milliseconds interval, bool& inRange, bool& resetTicks);
 	bool getRandomStep(const Position& creaturePos, Direction& direction) const;
 	bool getDanceStep(const Position& creaturePos, Direction& direction, bool keepAttack = true,
 	                  bool keepDistance = true);
 	bool canWalkTo(Position pos, Direction direction) const;
 
-	void onThinkTarget(uint32_t interval);
-	void onThinkYell(uint32_t interval);
-	void onThinkDefense(uint32_t interval);
+	void onThinkTarget(std::chrono::milliseconds interval);
+	void onThinkYell(std::chrono::milliseconds interval);
+	void onThinkDefense(std::chrono::milliseconds interval);
 
 	uint64_t getLostExperience() const override { return skillLoss ? mType->info.experience : 0; }
 	uint16_t getLookCorpse() const override { return mType->info.lookcorpse; }

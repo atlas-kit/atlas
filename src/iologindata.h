@@ -36,14 +36,14 @@ public:
 	static void increaseBankBalance(uint32_t guid, uint64_t bankBalance);
 	static bool hasBiddedOnHouse(uint32_t guid);
 
-	static std::forward_list<VIPEntry> getVIPEntries(uint32_t accountId);
+	static std::vector<VIPEntry> getVIPEntries(uint32_t accountId);
 	static void addVIPEntry(uint32_t accountId, uint32_t guid, const std::string& description, uint32_t icon,
 	                        bool notify);
 	static void editVIPEntry(uint32_t accountId, uint32_t guid, const std::string& description, uint32_t icon,
 	                         bool notify);
 	static void removeVIPEntry(uint32_t accountId, uint32_t guid);
 
-	static void updatePremiumTime(uint32_t accountId, time_t endTime);
+	static void updatePremiumTime(uint32_t accountId, std::chrono::system_clock::time_point endTime);
 
 private:
 	using ItemMap = std::map<uint32_t, std::pair<std::shared_ptr<Item>, uint32_t>>;
