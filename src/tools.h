@@ -31,7 +31,7 @@ std::string randomBytes(size_t length);
 Position getNextPosition(Direction direction, Position pos);
 Direction getDirectionTo(const Position& from, const Position& to);
 
-std::string formatDateShort(time_t time);
+std::string formatDateShort(std::chrono::system_clock::time_point time);
 
 uint16_t getDepotBoxId(uint16_t index);
 MagicEffectClasses getMagicEffect(const std::string& strValue);
@@ -59,8 +59,6 @@ uint8_t clientFluidToServer(uint8_t clientFluid);
 itemAttrTypes stringToItemAttribute(const std::string& str);
 
 const char* getReturnMessage(ReturnValue value);
-
-int64_t OTSYS_TIME();
 
 SpellGroup_t stringToSpellGroup(const std::string& value);
 

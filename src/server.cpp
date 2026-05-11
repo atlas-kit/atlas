@@ -15,8 +15,8 @@ namespace {
 
 struct ConnectBlock
 {
-	uint64_t lastAttempt;
-	uint64_t blockTime = 0;
+	std::chrono::steady_clock::time_point lastAttempt;
+	std::chrono::steady_clock::time_point blockTime = std::chrono::steady_clock::time_point::min();
 	uint32_t count = 1;
 };
 
@@ -25,7 +25,7 @@ bool acceptConnection(const Connection::Address& clientIP)
 	static std::recursive_mutex mu;
 	std::lock_guard lock{mu};
 
-	uint64_t currentTime = OTSYS_TIME();
+	auto currentTime = std::chrono::steady_clock::now();
 
 	static std::map<Connection::Address, ConnectBlock> ipConnectMap;
 	auto it = ipConnectMap.find(clientIP);
@@ -36,17 +36,17 @@ bool acceptConnection(const Connection::Address& clientIP)
 
 	ConnectBlock& connectBlock = it->second;
 	if (connectBlock.blockTime > currentTime) {
-		connectBlock.blockTime += 250;
+		connectBlock.blockTime += 250ms;
 		return false;
 	}
 
-	int64_t timeDiff = currentTime - connectBlock.lastAttempt;
+	auto timeDiff = currentTime - connectBlock.lastAttempt;
 	connectBlock.lastAttempt = currentTime;
-	if (timeDiff <= 5000) {
+	if (timeDiff <= 5s) {
 		if (++connectBlock.count > 5) {
 			connectBlock.count = 0;
-			if (timeDiff <= 500) {
-				connectBlock.blockTime = currentTime + 3000;
+			if (timeDiff <= 500ms) {
+				connectBlock.blockTime = currentTime + 3s;
 				return false;
 			}
 		}
@@ -102,7 +102,7 @@ void ServiceManager::stop()
 
 	acceptors.clear();
 
-	death_timer.expires_after(std::chrono::seconds(3));
+	death_timer.expires_after(3s);
 	death_timer.async_wait([this](const boost::system::error_code&) { die(); });
 }
 
@@ -163,7 +163,7 @@ void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::
 			close();
 			pendingStart = true;
 			g_scheduler.addEvent(createSchedulerTask(
-			    15000, [serverPort = this->serverPort, service = std::weak_ptr<ServicePort>(shared_from_this())]() {
+			    15s, [serverPort = this->serverPort, service = std::weak_ptr<ServicePort>(shared_from_this())]() {
 				    openAcceptor(service, serverPort);
 			    }));
 		}
@@ -218,8 +218,7 @@ void ServicePort::open(uint16_t port)
 
 		pendingStart = true;
 		g_scheduler.addEvent(createSchedulerTask(
-		    15000,
-		    [port, service = std::weak_ptr<ServicePort>(shared_from_this())]() { openAcceptor(service, port); }));
+		    15s, [port, service = std::weak_ptr<ServicePort>(shared_from_this())]() { openAcceptor(service, port); }));
 	}
 }
 

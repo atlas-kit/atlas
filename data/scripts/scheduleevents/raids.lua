@@ -1,14 +1,12 @@
-local event = GlobalEvent("raids")
-
 local CHECK_RAIDS_INTERVAL = 60 * 1000
 local MAX_RAND_RANGE = 10000000
-
-event:interval(CHECK_RAIDS_INTERVAL)
 
 local running = nil
 local lastRaidEnd = 0
 
-function event.onTime(interval)
+local event = ScheduleEvent(CHECK_RAIDS_INTERVAL)
+
+event.onTrigger = function()
 	io.write(">> Executing raids event...\n")
 	if running then
 		return true

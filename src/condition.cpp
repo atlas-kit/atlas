@@ -14,7 +14,7 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 {
 	switch (param) {
 		case CONDITION_PARAM_TICKS: {
-			ticks = value;
+			ticks = std::chrono::milliseconds{value};
 			return true;
 		}
 
@@ -43,7 +43,7 @@ int32_t Condition::getParam(ConditionParam_t param)
 {
 	switch (param) {
 		case CONDITION_PARAM_TICKS:
-			return ticks;
+			return ticks.count();
 
 		case CONDITION_PARAM_BUFF_SPELL:
 			return isBuff ? 1 : 0;
@@ -91,7 +91,13 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 		}
 
 		case CONDITIONATTR_TICKS: {
-			return propStream.read<int32_t>(ticks);
+			uint32_t _ticks;
+			if (!propStream.read<uint32_t>(_ticks)) {
+				return false;
+			}
+
+			ticks = std::chrono::milliseconds{_ticks};
+			return true;
 		}
 
 		case CONDITIONATTR_ISBUFF: {
@@ -135,7 +141,7 @@ void Condition::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.write<uint32_t>(id);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_TICKS);
-	propWriteStream.write<uint32_t>(ticks);
+	propWriteStream.write<uint32_t>(ticks.count());
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_ISBUFF);
 	propWriteStream.write<uint8_t>(isBuff);
@@ -147,26 +153,27 @@ void Condition::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.write<uint8_t>(aggressive);
 }
 
-void Condition::setTicks(int32_t newTicks)
+void Condition::setTicks(std::chrono::milliseconds newTicks)
 {
 	ticks = newTicks;
-	endTime = ticks + OTSYS_TIME();
+	endTime = ticks + std::chrono::steady_clock::now();
 }
 
-bool Condition::executeCondition(const std::shared_ptr<Creature>&, int32_t interval)
+bool Condition::executeCondition(const std::shared_ptr<Creature>&, std::chrono::milliseconds interval)
 {
-	if (ticks == -1) {
+	if (ticks < std::chrono::milliseconds::zero()) {
 		return true;
 	}
 
 	// Not using set ticks here since it would reset endTime
-	ticks = std::max<int32_t>(0, ticks - interval);
-	return getEndTime() >= OTSYS_TIME();
+	ticks = std::max(std::chrono::milliseconds::zero(), ticks - interval);
+	return getEndTime() >= std::chrono::steady_clock::now();
 }
 
-std::unique_ptr<Condition> Condition::createCondition(ConditionId_t id, ConditionType_t type, int32_t ticks,
-                                                      int32_t param /* = 0*/, bool buff /* = false*/,
-                                                      uint32_t subId /* = 0*/, bool aggressive /* = false */)
+std::unique_ptr<Condition> Condition::createCondition(ConditionId_t id, ConditionType_t type,
+                                                      std::chrono::milliseconds ticks, int32_t param /* = 0*/,
+                                                      bool buff /* = false*/, uint32_t subId /* = 0*/,
+                                                      bool aggressive /* = false */)
 {
 	switch (type) {
 		case CONDITION_POISON:
@@ -256,10 +263,11 @@ std::unique_ptr<Condition> Condition::createCondition(PropStream& propStream)
 		return nullptr;
 	}
 
-	uint32_t ticks;
-	if (!propStream.read<uint32_t>(ticks)) {
+	uint32_t _ticks;
+	if (!propStream.read<uint32_t>(_ticks)) {
 		return nullptr;
 	}
+	auto ticks = std::chrono::milliseconds{_ticks};
 
 	if (!propStream.read<uint8_t>(attr) || attr != CONDITIONATTR_ISBUFF) {
 		return nullptr;
@@ -294,15 +302,15 @@ std::unique_ptr<Condition> Condition::createCondition(PropStream& propStream)
 
 bool Condition::startCondition(const std::shared_ptr<Creature>&)
 {
-	if (ticks > 0) {
-		endTime = ticks + OTSYS_TIME();
+	if (ticks > std::chrono::milliseconds::zero()) {
+		endTime = ticks + std::chrono::steady_clock::now();
 	}
 	return true;
 }
 
 bool Condition::isPersistent() const
 {
-	if (ticks == -1) {
+	if (ticks < std::chrono::milliseconds::zero()) {
 		return false;
 	}
 
@@ -321,11 +329,12 @@ bool Condition::updateCondition(const Condition* addCondition)
 		return false;
 	}
 
-	if (ticks == -1 && addCondition->getTicks() > 0) {
+	if (ticks < std::chrono::milliseconds::zero() && addCondition->getTicks() > std::chrono::milliseconds::zero()) {
 		return false;
 	}
 
-	if (addCondition->getTicks() >= 0 && getEndTime() > (OTSYS_TIME() + addCondition->getTicks())) {
+	if (addCondition->getTicks() >= std::chrono::milliseconds::zero() &&
+	    getEndTime() > (std::chrono::steady_clock::now() + addCondition->getTicks())) {
 		return false;
 	}
 
@@ -337,7 +346,7 @@ bool ConditionGeneric::startCondition(const std::shared_ptr<Creature>& creature)
 	return Condition::startCondition(creature);
 }
 
-bool ConditionGeneric::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionGeneric::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	return Condition::executeCondition(creature, interval);
 }
@@ -534,7 +543,8 @@ void ConditionAttributes::updateSkills(const std::shared_ptr<Player>& player)
 	}
 }
 
-bool ConditionAttributes::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionAttributes::executeCondition(const std::shared_ptr<Creature>& creature,
+                                           std::chrono::milliseconds interval)
 {
 	return ConditionGeneric::executeCondition(creature, interval);
 }
@@ -853,11 +863,21 @@ void ConditionRegeneration::addCondition(const std::shared_ptr<Creature>&, const
 bool ConditionRegeneration::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 {
 	if (attr == CONDITIONATTR_HEALTHTICKS) {
-		return propStream.read<uint32_t>(healthTicks);
+		uint32_t value;
+		if (!propStream.read<uint32_t>(value)) {
+			return false;
+		}
+		healthTicks = std::chrono::milliseconds{value};
+		return true;
 	} else if (attr == CONDITIONATTR_HEALTHGAIN) {
 		return propStream.read<uint32_t>(healthGain);
 	} else if (attr == CONDITIONATTR_MANATICKS) {
-		return propStream.read<uint32_t>(manaTicks);
+		uint32_t value;
+		if (!propStream.read<uint32_t>(value)) {
+			return false;
+		}
+		manaTicks = std::chrono::milliseconds{value};
+		return true;
 	} else if (attr == CONDITIONATTR_MANAGAIN) {
 		return propStream.read<uint32_t>(manaGain);
 	}
@@ -869,19 +889,20 @@ void ConditionRegeneration::serialize(PropWriteStream& propWriteStream)
 	Condition::serialize(propWriteStream);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_HEALTHTICKS);
-	propWriteStream.write<uint32_t>(healthTicks);
+	propWriteStream.write<uint32_t>(healthTicks.count());
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_HEALTHGAIN);
 	propWriteStream.write<uint32_t>(healthGain);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_MANATICKS);
-	propWriteStream.write<uint32_t>(manaTicks);
+	propWriteStream.write<uint32_t>(manaTicks.count());
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_MANAGAIN);
 	propWriteStream.write<uint32_t>(manaGain);
 }
 
-bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& creature,
+                                             std::chrono::milliseconds interval)
 {
 	if (!creature) {
 		return false;
@@ -895,7 +916,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 	}
 
 	if (internalHealthTicks >= healthTicks) {
-		internalHealthTicks = 0;
+		internalHealthTicks = std::chrono::milliseconds::zero();
 
 		int32_t realHealthGain = creature->getHealth();
 		creature->changeHealth(healthGain);
@@ -928,7 +949,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 	}
 
 	if (internalManaTicks >= manaTicks) {
-		internalManaTicks = 0;
+		internalManaTicks = std::chrono::milliseconds::zero();
 
 		if (const auto& player = creature->asPlayer()) {
 			int32_t realManaGain = player->getMana();
@@ -972,7 +993,7 @@ bool ConditionRegeneration::setParam(ConditionParam_t param, int32_t value)
 			return true;
 
 		case CONDITION_PARAM_HEALTHTICKS:
-			healthTicks = value;
+			healthTicks = std::chrono::milliseconds{value};
 			return true;
 
 		case CONDITION_PARAM_MANAGAIN:
@@ -980,7 +1001,7 @@ bool ConditionRegeneration::setParam(ConditionParam_t param, int32_t value)
 			return true;
 
 		case CONDITION_PARAM_MANATICKS:
-			manaTicks = value;
+			manaTicks = std::chrono::milliseconds{value};
 			return true;
 
 		default:
@@ -995,13 +1016,13 @@ int32_t ConditionRegeneration::getParam(ConditionParam_t param)
 			return healthGain;
 
 		case CONDITION_PARAM_HEALTHTICKS:
-			return healthTicks;
+			return healthTicks.count();
 
 		case CONDITION_PARAM_MANAGAIN:
 			return manaGain;
 
 		case CONDITION_PARAM_MANATICKS:
-			return manaTicks;
+			return manaTicks.count();
 
 		default:
 			return ConditionGeneric::getParam(param);
@@ -1025,7 +1046,12 @@ bool ConditionSoul::unserializeProp(ConditionAttr_t attr, PropStream& propStream
 	if (attr == CONDITIONATTR_SOULGAIN) {
 		return propStream.read<uint32_t>(soulGain);
 	} else if (attr == CONDITIONATTR_SOULTICKS) {
-		return propStream.read<uint32_t>(soulTicks);
+		uint32_t value;
+		if (!propStream.read<uint32_t>(value)) {
+			return false;
+		}
+		soulTicks = std::chrono::milliseconds{value};
+		return true;
 	}
 	return Condition::unserializeProp(attr, propStream);
 }
@@ -1038,10 +1064,10 @@ void ConditionSoul::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.write<uint32_t>(soulGain);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_SOULTICKS);
-	propWriteStream.write<uint32_t>(soulTicks);
+	propWriteStream.write<uint32_t>(soulTicks.count());
 }
 
-bool ConditionSoul::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionSoul::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	if (!creature) {
 		return false;
@@ -1052,7 +1078,7 @@ bool ConditionSoul::executeCondition(const std::shared_ptr<Creature>& creature, 
 	if (const auto& player = creature->asPlayer()) {
 		if (player->getZone() != ZONE_PROTECTION) {
 			if (internalSoulTicks >= soulTicks) {
-				internalSoulTicks = 0;
+				internalSoulTicks = std::chrono::milliseconds::zero();
 				player->changeSoul(soulGain);
 			}
 		}
@@ -1070,7 +1096,7 @@ bool ConditionSoul::setParam(ConditionParam_t param, int32_t value)
 			return true;
 
 		case CONDITION_PARAM_SOULTICKS:
-			soulTicks = value;
+			soulTicks = std::chrono::milliseconds{value};
 			return true;
 
 		default:
@@ -1085,7 +1111,7 @@ int32_t ConditionSoul::getParam(ConditionParam_t param)
 			return soulGain;
 
 		case CONDITION_PARAM_SOULTICKS:
-			return soulTicks;
+			return soulTicks.count();
 
 		default:
 			return ConditionGeneric::getParam(param);
@@ -1122,7 +1148,7 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 			break;
 
 		case CONDITION_PARAM_TICKINTERVAL:
-			tickInterval = std::abs(value);
+			tickInterval = std::chrono::milliseconds{std::abs(value)};
 			break;
 
 		case CONDITION_PARAM_PERIODICDAMAGE:
@@ -1162,7 +1188,7 @@ int32_t ConditionDamage::getParam(ConditionParam_t param)
 			return startDamage;
 
 		case CONDITION_PARAM_TICKINTERVAL:
-			return tickInterval;
+			return tickInterval.count();
 
 		case CONDITION_PARAM_PERIODICDAMAGE:
 			return periodDamage;
@@ -1196,7 +1222,7 @@ bool ConditionDamage::unserializeProp(ConditionAttr_t attr, PropStream& propStre
 		}
 
 		damageList.push_back(damageInfo);
-		if (ticks != -1) {
+		if (ticks >= std::chrono::milliseconds::zero()) {
 			setTicks(ticks + damageInfo.interval);
 		}
 		return true;
@@ -1227,20 +1253,20 @@ bool ConditionDamage::updateCondition(const Condition* addCondition)
 		return true;
 	}
 
-	if (ticks == -1 && conditionDamage.ticks > 0) {
+	if (ticks < std::chrono::milliseconds::zero() && conditionDamage.ticks > std::chrono::milliseconds::zero()) {
 		return false;
 	}
 
 	return conditionDamage.getTotalDamage() > getTotalDamage();
 }
 
-bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
+bool ConditionDamage::addDamage(int32_t rounds, std::chrono::milliseconds time, int32_t value)
 {
-	time = std::max<int32_t>(time, EVENT_CREATURE_THINK_INTERVAL);
+	time = std::max(time, EVENT_CREATURE_THINK_INTERVAL);
 	if (rounds == -1) {
 		// periodic damage
 		periodDamage = value;
-		setParam(CONDITION_PARAM_TICKINTERVAL, time);
+		setParam(CONDITION_PARAM_TICKINTERVAL, time.count());
 		setParam(CONDITION_PARAM_TICKS, -1);
 		return true;
 	}
@@ -1258,7 +1284,7 @@ bool ConditionDamage::addDamage(int32_t rounds, int32_t time, int32_t value)
 
 		damageList.push_back(damageInfo);
 
-		if (ticks != -1) {
+		if (ticks >= std::chrono::milliseconds::zero()) {
 			setTicks(ticks + damageInfo.interval);
 		}
 	}
@@ -1276,7 +1302,7 @@ bool ConditionDamage::init()
 		return true;
 	}
 
-	setTicks(0);
+	setTicks(std::chrono::milliseconds::zero());
 
 	int32_t amount = uniform_random(minDamage, maxDamage);
 	if (amount != 0) {
@@ -1314,23 +1340,23 @@ bool ConditionDamage::startCondition(const std::shared_ptr<Creature>& creature)
 	return true;
 }
 
-bool ConditionDamage::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionDamage::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	if (periodDamage != 0) {
 		periodDamageTick += interval;
 
 		if (periodDamageTick >= tickInterval) {
-			periodDamageTick = 0;
+			periodDamageTick = std::chrono::milliseconds::zero();
 			doDamage(creature, periodDamage);
 		}
 	} else if (!damageList.empty()) {
 		IntervalInfo& damageInfo = damageList.front();
 
-		bool bRemove = (ticks != -1);
+		bool bRemove = (ticks >= std::chrono::milliseconds::zero());
 		creature->onTickCondition(getType(), bRemove);
 		damageInfo.timeLeft -= interval;
 
-		if (damageInfo.timeLeft <= 0) {
+		if (damageInfo.timeLeft <= std::chrono::milliseconds::zero()) {
 			int32_t damage = damageInfo.value;
 
 			if (bRemove) {
@@ -1343,11 +1369,11 @@ bool ConditionDamage::executeCondition(const std::shared_ptr<Creature>& creature
 		}
 
 		if (!bRemove) {
-			if (ticks > 0) {
+			if (ticks > std::chrono::milliseconds::zero()) {
 				endTime += interval;
 			}
 
-			interval = 0;
+			interval = std::chrono::milliseconds::zero();
 		}
 	}
 
@@ -1362,7 +1388,7 @@ bool ConditionDamage::getNextDamage(int32_t& damage)
 	} else if (!damageList.empty()) {
 		IntervalInfo& damageInfo = damageList.front();
 		damage = damageInfo.value;
-		if (ticks != -1) {
+		if (ticks >= std::chrono::milliseconds::zero()) {
 			damageList.pop_front();
 		}
 		return true;
@@ -1462,7 +1488,7 @@ void ConditionDamage::addCondition(const std::shared_ptr<Creature>& creature, co
 	startDamage = conditionDamage.startDamage;
 	tickInterval = conditionDamage.tickInterval;
 	periodDamage = conditionDamage.periodDamage;
-	int32_t nextTimeLeft = tickInterval;
+	auto nextTimeLeft = tickInterval;
 
 	if (!damageList.empty()) {
 		// save previous timeLeft
@@ -1657,7 +1683,7 @@ bool ConditionSpeed::startCondition(const std::shared_ptr<Creature>& creature)
 	return true;
 }
 
-bool ConditionSpeed::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionSpeed::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	return Condition::executeCondition(creature, interval);
 }
@@ -1673,7 +1699,7 @@ void ConditionSpeed::addCondition(const std::shared_ptr<Creature>& creature, con
 		return;
 	}
 
-	if (ticks == -1 && condition->getTicks() > 0) {
+	if (ticks < std::chrono::milliseconds::zero() && condition->getTicks() > std::chrono::milliseconds::zero()) {
 		return;
 	}
 
@@ -1763,7 +1789,7 @@ bool ConditionOutfit::startCondition(const std::shared_ptr<Creature>& creature)
 	return true;
 }
 
-bool ConditionOutfit::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionOutfit::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	return Condition::executeCondition(creature, interval);
 }
@@ -1791,14 +1817,14 @@ bool ConditionLight::startCondition(const std::shared_ptr<Creature>& creature)
 		return false;
 	}
 
-	internalLightTicks = 0;
+	internalLightTicks = std::chrono::milliseconds::zero();
 	lightChangeInterval = ticks / lightInfo.level;
 	creature->setCreatureLight(lightInfo);
 	g_game.changeLight(creature);
 	return true;
 }
 
-bool ConditionLight::executeCondition(const std::shared_ptr<Creature>& creature, int32_t interval)
+bool ConditionLight::executeCondition(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	if (!creature) {
 		return false;
@@ -1807,7 +1833,7 @@ bool ConditionLight::executeCondition(const std::shared_ptr<Creature>& creature,
 	internalLightTicks += interval;
 
 	if (internalLightTicks >= lightChangeInterval) {
-		internalLightTicks = 0;
+		internalLightTicks = std::chrono::milliseconds::zero();
 		LightInfo lightInfo = creature->getCreatureLight();
 
 		if (lightInfo.level > 0) {
@@ -1835,7 +1861,7 @@ void ConditionLight::addCondition(const std::shared_ptr<Creature>& creature, con
 		lightInfo.level = conditionLight.lightInfo.level;
 		lightInfo.color = conditionLight.lightInfo.color;
 		lightChangeInterval = ticks / std::max<uint8_t>(1, lightInfo.level);
-		internalLightTicks = 0;
+		internalLightTicks = std::chrono::milliseconds::zero();
 		creature->setCreatureLight(lightInfo);
 		g_game.changeLight(creature);
 	}
@@ -1900,9 +1926,21 @@ bool ConditionLight::unserializeProp(ConditionAttr_t attr, PropStream& propStrea
 		lightInfo.level = value;
 		return true;
 	} else if (attr == CONDITIONATTR_LIGHTTICKS) {
-		return propStream.read<uint32_t>(internalLightTicks);
+		uint32_t value;
+		if (!propStream.read<uint32_t>(value)) {
+			return false;
+		}
+
+		internalLightTicks = std::chrono::milliseconds{value};
+		return true;
 	} else if (attr == CONDITIONATTR_LIGHTINTERVAL) {
-		return propStream.read<uint32_t>(lightChangeInterval);
+		uint32_t value;
+		if (!propStream.read<uint32_t>(value)) {
+			return false;
+		}
+
+		lightChangeInterval = std::chrono::milliseconds{value};
+		return true;
 	}
 	return Condition::unserializeProp(attr, propStream);
 }
@@ -1920,10 +1958,10 @@ void ConditionLight::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.write<uint32_t>(lightInfo.level);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_LIGHTTICKS);
-	propWriteStream.write<uint32_t>(internalLightTicks);
+	propWriteStream.write<uint32_t>(internalLightTicks.count());
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_LIGHTINTERVAL);
-	propWriteStream.write<uint32_t>(lightChangeInterval);
+	propWriteStream.write<uint32_t>(lightChangeInterval.count());
 }
 
 void ConditionSpellCooldown::addCondition(const std::shared_ptr<Creature>& creature, const Condition* condition)
@@ -1931,7 +1969,7 @@ void ConditionSpellCooldown::addCondition(const std::shared_ptr<Creature>& creat
 	if (updateCondition(condition)) {
 		setTicks(condition->getTicks());
 
-		if (subId != 0 && ticks > 0) {
+		if (subId != 0 && ticks > std::chrono::milliseconds::zero()) {
 			if (const auto& player = creature->asPlayer()) {
 				player->sendSpellCooldown(subId, ticks);
 			}
@@ -1945,7 +1983,7 @@ bool ConditionSpellCooldown::startCondition(const std::shared_ptr<Creature>& cre
 		return false;
 	}
 
-	if (subId != 0 && ticks > 0) {
+	if (subId != 0 && ticks > std::chrono::milliseconds::zero()) {
 		if (const auto& player = creature->asPlayer()) {
 			player->sendSpellCooldown(subId, ticks);
 		}
@@ -1958,7 +1996,7 @@ void ConditionSpellGroupCooldown::addCondition(const std::shared_ptr<Creature>& 
 	if (updateCondition(condition)) {
 		setTicks(condition->getTicks());
 
-		if (subId != 0 && ticks > 0) {
+		if (subId != 0 && ticks > std::chrono::milliseconds::zero()) {
 			if (const auto& player = creature->asPlayer()) {
 				player->sendSpellGroupCooldown(static_cast<SpellGroup_t>(subId), ticks);
 			}
@@ -1972,7 +2010,7 @@ bool ConditionSpellGroupCooldown::startCondition(const std::shared_ptr<Creature>
 		return false;
 	}
 
-	if (subId != 0 && ticks > 0) {
+	if (subId != 0 && ticks > std::chrono::milliseconds::zero()) {
 		if (const auto& player = creature->asPlayer()) {
 			player->sendSpellGroupCooldown(static_cast<SpellGroup_t>(subId), ticks);
 		}

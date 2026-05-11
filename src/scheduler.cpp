@@ -67,7 +67,7 @@ void Scheduler::shutdown()
 	});
 }
 
-std::unique_ptr<SchedulerTask> createSchedulerTask(uint32_t delay, TaskFunc&& f)
+std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f)
 {
 	return std::make_unique<SchedulerTask>(delay, std::move(f));
 }

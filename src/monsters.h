@@ -54,7 +54,7 @@ struct summonBlock_t
 {
 	std::string name;
 	uint32_t chance;
-	uint32_t speed;
+	std::chrono::milliseconds speed = 2000ms;
 	uint32_t max;
 	MagicEffectClasses effect = CONST_ME_TELEPORT;
 	MagicEffectClasses masterEffect = CONST_ME_NONE;
@@ -83,7 +83,7 @@ struct spellBlock_t
 
 	BaseSpell* spell = nullptr;
 	uint32_t chance = 100;
-	uint32_t speed = 2000;
+	std::chrono::milliseconds speed = 2000ms;
 	uint32_t range = 0;
 	int32_t minCombatValue = 0;
 	int32_t maxCombatValue = 0;
@@ -136,10 +136,10 @@ class MonsterType
 
 		uint32_t manaCost = 0;
 		uint32_t yellChance = 0;
-		uint32_t yellSpeedTicks = 0;
+		std::chrono::milliseconds yellSpeedTicks = std::chrono::milliseconds::zero();
 		uint32_t staticAttackChance = 95;
 		uint32_t maxSummons = 0;
-		uint32_t changeTargetSpeed = 0;
+		std::chrono::milliseconds changeTargetSpeed = std::chrono::milliseconds::zero();
 		uint32_t conditionImmunities = 0;
 		uint32_t damageImmunities = 0;
 		uint32_t baseSpeed = 200;
@@ -210,7 +210,7 @@ public:
 	uint8_t range = 0;
 	uint8_t drunkenness = 0;
 
-	uint16_t interval = 2000;
+	std::chrono::milliseconds interval = 2000ms;
 
 	int32_t minCombatValue = 0;
 	int32_t maxCombatValue = 0;
@@ -223,10 +223,10 @@ public:
 	int32_t conditionMinDamage = 0;
 	int32_t conditionMaxDamage = 0;
 	int32_t conditionStartDamage = 0;
-	int32_t tickInterval = 0;
+	std::chrono::milliseconds tickInterval = std::chrono::milliseconds::zero();
 	int32_t minSpeedChange = 0;
 	int32_t maxSpeedChange = 0;
-	int32_t duration = 0;
+	std::chrono::milliseconds duration = std::chrono::milliseconds::zero();
 
 	bool isScripted = false;
 	bool needTarget = false;
@@ -265,7 +265,8 @@ public:
 
 private:
 	std::unique_ptr<ConditionDamage> getDamageCondition(ConditionType_t conditionType, int32_t maxDamage,
-	                                                    int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
+	                                                    int32_t minDamage, int32_t startDamage,
+	                                                    std::chrono::milliseconds tickInterval);
 	bool deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, const std::string& description = "");
 
 	MonsterType* loadMonster(const std::string& file, const std::string& monsterName, bool reloading = false);

@@ -1,4 +1,3 @@
-local event = GlobalEvent("WorldLight")
 
 local lightConfig = {
 	day = 250,
@@ -36,7 +35,9 @@ local function calculateWorldLightLevel()
 	return lightConfig.day
 end
 
-function event.onTime(interval)
+local event = ScheduleEvent(10000)
+
+event.onTrigger = function()
 	if not defaultWorldLight then
 		return true
 	end
@@ -47,5 +48,4 @@ function event.onTime(interval)
 	return true
 end
 
-event:interval(10000) -- 10 seconds
 event:register()
