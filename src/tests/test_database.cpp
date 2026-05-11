@@ -5,6 +5,7 @@
 #include "../configmanager.h"
 #include "../database.h"
 
+// cppcheck-suppress missingIncludeSystem
 #include <boost/test/unit_test.hpp>
 
 // Most tests use a top-level DBTransaction that is never committed, so its
