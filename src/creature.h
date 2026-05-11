@@ -370,8 +370,8 @@ protected:
 
 	std::vector<Direction> listWalkDir;
 
-	std::chrono::steady_clock::time_point lastStep = std::chrono::steady_clock::time_point::min();
-	std::chrono::steady_clock::time_point lastPathUpdate = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastStep{};
+	std::chrono::steady_clock::time_point lastPathUpdate{};
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;

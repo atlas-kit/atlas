@@ -91,8 +91,8 @@ bool Condition::unserializeProp(ConditionAttr_t attr, PropStream& propStream)
 		}
 
 		case CONDITIONATTR_TICKS: {
-			uint32_t _ticks;
-			if (!propStream.read<uint32_t>(_ticks)) {
+			int32_t _ticks;
+			if (!propStream.read<int32_t>(_ticks)) {
 				return false;
 			}
 
@@ -141,7 +141,7 @@ void Condition::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.write<uint32_t>(id);
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_TICKS);
-	propWriteStream.write<uint32_t>(ticks.count());
+	propWriteStream.write<int32_t>(static_cast<int32_t>(ticks.count()));
 
 	propWriteStream.write<uint8_t>(CONDITIONATTR_ISBUFF);
 	propWriteStream.write<uint8_t>(isBuff);
@@ -263,8 +263,8 @@ std::unique_ptr<Condition> Condition::createCondition(PropStream& propStream)
 		return nullptr;
 	}
 
-	uint32_t _ticks;
-	if (!propStream.read<uint32_t>(_ticks)) {
+	int32_t _ticks;
+	if (!propStream.read<int32_t>(_ticks)) {
 		return nullptr;
 	}
 	auto ticks = std::chrono::milliseconds{_ticks};
