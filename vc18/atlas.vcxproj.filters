@@ -146,9 +146,6 @@
     <ClCompile Include="..\src\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\globalevent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\groups.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -197,9 +194,6 @@
     <ClCompile Include="..\src\monsters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\mounts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\movement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -210,9 +204,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\otserv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\outfit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\outputmessage.cpp">
@@ -284,9 +275,6 @@
     <ClCompile Include="..\src\lua\modules\weapon.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\lua\modules\globalevent.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\lua\modules\moveevent.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
@@ -300,9 +288,6 @@
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\modules\party.cpp">
-      <Filter>Source Files\lua\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\modules\outfit.cpp">
       <Filter>Source Files\lua\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\modules\condition.cpp">
@@ -493,9 +478,6 @@
     <ClInclude Include="..\src\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\globalevent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\groups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -550,9 +532,6 @@
     <ClInclude Include="..\src\monsters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mounts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\movement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -566,9 +545,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\otserv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\outfit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\outputmessage.h">

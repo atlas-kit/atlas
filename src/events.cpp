@@ -599,7 +599,7 @@ void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_p
 	tfs::lua::resetScriptEnv();
 }
 
-void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval)
+void onThink(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval)
 {
 	// Creature:onThink(interval)
 	if (creatureHandlers.onThink == -1) {
@@ -618,7 +618,7 @@ void onThink(const std::shared_ptr<Creature>& creature, uint32_t interval)
 	scriptInterface.pushFunction(creatureHandlers.onThink);
 
 	tfs::lua::pushThing(L, creature);
-	tfs::lua::pushNumber(L, interval);
+	tfs::lua::pushNumber(L, interval.count());
 	scriptInterface.callVoidFunction(2);
 }
 

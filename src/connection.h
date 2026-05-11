@@ -15,13 +15,6 @@ enum ConnectionState_t
 	CONNECTION_STATE_PENDING
 };
 
-enum checksumMode_t
-{
-	CHECKSUM_DISABLED,
-	CHECKSUM_ADLER,
-	CHECKSUM_SEQUENCE
-};
-
 static constexpr int32_t CONNECTION_WRITE_TIMEOUT = 30;
 static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
@@ -106,7 +99,7 @@ private:
 
 	boost::asio::ip::tcp::socket socket;
 	Address remoteAddress;
-	time_t timeConnected;
+	std::chrono::steady_clock::time_point timeConnected;
 	uint32_t packetsSent = 0;
 
 	ConnectionState_t connectionState = CONNECTION_STATE_PENDING;

@@ -7,7 +7,6 @@
 #include "../configmanager.h"
 #include "../events.h"
 #include "../game.h"
-#include "../globalevent.h"
 #include "../item.h"
 #include "../movement.h"
 #include "../player.h"
@@ -25,7 +24,6 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern Spells* g_spells;
@@ -72,7 +70,7 @@ int luaDebugPrint(lua_State* L)
 int luaGetWorldUpTime(lua_State* L)
 {
 	// getWorldUpTime()
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	auto uptime = duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count();
 	tfs::lua::pushNumber(L, uptime);
 	return 1;
 }
@@ -145,7 +143,7 @@ int luaDoAreaCombat(lua_State* L)
 
 		CombatParams params;
 		params.combatType = combatType;
-		params.impactEffect = tfs::lua::getNumber<uint8_t>(L, 7);
+		params.impactEffect = tfs::lua::getNumber<uint16_t>(L, 7);
 
 		params.blockedByArmor = tfs::lua::getBoolean(L, 9, false);
 		params.blockedByShield = tfs::lua::getBoolean(L, 10, false);
@@ -187,7 +185,7 @@ int luaDoTargetCombat(lua_State* L)
 
 	CombatParams params{
 	    .combatType = combatType,
-	    .impactEffect = tfs::lua::getNumber<uint8_t>(L, 6),
+	    .impactEffect = tfs::lua::getNumber<uint16_t>(L, 6),
 	    .blockedByArmor = tfs::lua::getBoolean(L, 8, false),
 	    .blockedByShield = tfs::lua::getBoolean(L, 9, false),
 	    .ignoreResistances = tfs::lua::getBoolean(L, 10, false),
@@ -429,7 +427,7 @@ int luaAddEvent(lua_State* L)
 		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 
-	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
+	auto delay = std::chrono::milliseconds{std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2))};
 	lua_pop(L, 1);
 
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);

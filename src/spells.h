@@ -26,7 +26,7 @@ public:
 	Spells& operator=(const Spells&) = delete;
 
 	Spell* getSpellByName(const std::string& name);
-	RuneSpell* getRuneSpell(uint32_t id);
+	RuneSpell* getRuneSpell(uint16_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 
 	InstantSpell* getInstantSpell(const std::string& words);
@@ -103,8 +103,8 @@ public:
 	bool configureSpell(const pugi::xml_node& node);
 	const std::string& getName() const { return name; }
 	void setName(std::string n) { name = std::move(n); }
-	uint8_t getId() const { return spellId; }
-	void setId(uint8_t id) { spellId = id; }
+	uint16_t getId() const { return spellId; }
+	void setId(uint16_t id) { spellId = id; }
 
 	void postCastSpell(const std::shared_ptr<Player>& player, bool finishedCast = true, bool payCost = true) const;
 	static void postCastSpell(const std::shared_ptr<Player>& player, uint32_t manaCost, uint32_t soulCost);
@@ -126,6 +126,10 @@ public:
 	void setEnabled(bool e) { enabled = e; }
 
 	virtual bool isInstant() const = 0;
+	virtual InstantSpell* getInstantSpell() { return nullptr; }
+	virtual const InstantSpell* getInstantSpell() const { return nullptr; }
+	virtual RuneSpell* getRuneSpell() { return nullptr; }
+	virtual const RuneSpell* getRuneSpell() const { return nullptr; }
 	bool isLearnable() const { return learnable; }
 	void setLearnable(bool l) { learnable = l; }
 
@@ -142,12 +146,12 @@ public:
 	SpellGroup_t getSecondaryGroup() const { return secondaryGroup; }
 	void setSecondaryGroup(SpellGroup_t g) { secondaryGroup = g; }
 
-	uint32_t getCooldown() const { return cooldown; }
-	void setCooldown(uint32_t cd) { cooldown = cd; }
-	uint32_t getSecondaryCooldown() const { return secondaryGroupCooldown; }
-	void setSecondaryCooldown(uint32_t cd) { secondaryGroupCooldown = cd; }
-	uint32_t getGroupCooldown() const { return groupCooldown; }
-	void setGroupCooldown(uint32_t cd) { groupCooldown = cd; }
+	auto getCooldown() const { return cooldown; }
+	void setCooldown(std::chrono::milliseconds cd) { cooldown = cd; }
+	auto getSecondaryCooldown() const { return secondaryGroupCooldown; }
+	void setSecondaryCooldown(std::chrono::milliseconds cd) { secondaryGroupCooldown = cd; }
+	auto getGroupCooldown() const { return groupCooldown; }
+	void setGroupCooldown(std::chrono::milliseconds cd) { groupCooldown = cd; }
 
 	int32_t getRange() const { return range; }
 	void setRange(int32_t r) { range = r; }
@@ -181,14 +185,14 @@ protected:
 	SpellGroup_t group = SPELLGROUP_NONE;
 	SpellGroup_t secondaryGroup = SPELLGROUP_NONE;
 
-	uint32_t cooldown = 1000;
-	uint32_t groupCooldown = 1000;
-	uint32_t secondaryGroupCooldown = 0;
+	std::chrono::milliseconds cooldown = 1000ms;
+	std::chrono::milliseconds groupCooldown = 1000ms;
+	std::chrono::milliseconds secondaryGroupCooldown = std::chrono::milliseconds::zero();
 	uint32_t level = 0;
 	uint32_t magLevel = 0;
 	int32_t range = -1;
 
-	uint8_t spellId = 0;
+	uint16_t spellId = 0;
 
 	bool selfTarget = false;
 	bool needTarget = false;
@@ -226,6 +230,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var);
 
 	bool isInstant() const override { return true; }
+	InstantSpell* getInstantSpell() override { return this; }
+	const InstantSpell* getInstantSpell() const override { return this; }
 	bool getHasParam() const { return hasParam; }
 	void setHasParam(bool p) { hasParam = p; }
 	bool getHasPlayerNameParam() const { return hasPlayerNameParam; }
@@ -278,6 +284,8 @@ public:
 	bool executeCastSpell(const std::shared_ptr<Creature>& creature, const LuaVariant& var, bool isHotkey);
 
 	bool isInstant() const override { return false; }
+	RuneSpell* getRuneSpell() override { return this; }
+	const RuneSpell* getRuneSpell() const override { return this; }
 	uint16_t getRuneItemId() const { return runeId; }
 	void setRuneItemId(uint16_t i) { runeId = i; }
 	uint32_t getCharges() const { return charges; }

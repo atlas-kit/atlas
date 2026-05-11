@@ -58,7 +58,7 @@ Connection::Connection(boost::asio::io_context& io_context, std::shared_ptr<cons
     writeTimer(io_context),
     service_port(std::move(service_port)),
     socket(io_context),
-    timeConnected(time(nullptr))
+    timeConnected(std::chrono::steady_clock::now())
 {}
 
 void Connection::close(bool force)
@@ -153,8 +153,10 @@ void Connection::parseHeader(const boost::system::error_code& error)
 		return;
 	}
 
-	uint32_t timePassed = std::max<uint32_t>(1, (time(nullptr) - timeConnected) + 1);
-	if ((++packetsSent / timePassed) > static_cast<uint32_t>(getNumber(ConfigManager::MAX_PACKETS_PER_SECOND))) {
+	auto timePassed =
+	    std::max(1s, duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - timeConnected) + 1s);
+	if ((++packetsSent / timePassed.count()) >
+	    static_cast<uint32_t>(getNumber(ConfigManager::MAX_PACKETS_PER_SECOND))) {
 		std::cout << getIP() << " disconnected for exceeding packet per second limit." << std::endl;
 		close();
 		return;
@@ -186,12 +188,12 @@ void Connection::parseHeader(const boost::system::error_code& error)
 		connectionState = CONNECTION_STATE_GAME;
 	}
 
-	if (timePassed > 2) {
-		timeConnected = time(nullptr);
+	if (timePassed > 2s) {
+		timeConnected = std::chrono::steady_clock::now();
 		packetsSent = 0;
 	}
 
-	uint16_t size = msg.getLengthHeader();
+	uint16_t size = (msg.getLengthHeader() * 8) + NetworkMessage::CHECKSUM_LENGTH;
 	if (size == 0 || size >= NETWORKMESSAGE_MAXSIZE - 16) {
 		close(FORCE_CLOSE);
 		return;
@@ -249,7 +251,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 				return;
 			}
 		} else {
-			msg.skipBytes(1); // Skip protocol ID
+			msg.skipBytes(2); // Skip enter-game opcode (u16 in 15.24, was u8)
 		}
 
 		protocol->onRecvFirstMessage(msg);

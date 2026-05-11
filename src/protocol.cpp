@@ -32,8 +32,9 @@ bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
 	uint8_t* buffer = msg.getRemainingBuffer();
 	xtea::decrypt(buffer, msg.getLength() - 6, key);
 
-	uint16_t innerLength = msg.get<uint16_t>();
-	if (innerLength + 8 > msg.getLength()) {
+	uint8_t paddingLength = msg.getByte();
+	uint16_t innerLength = msg.getLength() - 6 - paddingLength;
+	if (innerLength + 7 > msg.getLength()) {
 		return false;
 	}
 
@@ -56,7 +57,7 @@ Protocol::~Protocol()
 void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 {
 	if (!rawMessages) {
-		if (encryptionEnabled && checksumMode == CHECKSUM_SEQUENCE) {
+		if (encryptionEnabled) {
 			uint32_t compressionChecksum = 0;
 			if (msg->getLength() >= 128 && deflateMessage(*msg)) {
 				compressionChecksum = 0x80000000;
@@ -68,8 +69,9 @@ void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 		msg->writeMessageLength();
 
 		if (encryptionEnabled) {
+			msg->writePaddingLength();
 			XTEA_encrypt(*msg, key);
-			msg->addCryptoHeader(checksumMode);
+			msg->addCryptoHeader();
 		}
 	}
 }

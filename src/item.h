@@ -108,9 +108,18 @@ public:
 	void resetText() { removeAttribute(ITEM_ATTRIBUTE_TEXT); }
 	const std::string& getText() const { return getStrAttr(ITEM_ATTRIBUTE_TEXT); }
 
-	void setDate(int32_t n) { setIntAttr(ITEM_ATTRIBUTE_DATE, n); }
+	void setDate(std::chrono::system_clock::time_point n)
+	{
+		setIntAttr(ITEM_ATTRIBUTE_DATE, duration_cast<std::chrono::seconds>(n.time_since_epoch()).count());
+	}
 	void resetDate() { removeAttribute(ITEM_ATTRIBUTE_DATE); }
-	time_t getDate() const { return static_cast<time_t>(getIntAttr(ITEM_ATTRIBUTE_DATE)); }
+	std::optional<std::chrono::system_clock::time_point> getDate() const
+	{
+		if (hasAttribute(ITEM_ATTRIBUTE_DATE)) {
+			return std::chrono::system_clock::time_point{std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DATE)}};
+		}
+		return std::nullopt;
+	}
 
 	void setWriter(const std::string& writer) { setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 	void resetWriter() { removeAttribute(ITEM_ATTRIBUTE_WRITER); }
@@ -134,9 +143,12 @@ public:
 	void setCorpseOwner(uint32_t corpseOwner) { setIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER, corpseOwner); }
 	uint32_t getCorpseOwner() const { return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER); }
 
-	void setDuration(int32_t time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time); }
-	void decreaseDuration(int32_t time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time); }
-	uint32_t getDuration() const { return getIntAttr(ITEM_ATTRIBUTE_DURATION); }
+	void setDuration(std::chrono::milliseconds time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time.count()); }
+	void decreaseDuration(std::chrono::milliseconds time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time.count()); }
+	std::chrono::milliseconds getDuration() const
+	{
+		return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
 	ItemDecayState_t getDecaying() const
@@ -563,9 +575,18 @@ public:
 	void resetText() { removeAttribute(ITEM_ATTRIBUTE_TEXT); }
 	const std::string& getText() const { return getStrAttr(ITEM_ATTRIBUTE_TEXT); }
 
-	void setDate(int32_t n) { setIntAttr(ITEM_ATTRIBUTE_DATE, n); }
+	void setDate(std::chrono::system_clock::time_point n)
+	{
+		setIntAttr(ITEM_ATTRIBUTE_DATE, duration_cast<std::chrono::seconds>(n.time_since_epoch()).count());
+	}
 	void resetDate() { removeAttribute(ITEM_ATTRIBUTE_DATE); }
-	time_t getDate() const { return static_cast<time_t>(getIntAttr(ITEM_ATTRIBUTE_DATE)); }
+	std::optional<std::chrono::system_clock::time_point> getDate() const
+	{
+		if (hasAttribute(ITEM_ATTRIBUTE_DATE)) {
+			return std::chrono::system_clock::time_point{std::chrono::seconds{getIntAttr(ITEM_ATTRIBUTE_DATE)}};
+		}
+		return std::nullopt;
+	}
 
 	void setWriter(std::string_view writer) { setStrAttr(ITEM_ATTRIBUTE_WRITER, writer); }
 	void resetWriter() { removeAttribute(ITEM_ATTRIBUTE_WRITER); }
@@ -631,14 +652,14 @@ public:
 		return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
 	}
 
-	void setDuration(int32_t time) { setIntAttr(ITEM_ATTRIBUTE_DURATION, time); }
-	void decreaseDuration(int32_t time) { increaseIntAttr(ITEM_ATTRIBUTE_DURATION, -time); }
-	uint32_t getDuration() const
+	void setDuration(std::chrono::milliseconds time) { attributes->setDuration(time); }
+	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
+	std::chrono::milliseconds getDuration() const
 	{
 		if (!attributes) {
-			return 0;
+			return std::chrono::milliseconds::zero();
 		}
-		return getIntAttr(ITEM_ATTRIBUTE_DURATION);
+		return std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
 	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
@@ -650,17 +671,17 @@ public:
 		return static_cast<ItemDecayState_t>(getIntAttr(ITEM_ATTRIBUTE_DECAYSTATE));
 	}
 
-	int32_t getDecayTimeMin() const
+	std::chrono::milliseconds getDecayTimeMin() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_DURATION_MIN)) {
-			return getIntAttr(ITEM_ATTRIBUTE_DURATION_MIN);
+			return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MIN)};
 		}
 		return items[id].decayTimeMin;
 	}
-	int32_t getDecayTimeMax() const
+	std::chrono::milliseconds getDecayTimeMax() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_DURATION_MAX)) {
-			return getIntAttr(ITEM_ATTRIBUTE_DURATION_MAX);
+			return std::chrono::milliseconds{getIntAttr(ITEM_ATTRIBUTE_DURATION_MAX)};
 		}
 		return items[id].decayTimeMax;
 	}
@@ -723,12 +744,12 @@ public:
 		}
 		return items[id].attack;
 	}
-	uint32_t getAttackSpeed() const
+	std::chrono::milliseconds getAttackSpeed() const
 	{
 		if (hasAttribute(ITEM_ATTRIBUTE_ATTACK_SPEED)) {
-			return getIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED);
+			return std::chrono::milliseconds(getIntAttr(ITEM_ATTRIBUTE_ATTACK_SPEED));
 		}
-		return items[id].attackSpeed;
+		return std::chrono::milliseconds(items[id].attackSpeed);
 	}
 	int32_t getArmor() const
 	{
@@ -838,8 +859,8 @@ public:
 	void setUniqueId(uint16_t n);
 
 	void setDefaultDuration();
-	uint32_t getDefaultDurationMin() const { return items[id].decayTimeMin * 1000; }
-	uint32_t getDefaultDurationMax() const { return items[id].decayTimeMax * 1000; }
+	auto getDefaultDurationMin() const { return items[id].decayTimeMin; }
+	auto getDefaultDurationMax() const { return items[id].decayTimeMax; }
 	bool canDecay() const;
 
 	virtual bool canRemove() const { return true; }

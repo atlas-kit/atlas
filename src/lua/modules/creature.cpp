@@ -834,7 +834,8 @@ int luaCreatureGetDamageMap(lua_State* L)
 	for (auto&& [id, cb] : damageMap) {
 		lua_createtable(L, 0, 2);
 		tfs::lua::setField(L, "total", cb.total);
-		tfs::lua::setField(L, "ticks", cb.ticks);
+		const auto wallTicks = std::chrono::system_clock::now() - (std::chrono::steady_clock::now() - cb.ticks);
+		tfs::lua::setField(L, "ticks", duration_cast<std::chrono::milliseconds>(wallTicks.time_since_epoch()).count());
 		lua_rawseti(L, -2, id);
 	}
 	return 1;

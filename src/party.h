@@ -59,7 +59,7 @@ public:
 private:
 	SharedExpStatus_t getSharedExperienceStatus();
 
-	std::map<uint32_t, int64_t> ticksMap;
+	std::map<uint32_t, std::chrono::steady_clock::time_point> ticksMap;
 
 	boost::container::flat_set<std::weak_ptr<Player>, std::owner_less<std::weak_ptr<const Player>>> memberList;
 	boost::container::flat_set<std::weak_ptr<Player>, std::owner_less<std::weak_ptr<const Player>>> inviteList;

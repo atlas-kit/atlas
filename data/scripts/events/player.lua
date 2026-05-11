@@ -100,7 +100,7 @@ function Player:onPodiumRequest(item)
 		return
 	end
 
-	self:sendEditPodium(item)
+	self:sendPodiumWindow(item)
 end
 
 function Player:onPodiumEdit(item, outfit, direction, isVisible)
@@ -122,8 +122,8 @@ function Player:onPodiumEdit(item, outfit, direction, isVisible)
 		end
 
 		-- reset mount if unable to ride
-		local mount = Game.getMountIdByLookType(outfit.lookMount)
-		if not (mount and self:hasMount(mount)) then
+		local mount = Game.getMountByLookType(outfit.lookMount)
+		if not mount or not self:hasMount(mount.lookType) then
 			outfit.lookMount = 0
 		end
 	end

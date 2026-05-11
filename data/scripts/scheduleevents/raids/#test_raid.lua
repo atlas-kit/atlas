@@ -1,6 +1,3 @@
-local raid = GlobalEvent("Testraid")
-raid:interval(1800)
-
 local function event0()
 	Game.broadcastMessage("Rats are attacking near Trekolt Temple!", MESSAGE_STATUS_WARNING)
 end
@@ -37,7 +34,9 @@ local function event6()
 	Game.createMonster("Cave Rat", Position(94, 128, 7))
 end
 
-function raid.onTime(interval)
+local event = ScheduleEvent(1800)
+
+event.onTrigger = function()
 	addEvent(event0, 1000)
 	addEvent(event1, 2000)
 	addEvent(event2, 15000)
@@ -48,4 +47,4 @@ function raid.onTime(interval)
 	return true
 end
 
-raid:register()
+event:register()
