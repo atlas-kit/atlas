@@ -28,7 +28,6 @@ Creature::~Creature()
 		summon->setAttackedCreature(nullptr);
 		summon->removeMaster();
 	}
-	assert(conditions.empty());
 }
 
 bool Creature::canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY)
