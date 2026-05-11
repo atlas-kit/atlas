@@ -901,7 +901,7 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate < std::chrono::steady_clock::now()) {
+		if (follower->lastPathUpdate >= std::chrono::steady_clock::now()) {
 			continue;
 		}
 
