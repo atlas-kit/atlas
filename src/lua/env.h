@@ -29,16 +29,16 @@ public:
 	void setScriptId(int32_t scriptId, LuaScriptInterface* scriptInterface)
 	{
 		this->scriptId = scriptId;
-		interface = scriptInterface;
+		luaInterface = scriptInterface;
 	}
 	bool setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface);
 
 	int32_t getScriptId() const { return scriptId; }
-	LuaScriptInterface* getScriptInterface() { return interface; }
+	LuaScriptInterface* getScriptInterface() { return luaInterface; }
 
 	void setTimerEvent() { timerEvent = true; }
 
-	auto getEventInfo() const { return std::make_tuple(scriptId, interface, callbackId, timerEvent); }
+	auto getEventInfo() const { return std::make_tuple(scriptId, luaInterface, callbackId, timerEvent); }
 
 	uint32_t addThing(const std::shared_ptr<Thing>& thing);
 	void insertItem(uint32_t uid, const std::shared_ptr<Item>& item);
@@ -52,7 +52,7 @@ public:
 	void removeItemByUID(uint32_t uid);
 
 private:
-	LuaScriptInterface* interface;
+	LuaScriptInterface* luaInterface;
 
 	// for npc scripts
 	std::shared_ptr<Npc> curNpc = nullptr;

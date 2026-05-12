@@ -331,8 +331,8 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
 	return false;
 }
 
-Action::Action(LuaScriptInterface* interface) :
-    Event(interface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
+Action::Action(LuaScriptInterface* luaInterface) :
+    Event(luaInterface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
 {}
 
 ReturnValue Action::canExecuteAction(const std::shared_ptr<const Player>& player, const Position& toPos)

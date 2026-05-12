@@ -557,8 +557,8 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		creature->setMaster(nullptr);
 	}
 
-	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition.get(), true);
+	while (!creature->getConditions().empty()) {
+		creature->removeCondition(creature->getConditions().back().get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -2791,8 +2791,9 @@ void Game::playerAcceptTrade(uint32_t playerId)
 		}
 
 		if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
-			tradePartnerRet = internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, 0, true);
-			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, 0, true);
+			tradePartnerRet =
+			    internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
+			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
 			if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
 				playerRet = internalRemoveItem(playerTradeItem, playerTradeItem->getItemCount(), true);
 				tradePartnerRet = internalRemoveItem(partnerTradeItem, partnerTradeItem->getItemCount(), true);

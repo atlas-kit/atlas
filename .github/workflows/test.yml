@@ -34,32 +34,31 @@ jobs:
 
     env:
       CXX: g++-14
-      VCPKG_BUILD_TYPE: release
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_BUILD_TYPE: debug
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux-debug-asan
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Create vcpkg binary cache directory
         run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
 
       - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+        uses: lukka/get-cmake@f57d5c55bca331a49bdc52a6069f211f1363a275 # v4.3.2
 
       - name: Cache vcpkg binary packages
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-binary-ubuntu-test-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-binary-ubuntu-test-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
           restore-keys: |
             vcpkg-binary-ubuntu-test-
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          doNotCache: false
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
 
       - name: Setup database
         run: |
@@ -68,14 +67,11 @@ jobs:
           mysql -h 0.0.0.0 -u atlas -patlas atlas < schema.sql
 
       - name: Build with CMake
-        uses: lukka/run-cmake@v10
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         env:
           ASAN_OPTIONS: exitcode=0
           LSAN_OPTIONS: exitcode=0
         with:
-          configurePreset: vcpkg
-          configurePresetAdditionalArgs: "['-DBUILD_TESTING=ON', '-DENABLE_ASAN=ON']"
-          buildPreset: vcpkg
-          buildPresetAdditionalArgs: "['--config', 'Debug']"
-          testPreset: vcpkg
-          testPresetAdditionalArgs: "['--build-config', 'Debug']"
+          configurePreset: linux-debug-asan
+          buildPreset: linux-debug-asan
+          testPreset: linux-debug-asan
