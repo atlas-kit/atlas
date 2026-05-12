@@ -22,12 +22,16 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <EnableUnitySupport>true</EnableUnitySupport>
+    <!-- VS 2026 (v145) breaks Unity + PCH builds with C10xx/C23xx errors. See atlas-kit/atlas#150. -->
+    <EnableUnitySupport Condition="'$(PlatformToolset)'=='v145'">false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <EnableUnitySupport>true</EnableUnitySupport>
+    <!-- VS 2026 (v145) breaks Unity + PCH builds with C10xx/C23xx errors. See atlas-kit/atlas#150. -->
+    <EnableUnitySupport Condition="'$(PlatformToolset)'=='v145'">false</EnableUnitySupport>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

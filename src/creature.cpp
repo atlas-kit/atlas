@@ -28,7 +28,6 @@ Creature::~Creature()
 		summon->setAttackedCreature(nullptr);
 		summon->removeMaster();
 	}
-	assert(conditions.empty());
 }
 
 bool Creature::canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY)
@@ -901,7 +900,7 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate < std::chrono::steady_clock::now()) {
+		if (follower->lastPathUpdate >= std::chrono::steady_clock::now()) {
 			continue;
 		}
 

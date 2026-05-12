@@ -1404,15 +1404,9 @@
 		<attribute key="rotateTo" value="1751" />
 		<attribute key="type" value="container" />
 	</item>
-	<item fromid="1754" toid="1755" article="a" name="bed">
-		<attribute key="moveable" value="true" />
-	</item>
-	<item fromid="1756" toid="1759" article="a" name="cot">
-		<attribute key="moveable" value="true" />
-	</item>
-	<item fromid="1760" toid="1761" article="a" name="bed">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="1754" toid="1755" article="a" name="bed" />
+	<item fromid="1756" toid="1759" article="a" name="cot" />
+	<item fromid="1760" toid="1761" article="a" name="bed" />
 	<item fromid="1762" toid="1765" article="a" name="bed" />
 	<item fromid="1766" toid="1769" article="a" name="cot" />
 	<item id="1770" article="a" name="barrel">
@@ -7462,9 +7456,7 @@
 		<attribute key="rotateTo" value="3834" />
 		<attribute key="type" value="container" />
 	</item>
-	<item fromid="3836" toid="3839" article="a" name="hammock">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="3836" toid="3839" article="a" name="hammock" />
 	<item fromid="3840" toid="3843" article="a" name="hammock" />
 	<item fromid="3844" toid="3847" article="a" name="grass mat" />
 	<item fromid="3848" toid="3851" article="a" name="straw mat" />
@@ -9247,9 +9239,7 @@
 	<item fromid="5481" toid="5482" name="shackles" />
 	<item fromid="5483" toid="5484" name="wall chains" />
 	<item fromid="5485" toid="5495" name="straw" />
-	<item fromid="5496" toid="5499" article="a" name="straw mat">
-		<attribute key="moveable" value="true" />
-	</item>
+	<item fromid="5496" toid="5499" article="a" name="straw mat" />
 	<item fromid="5500" toid="5503" article="a" name="straw mat" />
 	<item id="5504" article="a" name="wooden column" />
 	<item fromid="5505" toid="5512" article="a" name="pulley" />

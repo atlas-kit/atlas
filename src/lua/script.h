@@ -105,12 +105,12 @@ public:
 	LuaScriptInterface* getTestInterface();
 
 	std::shared_ptr<Combat> getCombatObject(uint32_t id) const;
-	std::shared_ptr<Combat> createCombatObject(LuaScriptInterface* interface);
-	void clearCombatObjects(LuaScriptInterface* interface);
+	std::shared_ptr<Combat> createCombatObject(LuaScriptInterface* luaInterface);
+	void clearCombatObjects(LuaScriptInterface* luaInterface);
 
 	AreaCombat* getAreaObject(uint32_t id) const;
-	uint32_t createAreaObject(LuaScriptInterface* interface);
-	void clearAreaObjects(LuaScriptInterface* interface);
+	uint32_t createAreaObject(LuaScriptInterface* luaInterface);
+	void clearAreaObjects(LuaScriptInterface* luaInterface);
 
 	void executeTimerEvent(uint32_t eventIndex);
 

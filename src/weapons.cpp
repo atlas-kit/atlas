@@ -428,7 +428,7 @@ void Weapon::addVocationWeaponSet(const std::string& vocationName)
 	}
 }
 
-WeaponMelee::WeaponMelee(LuaScriptInterface* interface) : Weapon(interface)
+WeaponMelee::WeaponMelee(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
@@ -527,7 +527,7 @@ int32_t WeaponMelee::getWeaponDamage(const std::shared_ptr<const Player>& player
 	return -normal_random(0, maxValue);
 }
 
-WeaponDistance::WeaponDistance(LuaScriptInterface* interface) : Weapon(interface)
+WeaponDistance::WeaponDistance(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
