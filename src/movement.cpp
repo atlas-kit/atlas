@@ -490,7 +490,7 @@ uint32_t MoveEvents::onItemMove(const std::shared_ptr<Item>& item, const std::sh
 	return ret;
 }
 
-MoveEvent::MoveEvent(LuaScriptInterface* interface) : Event(interface) {}
+MoveEvent::MoveEvent(LuaScriptInterface* luaInterface) : Event(luaInterface) {}
 
 std::string_view MoveEvent::getScriptEventName() const
 {

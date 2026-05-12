@@ -27,71 +27,105 @@ on:
       - vcpkg.json
 
 jobs:
-  build-vcpkg:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}-latest
-    strategy:
-      matrix:
-        os: [ubuntu, windows]
+  build-linux:
+    name: Linux
+    runs-on: ubuntu-latest
 
     env:
+      CXX: g++-14
       VCPKG_BUILD_TYPE: release
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Create vcpkg binary cache directory
         run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
         shell: bash
 
-      - run: echo CXX=g++-14 >> $GITHUB_ENV
-        if: ${{ matrix.os == 'ubuntu' }}
-
       - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+        uses: lukka/get-cmake@f57d5c55bca331a49bdc52a6069f211f1363a275 # v4.3.2
 
       - name: Cache vcpkg binary packages
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-binary-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
+          key: vcpkg-linux-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
           restore-keys: |
-            vcpkg-binary-${{ matrix.os }}-
+            vcpkg-linux-
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          doNotCache: false
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
 
       - name: Build with CMake
-        uses: lukka/run-cmake@v10
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
-          configurePreset: vcpkg
-          buildPreset: vcpkg
-          buildPresetAdditionalArgs: "['--config', 'Debug']"
+          configurePreset: linux-release
+          buildPreset: linux-release
 
       - name: Upload build logs
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: logs-${{ matrix.os }}-${{ github.sha }}
+          name: logs-linux-${{ github.sha }}
           path: ${{ github.workspace }}/vcpkg/buildtrees/**/*.log
         if: ${{ failure() }}
 
       - name: Upload artifact binary
-        uses: actions/upload-artifact@v7
-        if: ${{ !startsWith(matrix.os, 'windows') }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: tfs-${{ matrix.os }}-${{ github.sha }}
-          path: ${{ github.workspace }}/build/Debug/tfs
+          name: tfs-linux-${{ github.sha }}
+          path: ${{ github.workspace }}/build/linux-release/tfs
 
-      - name: Upload artifact binary (exe)
-        uses: actions/upload-artifact@v7
-        if: ${{ startsWith(matrix.os, 'windows') }}
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BUILD_TYPE: release
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows-static-release
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@f57d5c55bca331a49bdc52a6069f211f1363a275 # v4.3.2
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
-          name: tfs-${{ matrix.os }}-${{ github.sha }}
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-windows-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          restore-keys: |
+            vcpkg-windows-
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
+
+      - name: Build with CMake
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
+        with:
+          configurePreset: windows-release
+          buildPreset: windows-release
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: logs-windows-${{ github.sha }}
+          path: ${{ github.workspace }}/vcpkg/buildtrees/**/*.log
+        if: ${{ failure() }}
+
+      - name: Upload artifact binary
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: tfs-windows-${{ github.sha }}
           path: |
-            ${{ github.workspace }}/build/Debug/tfs.exe
-            ${{ github.workspace }}/build/Debug/*.dll
+            ${{ github.workspace }}/build/windows-release/tfs.exe
+            ${{ github.workspace }}/build/windows-release/*.dll
