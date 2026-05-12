@@ -99,7 +99,7 @@ private:
 
 	boost::asio::ip::tcp::socket socket;
 	Address remoteAddress;
-	time_t timeConnected;
+	std::chrono::steady_clock::time_point timeConnected;
 	uint32_t packetsSent = 0;
 
 	ConnectionState_t connectionState = CONNECTION_STATE_PENDING;

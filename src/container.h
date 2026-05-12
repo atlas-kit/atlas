@@ -7,6 +7,7 @@
 #include "item.h"
 
 class Container;
+class DepotChest;
 class DepotLocker;
 class StoreInbox;
 
@@ -53,6 +54,9 @@ public:
 	{
 		return std::static_pointer_cast<const Container>(shared_from_this());
 	}
+
+	virtual std::shared_ptr<DepotChest> asDepotChest() { return nullptr; }
+	virtual std::shared_ptr<const DepotChest> asDepotChest() const { return nullptr; }
 
 	virtual std::shared_ptr<DepotLocker> asDepotLocker() { return nullptr; }
 	virtual std::shared_ptr<const DepotLocker> asDepotLocker() const { return nullptr; }

@@ -218,9 +218,9 @@ enum ItemParseAttributes_t
 struct Abilities
 {
 	uint32_t healthGain = 0;
-	uint32_t healthTicks = 0;
+	std::chrono::milliseconds healthTicks = std::chrono::milliseconds::zero();
 	uint32_t manaGain = 0;
-	uint32_t manaTicks = 0;
+	std::chrono::milliseconds manaTicks = std::chrono::milliseconds::zero();
 
 	uint32_t conditionImmunities = 0;
 	uint32_t conditionSuppressions = 0;
@@ -334,8 +334,8 @@ public:
 	uint32_t attackSpeed = 0;
 	uint32_t weight = 0;
 	uint32_t levelDoor = 0;
-	uint32_t decayTimeMin = 0;
-	uint32_t decayTimeMax = 0;
+	std::chrono::milliseconds decayTimeMin = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds decayTimeMax = std::chrono::milliseconds::zero();
 	uint32_t wieldInfo = 0;
 	uint32_t minReqLevel = 0;
 	uint32_t minReqMagicLevel = 0;

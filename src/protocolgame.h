@@ -100,7 +100,6 @@ private:
 
 	// Parse methods
 	void parseAutoWalk(NetworkMessage& msg);
-	void parseSetOutfit(NetworkMessage& msg);
 	void parseEditPodiumRequest(NetworkMessage& msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
@@ -225,9 +224,6 @@ private:
 	void sendHouseWindow(uint32_t windowTextId, const std::string& text);
 	void sendCombatAnalyzer(CombatType_t type, int32_t amount, DamageAnalyzerImpactType impactType,
 	                        const std::string& target);
-	void sendOutfitWindow();
-
-	void sendPodiumWindow(const std::shared_ptr<const Item>& item);
 
 	void sendUpdatedVIPStatus(uint32_t guid, VipStatus_t newStatus);
 	void sendVIP(uint32_t guid, const std::string& name, const std::string& description, uint32_t icon, bool notify,
@@ -265,9 +261,9 @@ private:
 
 	void sendCreatureSquare(const std::shared_ptr<const Creature>& creature, SquareColor_t color);
 
-	void sendSpellCooldown(uint16_t spellId, uint32_t time);
-	void sendSpellGroupCooldown(SpellGroup_t groupId, uint32_t time);
-	void sendUseItemCooldown(uint32_t time);
+	void sendSpellCooldown(uint16_t spellId, std::chrono::milliseconds time);
+	void sendSpellGroupCooldown(SpellGroup_t groupId, std::chrono::milliseconds time);
+	void sendUseItemCooldown(std::chrono::milliseconds time);
 	void sendSupplyUsed(const uint16_t clientId);
 
 	// tiles
@@ -352,7 +348,7 @@ private:
 	std::shared_ptr<Player> player = nullptr;
 
 	uint32_t eventConnect = 0;
-	uint32_t challengeTimestamp = 0;
+	std::chrono::system_clock::time_point challengeTimestamp = std::chrono::system_clock::time_point::min();
 	int32_t clientVersion = 0;
 	uint16_t version = CLIENT_VERSION_MIN;
 	uint16_t otclientV8 = 0;

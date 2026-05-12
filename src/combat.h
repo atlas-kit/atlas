@@ -148,7 +148,7 @@ private:
 class MagicField final : public Item
 {
 public:
-	explicit MagicField(uint16_t type) : Item{type}, createTime(OTSYS_TIME()) {}
+	explicit MagicField(uint16_t type) : Item{type}, createTime{std::chrono::steady_clock::now()} {}
 
 	std::shared_ptr<MagicField> asMagicField() override
 	{
@@ -176,7 +176,7 @@ public:
 	void onStepInField(const std::shared_ptr<Creature>& creature);
 
 private:
-	int64_t createTime;
+	std::chrono::steady_clock::time_point createTime;
 };
 
 #endif // FS_COMBAT_H

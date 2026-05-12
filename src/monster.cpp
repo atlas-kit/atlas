@@ -663,7 +663,7 @@ void Monster::onEndCondition(ConditionType_t type)
 	updateIdleStatus();
 }
 
-void Monster::onThink(uint32_t interval)
+void Monster::onThink(std::chrono::milliseconds interval)
 {
 	Creature::onThink(interval);
 
@@ -684,7 +684,7 @@ void Monster::onThink(uint32_t interval)
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
 
-		tfs::lua::pushNumber(L, interval);
+		tfs::lua::pushNumber(L, interval.count());
 
 		if (scriptInterface->callFunction(2)) {
 			return;
@@ -746,7 +746,7 @@ void Monster::onThink(uint32_t interval)
 	}
 }
 
-void Monster::onAttacking(uint32_t interval)
+void Monster::onAttacking(std::chrono::milliseconds interval)
 {
 	const auto& attackedCreature = getAttackedCreature();
 	if (!attackedCreature) {
@@ -768,7 +768,7 @@ void Monster::onAttacking(uint32_t interval)
 	}
 
 	bool lookUpdated = false;
-	bool resetTicks = interval != 0;
+	bool resetTicks = interval != std::chrono::milliseconds::zero();
 	attackTicks += interval;
 
 	for (const spellBlock_t& spellBlock : mType->info.attackSpells) {
@@ -790,24 +790,24 @@ void Monster::onAttacking(uint32_t interval)
 				spellBlock.spell->castSpell(asMonster(), attackedCreature);
 
 				if (spellBlock.isMelee) {
-					lastMeleeAttack = OTSYS_TIME();
+					lastMeleeAttack = std::chrono::steady_clock::now();
 				}
 			}
 		}
 
 		if (!inRange && spellBlock.isMelee) {
 			// melee swing out of reach
-			lastMeleeAttack = 0;
+			lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 		}
 	}
 
 	// ensure ranged creatures turn to player
-	if (!lookUpdated && lastMeleeAttack == 0 && !isFleeing()) {
+	if (!lookUpdated && lastMeleeAttack == std::chrono::steady_clock::time_point::min() && !isFleeing()) {
 		updateLookDirection();
 	}
 
 	if (resetTicks) {
-		attackTicks = 0;
+		attackTicks = std::chrono::milliseconds::zero();
 	}
 }
 
@@ -826,13 +826,18 @@ bool Monster::canUseAttack(const Position& pos, const std::shared_ptr<const Crea
 	return true;
 }
 
-bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb, uint32_t interval,
-                          bool& inRange, bool& resetTicks)
+bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
+                          std::chrono::milliseconds interval, bool& inRange, bool& resetTicks)
 {
 	inRange = true;
 
 	if (sb.isMelee) {
-		if (isFleeing() || (OTSYS_TIME() - lastMeleeAttack) < sb.speed) {
+		if (isFleeing()) {
+			return false;
+		}
+
+		if (lastMeleeAttack != std::chrono::steady_clock::time_point::min() &&
+		    std::chrono::steady_clock::now() - lastMeleeAttack < sb.speed) {
 			return false;
 		}
 	} else {
@@ -854,25 +859,25 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 	return true;
 }
 
-void Monster::onThinkTarget(uint32_t interval)
+void Monster::onThinkTarget(std::chrono::milliseconds interval)
 {
 	if (!isSummon()) {
-		if (mType->info.changeTargetSpeed != 0) {
+		if (mType->info.changeTargetSpeed != std::chrono::milliseconds::zero()) {
 			bool canChangeTarget = true;
 
-			if (challengeFocusDuration > 0) {
+			if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
 				challengeFocusDuration -= interval;
 
-				if (challengeFocusDuration <= 0) {
-					challengeFocusDuration = 0;
+				if (challengeFocusDuration <= std::chrono::milliseconds::zero()) {
+					challengeFocusDuration = std::chrono::milliseconds::zero();
 				}
 			}
 
-			if (targetChangeCooldown > 0) {
+			if (targetChangeCooldown > std::chrono::milliseconds::zero()) {
 				targetChangeCooldown -= interval;
 
-				if (targetChangeCooldown <= 0) {
-					targetChangeCooldown = 0;
+				if (targetChangeCooldown <= std::chrono::milliseconds::zero()) {
+					targetChangeCooldown = std::chrono::milliseconds::zero();
 					targetChangeTicks = mType->info.changeTargetSpeed;
 				} else {
 					canChangeTarget = false;
@@ -883,11 +888,11 @@ void Monster::onThinkTarget(uint32_t interval)
 				targetChangeTicks += interval;
 
 				if (targetChangeTicks >= mType->info.changeTargetSpeed) {
-					targetChangeTicks = 0;
+					targetChangeTicks = std::chrono::milliseconds::zero();
 					targetChangeCooldown = mType->info.changeTargetSpeed;
 
-					if (challengeFocusDuration > 0) {
-						challengeFocusDuration = 0;
+					if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
+						challengeFocusDuration = std::chrono::milliseconds::zero();
 					}
 
 					if (mType->info.changeTargetChance >= uniform_random(1, 100)) {
@@ -903,7 +908,7 @@ void Monster::onThinkTarget(uint32_t interval)
 	}
 }
 
-void Monster::onThinkDefense(uint32_t interval)
+void Monster::onThinkDefense(std::chrono::milliseconds interval)
 {
 	bool resetTicks = true;
 	defenseTicks += interval;
@@ -972,19 +977,19 @@ void Monster::onThinkDefense(uint32_t interval)
 	}
 
 	if (resetTicks) {
-		defenseTicks = 0;
+		defenseTicks = std::chrono::milliseconds::zero();
 	}
 }
 
-void Monster::onThinkYell(uint32_t interval)
+void Monster::onThinkYell(std::chrono::milliseconds interval)
 {
-	if (mType->info.yellSpeedTicks == 0) {
+	if (mType->info.yellSpeedTicks == std::chrono::milliseconds::zero()) {
 		return;
 	}
 
 	yellTicks += interval;
 	if (yellTicks >= mType->info.yellSpeedTicks) {
-		yellTicks = 0;
+		yellTicks = std::chrono::milliseconds::zero();
 
 		if (!mType->info.voiceVector.empty() &&
 		    (mType->info.yellChance >= static_cast<uint32_t>(uniform_random(1, 100)))) {
@@ -1133,7 +1138,7 @@ bool Monster::getNextStep(Direction& direction, uint32_t& flags)
 
 	bool result = false;
 	if (!walkingToSpawn && (!getFollowCreature() || !hasFollowPath) && (!isSummon() || !isMasterInRange)) {
-		if (getTimeSinceLastMove() >= 1000) {
+		if (getTimeSinceLastMove() >= 1s) {
 			randomStepping = true;
 			// choose a random direction
 			result = getRandomStep(getPosition(), direction);
@@ -1940,9 +1945,9 @@ bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool 
 
 	bool result = selectTarget(creature);
 	if (result) {
-		targetChangeCooldown = 8000;
+		targetChangeCooldown = 8s;
 		challengeFocusDuration = targetChangeCooldown;
-		targetChangeTicks = 0;
+		targetChangeTicks = std::chrono::milliseconds::zero();
 	}
 	return result;
 }

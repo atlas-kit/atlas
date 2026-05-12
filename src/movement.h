@@ -118,7 +118,7 @@ using EquipFunction = std::function<ReturnValue(MoveEvent* moveEvent, const std:
 class MoveEvent final : public Event
 {
 public:
-	explicit MoveEvent(LuaScriptInterface* interface);
+	explicit MoveEvent(LuaScriptInterface* luaInterface);
 
 	MoveEvent_t getEventType() const;
 	void setEventType(MoveEvent_t type);

@@ -111,6 +111,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
+		addByte(0x00); // quiver ammo count
 	} else if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
@@ -120,7 +121,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
 	} else if (it.showClientDuration) {
-		add<uint32_t>(it.decayTimeMin);
+		add<uint32_t>(floor<std::chrono::seconds>(it.decayTimeMin).count());
 		addByte(0x00); // is brand new
 	} else if (it.showClientCharges) {
 		add<uint32_t>(it.charges);
@@ -142,6 +143,13 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 		addByte(fluidMap[item->getFluidType() & 7]);
 	} else if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
+		const auto& container = item->asContainer();
+		if (container && it.weaponType == WEAPON_QUIVER) {
+			addByte(0x01);
+			add<uint32_t>(container->getAmmoCount());
+		} else {
+			addByte(0x00);
+		}
 	} else if (it.isPodium()) {
 		const auto& podium = item->asPodium();
 		const Outfit_t& outfit = podium->getOutfit();
@@ -181,7 +189,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	} else if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
 	} else if (it.showClientDuration) {
-		add<uint32_t>(item->getDuration() / 1000);
+		add<uint32_t>(floor<std::chrono::seconds>(item->getDuration()).count());
 		addByte(0); // is brand new
 	} else if (it.showClientCharges) {
 		add<uint32_t>(item->getCharges());

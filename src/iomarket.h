@@ -17,7 +17,7 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool);
 void checkExpiredOffers();
 
 uint32_t getPlayerOfferCount(uint32_t playerId);
-MarketOfferEx getOfferByCounter(uint32_t timestamp, uint16_t counter);
+MarketOfferEx getOfferByCounter(std::chrono::system_clock::time_point timestamp, uint16_t counter);
 
 void createOffer(uint32_t playerId, MarketAction_t action, uint32_t itemId, uint16_t amount, uint64_t price,
                  bool anonymous);
@@ -25,7 +25,7 @@ void acceptOffer(uint32_t offerId, uint16_t amount);
 void deleteOffer(uint32_t offerId);
 
 void appendHistory(uint32_t playerId, MarketAction_t type, uint16_t itemId, uint16_t amount, uint64_t price,
-                   time_t timestamp, MarketOfferState_t state);
+                   std::chrono::system_clock::time_point timestamp, MarketOfferState_t state);
 bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state);
 
 void updateStatistics();

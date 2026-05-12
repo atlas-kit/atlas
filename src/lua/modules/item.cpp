@@ -3,6 +3,7 @@
 #include "../../item.h"
 
 #include "../../game.h"
+#include "../../podium.h"
 #include "../../tools.h"
 #include "../api.h"
 #include "../env.h"
@@ -33,6 +34,35 @@ int luaItemIsItem(lua_State* L)
 	// item:isItem()
 	if (const auto& thing = tfs::lua::getThing(L, 1)) {
 		tfs::lua::pushBoolean(L, thing->asItem() != nullptr);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaItemIsPodium(lua_State* L)
+{
+	// item:isPodium()
+	if (const auto& item = tfs::lua::getSharedPtr<Item>(L, 1)) {
+		tfs::lua::pushBoolean(L, item->isPodium());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaItemGetPodium(lua_State* L)
+{
+	// item:getPodium()
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 1);
+	if (!item) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	if (const auto& podium = item->asPodium()) {
+		tfs::lua::pushSharedPtr(L, podium);
+		tfs::lua::setMetatable(L, -1, "Podium");
 	} else {
 		lua_pushnil(L);
 	}
@@ -809,6 +839,8 @@ void tfs::lua::registerItem(LuaScriptInterface& lsi)
 	lsi.registerMetaMethod("Item", "__gc", tfs::lua::luaSharedPtrDelete<Item>);
 
 	lsi.registerMethod("Item", "isItem", luaItemIsItem);
+	lsi.registerMethod("Item", "isPodium", luaItemIsPodium);
+	lsi.registerMethod("Item", "getPodium", luaItemGetPodium);
 
 	lsi.registerMethod("Item", "hasParent", luaItemHasParent);
 	lsi.registerMethod("Item", "getParent", luaItemGetParent);

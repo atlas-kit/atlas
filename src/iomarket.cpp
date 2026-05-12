@@ -35,13 +35,13 @@ MarketOfferList getActiveOffers(MarketAction_t action, uint16_t itemId)
 		return offerList;
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto marketOfferDuration = std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	do {
 		MarketOffer offer;
 		offer.amount = result->getNumber<uint16_t>("amount");
 		offer.price = result->getNumber<uint64_t>("price");
-		offer.timestamp = result->getNumber<uint32_t>("created") + marketOfferDuration;
+		offer.timestamp = result->getDateTime("created") + marketOfferDuration;
 		offer.counter = result->getNumber<uint32_t>("id") & 0xFFFF;
 		offer.itemId = itemId;
 		if (result->getNumber<uint16_t>("anonymous") == 0) {
@@ -58,6 +58,7 @@ MarketOfferList getOwnOffers(MarketAction_t action, uint32_t playerId)
 {
 	MarketOfferList offerList;
 
+	const auto marketOfferDuration = std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 	const auto& result = Database::getInstance().storeQuery(std::format(
 	    "SELECT `id`, `amount`, `price`, `created`, `itemtype` FROM `market_offers` WHERE `player_id` = {:d} AND `sale` = {:d}",
 	    playerId, std::to_underlying(action)));
@@ -65,13 +66,11 @@ MarketOfferList getOwnOffers(MarketAction_t action, uint32_t playerId)
 		return offerList;
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
-
 	do {
 		MarketOffer offer;
 		offer.amount = result->getNumber<uint16_t>("amount");
 		offer.price = result->getNumber<uint64_t>("price");
-		offer.timestamp = result->getNumber<uint32_t>("created") + marketOfferDuration;
+		offer.timestamp = result->getDateTime("created") + marketOfferDuration;
 		offer.counter = result->getNumber<uint32_t>("id") & 0xFFFF;
 		offer.itemId = result->getNumber<uint16_t>("itemtype");
 		offerList.push_back(offer);
@@ -95,7 +94,7 @@ HistoryMarketOfferList getOwnHistory(MarketAction_t action, uint32_t playerId)
 		offer.itemId = result->getNumber<uint16_t>("itemtype");
 		offer.amount = result->getNumber<uint16_t>("amount");
 		offer.price = result->getNumber<uint64_t>("price");
-		offer.timestamp = result->getNumber<uint32_t>("expires_at");
+		offer.timestamp = result->getDateTime("expires_at");
 
 		MarketOfferState_t offerState = static_cast<MarketOfferState_t>(result->getNumber<uint16_t>("state"));
 		if (offerState == OFFERSTATE_ACCEPTEDEX) {
@@ -183,20 +182,22 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool)
 
 void checkExpiredOffers()
 {
-	const time_t lastExpireDate = time(nullptr) - getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto lastExpireDate =
+	    std::chrono::system_clock::now() - std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	g_databaseTasks.addTask(
 	    std::format(
 	        "SELECT `id`, `amount`, `price`, `itemtype`, `player_id`, `sale` FROM `market_offers` WHERE `created` <= {:d}",
-	        lastExpireDate),
+	        duration_cast<std::chrono::seconds>(lastExpireDate.time_since_epoch()).count()),
 	    processExpiredOffers, true);
 
-	int32_t checkExpiredMarketOffersEachMinutes = getNumber(ConfigManager::CHECK_EXPIRED_MARKET_OFFERS_EACH_MINUTES);
-	if (checkExpiredMarketOffersEachMinutes <= 0) {
+	auto checkExpiredMarketOffersEachMinutes =
+	    std::chrono::minutes{getNumber(ConfigManager::CHECK_EXPIRED_MARKET_OFFERS_EACH_MINUTES)};
+	if (checkExpiredMarketOffersEachMinutes <= std::chrono::minutes::zero()) {
 		return;
 	}
 
-	g_scheduler.addEvent(createSchedulerTask(checkExpiredMarketOffersEachMinutes * 60 * 1000, &checkExpiredOffers));
+	g_scheduler.addEvent(createSchedulerTask(checkExpiredMarketOffersEachMinutes, &checkExpiredOffers));
 }
 
 uint32_t getPlayerOfferCount(uint32_t playerId)
@@ -209,15 +210,15 @@ uint32_t getPlayerOfferCount(uint32_t playerId)
 	return result->getNumber<int32_t>("count");
 }
 
-MarketOfferEx getOfferByCounter(uint32_t timestamp, uint16_t counter)
+MarketOfferEx getOfferByCounter(std::chrono::system_clock::time_point timestamp, uint16_t counter)
 {
 	MarketOfferEx offer;
 
-	const int32_t created = timestamp - getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto created = timestamp - std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	const auto& result = Database::getInstance().storeQuery(std::format(
-	    "SELECT `id`, `sale`, `itemtype`, `amount`, `created`, `price`, `player_id`, `anonymous`, (SELECT `name` FROM `players` WHERE `id` = `player_id`) AS `player_name` FROM `market_offers` WHERE `created` = {:d} AND (`id` & 65535) = {:d} LIMIT 1",
-	    created, counter));
+	    "SELECT `id`, `sale`, `itemtype`, `amount`, `created`, `price`, `player_id`, `anonymous`, (SELECT `name` FROM `players` WHERE `id` = `player_id`) AS `player_name` FROM `market_offers` WHERE `created` = {:%Q} AND (`id` & 65535) = {:d} LIMIT 1",
+	    duration_cast<std::chrono::seconds>(created.time_since_epoch()), counter));
 	if (!result) {
 		offer.id = 0;
 		offer.playerId = 0;
@@ -228,7 +229,7 @@ MarketOfferEx getOfferByCounter(uint32_t timestamp, uint16_t counter)
 	offer.type = static_cast<MarketAction_t>(result->getNumber<uint16_t>("sale"));
 	offer.amount = result->getNumber<uint16_t>("amount");
 	offer.counter = result->getNumber<uint32_t>("id") & 0xFFFF;
-	offer.timestamp = result->getNumber<uint32_t>("created");
+	offer.timestamp = result->getDateTime("created");
 	offer.price = result->getNumber<uint64_t>("price");
 	offer.itemId = result->getNumber<uint16_t>("itemtype");
 	offer.playerId = result->getNumber<uint32_t>("player_id");
@@ -260,16 +261,19 @@ void deleteOffer(uint32_t offerId)
 }
 
 void appendHistory(uint32_t playerId, MarketAction_t action, uint16_t itemId, uint16_t amount, uint64_t price,
-                   time_t timestamp, MarketOfferState_t state)
+                   std::chrono::system_clock::time_point timestamp, MarketOfferState_t state)
 {
 	g_databaseTasks.addTask(std::format(
-	    "INSERT INTO `market_history` (`player_id`, `sale`, `itemtype`, `amount`, `price`, `expires_at`, `inserted`, `state`) VALUES ({:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d}, {:d})",
-	    playerId, std::to_underlying(action), itemId, amount, price, timestamp, time(nullptr),
+	    "INSERT INTO `market_history` (`player_id`, `sale`, `itemtype`, `amount`, `price`, `expires_at`, `inserted`, `state`) VALUES ({:d}, {:d}, {:d}, {:d}, {:d}, {:%Q}, {:%Q}, {:d})",
+	    playerId, std::to_underlying(action), itemId, amount, price,
+	    duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()),
+	    duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()),
 	    std::to_underlying(state)));
 }
 
 bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state)
 {
+	const auto marketOfferDuration = std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 	Database& db = Database::getInstance();
 
 	const auto& result = db.storeQuery(std::format(
@@ -283,11 +287,10 @@ bool moveOfferToHistory(uint32_t offerId, MarketOfferState_t state)
 		return false;
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
-	appendHistory(
-	    result->getNumber<uint32_t>("player_id"), static_cast<MarketAction_t>(result->getNumber<uint16_t>("sale")),
-	    result->getNumber<uint16_t>("itemtype"), result->getNumber<uint16_t>("amount"),
-	    result->getNumber<uint64_t>("price"), result->getNumber<uint32_t>("created") + marketOfferDuration, state);
+	appendHistory(result->getNumber<uint32_t>("player_id"),
+	              static_cast<MarketAction_t>(result->getNumber<uint16_t>("sale")),
+	              result->getNumber<uint16_t>("itemtype"), result->getNumber<uint16_t>("amount"),
+	              result->getNumber<uint64_t>("price"), result->getDateTime("created") + marketOfferDuration, state);
 	return true;
 }
 

@@ -7,7 +7,6 @@
 #include "../configmanager.h"
 #include "../events.h"
 #include "../game.h"
-#include "../globalevent.h"
 #include "../item.h"
 #include "../movement.h"
 #include "../player.h"
@@ -25,7 +24,6 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern Spells* g_spells;
@@ -72,7 +70,7 @@ int luaDebugPrint(lua_State* L)
 int luaGetWorldUpTime(lua_State* L)
 {
 	// getWorldUpTime()
-	uint64_t uptime = (OTSYS_TIME() - ProtocolStatus::start) / 1000;
+	auto uptime = duration_cast<std::chrono::seconds>(g_game.getWorldUptime()).count();
 	tfs::lua::pushNumber(L, uptime);
 	return 1;
 }
@@ -429,7 +427,7 @@ int luaAddEvent(lua_State* L)
 		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 
-	uint32_t delay = std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2));
+	auto delay = std::chrono::milliseconds{std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2))};
 	lua_pop(L, 1);
 
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -936,12 +934,12 @@ bool LuaEnvironment::closeState()
 		return false;
 	}
 
-	for (auto&& interface : combatIdMap | std::views::keys | std::views::as_const) {
-		clearCombatObjects(interface);
+	for (auto&& luaInterface : combatIdMap | std::views::keys | std::views::as_const) {
+		clearCombatObjects(luaInterface);
 	}
 
-	for (auto&& interface : areaIdMap | std::views::keys | std::views::as_const) {
-		clearAreaObjects(interface);
+	for (auto&& luaInterface : areaIdMap | std::views::keys | std::views::as_const) {
+		clearAreaObjects(luaInterface);
 	}
 
 	for (auto&& timerEvent : timerEvents | std::views::values) {
@@ -980,17 +978,17 @@ std::shared_ptr<Combat> LuaEnvironment::getCombatObject(uint32_t id) const
 	return it->second;
 }
 
-std::shared_ptr<Combat> LuaEnvironment::createCombatObject(LuaScriptInterface* interface)
+std::shared_ptr<Combat> LuaEnvironment::createCombatObject(LuaScriptInterface* luaInterface)
 {
 	const auto combat = std::make_shared<Combat>();
 	combatMap[++lastCombatId] = combat;
-	combatIdMap[interface].push_back(lastCombatId);
+	combatIdMap[luaInterface].push_back(lastCombatId);
 	return combat;
 }
 
-void LuaEnvironment::clearCombatObjects(LuaScriptInterface* interface)
+void LuaEnvironment::clearCombatObjects(LuaScriptInterface* luaInterface)
 {
-	auto it = combatIdMap.find(interface);
+	auto it = combatIdMap.find(luaInterface);
 	if (it == combatIdMap.end()) {
 		return;
 	}
@@ -1013,16 +1011,16 @@ AreaCombat* LuaEnvironment::getAreaObject(uint32_t id) const
 	return it->second;
 }
 
-uint32_t LuaEnvironment::createAreaObject(LuaScriptInterface* interface)
+uint32_t LuaEnvironment::createAreaObject(LuaScriptInterface* luaInterface)
 {
 	areaMap[++lastAreaId] = new AreaCombat;
-	areaIdMap[interface].push_back(lastAreaId);
+	areaIdMap[luaInterface].push_back(lastAreaId);
 	return lastAreaId;
 }
 
-void LuaEnvironment::clearAreaObjects(LuaScriptInterface* interface)
+void LuaEnvironment::clearAreaObjects(LuaScriptInterface* luaInterface)
 {
-	auto it = areaIdMap.find(interface);
+	auto it = areaIdMap.find(luaInterface);
 	if (it == areaIdMap.end()) {
 		return;
 	}

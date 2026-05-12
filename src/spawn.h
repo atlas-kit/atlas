@@ -14,8 +14,8 @@ struct spawnBlock_t
 {
 	Position pos;
 	std::vector<std::pair<MonsterType*, uint16_t>> mTypes;
-	int64_t lastSpawn;
-	uint32_t interval;
+	std::chrono::steady_clock::time_point lastSpawn;
+	std::chrono::milliseconds interval;
 	Direction direction;
 };
 
@@ -34,10 +34,10 @@ public:
 	Spawn& operator=(Spawn&&) = default;
 
 	bool addBlock(spawnBlock_t sb);
-	bool addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval);
+	bool addMonster(const std::string& name, const Position& pos, Direction dir, std::chrono::milliseconds interval);
 	void removeMonster(const std::shared_ptr<Monster>& monster);
 
-	uint32_t getInterval() const { return interval; }
+	auto getInterval() const { return interval; }
 	void startup();
 
 	void startSpawnCheck();
@@ -54,7 +54,7 @@ private:
 
 	Position centerPos;
 
-	uint32_t interval = 60000;
+	std::chrono::milliseconds interval = 60000ms;
 	uint32_t checkSpawnEvent = 0;
 
 	static bool findPlayer(const Position& pos);
