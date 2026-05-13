@@ -111,22 +111,19 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			}
 		}
 	}
-	buildIndices();
-	return true;
-}
-
-void Vocations::buildIndices()
-{
 	vocationByName.clear();
-	promotedVocations.clear();
 	vocationByName.reserve(vocationsMap.size());
+
+	promotedVocations.clear();
 	promotedVocations.reserve(vocationsMap.size());
+
 	for (const auto& [id, voc] : vocationsMap) {
 		vocationByName[voc.name] = id;
 		if (voc.fromVocation != VOCATION_NONE && voc.fromVocation != id) {
 			promotedVocations[voc.fromVocation] = id;
 		}
 	}
+	return true;
 }
 
 Vocation* Vocations::getVocation(uint16_t id)
