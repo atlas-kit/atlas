@@ -47,7 +47,7 @@ int luaPositionIsHotkey(lua_State* L)
 {
 	// position:isHotkey()
 	const Position& position = tfs::lua::getPosition(L, 1);
-	tfs::lua::pushBoolean(L, position.isHotkey());
+	tfs::lua::pushBoolean(L, position == Position::HOTKEY);
 	return 1;
 }
 
@@ -55,7 +55,7 @@ int luaPositionIsInventoryOrContainer(lua_State* L)
 {
 	// position:isInventoryOrContainer()
 	const Position& position = tfs::lua::getPosition(L, 1);
-	tfs::lua::pushBoolean(L, position.isInventoryOrContainer());
+	tfs::lua::pushBoolean(L, position.x == Position::INVENTORY_X);
 	return 1;
 }
 
