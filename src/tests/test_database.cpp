@@ -8,6 +8,8 @@
 // cppcheck-suppress missingIncludeSystem
 #include <boost/test/unit_test.hpp>
 
+#include <stdexcept>
+
 // Most tests use a top-level DBTransaction that is never committed, so its
 // destructor rolls back every change the test performed. Tests that need to
 // exercise DBTransaction commit/rollback semantics directly use the
@@ -22,8 +24,12 @@ struct DatabaseFixture
 		setString(ConfigManager::MYSQL_DB, "atlas");
 		setNumber(ConfigManager::SQL_PORT, 3306);
 
-		db.connect();
-		transaction.begin();
+		if (!db.connect()) {
+			throw std::runtime_error("DatabaseFixture: failed to connect to database");
+		}
+		if (!transaction.begin()) {
+			throw std::runtime_error("DatabaseFixture: failed to start transaction");
+		}
 	}
 
 	Database& db = Database::getInstance();
@@ -40,7 +46,9 @@ struct DatabaseNoTxFixture
 		setString(ConfigManager::MYSQL_DB, "atlas");
 		setNumber(ConfigManager::SQL_PORT, 3306);
 
-		db.connect();
+		if (!db.connect()) {
+			throw std::runtime_error("DatabaseNoTxFixture: failed to connect to database");
+		}
 		cleanup();
 	}
 
