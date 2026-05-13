@@ -46,7 +46,7 @@ enum GameState_t
 inline constexpr int32_t PLAYER_NAME_LENGTH = 25;
 
 inline constexpr auto EVENT_DECAYINTERVAL = 250ms;
-inline constexpr int32_t EVENT_DECAY_BUCKETS = 4;
+inline constexpr int32_t EVENT_DECAY_BUCKETS = 7200;
 
 inline constexpr auto MOVE_CREATURE_INTERVAL = 1000ms;
 inline constexpr auto RANGE_MOVE_CREATURE_INTERVAL = 1500ms;
