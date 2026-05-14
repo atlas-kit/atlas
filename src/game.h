@@ -519,11 +519,11 @@ private:
 
 	boost::container::flat_map<uint32_t, std::shared_ptr<House>> houses;
 
-	std::map<uint32_t, std::weak_ptr<Npc>> npcs;
-	std::map<uint32_t, std::weak_ptr<Monster>> monsters;
+	std::unordered_map<uint32_t, std::weak_ptr<Npc>> npcs;
+	std::unordered_map<uint32_t, std::weak_ptr<Monster>> monsters;
 
 	// list of items that are in trading state, mapped to the player holding them
-	std::map<std::shared_ptr<Item>, uint32_t> tradeItems;
+	std::unordered_map<std::shared_ptr<Item>, uint32_t> tradeItems;
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 
