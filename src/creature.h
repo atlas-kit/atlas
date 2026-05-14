@@ -427,8 +427,8 @@ private:
 
 	std::vector<std::weak_ptr<Creature>> summons;
 
-	std::map<uint32_t, CountBlock_t> damageMap;
-	std::map<uint32_t, int32_t> storageMap;
+	std::unordered_map<uint32_t, CountBlock_t> damageMap;
+	std::unordered_map<uint32_t, int32_t> storageMap;
 
 	Position position;
 	Position lastPosition;
