@@ -657,7 +657,6 @@ public:
 		decayStartedAt = {};
 		getAttributes()->setDuration(time);
 	}
-	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
 	std::chrono::milliseconds getDuration() const
 	{
 		if (!attributes) {
