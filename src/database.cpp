@@ -202,7 +202,11 @@ retry:
 	}
 	resultImpl->row = mysql_fetch_row(resultImpl->handle.get());
 
-	auto result = std::make_shared<DBResult>(std::move(resultImpl));
+	// `std::make_shared<DBResult>` would require a publicly accessible constructor. Keeping the
+	// constructor private (with `Database` as the only friend able to invoke it) means we pay one
+	// extra allocation in exchange for not exposing a way to fabricate `DBResult` instances from
+	// outside this translation unit.
+	std::shared_ptr<DBResult> result{new DBResult(std::move(resultImpl))};
 	if (result->hasNext()) {
 		return result;
 	}

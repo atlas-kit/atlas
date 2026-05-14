@@ -97,8 +97,6 @@ private:
 class DBResult
 {
 public:
-	struct Impl;
-	explicit DBResult(std::unique_ptr<Impl> impl);
 	~DBResult();
 
 	// non-copyable
@@ -121,6 +119,9 @@ public:
 	bool next();
 
 private:
+	struct Impl;
+	explicit DBResult(std::unique_ptr<Impl> impl);
+
 	/**
 	 * Returns the raw C-string for `column`, or nullptr if the column is missing or its value is
 	 * SQL NULL. Logs an error with the given `context` (typically "DBResult::<method>") when the
