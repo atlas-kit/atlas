@@ -149,7 +149,7 @@ void Game::loadMap(const std::string& path, bool isCalledByLua) { map.loadMap(pa
 
 std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& player, const Position& pos) const
 {
-	if (pos.x != Position::INVENTORY_X) {
+	if (pos.x != CONTAINER_POSITION) {
 		return map.getTile(pos);
 	}
 
@@ -166,7 +166,7 @@ std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& pla
 std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& player, const Position& pos, int32_t index,
                                               uint32_t spriteId, stackPosType_t type) const
 {
-	if (pos.x != Position::INVENTORY_X) {
+	if (pos.x != CONTAINER_POSITION) {
 		const auto& tile = map.getTile(pos);
 		if (!tile) {
 			return nullptr;
@@ -288,7 +288,7 @@ static std::pair<Position, uint8_t> internalGetPosition(const std::shared_ptr<It
 	if (const auto& topParent = item->getTopParent()) {
 		if (const auto& creature = topParent->asCreature()) {
 			if (const auto& player = creature->asPlayer()) {
-				const uint16_t x = Position::INVENTORY_X;
+				const uint16_t x = CONTAINER_POSITION;
 
 				if (const auto& container = std::dynamic_pointer_cast<Container>(item->getTopParent())) {
 					const auto y = static_cast<uint16_t>(static_cast<uint16_t>(0x40) |
@@ -603,7 +603,7 @@ void Game::playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t 
 	}
 
 	uint8_t fromIndex = 0;
-	if (fromPos.x == Position::INVENTORY_X) {
+	if (fromPos.x == CONTAINER_POSITION) {
 		if (fromPos.y & 0x40) {
 			fromIndex = fromPos.z;
 		} else {
@@ -899,7 +899,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 
 	if (!item) {
 		uint8_t fromIndex = 0;
-		if (fromPos.x == Position::INVENTORY_X) {
+		if (fromPos.x == CONTAINER_POSITION) {
 			if (fromPos.y & 0x40) {
 				fromIndex = fromPos.z;
 			} else {
@@ -997,7 +997,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != Position::INVENTORY_X && mapFromPos.isInRange(playerPos, 1, 1) &&
+			if (fromPos.x != CONTAINER_POSITION && mapFromPos.isInRange(playerPos, 1, 1) &&
 			    !mapFromPos.isInRange(walkPos, 1, 1, 0)) {
 				// need to pickup the item first
 				std::shared_ptr<Item> moveItem = nullptr;
@@ -1047,7 +1047,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 	}
 
 	uint8_t toIndex = 0;
-	if (toPos.x == Position::INVENTORY_X) {
+	if (toPos.x == CONTAINER_POSITION) {
 		if (toPos.y & 0x40) {
 			toIndex = toPos.z;
 		} else {
@@ -2024,7 +2024,7 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return;
 	}
 
-	bool isHotkey = (fromPos == Position::HOTKEY);
+	bool isHotkey = (fromPos == HOTKEY_POSITION);
 	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
@@ -2055,7 +2055,7 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != Position::INVENTORY_X && toPos.x != Position::INVENTORY_X &&
+			if (fromPos.x != CONTAINER_POSITION && toPos.x != CONTAINER_POSITION &&
 			    fromPos.isInRange(player->getPosition(), 1, 1, 0) && !fromPos.isInRange(toPos, 1, 1, 0)) {
 				std::shared_ptr<Item> moveItem = nullptr;
 
@@ -2110,7 +2110,7 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return;
 	}
 
-	bool isHotkey = (pos == Position::HOTKEY);
+	bool isHotkey = (pos == HOTKEY_POSITION);
 	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
@@ -2180,7 +2180,7 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 	}
 
 	if (!getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
-		if (creature->asPlayer() || fromPos == Position::HOTKEY) {
+		if (creature->asPlayer() || fromPos == HOTKEY_POSITION) {
 			player->sendCancelMessage(RETURNVALUE_DIRECTPLAYERSHOOT);
 			return;
 		}
@@ -2213,7 +2213,7 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != Position::INVENTORY_X && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
+			if (fromPos.x != CONTAINER_POSITION && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
 			    !fromPos.isInRange(toPos, 1, 1, 0)) {
 				std::shared_ptr<Item> moveItem = nullptr;
 				ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), moveItem,
@@ -2258,7 +2258,7 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 	player->setNextActionTask(nullptr);
 
 	g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->getThingIndex(creature), item,
-	                     fromPos == Position::HOTKEY, creature);
+	                     fromPos == HOTKEY_POSITION, creature);
 }
 
 void Game::playerCloseContainer(uint32_t playerId, uint8_t cid)
@@ -2354,7 +2354,7 @@ void Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return;
 	}
 
-	if (pos.x != Position::INVENTORY_X && !pos.isInRange(player->getPosition(), 1, 1, 0)) {
+	if (pos.x != CONTAINER_POSITION && !pos.isInRange(player->getPosition(), 1, 1, 0)) {
 		std::vector<Direction> listDir;
 		if (player->getPathTo(pos, listDir, 0, 1, true, true)) {
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
@@ -2549,7 +2549,7 @@ void Game::playerWrapItem(uint32_t playerId, const Position& position, uint8_t s
 		return;
 	}
 
-	if (position.x != Position::INVENTORY_X && !position.isInRange(player->getPosition(), 1, 1, 0)) {
+	if (position.x != CONTAINER_POSITION && !position.isInRange(player->getPosition(), 1, 1, 0)) {
 		std::vector<Direction> listDir;
 		if (player->getPathTo(position, listDir, 0, 1, true, true)) {
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
@@ -3284,7 +3284,7 @@ void Game::playerRequestEditPodium(uint32_t playerId, const Position& position, 
 	// player has to walk to podium
 	// gm/god can edit instantly
 	if (!player->isAccessPlayer()) {
-		if (position.x != Position::INVENTORY_X && !position.isInRange(player->getPosition(), 1, 1, 0)) {
+		if (position.x != CONTAINER_POSITION && !position.isInRange(player->getPosition(), 1, 1, 0)) {
 			std::vector<Direction> listDir;
 			if (player->getPathTo(position, listDir, 0, 1, true, true)) {
 				g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {

@@ -50,9 +50,6 @@ struct Position
 	constexpr int32_t getDistanceY(const Position& p) const { return tfs::abs(getOffsetY(p)); }
 	constexpr int16_t getDistanceZ(const Position& p) const { return tfs::abs(getOffsetZ(p)); }
 
-	static constexpr uint16_t INVENTORY_X = 0xFFFF;
-	static const Position HOTKEY;
-
 	uint16_t x = 0;
 	uint16_t y = 0;
 	uint8_t z = 0;
@@ -66,7 +63,7 @@ struct Position
 	constexpr int16_t getZ() const { return z; }
 };
 
-inline constexpr Position Position::HOTKEY{Position::INVENTORY_X, 0, 0};
+inline constexpr Position HOTKEY_POSITION{0xFFFF, 0, 0};
 
 std::ostream& operator<<(std::ostream&, const Position&);
 
