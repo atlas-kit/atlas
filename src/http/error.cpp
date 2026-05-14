@@ -1,3 +1,5 @@
+#include "../otpch.h"
+
 #include "error.h"
 
 std::pair<beast::http::status, json::value> tfs::http::make_error_response(detail::ErrorResponseParams params /*= {}*/)
