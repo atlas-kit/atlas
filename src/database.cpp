@@ -231,10 +231,7 @@ std::string Database::escapeBlob(const char* s, uint32_t length) const
 	return escaped;
 }
 
-uint64_t Database::getLastInsertId() const
-{
-	return static_cast<uint64_t>(mysql_insert_id(impl_->handle.get()));
-}
+uint64_t Database::getLastInsertId() const { return static_cast<uint64_t>(mysql_insert_id(impl_->handle.get())); }
 
 const char* Database::getClientVersion() { return mysql_get_client_info(); }
 
