@@ -111,6 +111,18 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			}
 		}
 	}
+	vocationByName.clear();
+	vocationByName.reserve(vocationsMap.size());
+
+	promotedVocations.clear();
+	promotedVocations.reserve(vocationsMap.size());
+
+	for (const auto& [id, voc] : vocationsMap) {
+		vocationByName[voc.name] = id;
+		if (voc.fromVocation != VOCATION_NONE && voc.fromVocation != id) {
+			promotedVocations[voc.fromVocation] = id;
+		}
+	}
 	return true;
 }
 
@@ -126,16 +138,14 @@ Vocation* Vocations::getVocation(uint16_t id)
 
 int32_t Vocations::getVocationId(std::string_view name) const
 {
-	auto it = std::find_if(vocationsMap.begin(), vocationsMap.end(),
-	                       [=](auto it) { return boost::iequals(name, it.second.name); });
-	return it != vocationsMap.end() ? it->first : -1;
+	auto it = vocationByName.find(name);
+	return it != vocationByName.end() ? it->second : -1;
 }
 
 uint16_t Vocations::getPromotedVocation(uint16_t id) const
 {
-	auto it = std::find_if(vocationsMap.begin(), vocationsMap.end(),
-	                       [id](auto it) { return it.second.fromVocation == id && it.first != id; });
-	return it != vocationsMap.end() ? it->first : VOCATION_NONE;
+	auto it = promotedVocations.find(id);
+	return it != promotedVocations.end() ? it->second : VOCATION_NONE;
 }
 
 static const uint32_t skillBase[SKILL_LAST + 1] = {50, 50, 50, 50, 30, 100, 20};

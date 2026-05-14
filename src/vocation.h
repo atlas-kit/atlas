@@ -6,6 +6,7 @@
 
 #include "configmanager.h"
 #include "enums.h"
+#include "tools.h"
 
 class Vocation
 {
@@ -87,7 +88,7 @@ private:
 	bool magicShield = false;
 };
 
-using VocationMap = std::map<uint16_t, Vocation>;
+using VocationMap = std::unordered_map<uint16_t, Vocation>;
 
 class Vocations
 {
@@ -101,6 +102,8 @@ public:
 
 private:
 	VocationMap vocationsMap;
+	std::unordered_map<std::string, uint16_t, CaseInsensitiveStringHash, CaseInsensitiveStringEqual> vocationByName;
+	std::unordered_map<uint16_t, uint16_t> promotedVocations;
 };
 
 #endif // FS_VOCATION_H

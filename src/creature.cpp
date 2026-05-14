@@ -1230,28 +1230,33 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t conditionI
 
 void Creature::executeConditions(std::chrono::milliseconds interval)
 {
-	std::vector<Condition*> tempConditions;
-	tempConditions.reserve(conditions.size());
+	std::vector<Condition*> snapshot;
+	snapshot.reserve(conditions.size());
 	for (const auto& condition : conditions) {
-		tempConditions.push_back(condition.get());
+		snapshot.push_back(condition.get());
 	}
 
-	for (Condition* condition : tempConditions) {
-		auto it = std::find_if(conditions.begin(), conditions.end(),
-		                       [condition](const std::unique_ptr<Condition>& c) { return c.get() == condition; });
+	auto findOwning = [this](Condition* c) {
+		return std::ranges::find_if(conditions, [c](const std::unique_ptr<Condition>& p) { return p.get() == c; });
+	};
+
+	for (Condition* condition : snapshot) {
+		if (findOwning(condition) == conditions.end()) {
+			continue;
+		}
+
+		if (condition->executeCondition(asCreature(), interval)) {
+			continue;
+		}
+
+		auto it = findOwning(condition);
 		if (it == conditions.end()) {
 			continue;
 		}
 
-		if (!condition->executeCondition(asCreature(), interval)) {
-			it = std::find_if(conditions.begin(), conditions.end(),
-			                  [condition](const std::unique_ptr<Condition>& c) { return c.get() == condition; });
-			if (it != conditions.end()) {
-				condition->endCondition(asCreature());
-				onEndCondition(condition->getType());
-				conditions.erase(it);
-			}
-		}
+		condition->endCondition(asCreature());
+		onEndCondition(condition->getType());
+		conditions.erase(it);
 	}
 }
 
