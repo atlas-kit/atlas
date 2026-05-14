@@ -453,14 +453,18 @@ int luaItemSetAttribute(lua_State* L)
 		}
 
 		if (attribute == ITEM_ATTRIBUTE_DURATION) {
-			// Calling startDecay here would create a duplicate wheel entry while the
-			// previous one stays alive — when its bucket eventually fires the item
-			// gets processed twice. Update the stored duration in place and re-arm
-			// the timestamp; the existing wheel entry will pick up the new value
-			// via flushDecayDuration() and re-bucket itself when it fires.
+			// Bump the decay generation so the old wheel entry is dropped on its
+			// next visit; then re-register so cleanup runs at the new deadline
+			// instead of waiting up to a full wheel rotation when the duration
+			// is shortened.
+			bool wasDecaying = item->getDecaying() == DECAYING_TRUE;
+			if (wasDecaying) {
+				item->bumpDecayGeneration();
+				item->setDecaying(DECAYING_FALSE);
+			}
 			item->setDuration(std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)});
-			if (item->getDecaying() == DECAYING_TRUE) {
-				item->markDecayStart();
+			if (wasDecaying) {
+				g_game.startDecay(item);
 			}
 		} else {
 			item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
@@ -493,6 +497,13 @@ int luaItemRemoveAttribute(lua_State* L)
 
 	bool ret = attribute != ITEM_ATTRIBUTE_UNIQUEID;
 	if (ret) {
+		// Removing the duration must also detach the item from the wheel,
+		// otherwise it would be processed once the old bucket fires and a
+		// missing duration would trigger an immediate (and unintended) decay.
+		if (attribute == ITEM_ATTRIBUTE_DURATION && item->getDecaying() == DECAYING_TRUE) {
+			item->bumpDecayGeneration();
+			item->setDecaying(DECAYING_FALSE);
+		}
 		item->removeAttribute(attribute);
 	} else {
 		tfs::lua::reportError(L, "Attempt to erase protected key \"uid\"");

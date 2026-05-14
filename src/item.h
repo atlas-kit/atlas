@@ -681,6 +681,13 @@ public:
 		}
 	}
 
+	// Wheel entries are stamped with the generation that was current when they
+	// were inserted. Bumping the generation invalidates every old entry so that
+	// callers wanting a real reschedule (Lua setting/removing a duration) can
+	// re-register the item without leaving duplicate or stale slots behind.
+	uint32_t getDecayGeneration() const { return decayGeneration; }
+	void bumpDecayGeneration() { ++decayGeneration; }
+
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
 	ItemDecayState_t getDecaying() const
 	{
@@ -923,6 +930,7 @@ private:
 	std::unique_ptr<ItemAttributes> attributes;
 
 	std::chrono::steady_clock::time_point decayStartedAt{};
+	uint32_t decayGeneration = 0;
 
 	uint8_t count = 1; // number of stacked items
 

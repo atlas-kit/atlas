@@ -4562,8 +4562,15 @@ void Game::checkDecay()
 		auto& decayItemBucket = decayItems[bucket];
 		auto it = decayItemBucket.begin();
 		while (it != decayItemBucket.end()) {
-			const auto item = it->lock();
+			const auto item = it->item.lock();
 			if (!item) {
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			// Stale entry: the item was rescheduled (Lua duration change, etc.)
+			// and a fresh entry exists in another bucket. Drop this one.
+			if (it->generation != item->getDecayGeneration()) {
 				it = decayItemBucket.erase(it);
 				continue;
 			}
@@ -4587,7 +4594,7 @@ void Game::checkDecay()
 				size_t ticks =
 				    std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 				             static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
-				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
+				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
 			} else {
 				item->markDecayStart();
 				++it;
@@ -4634,12 +4641,12 @@ void Game::cleanup()
 			internalDecayItem(item);
 		} else if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			item->markDecayStart();
-			decayItems[lastBucket].push_back(item);
+			decayItems[lastBucket].push_back({item, item->getDecayGeneration()});
 		} else {
 			item->markDecayStart();
 			size_t ticks = std::min(static_cast<size_t>((dur + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
-			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
+			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
 		}
 	}
 }

@@ -510,7 +510,13 @@ private:
 	std::unordered_map<uint32_t, std::shared_ptr<Guild>> guilds;
 	std::unordered_map<uint16_t, std::shared_ptr<Item>> uniqueItems;
 
-	std::list<std::weak_ptr<Item>> decayItems[EVENT_DECAY_BUCKETS];
+	struct DecayEntry
+	{
+		std::weak_ptr<Item> item;
+		uint32_t generation;
+	};
+
+	std::list<DecayEntry> decayItems[EVENT_DECAY_BUCKETS];
 	std::list<std::weak_ptr<Creature>> checkCreatureLists[EVENT_CREATURECOUNT];
 
 	size_t lastBucket = 0;
