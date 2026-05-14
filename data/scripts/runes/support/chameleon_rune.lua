@@ -5,7 +5,7 @@ local spell = Spell(SPELL_RUNE)
 
 function spell.onCastSpell(creature, variant, isHotkey)
 	local position, item = variant:getPosition()
-	if position:isInventoryOrContainer() then
+	if position.x == CONTAINER_POSITION then
 		local container = creature:getContainerById(position.y - 64)
 		if container then
 			item = container:getItem(position.z)
