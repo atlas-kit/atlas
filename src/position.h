@@ -63,8 +63,6 @@ struct Position
 	constexpr int16_t getZ() const { return z; }
 };
 
-inline constexpr Position HOTKEY_POSITION{0xFFFF, 0, 0};
-
 std::ostream& operator<<(std::ostream&, const Position&);
 
 #endif // FS_POSITION_H
