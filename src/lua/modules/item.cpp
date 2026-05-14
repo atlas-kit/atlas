@@ -453,7 +453,15 @@ int luaItemSetAttribute(lua_State* L)
 		}
 
 		if (attribute == ITEM_ATTRIBUTE_DURATION) {
+			bool wasDecaying = item->getDecaying() == DECAYING_TRUE;
+			if (wasDecaying) {
+				item->flushDecayDuration();
+				item->setDecaying(DECAYING_FALSE);
+			}
 			item->setDuration(std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)});
+			if (wasDecaying) {
+				g_game.startDecay(item);
+			}
 		} else {
 			item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
 		}

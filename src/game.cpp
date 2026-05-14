@@ -4598,11 +4598,14 @@ void Game::cleanup()
 {
 	for (const auto& item : toDecayItems) {
 		item->flushDecayDuration();
-		item->markDecayStart();
 		const auto dur = item->getDuration();
-		if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+		if (dur <= std::chrono::milliseconds::zero()) {
+			internalDecayItem(item);
+		} else if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+			item->markDecayStart();
 			decayItems[lastBucket].push_back(item);
 		} else {
+			item->markDecayStart();
 			size_t ticks = std::min(static_cast<size_t>((dur + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
 			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);

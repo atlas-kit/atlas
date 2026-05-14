@@ -143,6 +143,7 @@ std::shared_ptr<Item> Item::clone() const
 	const auto item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
+		item->setDecaying(DECAYING_FALSE);
 		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
 			item->setDuration(getDuration());
 		}

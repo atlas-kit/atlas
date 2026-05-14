@@ -655,7 +655,7 @@ public:
 	void setDuration(std::chrono::milliseconds time)
 	{
 		decayStartedAt = {};
-		attributes->setDuration(time);
+		getAttributes()->setDuration(time);
 	}
 	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
 	std::chrono::milliseconds getDuration() const
@@ -678,7 +678,7 @@ public:
 		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
 			auto remaining = getDuration();
 			decayStartedAt = {};
-			attributes->setDuration(remaining);
+			getAttributes()->setDuration(remaining);
 		}
 	}
 
@@ -923,7 +923,7 @@ private:
 
 	std::unique_ptr<ItemAttributes> attributes;
 
-	mutable std::chrono::steady_clock::time_point decayStartedAt{};
+	std::chrono::steady_clock::time_point decayStartedAt{};
 
 	uint8_t count = 1; // number of stacked items
 
