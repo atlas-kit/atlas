@@ -453,14 +453,14 @@ int luaItemSetAttribute(lua_State* L)
 		}
 
 		if (attribute == ITEM_ATTRIBUTE_DURATION) {
-			bool wasDecaying = item->getDecaying() == DECAYING_TRUE;
-			if (wasDecaying) {
-				item->flushDecayDuration();
-				item->setDecaying(DECAYING_FALSE);
-			}
+			// Calling startDecay here would create a duplicate wheel entry while the
+			// previous one stays alive — when its bucket eventually fires the item
+			// gets processed twice. Update the stored duration in place and re-arm
+			// the timestamp; the existing wheel entry will pick up the new value
+			// via flushDecayDuration() and re-bucket itself when it fires.
 			item->setDuration(std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)});
-			if (wasDecaying) {
-				g_game.startDecay(item);
+			if (item->getDecaying() == DECAYING_TRUE) {
+				item->markDecayStart();
 			}
 		} else {
 			item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));

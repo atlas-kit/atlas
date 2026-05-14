@@ -4622,7 +4622,12 @@ void Game::shutdown()
 
 void Game::cleanup()
 {
-	for (const auto& item : toDecayItems) {
+	// internalDecayItem -> startDecay can push back into toDecayItems while we're
+	// iterating, which would invalidate the cached end iterator and lose the new
+	// entry to the trailing clear(). Drain the queue into a local first so any
+	// re-entrant push_back goes to a fresh container processed on the next tick.
+	auto items = std::exchange(toDecayItems, {});
+	for (const auto& item : items) {
 		item->flushDecayDuration();
 		const auto dur = item->getDuration();
 		if (dur <= std::chrono::milliseconds::zero()) {
@@ -4637,7 +4642,6 @@ void Game::cleanup()
 			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
 		}
 	}
-	toDecayItems.clear();
 }
 
 void Game::broadcastMessage(const std::string& text, MessageClasses type) const
