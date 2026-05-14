@@ -514,6 +514,7 @@ private:
 	std::list<std::weak_ptr<Creature>> checkCreatureLists[EVENT_CREATURECOUNT];
 
 	size_t lastBucket = 0;
+	std::chrono::steady_clock::time_point nextDecayTick{};
 
 	WildcardTreeNode wildcardTree{false};
 

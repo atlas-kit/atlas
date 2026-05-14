@@ -4533,44 +4533,70 @@ void Game::internalDecayItem(const std::shared_ptr<Item>& item)
 
 void Game::checkDecay()
 {
-	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
-	size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
-
-	auto& decayItemBucket = decayItems[bucket];
-	auto it = decayItemBucket.begin();
-	while (it != decayItemBucket.end()) {
-		const auto item = it->lock();
-		if (!item) {
-			it = decayItemBucket.erase(it);
-			continue;
-		}
-
-		if (!item->canDecay()) {
-			item->flushDecayDuration();
-			item->setDecaying(DECAYING_FALSE);
-			it = decayItemBucket.erase(it);
-			continue;
-		}
-
-		item->flushDecayDuration();
-		auto duration = item->getDuration();
-
-		if (duration <= std::chrono::milliseconds::zero()) {
-			it = decayItems[bucket].erase(it);
-			internalDecayItem(item);
-		} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
-			it = decayItems[bucket].erase(it);
-			item->markDecayStart();
-			size_t ticks = std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
-			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
-			decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
-		} else {
-			item->markDecayStart();
-			++it;
-		}
+	auto now = std::chrono::steady_clock::now();
+	if (nextDecayTick == std::chrono::steady_clock::time_point{}) {
+		nextDecayTick = now;
 	}
 
-	lastBucket = bucket;
+	// Catch up: if scheduler ran late, advance multiple buckets so the wheel
+	// stays aligned with wall-clock time instead of accumulating drift.
+	size_t bucketsToProcess = 1;
+	auto lag = now - nextDecayTick;
+	if (lag > EVENT_DECAYINTERVAL) {
+		bucketsToProcess = 1 + static_cast<size_t>(lag / EVENT_DECAYINTERVAL);
+		bucketsToProcess = std::min(bucketsToProcess, static_cast<size_t>(EVENT_DECAY_BUCKETS));
+	}
+	nextDecayTick += EVENT_DECAYINTERVAL * bucketsToProcess;
+
+	auto delay = nextDecayTick - now;
+	if (delay <= std::chrono::milliseconds::zero()) {
+		delay = EVENT_DECAYINTERVAL;
+		nextDecayTick = now + EVENT_DECAYINTERVAL;
+	}
+	g_scheduler.addEvent(
+	    createSchedulerTask(std::chrono::duration_cast<std::chrono::milliseconds>(delay), [this]() { checkDecay(); }));
+
+	for (size_t i = 0; i < bucketsToProcess; ++i) {
+		size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
+
+		auto& decayItemBucket = decayItems[bucket];
+		auto it = decayItemBucket.begin();
+		while (it != decayItemBucket.end()) {
+			const auto item = it->lock();
+			if (!item) {
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			if (!item->canDecay()) {
+				item->flushDecayDuration();
+				item->setDecaying(DECAYING_FALSE);
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			item->flushDecayDuration();
+			auto duration = item->getDuration();
+
+			if (duration <= std::chrono::milliseconds::zero()) {
+				it = decayItems[bucket].erase(it);
+				internalDecayItem(item);
+			} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+				it = decayItems[bucket].erase(it);
+				item->markDecayStart();
+				size_t ticks =
+				    std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
+				             static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
+				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
+			} else {
+				item->markDecayStart();
+				++it;
+			}
+		}
+
+		lastBucket = bucket;
+	}
+
 	cleanup();
 }
 
