@@ -665,8 +665,8 @@ public:
 		}
 		auto stored = std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
 		if (decayStartedAt != std::chrono::steady_clock::time_point{} && stored > std::chrono::milliseconds::zero()) {
-			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-			    std::chrono::steady_clock::now() - decayStartedAt);
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+			                                                                     decayStartedAt);
 			return std::max(std::chrono::milliseconds::zero(), stored - elapsed);
 		}
 		return stored;
