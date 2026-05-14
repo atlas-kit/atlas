@@ -652,14 +652,34 @@ public:
 		return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
 	}
 
-	void setDuration(std::chrono::milliseconds time) { attributes->setDuration(time); }
+	void setDuration(std::chrono::milliseconds time)
+	{
+		decayStartedAt = {};
+		attributes->setDuration(time);
+	}
 	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
 	std::chrono::milliseconds getDuration() const
 	{
 		if (!attributes) {
 			return std::chrono::milliseconds::zero();
 		}
-		return std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+		auto stored = std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+		if (decayStartedAt != std::chrono::steady_clock::time_point{} && stored > std::chrono::milliseconds::zero()) {
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+			    std::chrono::steady_clock::now() - decayStartedAt);
+			return std::max(std::chrono::milliseconds::zero(), stored - elapsed);
+		}
+		return stored;
+	}
+
+	void markDecayStart() { decayStartedAt = std::chrono::steady_clock::now(); }
+	void flushDecayDuration()
+	{
+		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
+			auto remaining = getDuration();
+			decayStartedAt = {};
+			attributes->setDuration(remaining);
+		}
 	}
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
@@ -903,11 +923,11 @@ private:
 
 	std::unique_ptr<ItemAttributes> attributes;
 
+	mutable std::chrono::steady_clock::time_point decayStartedAt{};
+
 	uint8_t count = 1; // number of stacked items
 
 	bool loadedFromMap = false;
-
-	// Don't add variables here, use the ItemAttribute class.
 };
 
 using ItemList = std::list<std::shared_ptr<Item>>;

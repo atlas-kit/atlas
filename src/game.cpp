@@ -4505,6 +4505,7 @@ void Game::startDecay(const std::shared_ptr<Item>& item)
 
 	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		item->setDecaying(DECAYING_TRUE);
+		item->markDecayStart();
 		toDecayItems.push_back(item);
 	} else {
 		internalDecayItem(item);
@@ -4545,26 +4546,26 @@ void Game::checkDecay()
 		}
 
 		if (!item->canDecay()) {
+			item->flushDecayDuration();
 			item->setDecaying(DECAYING_FALSE);
 			it = decayItemBucket.erase(it);
 			continue;
 		}
 
+		item->flushDecayDuration();
 		auto duration = item->getDuration();
-		auto decreaseTime = std::min(EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS, duration);
-
-		duration -= decreaseTime;
-		item->decreaseDuration(decreaseTime);
 
 		if (duration <= std::chrono::milliseconds::zero()) {
 			it = decayItems[bucket].erase(it);
 			internalDecayItem(item);
 		} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			it = decayItems[bucket].erase(it);
+			item->markDecayStart();
 			size_t ticks = std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
 			decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back(item);
 		} else {
+			item->markDecayStart();
 			++it;
 		}
 	}
@@ -4596,6 +4597,8 @@ void Game::shutdown()
 void Game::cleanup()
 {
 	for (const auto& item : toDecayItems) {
+		item->flushDecayDuration();
+		item->markDecayStart();
 		const auto dur = item->getDuration();
 		if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 			decayItems[lastBucket].push_back(item);

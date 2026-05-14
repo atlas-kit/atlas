@@ -416,7 +416,11 @@ int luaItemGetAttribute(lua_State* L)
 	}
 
 	if (ItemAttributes::isIntAttrType(attribute)) {
-		tfs::lua::pushNumber(L, item->getIntAttr(attribute));
+		if (attribute == ITEM_ATTRIBUTE_DURATION) {
+			tfs::lua::pushNumber(L, item->getDuration().count());
+		} else {
+			tfs::lua::pushNumber(L, item->getIntAttr(attribute));
+		}
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
 		tfs::lua::pushString(L, item->getStrAttr(attribute));
 	} else {
@@ -448,7 +452,11 @@ int luaItemSetAttribute(lua_State* L)
 			return 1;
 		}
 
-		item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
+		if (attribute == ITEM_ATTRIBUTE_DURATION) {
+			item->setDuration(std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)});
+		} else {
+			item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
+		}
 		tfs::lua::pushBoolean(L, true);
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
 		item->setStrAttr(attribute, tfs::lua::getString(L, 3));

@@ -143,6 +143,9 @@ std::shared_ptr<Item> Item::clone() const
 	const auto item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
+		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
+			item->setDuration(getDuration());
+		}
 		if (item->getDuration() > std::chrono::milliseconds::zero()) {
 			item->setDecaying(DECAYING_TRUE);
 			g_game.toDecayItems.push_back(item);
