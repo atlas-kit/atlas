@@ -1099,8 +1099,7 @@ bool Item::hasMarketAttributes() const
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			auto duration = std::chrono::milliseconds{attr.value.integer};
-			if (duration <= getDefaultDurationMin()) {
+			if (getDuration() <= getDefaultDurationMin()) {
 				return false;
 			}
 		} else {
