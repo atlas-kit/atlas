@@ -1408,9 +1408,6 @@ ReturnValue Game::internalRemoveItem(const std::shared_ptr<Item>& item, int32_t 
 
 		if (item->isRemoved()) {
 			item->onRemoved();
-			if (item->canDecay()) {
-				decayItems->remove_if([&item](const auto& decayItem) { return decayItem.lock() == item; });
-			}
 		}
 
 		parent->postRemoveNotification(item, nullptr, index);
