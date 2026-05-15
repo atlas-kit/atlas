@@ -4555,6 +4555,17 @@ void Game::checkDecay()
 	g_scheduler.addEvent(
 	    createSchedulerTask(std::chrono::duration_cast<std::chrono::milliseconds>(delay), [this]() { checkDecay(); }));
 
+	// Items queued by gameplay since the last tick (internalMoveItem, clone, ...)
+	// must NOT be drained by the per-bucket cleanup() inside the catch-up loop:
+	// with a small `ticks` they land just ahead of `lastBucket` and the remaining
+	// catch-up iterations would revisit them every tick, re-arming markDecayStart
+	// each time. That makes a short-lived item chase the loop and lose all the
+	// catch-up's virtual time. Snapshot them here and promote them once, after
+	// the loop, anchored at the final lastBucket. The per-bucket cleanup() then
+	// only sees successors that internalDecayItem enqueues for the bucket being
+	// processed (the chained-decay alignment the per-bucket drain is meant for).
+	auto preExisting = std::exchange(toDecayItems, {});
+
 	for (size_t i = 0; i < bucketsToProcess; ++i) {
 		size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
 
@@ -4602,13 +4613,20 @@ void Game::checkDecay()
 
 		lastBucket = bucket;
 
-		// Drain toDecayItems between buckets, not at the end of the catch-up loop:
-		// internalDecayItem above may have enqueued a successor (decayTo chain), and
-		// we want it bucketed relative to `bucket` rather than the final lastBucket.
-		// Otherwise a multi-stage chain falls (bucketsToProcess - 1) ticks behind for
-		// the rest of its lifetime whenever the scheduler catches up after lag.
+		// Drain only the successors internalDecayItem enqueued for THIS bucket, so
+		// a multi-stage decayTo chain stays aligned during catch-up instead of
+		// falling (bucketsToProcess - 1) ticks behind. toDecayItems was emptied
+		// before the loop, so nothing here is a pre-existing gameplay enqueue.
 		cleanup();
 	}
+
+	// Promote the pre-existing snapshot (and any successor left over from the
+	// last bucket's cleanup) once, relative to the final lastBucket. Their decay
+	// clock starts now — at the end of the catch-up — so they are not chased.
+	for (auto& entry : preExisting) {
+		toDecayItems.push_back(std::move(entry));
+	}
+	cleanup();
 }
 
 void Game::shutdown()
