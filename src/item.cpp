@@ -149,7 +149,7 @@ std::shared_ptr<Item> Item::clone() const
 		}
 		if (item->getDuration() > std::chrono::milliseconds::zero()) {
 			item->setDecaying(DECAYING_TRUE);
-			g_game.toDecayItems.push_back(item);
+			g_game.toDecayItems.push_back({item, item->getDecayGeneration()});
 		}
 	}
 	return item;

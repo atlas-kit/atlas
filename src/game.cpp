@@ -1266,7 +1266,7 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 	if (moveItem && moveItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (moveItem->getDecaying() != DECAYING_TRUE) {
 			moveItem->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(moveItem);
+			toDecayItems.push_back({moveItem, moveItem->getDecayGeneration()});
 		}
 	}
 
@@ -1364,7 +1364,7 @@ ReturnValue Game::internalAddItem(const std::shared_ptr<Thing>& toThing, const s
 	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		if (item->getDecaying() != DECAYING_TRUE) {
 			item->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(item);
+			toDecayItems.push_back({item, item->getDecayGeneration()});
 		}
 	}
 
@@ -1712,7 +1712,7 @@ std::shared_ptr<Item> Game::transformItem(const std::shared_ptr<Item>& item, uin
 	if (newItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (newItem->getDecaying() != DECAYING_TRUE) {
 			newItem->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(newItem);
+			toDecayItems.push_back({newItem, newItem->getDecayGeneration()});
 		}
 	}
 
@@ -4502,7 +4502,7 @@ void Game::startDecay(const std::shared_ptr<Item>& item)
 	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		item->setDecaying(DECAYING_TRUE);
 		item->markDecayStart();
-		toDecayItems.push_back(item);
+		toDecayItems.push_back({item, item->getDecayGeneration()});
 	} else {
 		internalDecayItem(item);
 	}
@@ -4629,9 +4629,9 @@ void Game::cleanup()
 	// iterating, which would invalidate the cached end iterator and lose the new
 	// entry to the trailing clear(). Drain the queue into a local first so any
 	// re-entrant push_back goes to a fresh container processed on the next tick.
-	auto items = std::exchange(toDecayItems, {});
-	for (const auto& item : items) {
-		if (item->getDecaying() != DECAYING_TRUE) {
+	auto pending = std::exchange(toDecayItems, {});
+	for (const auto& [item, generation] : pending) {
+		if (item->getDecaying() != DECAYING_TRUE || generation != item->getDecayGeneration()) {
 			continue;
 		}
 

@@ -468,7 +468,13 @@ public:
 	Groups groups;
 	Map map;
 
-	std::vector<std::shared_ptr<Item>> toDecayItems;
+	struct PendingDecayEntry
+	{
+		std::shared_ptr<Item> item;
+		uint32_t generation;
+	};
+
+	std::vector<PendingDecayEntry> toDecayItems;
 
 	std::unordered_set<std::shared_ptr<Tile>> getTilesToClean() const { return tilesToClean; }
 	bool isTileInCleanList(const std::shared_ptr<Tile>& tile) { return tilesToClean.find(tile) != tilesToClean.end(); }
