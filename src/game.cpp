@@ -4638,6 +4638,17 @@ void Game::cleanup()
 			continue;
 		}
 
+		// Enqueue sites (internalMoveItem/internalAddItem/transformItem/clone) only
+		// gate on getDuration() > 0. Items that have a duration but cannot actually
+		// decay (uniqueId, isRemoved, no decayTo) must not enter the wheel — otherwise
+		// markDecayStart() arms the clock and getDuration() would silently bleed down
+		// until the wheel revisits the entry up to 30 minutes later.
+		if (!item->canDecay()) {
+			item->flushDecayDuration();
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
+			continue;
+		}
+
 		item->flushDecayDuration();
 		const auto dur = item->getDuration();
 		if (dur <= std::chrono::milliseconds::zero()) {
