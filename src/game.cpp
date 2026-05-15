@@ -4501,7 +4501,10 @@ void Game::startDecay(const std::shared_ptr<Item>& item)
 
 	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		item->setDecaying(DECAYING_TRUE);
-		item->markDecayStart();
+		// The decay clock starts when cleanup() promotes the item from
+		// toDecayItems into the wheel — not here. Otherwise items registered
+		// during map load would silently lose duration before the scheduler
+		// has even started (a 30s boot can fully consume a splash/field).
 		toDecayItems.push_back({item, item->getDecayGeneration()});
 	} else {
 		internalDecayItem(item);
