@@ -4601,9 +4601,14 @@ void Game::checkDecay()
 		}
 
 		lastBucket = bucket;
-	}
 
-	cleanup();
+		// Drain toDecayItems between buckets, not at the end of the catch-up loop:
+		// internalDecayItem above may have enqueued a successor (decayTo chain), and
+		// we want it bucketed relative to `bucket` rather than the final lastBucket.
+		// Otherwise a multi-stage chain falls (bucketsToProcess - 1) ticks behind for
+		// the rest of its lifetime whenever the scheduler catches up after lag.
+		cleanup();
+	}
 }
 
 void Game::shutdown()
