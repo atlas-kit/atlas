@@ -4538,7 +4538,7 @@ void Game::checkDecay()
 	// stays aligned with wall-clock time instead of accumulating drift.
 	size_t bucketsToProcess = 1;
 	auto lag = now - nextDecayTick;
-	if (lag > EVENT_DECAYINTERVAL) {
+	if (lag >= EVENT_DECAYINTERVAL) {
 		bucketsToProcess = 1 + static_cast<size_t>(lag / EVENT_DECAYINTERVAL);
 		bucketsToProcess = std::min(bucketsToProcess, static_cast<size_t>(EVENT_DECAY_BUCKETS));
 	}
@@ -4631,6 +4631,10 @@ void Game::cleanup()
 	// re-entrant push_back goes to a fresh container processed on the next tick.
 	auto items = std::exchange(toDecayItems, {});
 	for (const auto& item : items) {
+		if (item->getDecaying() != DECAYING_TRUE) {
+			continue;
+		}
+
 		item->flushDecayDuration();
 		const auto dur = item->getDuration();
 		if (dur <= std::chrono::milliseconds::zero()) {
