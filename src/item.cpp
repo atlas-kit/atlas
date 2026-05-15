@@ -143,12 +143,13 @@ std::shared_ptr<Item> Item::clone() const
 	const auto item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
-		// Only reset DECAYSTATE if the source actually had it. Calling setDecaying
-		// unconditionally would add the attribute to clones that never had decay,
-		// breaking stack-merge (operator==) and Market filtering (hasMarketAttributes
-		// rejects items carrying any unexpected attribute).
+		// Drop the inherited DECAYSTATE from the copied attributes. Calling
+		// setDecaying(DECAYING_FALSE) would keep the attribute slot with a
+		// residual zero, which still poisons operator== and hasMarketAttributes.
+		// removeAttribute clears both the value and the bit; if the clone is then
+		// registered for decay below, setDecaying(DECAYING_TRUE) recreates it.
 		if (hasAttribute(ITEM_ATTRIBUTE_DECAYSTATE)) {
-			item->setDecaying(DECAYING_FALSE);
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
 		}
 		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
 			item->setDuration(getDuration());

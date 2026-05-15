@@ -4576,7 +4576,7 @@ void Game::checkDecay()
 
 			if (!item->canDecay()) {
 				item->flushDecayDuration();
-				item->setDecaying(DECAYING_FALSE);
+				item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
 				it = decayItemBucket.erase(it);
 				continue;
 			}

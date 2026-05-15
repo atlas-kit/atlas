@@ -500,9 +500,13 @@ int luaItemRemoveAttribute(lua_State* L)
 		// Removing the duration must also detach the item from the wheel,
 		// otherwise it would be processed once the old bucket fires and a
 		// missing duration would trigger an immediate (and unintended) decay.
+		// Drop ITEM_ATTRIBUTE_DECAYSTATE entirely rather than setting it to
+		// DECAYING_FALSE: setDecaying writes via setIntAttr which keeps the
+		// attribute slot (and the attributeBits flag), so a residual zero
+		// would still poison operator== / hasMarketAttributes for the item.
 		if (attribute == ITEM_ATTRIBUTE_DURATION && item->getDecaying() != DECAYING_FALSE) {
 			item->bumpDecayGeneration();
-			item->setDecaying(DECAYING_FALSE);
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
 		}
 		item->removeAttribute(attribute);
 	} else {
