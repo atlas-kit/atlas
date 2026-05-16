@@ -4658,10 +4658,7 @@ void Game::shutdown()
 	std::cout << " done!" << std::endl;
 }
 
-void Game::cleanup()
-{
-	cleanup(std::chrono::steady_clock::now());
-}
+void Game::cleanup() { cleanup(std::chrono::steady_clock::now()); }
 
 void Game::cleanup(std::chrono::steady_clock::time_point virtualNow)
 {
