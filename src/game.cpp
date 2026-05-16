@@ -4607,13 +4607,17 @@ void Game::checkDecay()
 				internalDecayItem(item);
 			} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 				it = decayItems[bucket].erase(it);
-				item->markDecayStart(virtualNow);
+				// Use real time here: flushDecayDuration() already consumed the
+				// real elapsed time, so `duration` is the true remaining value
+				// measured against `now`. Re-arming with virtualNow (in the past)
+				// would cause a subsequent catch-up bucket to double-count the lag.
+				item->markDecayStart(now);
 				size_t ticks =
 				    std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 				             static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
 				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
 			} else {
-				item->markDecayStart(virtualNow);
+				item->markDecayStart(now);
 				++it;
 			}
 		}
