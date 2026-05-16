@@ -4,6 +4,8 @@
 #ifndef FS_CONST_H
 #define FS_CONST_H
 
+#include "position.h"
+
 static constexpr int32_t NETWORKMESSAGE_MAXSIZE = 65500;
 static constexpr int32_t MIN_MARKET_FEE = 20;
 static constexpr int32_t MAX_MARKET_FEE = 100000;
@@ -735,6 +737,9 @@ enum CreatureIcon_t : uint8_t
 static constexpr int32_t CHANNEL_GUILD = 0x00;
 static constexpr int32_t CHANNEL_PARTY = 0x01;
 static constexpr int32_t CHANNEL_PRIVATE = 0xFFFF;
+
+static constexpr uint16_t CONTAINER_POSITION = 0xFFFF;
+inline constexpr Position HOTKEY_POSITION{CONTAINER_POSITION, 0, 0};
 
 // Reserved player storage key ranges;
 //[10000000 - 20000000];

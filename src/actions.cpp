@@ -91,7 +91,7 @@ bool Actions::registerLuaEvent(Action* event)
 
 ReturnValue Actions::canUse(const std::shared_ptr<const Player>& player, const Position& pos)
 {
-	if (pos.x != 0xFFFF) {
+	if (pos.x != CONTAINER_POSITION) {
 		const Position& playerPos = player->getPosition();
 		if (playerPos.z != pos.z) {
 			return playerPos.z > pos.z ? RETURNVALUE_FIRSTGOUPSTAIRS : RETURNVALUE_FIRSTGODOWNSTAIRS;
@@ -117,7 +117,7 @@ ReturnValue Actions::canUse(const std::shared_ptr<const Player>& player, const P
 ReturnValue Actions::canUseFar(const std::shared_ptr<const Creature>& creature, const Position& toPos,
                                bool checkLineOfSight, bool checkFloor)
 {
-	if (toPos.x == 0xFFFF) {
+	if (toPos.x == CONTAINER_POSITION) {
 		return RETURNVALUE_NOERROR;
 	}
 
