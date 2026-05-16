@@ -1024,7 +1024,13 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		updateRegeneration();
 
-		onChangeZone(getZone());
+		if (getZone() == ZONE_PROTECTION) {
+			if (getAttackedCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
+				setAttackedCreature(nullptr);
+				sendCancelTarget();
+				sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+			}
+		}
 
 		IOLoginData::updateOnlineStatus(guid, true);
 
@@ -1058,6 +1064,10 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	sendPendingStateEntered();
 	sendEnterWorld();
 	sendMapDescription();
+
+	if (isLogin) {
+		g_game.updateCreatureWalkthrough(asPlayer());
+	}
 
 	if (magicEffect != CONST_ME_NONE) {
 		sendMagicEffect(magicEffect);
