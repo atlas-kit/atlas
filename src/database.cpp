@@ -39,6 +39,11 @@ struct DBResult::Impl
 {
 	tfs::detail::MysqlResult_ptr handle;
 	MYSQL_ROW row = nullptr;
+	// The keys are std::string_view into MYSQL_FIELD::name buffers owned by `handle`. They stay
+	// valid only while `handle` is alive, so `handle` must outlive `listNames` and must not be
+	// reset while this result is in use. Declaration order (handle before listNames) gives the
+	// correct destruction order; do not reorder. A future backend that cannot guarantee stable
+	// field-name storage should switch these to owning std::string keys.
 	std::map<std::string_view, size_t> listNames;
 };
 
