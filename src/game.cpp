@@ -4566,6 +4566,13 @@ void Game::checkDecay()
 	// processed (the chained-decay alignment the per-bucket drain is meant for).
 	auto preExisting = std::exchange(toDecayItems, {});
 
+	// Virtual time tracks where the wheel "should be" at each bucket. During
+	// catch-up, real time barely advances between iterations, but each bucket
+	// represents one EVENT_DECAYINTERVAL of virtual time. Using virtualNow for
+	// markDecayStart ensures getDuration() on successors properly consumes the
+	// virtual time that has passed, so chained decays expire on schedule.
+	auto virtualNow = now - (EVENT_DECAYINTERVAL * (bucketsToProcess - 1));
+
 	for (size_t i = 0; i < bucketsToProcess; ++i) {
 		size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
 
@@ -4600,13 +4607,13 @@ void Game::checkDecay()
 				internalDecayItem(item);
 			} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
 				it = decayItems[bucket].erase(it);
-				item->markDecayStart();
+				item->markDecayStart(virtualNow);
 				size_t ticks =
 				    std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 				             static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
 				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
 			} else {
-				item->markDecayStart();
+				item->markDecayStart(virtualNow);
 				++it;
 			}
 		}
@@ -4617,7 +4624,9 @@ void Game::checkDecay()
 		// a multi-stage decayTo chain stays aligned during catch-up instead of
 		// falling (bucketsToProcess - 1) ticks behind. toDecayItems was emptied
 		// before the loop, so nothing here is a pre-existing gameplay enqueue.
-		cleanup();
+		cleanup(virtualNow);
+
+		virtualNow += EVENT_DECAYINTERVAL;
 	}
 
 	// Promote the pre-existing snapshot (and any successor left over from the
@@ -4651,6 +4660,11 @@ void Game::shutdown()
 
 void Game::cleanup()
 {
+	cleanup(std::chrono::steady_clock::now());
+}
+
+void Game::cleanup(std::chrono::steady_clock::time_point virtualNow)
+{
 	// internalDecayItem -> startDecay can push back into toDecayItems while we're
 	// iterating, which would invalidate the cached end iterator and lose the new
 	// entry to the trailing clear(). Drain the queue into a local first so any
@@ -4677,10 +4691,10 @@ void Game::cleanup()
 		if (dur <= std::chrono::milliseconds::zero()) {
 			internalDecayItem(item);
 		} else if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
-			item->markDecayStart();
+			item->markDecayStart(virtualNow);
 			decayItems[lastBucket].push_back({item, item->getDecayGeneration()});
 		} else {
-			item->markDecayStart();
+			item->markDecayStart(virtualNow);
 			size_t ticks = std::min(static_cast<size_t>((dur + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
 			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
 			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});

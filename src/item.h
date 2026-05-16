@@ -672,6 +672,7 @@ public:
 	}
 
 	void markDecayStart() { decayStartedAt = std::chrono::steady_clock::now(); }
+	void markDecayStart(std::chrono::steady_clock::time_point tp) { decayStartedAt = tp; }
 	void flushDecayDuration()
 	{
 		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {

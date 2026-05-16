@@ -507,6 +507,7 @@ private:
 
 	void checkDecay();
 	void internalDecayItem(const std::shared_ptr<Item>& item);
+	void cleanup(std::chrono::steady_clock::time_point virtualNow);
 
 	std::chrono::steady_clock::time_point worldStart = std::chrono::steady_clock::now();
 
