@@ -101,6 +101,8 @@ public:
 	const VocationMap& getVocations() const { return vocationsMap; }
 
 private:
+	void buildIndices();
+
 	VocationMap vocationsMap;
 	std::unordered_map<std::string, uint16_t, CaseInsensitiveStringHash, CaseInsensitiveStringEqual> vocationByName;
 	std::unordered_map<uint16_t, uint16_t> promotedVocations;
