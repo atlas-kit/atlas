@@ -13,6 +13,40 @@
 #include <mysql/errmsg.h>
 #endif
 
+namespace tfs::detail {
+
+struct MysqlDeleter
+{
+	void operator()(MYSQL* handle) const { mysql_close(handle); }
+	void operator()(MYSQL_RES* handle) const { mysql_free_result(handle); }
+};
+
+using Mysql_ptr = std::unique_ptr<MYSQL, MysqlDeleter>;
+using MysqlResult_ptr = std::unique_ptr<MYSQL_RES, MysqlDeleter>;
+
+} // namespace tfs::detail
+
+struct Database::Impl
+{
+	tfs::detail::Mysql_ptr handle = nullptr;
+	std::recursive_mutex databaseLock;
+	uint64_t maxPacketSize = 1048576;
+	// Do not retry queries while in the middle of a transaction.
+	bool retryQueries = true;
+};
+
+struct DBResult::Impl
+{
+	tfs::detail::MysqlResult_ptr handle;
+	MYSQL_ROW row = nullptr;
+	// The keys are std::string_view into MYSQL_FIELD::name buffers owned by `handle`. They stay
+	// valid only while `handle` is alive, so `handle` must outlive `listNames` and must not be
+	// reset while this result is in use. Declaration order (handle before listNames) gives the
+	// correct destruction order; do not reorder. A future backend that cannot guarantee stable
+	// field-name storage should switch these to owning std::string keys.
+	std::map<std::string_view, size_t> listNames;
+};
+
 static tfs::detail::Mysql_ptr connectToDatabase(const bool retryIfError)
 {
 	bool isFirstAttemptToConnect = true;
@@ -82,6 +116,10 @@ static bool executeQuery(tfs::detail::Mysql_ptr& handle, std::string_view query,
 	return true;
 }
 
+Database::Database() : impl_(std::make_unique<Impl>()) {}
+
+Database::~Database() = default;
+
 bool Database::connect()
 {
 	auto newHandle = connectToDatabase(false);
@@ -89,20 +127,20 @@ bool Database::connect()
 		return false;
 	}
 
-	handle = std::move(newHandle);
+	impl_->handle = std::move(newHandle);
 	if (const auto& result = storeQuery("SHOW VARIABLES LIKE 'max_allowed_packet'")) {
-		maxPacketSize = result->getNumber<uint64_t>("Value");
+		impl_->maxPacketSize = result->getNumber<uint64_t>("Value");
 	}
 	return true;
 }
 
 bool Database::beginTransaction()
 {
-	databaseLock.lock();
+	impl_->databaseLock.lock();
 	const bool result = executeQuery("START TRANSACTION");
-	retryQueries = !result;
+	impl_->retryQueries = !result;
 	if (!result) {
-		databaseLock.unlock();
+		impl_->databaseLock.unlock();
 	}
 	return result;
 }
@@ -110,27 +148,27 @@ bool Database::beginTransaction()
 bool Database::rollback()
 {
 	const bool result = executeQuery("ROLLBACK");
-	retryQueries = true;
-	databaseLock.unlock();
+	impl_->retryQueries = true;
+	impl_->databaseLock.unlock();
 	return result;
 }
 
 bool Database::commit()
 {
 	const bool result = executeQuery("COMMIT");
-	retryQueries = true;
-	databaseLock.unlock();
+	impl_->retryQueries = true;
+	impl_->databaseLock.unlock();
 	return result;
 }
 
 bool Database::executeQuery(const std::string& query)
 {
-	std::lock_guard<std::recursive_mutex> lockGuard(databaseLock);
-	auto success = ::executeQuery(handle, query, retryQueries);
+	std::lock_guard<std::recursive_mutex> lockGuard(impl_->databaseLock);
+	auto success = ::executeQuery(impl_->handle, query, impl_->retryQueries);
 
-	// executeQuery can be called with command that produces result (e.g. SELECT)
-	// we have to store that result, even though we do not need it, otherwise handle will get blocked
-	auto mysql_res = mysql_store_result(handle.get());
+	// executeQuery can be called with a command that produces a result (e.g. SELECT). We have to
+	// store that result, even though we do not need it, otherwise the handle will get blocked.
+	auto mysql_res = mysql_store_result(impl_->handle.get());
 	mysql_free_result(mysql_res);
 
 	return success;
@@ -138,33 +176,49 @@ bool Database::executeQuery(const std::string& query)
 
 std::shared_ptr<DBResult> Database::storeQuery(std::string_view query)
 {
-	std::lock_guard<std::recursive_mutex> lockGuard(databaseLock);
+	std::lock_guard<std::recursive_mutex> lockGuard(impl_->databaseLock);
 
 retry:
-	if (!::executeQuery(handle, query, retryQueries) && !retryQueries) {
+	if (!::executeQuery(impl_->handle, query, impl_->retryQueries) && !impl_->retryQueries) {
 		return nullptr;
 	}
 
 	// we should call that every time as someone would call executeQuery('SELECT...')
 	// as it is described in MySQL manual: "it doesn't hurt" :P
-	tfs::detail::MysqlResult_ptr res{mysql_store_result(handle.get())};
+	tfs::detail::MysqlResult_ptr res{mysql_store_result(impl_->handle.get())};
 	if (!res) {
 		std::cout << "[Error - mysql_store_result] Query: " << query << std::endl
-		          << "Message: " << mysql_error(handle.get()) << std::endl;
-		const unsigned error = mysql_errno(handle.get());
-		if (!isLostConnectionError(error) || !retryQueries) {
+		          << "Message: " << mysql_error(impl_->handle.get()) << std::endl;
+		const unsigned error = mysql_errno(impl_->handle.get());
+		if (!isLostConnectionError(error) || !impl_->retryQueries) {
 			return nullptr;
 		}
 		goto retry;
 	}
 
-	// retrieving results of query
-	const auto result = std::make_shared<DBResult>(std::move(res));
+	auto resultImpl = std::make_unique<DBResult::Impl>();
+	resultImpl->handle = std::move(res);
+
+	size_t i = 0;
+	MYSQL_FIELD* field = mysql_fetch_field(resultImpl->handle.get());
+	while (field) {
+		resultImpl->listNames[field->name] = i++;
+		field = mysql_fetch_field(resultImpl->handle.get());
+	}
+	resultImpl->row = mysql_fetch_row(resultImpl->handle.get());
+
+	// `std::make_shared<DBResult>` would require a publicly accessible constructor. Keeping the
+	// constructor private (with `Database` as the only friend able to invoke it) means we pay one
+	// extra allocation in exchange for not exposing a way to fabricate `DBResult` instances from
+	// outside this translation unit.
+	std::shared_ptr<DBResult> result{new DBResult(std::move(resultImpl))};
 	if (result->hasNext()) {
 		return result;
 	}
 	return nullptr;
 }
+
+std::string Database::escapeString(std::string_view s) const { return escapeBlob(s.data(), s.length()); }
 
 std::string Database::escapeBlob(const char* s, uint32_t length) const
 {
@@ -177,7 +231,7 @@ std::string Database::escapeBlob(const char* s, uint32_t length) const
 
 	if (length != 0) {
 		char* output = new char[maxLength];
-		mysql_real_escape_string(handle.get(), output, s, length);
+		mysql_real_escape_string(impl_->handle.get(), output, s, length);
 		escaped.append(output);
 		delete[] output;
 	}
@@ -186,17 +240,25 @@ std::string Database::escapeBlob(const char* s, uint32_t length) const
 	return escaped;
 }
 
-DBResult::DBResult(tfs::detail::MysqlResult_ptr&& res) : handle{std::move(res)}
+uint64_t Database::getLastInsertId() const { return static_cast<uint64_t>(mysql_insert_id(impl_->handle.get())); }
+
+const char* Database::getClientVersion() { return mysql_get_client_info(); }
+
+uint64_t Database::getMaxPacketSize() const { return impl_->maxPacketSize; }
+
+DBResult::DBResult(std::unique_ptr<Impl> impl) : impl_(std::move(impl)) {}
+
+DBResult::~DBResult() = default;
+
+const char* DBResult::tryGetColumn(std::string_view column, std::string_view context) const
 {
-	size_t i = 0;
-
-	MYSQL_FIELD* field = mysql_fetch_field(handle.get());
-	while (field) {
-		listNames[field->name] = i++;
-		field = mysql_fetch_field(handle.get());
+	auto it = impl_->listNames.find(column);
+	if (it == impl_->listNames.end()) {
+		std::cout << "[Error - " << context << "] Column '" << column << "' doesn't exist in the result set"
+		          << std::endl;
+		return nullptr;
 	}
-
-	row = mysql_fetch_row(handle.get());
+	return impl_->row[it->second];
 }
 
 std::chrono::system_clock::time_point DBResult::getDateTime(std::string_view column) const
@@ -206,27 +268,27 @@ std::chrono::system_clock::time_point DBResult::getDateTime(std::string_view col
 
 std::string_view DBResult::getString(std::string_view column) const
 {
-	auto it = listNames.find(column);
-	if (it == listNames.end()) {
+	auto it = impl_->listNames.find(column);
+	if (it == impl_->listNames.end()) {
 		std::cout << "[Error - DBResult::getString] Column '" << column << "' does not exist in result set."
 		          << std::endl;
 		return {};
 	}
 
-	if (!row[it->second]) {
+	if (!impl_->row[it->second]) {
 		return {};
 	}
 
-	auto size = mysql_fetch_lengths(handle.get())[it->second];
-	return {row[it->second], size};
+	auto size = mysql_fetch_lengths(impl_->handle.get())[it->second];
+	return {impl_->row[it->second], size};
 }
 
-bool DBResult::hasNext() const { return row; }
+bool DBResult::hasNext() const { return impl_->row; }
 
 bool DBResult::next()
 {
-	row = mysql_fetch_row(handle.get());
-	return row;
+	impl_->row = mysql_fetch_row(impl_->handle.get());
+	return impl_->row;
 }
 
 DBInsert::DBInsert(std::string query) : query(std::move(query)) { this->length = this->query.length(); }
