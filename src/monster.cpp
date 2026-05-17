@@ -136,7 +136,7 @@ void Monster::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, 
 	}
 }
 
-void Monster::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
+void Monster::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool /*isLogout*/)
 {
 	if (mType->info.creatureDisappearEvent != -1) {
 		// onCreatureDisappear(self, creature)
