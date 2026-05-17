@@ -185,7 +185,12 @@ target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 
-add_executable(tfs ${tfs_MAIN})
+set(tfs_RC "")
+if (WIN32)
+    set(tfs_RC ${CMAKE_SOURCE_DIR}/atlas.rc)
+endif ()
+
+add_executable(tfs ${tfs_MAIN} ${tfs_RC})
 target_link_libraries(tfs PRIVATE tfslib)
 target_precompile_headers(tfs PUBLIC otpch.h)
 
