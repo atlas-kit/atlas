@@ -5,12 +5,11 @@
 
 #include "game.h"
 
-#include "../item.h"
 #include "../lua/env.h"
+#include "../lua/script.h"
+#include "events.h"
 
 namespace {
-
-LuaScriptInterface gameScriptInterface{"Game-Events Interface"};
 
 struct GameHandlers
 {
@@ -23,15 +22,16 @@ void loadGameScripts()
 {
 	gameHandlers = {};
 
-	if (gameScriptInterface.loadFile("data/scripts/events/game.lua") != 0) {
-		std::cout << "[Warning - tfs::events::game::load_from_scripts] Cannot load game events." << std::endl;
-		std::cout << gameScriptInterface.getLastLuaError() << std::endl;
+	auto& scriptInterface = tfs::events::getScriptInterface();
+	if (scriptInterface.loadFile("data/scripts/events/game.lua") != 0) {
+		std::cout << "[Warning - tfs::events::game::loadGameScripts] Cannot load game events." << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
 		return;
 	}
 
-	gameHandlers.onStartup = gameScriptInterface.getMetaEvent("Game", "onStartup");
-	gameHandlers.onShutdown = gameScriptInterface.getMetaEvent("Game", "onShutdown");
-	gameHandlers.onSave = gameScriptInterface.getMetaEvent("Game", "onSave");
+	gameHandlers.onStartup = scriptInterface.getMetaEvent("Game", "onStartup");
+	gameHandlers.onShutdown = scriptInterface.getMetaEvent("Game", "onShutdown");
+	gameHandlers.onSave = scriptInterface.getMetaEvent("Game", "onSave");
 }
 
 } // namespace
@@ -40,15 +40,11 @@ namespace tfs::events::game {
 
 void load()
 {
-	gameScriptInterface.initState();
-
 	loadGameScripts();
 }
 
 void reload()
 {
-	gameScriptInterface.reInitState();
-
 	loadGameScripts();
 }
 
@@ -64,12 +60,12 @@ void onStartup()
 		return;
 	}
 
+	auto& scriptInterface = tfs::events::getScriptInterface();
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(gameHandlers.onStartup, &gameScriptInterface);
+	env->setScriptId(gameHandlers.onStartup, &scriptInterface);
 
-	gameScriptInterface.pushFunction(gameHandlers.onStartup);
-
-	gameScriptInterface.callVoidFunction(0);
+	scriptInterface.pushFunction(gameHandlers.onStartup);
+	scriptInterface.callVoidFunction(0);
 }
 
 void onShutdown()
@@ -84,12 +80,12 @@ void onShutdown()
 		return;
 	}
 
+	auto& scriptInterface = tfs::events::getScriptInterface();
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(gameHandlers.onShutdown, &gameScriptInterface);
+	env->setScriptId(gameHandlers.onShutdown, &scriptInterface);
 
-	gameScriptInterface.pushFunction(gameHandlers.onShutdown);
-
-	gameScriptInterface.callVoidFunction(0);
+	scriptInterface.pushFunction(gameHandlers.onShutdown);
+	scriptInterface.callVoidFunction(0);
 }
 
 void onSave()
@@ -104,12 +100,12 @@ void onSave()
 		return;
 	}
 
+	auto& scriptInterface = tfs::events::getScriptInterface();
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(gameHandlers.onSave, &gameScriptInterface);
+	env->setScriptId(gameHandlers.onSave, &scriptInterface);
 
-	gameScriptInterface.pushFunction(gameHandlers.onSave);
-
-	gameScriptInterface.callVoidFunction(0);
+	scriptInterface.pushFunction(gameHandlers.onSave);
+	scriptInterface.callVoidFunction(0);
 }
 
 } // namespace tfs::events::game

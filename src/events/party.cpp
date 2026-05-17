@@ -5,14 +5,12 @@
 
 #include "party.h"
 
-#include "../item.h"
 #include "../lua/env.h"
 #include "../lua/error.h"
 #include "../player.h"
+#include "events.h"
 
 namespace {
-
-LuaScriptInterface partyScriptInterface{"Party-Events Interface"};
 
 struct PartyHandlers
 {
@@ -29,19 +27,20 @@ void loadPartyScripts()
 {
 	partyHandlers = {};
 
-	if (partyScriptInterface.loadFile("data/scripts/events/party.lua") != 0) {
+	auto& scriptInterface = tfs::events::getScriptInterface();
+	if (scriptInterface.loadFile("data/scripts/events/party.lua") != 0) {
 		std::cout << "[Warning - tfs::events::party::loadPartyScripts] Cannot load party events." << std::endl;
-		std::cout << partyScriptInterface.getLastLuaError() << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
 		return;
 	}
 
-	partyHandlers.onJoin = partyScriptInterface.getMetaEvent("Party", "onJoin");
-	partyHandlers.onLeave = partyScriptInterface.getMetaEvent("Party", "onLeave");
-	partyHandlers.onDisband = partyScriptInterface.getMetaEvent("Party", "onDisband");
-	partyHandlers.onShareExperience = partyScriptInterface.getMetaEvent("Party", "onShareExperience");
-	partyHandlers.onInvite = partyScriptInterface.getMetaEvent("Party", "onInvite");
-	partyHandlers.onRevokeInvitation = partyScriptInterface.getMetaEvent("Party", "onRevokeInvitation");
-	partyHandlers.onPassLeadership = partyScriptInterface.getMetaEvent("Party", "onPassLeadership");
+	partyHandlers.onJoin = scriptInterface.getMetaEvent("Party", "onJoin");
+	partyHandlers.onLeave = scriptInterface.getMetaEvent("Party", "onLeave");
+	partyHandlers.onDisband = scriptInterface.getMetaEvent("Party", "onDisband");
+	partyHandlers.onShareExperience = scriptInterface.getMetaEvent("Party", "onShareExperience");
+	partyHandlers.onInvite = scriptInterface.getMetaEvent("Party", "onInvite");
+	partyHandlers.onRevokeInvitation = scriptInterface.getMetaEvent("Party", "onRevokeInvitation");
+	partyHandlers.onPassLeadership = scriptInterface.getMetaEvent("Party", "onPassLeadership");
 }
 
 } // namespace
@@ -50,15 +49,11 @@ namespace tfs::events::party {
 
 void load()
 {
-	partyScriptInterface.initState();
-
 	loadPartyScripts();
 }
 
 void reload()
 {
-	partyScriptInterface.reInitState();
-
 	loadPartyScripts();
 }
 
@@ -75,14 +70,14 @@ bool onJoin(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& 
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onJoin, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onJoin, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onJoin);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onJoin);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushThing(L, player);
-	return partyScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
@@ -98,14 +93,14 @@ bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>&
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onLeave, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onLeave, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onLeave);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onLeave);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushThing(L, player);
-	return partyScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onDisband(const std::shared_ptr<Party>& party)
@@ -121,13 +116,13 @@ bool onDisband(const std::shared_ptr<Party>& party)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onDisband, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onDisband, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onDisband);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onDisband);
 
 	tfs::lua::pushParty(L, party);
-	return partyScriptInterface.callFunction(1);
+	return tfs::events::getScriptInterface().callFunction(1);
 }
 
 bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
@@ -143,14 +138,14 @@ bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onInvite, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onInvite, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onInvite);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onInvite);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushThing(L, player);
-	return partyScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
@@ -166,14 +161,14 @@ bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_p
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onRevokeInvitation, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onRevokeInvitation, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onRevokeInvitation);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onRevokeInvitation);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushThing(L, player);
-	return partyScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player)
@@ -189,14 +184,14 @@ bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onPassLeadership, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onPassLeadership, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onPassLeadership);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onPassLeadership);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushThing(L, player);
-	return partyScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp)
@@ -212,10 +207,10 @@ void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(partyHandlers.onShareExperience, &partyScriptInterface);
+	env->setScriptId(partyHandlers.onShareExperience, &tfs::events::getScriptInterface());
 
-	const auto L = partyScriptInterface.getLuaState();
-	partyScriptInterface.pushFunction(partyHandlers.onShareExperience);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(partyHandlers.onShareExperience);
 
 	tfs::lua::pushParty(L, party);
 	tfs::lua::pushNumber(L, exp);

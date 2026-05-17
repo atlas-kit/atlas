@@ -8,11 +8,10 @@
 #include "../item.h"
 #include "../lua/env.h"
 #include "../lua/error.h"
+#include "events.h"
 #include "player.h"
 
 namespace {
-
-LuaScriptInterface playerScriptInterface{"Player-Events Interface"};
 
 struct PlayerHandlers
 {
@@ -54,44 +53,45 @@ void loadPlayerScripts()
 {
 	playerHandlers = {};
 
-	if (playerScriptInterface.loadFile("data/scripts/events/player.lua") != 0) {
+	auto& scriptInterface = tfs::events::getScriptInterface();
+	if (scriptInterface.loadFile("data/scripts/events/player.lua") != 0) {
 		std::cout << "[Warning - tfs::events::player::loadPlayerScripts] Cannot load player events." << std::endl;
-		std::cout << playerScriptInterface.getLastLuaError() << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
 		return;
 	}
 
-	playerHandlers.onBrowseField = playerScriptInterface.getMetaEvent("Player", "onBrowseField");
-	playerHandlers.onLook = playerScriptInterface.getMetaEvent("Player", "onLook");
-	playerHandlers.onLookInBattleList = playerScriptInterface.getMetaEvent("Player", "onLookInBattleList");
-	playerHandlers.onLookInTrade = playerScriptInterface.getMetaEvent("Player", "onLookInTrade");
-	playerHandlers.onLookInShop = playerScriptInterface.getMetaEvent("Player", "onLookInShop");
-	playerHandlers.onLookInMarket = playerScriptInterface.getMetaEvent("Player", "onLookInMarket");
-	playerHandlers.onMoveItem = playerScriptInterface.getMetaEvent("Player", "onMoveItem");
-	playerHandlers.onItemMoved = playerScriptInterface.getMetaEvent("Player", "onItemMoved");
-	playerHandlers.onMoveCreature = playerScriptInterface.getMetaEvent("Player", "onMoveCreature");
-	playerHandlers.onReportRuleViolation = playerScriptInterface.getMetaEvent("Player", "onReportRuleViolation");
-	playerHandlers.onRotateItem = playerScriptInterface.getMetaEvent("Player", "onRotateItem");
-	playerHandlers.onTurn = playerScriptInterface.getMetaEvent("Player", "onTurn");
-	playerHandlers.onTradeRequest = playerScriptInterface.getMetaEvent("Player", "onTradeRequest");
-	playerHandlers.onTradeAccept = playerScriptInterface.getMetaEvent("Player", "onTradeAccept");
-	playerHandlers.onTradeCompleted = playerScriptInterface.getMetaEvent("Player", "onTradeCompleted");
-	playerHandlers.onPodiumRequest = playerScriptInterface.getMetaEvent("Player", "onPodiumRequest");
-	playerHandlers.onPodiumEdit = playerScriptInterface.getMetaEvent("Player", "onPodiumEdit");
-	playerHandlers.onGainExperience = playerScriptInterface.getMetaEvent("Player", "onGainExperience");
-	playerHandlers.onLoseExperience = playerScriptInterface.getMetaEvent("Player", "onLoseExperience");
-	playerHandlers.onGainSkillTries = playerScriptInterface.getMetaEvent("Player", "onGainSkillTries");
-	playerHandlers.onWrapItem = playerScriptInterface.getMetaEvent("Player", "onWrapItem");
-	playerHandlers.onInventoryUpdate = playerScriptInterface.getMetaEvent("Player", "onInventoryUpdate");
-	playerHandlers.onNetworkMessage = playerScriptInterface.getMetaEvent("Player", "onNetworkMessage");
-	playerHandlers.onSpellCheck = playerScriptInterface.getMetaEvent("Player", "onSpellCheck");
-	playerHandlers.onLogin = playerScriptInterface.getMetaEvent("Player", "onLogin");
-	playerHandlers.onJoin = playerScriptInterface.getMetaEvent("Player", "onJoin");
-	playerHandlers.onLogout = playerScriptInterface.getMetaEvent("Player", "onLogout");
-	playerHandlers.onReconnect = playerScriptInterface.getMetaEvent("Player", "onReconnect");
-	playerHandlers.onAdvance = playerScriptInterface.getMetaEvent("Player", "onAdvance");
-	playerHandlers.onModalWindow = playerScriptInterface.getMetaEvent("Player", "onModalWindow");
-	playerHandlers.onTextEdit = playerScriptInterface.getMetaEvent("Player", "onTextEdit");
-	playerHandlers.onExtendedOpcode = playerScriptInterface.getMetaEvent("Player", "onExtendedOpcode");
+	playerHandlers.onBrowseField = scriptInterface.getMetaEvent("Player", "onBrowseField");
+	playerHandlers.onLook = scriptInterface.getMetaEvent("Player", "onLook");
+	playerHandlers.onLookInBattleList = scriptInterface.getMetaEvent("Player", "onLookInBattleList");
+	playerHandlers.onLookInTrade = scriptInterface.getMetaEvent("Player", "onLookInTrade");
+	playerHandlers.onLookInShop = scriptInterface.getMetaEvent("Player", "onLookInShop");
+	playerHandlers.onLookInMarket = scriptInterface.getMetaEvent("Player", "onLookInMarket");
+	playerHandlers.onMoveItem = scriptInterface.getMetaEvent("Player", "onMoveItem");
+	playerHandlers.onItemMoved = scriptInterface.getMetaEvent("Player", "onItemMoved");
+	playerHandlers.onMoveCreature = scriptInterface.getMetaEvent("Player", "onMoveCreature");
+	playerHandlers.onReportRuleViolation = scriptInterface.getMetaEvent("Player", "onReportRuleViolation");
+	playerHandlers.onRotateItem = scriptInterface.getMetaEvent("Player", "onRotateItem");
+	playerHandlers.onTurn = scriptInterface.getMetaEvent("Player", "onTurn");
+	playerHandlers.onTradeRequest = scriptInterface.getMetaEvent("Player", "onTradeRequest");
+	playerHandlers.onTradeAccept = scriptInterface.getMetaEvent("Player", "onTradeAccept");
+	playerHandlers.onTradeCompleted = scriptInterface.getMetaEvent("Player", "onTradeCompleted");
+	playerHandlers.onPodiumRequest = scriptInterface.getMetaEvent("Player", "onPodiumRequest");
+	playerHandlers.onPodiumEdit = scriptInterface.getMetaEvent("Player", "onPodiumEdit");
+	playerHandlers.onGainExperience = scriptInterface.getMetaEvent("Player", "onGainExperience");
+	playerHandlers.onLoseExperience = scriptInterface.getMetaEvent("Player", "onLoseExperience");
+	playerHandlers.onGainSkillTries = scriptInterface.getMetaEvent("Player", "onGainSkillTries");
+	playerHandlers.onWrapItem = scriptInterface.getMetaEvent("Player", "onWrapItem");
+	playerHandlers.onInventoryUpdate = scriptInterface.getMetaEvent("Player", "onInventoryUpdate");
+	playerHandlers.onNetworkMessage = scriptInterface.getMetaEvent("Player", "onNetworkMessage");
+	playerHandlers.onSpellCheck = scriptInterface.getMetaEvent("Player", "onSpellCheck");
+	playerHandlers.onLogin = scriptInterface.getMetaEvent("Player", "onLogin");
+	playerHandlers.onJoin = scriptInterface.getMetaEvent("Player", "onJoin");
+	playerHandlers.onLogout = scriptInterface.getMetaEvent("Player", "onLogout");
+	playerHandlers.onReconnect = scriptInterface.getMetaEvent("Player", "onReconnect");
+	playerHandlers.onAdvance = scriptInterface.getMetaEvent("Player", "onAdvance");
+	playerHandlers.onModalWindow = scriptInterface.getMetaEvent("Player", "onModalWindow");
+	playerHandlers.onTextEdit = scriptInterface.getMetaEvent("Player", "onTextEdit");
+	playerHandlers.onExtendedOpcode = scriptInterface.getMetaEvent("Player", "onExtendedOpcode");
 }
 
 } // namespace
@@ -100,15 +100,11 @@ namespace tfs::events::player {
 
 void load()
 {
-	playerScriptInterface.initState();
-
 	loadPlayerScripts();
 }
 
 void reload()
 {
-	playerScriptInterface.reInitState();
-
 	loadPlayerScripts();
 }
 
@@ -125,14 +121,14 @@ bool onBrowseField(const std::shared_ptr<Player>& player, const Position& positi
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onBrowseField, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onBrowseField, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onBrowseField);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onBrowseField);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushPosition(L, position);
-	return playerScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 void onLook(const std::shared_ptr<Player>& player, const Position& position, const std::shared_ptr<Thing>& thing,
@@ -149,16 +145,16 @@ void onLook(const std::shared_ptr<Player>& player, const Position& position, con
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLook, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLook, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLook);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLook);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, thing);
 	tfs::lua::pushPosition(L, position, stackpos);
 	tfs::lua::pushNumber(L, lookDistance);
-	playerScriptInterface.callVoidFunction(4);
+	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
 void onLookInBattleList(const std::shared_ptr<Player>& player, const std::shared_ptr<Creature>& creature,
@@ -175,15 +171,15 @@ void onLookInBattleList(const std::shared_ptr<Player>& player, const std::shared
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLookInBattleList, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLookInBattleList, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLookInBattleList);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLookInBattleList);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, creature);
 	tfs::lua::pushNumber(L, lookDistance);
-	playerScriptInterface.callVoidFunction(3);
+	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 
 void onLookInTrade(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& partner,
@@ -200,16 +196,16 @@ void onLookInTrade(const std::shared_ptr<Player>& player, const std::shared_ptr<
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLookInTrade, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLookInTrade, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLookInTrade);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLookInTrade);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, partner);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushNumber(L, lookDistance);
-	playerScriptInterface.callVoidFunction(4);
+	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
 void onLookInShop(const std::shared_ptr<Player>& player, const ItemType* itemType, uint8_t count)
@@ -225,15 +221,15 @@ void onLookInShop(const std::shared_ptr<Player>& player, const ItemType* itemTyp
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLookInShop, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLookInShop, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLookInShop);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLookInShop);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushItemType(L, itemType);
 	tfs::lua::pushNumber(L, count);
-	playerScriptInterface.callVoidFunction(3);
+	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 
 void onLookInMarket(const std::shared_ptr<Player>& player, const ItemType* itemType)
@@ -249,14 +245,14 @@ void onLookInMarket(const std::shared_ptr<Player>& player, const ItemType* itemT
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLookInMarket, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLookInMarket, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLookInMarket);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLookInMarket);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushItemType(L, itemType);
-	playerScriptInterface.callVoidFunction(2);
+	tfs::events::getScriptInterface().callVoidFunction(2);
 }
 
 ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, uint16_t count,
@@ -274,10 +270,10 @@ ReturnValue onMoveItem(const std::shared_ptr<Player>& player, const std::shared_
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onMoveItem, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onMoveItem, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onMoveItem);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onMoveItem);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
@@ -315,10 +311,10 @@ void onItemMoved(const std::shared_ptr<Player>& player, const std::shared_ptr<It
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onItemMoved, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onItemMoved, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onItemMoved);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onItemMoved);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
@@ -327,7 +323,7 @@ void onItemMoved(const std::shared_ptr<Player>& player, const std::shared_ptr<It
 	tfs::lua::pushPosition(L, toPosition);
 	tfs::lua::pushThing(L, fromThing);
 	tfs::lua::pushThing(L, toThing);
-	playerScriptInterface.callVoidFunction(7);
+	tfs::events::getScriptInterface().callVoidFunction(7);
 }
 
 bool onMoveCreature(const std::shared_ptr<Player>& player, const std::shared_ptr<Creature>& creature,
@@ -344,16 +340,16 @@ bool onMoveCreature(const std::shared_ptr<Player>& player, const std::shared_ptr
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onMoveCreature, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onMoveCreature, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onMoveCreature);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onMoveCreature);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, creature);
 	tfs::lua::pushPosition(L, fromPosition);
 	tfs::lua::pushPosition(L, toPosition);
-	return playerScriptInterface.callFunction(4);
+	return tfs::events::getScriptInterface().callFunction(4);
 }
 
 void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::string& targetName, uint8_t reportType,
@@ -370,10 +366,10 @@ void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::str
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onReportRuleViolation, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onReportRuleViolation, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onReportRuleViolation);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onReportRuleViolation);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushString(L, targetName);
@@ -381,7 +377,7 @@ void onReportRuleViolation(const std::shared_ptr<Player>& player, const std::str
 	tfs::lua::pushNumber(L, reportReason);
 	tfs::lua::pushString(L, comment);
 	tfs::lua::pushString(L, translation);
-	playerScriptInterface.callVoidFunction(6);
+	tfs::events::getScriptInterface().callVoidFunction(6);
 }
 
 void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item)
@@ -397,14 +393,14 @@ void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onRotateItem, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onRotateItem, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onRotateItem);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onRotateItem);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
-	playerScriptInterface.callVoidFunction(2);
+	tfs::events::getScriptInterface().callVoidFunction(2);
 }
 
 bool onTurn(const std::shared_ptr<Player>& player, Direction direction)
@@ -420,14 +416,14 @@ bool onTurn(const std::shared_ptr<Player>& player, Direction direction)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTurn, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onTurn, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onTurn);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTurn);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, direction);
-	return playerScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onTradeRequest(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& target,
@@ -444,15 +440,15 @@ bool onTradeRequest(const std::shared_ptr<Player>& player, const std::shared_ptr
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTradeRequest, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onTradeRequest, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onTradeRequest);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTradeRequest);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, target);
 	tfs::lua::pushThing(L, item);
-	return playerScriptInterface.callFunction(3);
+	return tfs::events::getScriptInterface().callFunction(3);
 }
 
 bool onTradeAccept(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& target,
@@ -469,16 +465,16 @@ bool onTradeAccept(const std::shared_ptr<Player>& player, const std::shared_ptr<
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTradeAccept, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onTradeAccept, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onTradeAccept);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTradeAccept);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, target);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushThing(L, targetItem);
-	return playerScriptInterface.callFunction(4);
+	return tfs::events::getScriptInterface().callFunction(4);
 }
 
 void onTradeCompleted(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& target,
@@ -495,17 +491,17 @@ void onTradeCompleted(const std::shared_ptr<Player>& player, const std::shared_p
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTradeCompleted, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onTradeCompleted, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onTradeCompleted);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTradeCompleted);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, target);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushThing(L, targetItem);
 	tfs::lua::pushBoolean(L, isSuccess);
-	playerScriptInterface.callVoidFunction(5);
+	tfs::events::getScriptInterface().callVoidFunction(5);
 }
 
 void onPodiumRequest(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item)
@@ -521,14 +517,14 @@ void onPodiumRequest(const std::shared_ptr<Player>& player, const std::shared_pt
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onPodiumRequest, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onPodiumRequest, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onPodiumRequest);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onPodiumRequest);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
-	playerScriptInterface.callVoidFunction(2);
+	tfs::events::getScriptInterface().callVoidFunction(2);
 }
 
 void onPodiumEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, const Outfit_t& outfit,
@@ -545,17 +541,17 @@ void onPodiumEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onPodiumEdit, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onPodiumEdit, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onPodiumEdit);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onPodiumEdit);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushOutfit(L, outfit);
 	tfs::lua::pushNumber(L, direction);
 	tfs::lua::pushBoolean(L, podiumVisible);
-	playerScriptInterface.callVoidFunction(5);
+	tfs::events::getScriptInterface().callVoidFunction(5);
 }
 
 void onGainExperience(const std::shared_ptr<Player>& player, const std::shared_ptr<Creature>& source, uint64_t& exp,
@@ -572,10 +568,10 @@ void onGainExperience(const std::shared_ptr<Player>& player, const std::shared_p
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onGainExperience, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onGainExperience, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onGainExperience);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onGainExperience);
 
 	tfs::lua::pushThing(L, player);
 
@@ -612,10 +608,10 @@ void onLoseExperience(const std::shared_ptr<Player>& player, uint64_t& exp)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLoseExperience, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLoseExperience, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLoseExperience);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLoseExperience);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, exp);
@@ -643,10 +639,10 @@ void onGainSkillTries(const std::shared_ptr<Player>& player, skills_t skill, uin
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onGainSkillTries, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onGainSkillTries, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onGainSkillTries);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onGainSkillTries);
 
 	tfs::lua::pushThing(L, player);
 
@@ -676,14 +672,14 @@ void onWrapItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Ite
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onWrapItem, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onWrapItem, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onWrapItem);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onWrapItem);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
-	playerScriptInterface.callVoidFunction(2);
+	tfs::events::getScriptInterface().callVoidFunction(2);
 }
 
 void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, slots_t slot,
@@ -700,16 +696,16 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onInventoryUpdate, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onInventoryUpdate, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onInventoryUpdate);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onInventoryUpdate);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushNumber(L, slot);
 	tfs::lua::pushBoolean(L, equip);
-	playerScriptInterface.callVoidFunction(4);
+	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
 void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
@@ -725,15 +721,15 @@ void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, s
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onNetworkMessage, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onNetworkMessage, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onNetworkMessage);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onNetworkMessage);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, recvByte);
 	tfs::lua::pushNetworkMessage(L, msg.release());
-	playerScriptInterface.callVoidFunction(3);
+	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 
 bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell)
@@ -749,14 +745,14 @@ bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onSpellCheck, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onSpellCheck, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onSpellCheck);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onSpellCheck);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushSpell(L, *spell);
-	return playerScriptInterface.callFunction(2);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onLogin(const std::shared_ptr<Player>& player)
@@ -772,13 +768,13 @@ bool onLogin(const std::shared_ptr<Player>& player)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLogin, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLogin, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLogin);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLogin);
 
 	tfs::lua::pushThing(L, player);
-	return playerScriptInterface.callFunction(1);
+	return tfs::events::getScriptInterface().callFunction(1);
 }
 
 void onJoin(const std::shared_ptr<Player>& player)
@@ -794,13 +790,13 @@ void onJoin(const std::shared_ptr<Player>& player)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onJoin, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onJoin, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onJoin);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onJoin);
 
 	tfs::lua::pushThing(L, player);
-	playerScriptInterface.callVoidFunction(1);
+	tfs::events::getScriptInterface().callVoidFunction(1);
 }
 
 bool onLogout(const std::shared_ptr<Player>& player)
@@ -816,13 +812,13 @@ bool onLogout(const std::shared_ptr<Player>& player)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onLogout, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onLogout, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onLogout);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLogout);
 
 	tfs::lua::pushThing(L, player);
-	return playerScriptInterface.callFunction(1);
+	return tfs::events::getScriptInterface().callFunction(1);
 }
 
 void onReconnect(const std::shared_ptr<Player>& player)
@@ -838,13 +834,13 @@ void onReconnect(const std::shared_ptr<Player>& player)
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onReconnect, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onReconnect, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onReconnect);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onReconnect);
 
 	tfs::lua::pushThing(L, player);
-	playerScriptInterface.callVoidFunction(1);
+	tfs::events::getScriptInterface().callVoidFunction(1);
 }
 
 void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel)
@@ -860,16 +856,16 @@ void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t o
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onAdvance, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onAdvance, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onAdvance);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onAdvance);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, static_cast<uint32_t>(skill));
 	tfs::lua::pushNumber(L, oldLevel);
 	tfs::lua::pushNumber(L, newLevel);
-	playerScriptInterface.callVoidFunction(4);
+	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
 void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId)
@@ -885,16 +881,16 @@ void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onModalWindow, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onModalWindow, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onModalWindow);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onModalWindow);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, modalWindowId);
 	tfs::lua::pushNumber(L, buttonId);
 	tfs::lua::pushNumber(L, choiceId);
-	playerScriptInterface.callVoidFunction(4);
+	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
 bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, std::string_view text,
@@ -911,16 +907,16 @@ bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Ite
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTextEdit, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onTextEdit, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onTextEdit);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTextEdit);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
 	tfs::lua::pushString(L, text);
 	tfs::lua::pushNumber(L, windowTextId);
-	return playerScriptInterface.callFunction(4);
+	return tfs::events::getScriptInterface().callFunction(4);
 }
 
 void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std::string_view buffer)
@@ -936,15 +932,15 @@ void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onExtendedOpcode, &playerScriptInterface);
+	env->setScriptId(playerHandlers.onExtendedOpcode, &tfs::events::getScriptInterface());
 
-	const auto L = playerScriptInterface.getLuaState();
-	playerScriptInterface.pushFunction(playerHandlers.onExtendedOpcode);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onExtendedOpcode);
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, opcode);
 	tfs::lua::pushString(L, buffer);
-	playerScriptInterface.callVoidFunction(3);
+	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 
 } // namespace tfs::events::player

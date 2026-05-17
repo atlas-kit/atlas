@@ -3,6 +3,8 @@
 
 #pragma once
 
+class LuaScriptInterface;
+
 enum class EventInfoId
 {
 	// Creature
@@ -14,6 +16,10 @@ enum class EventInfoId
 
 namespace tfs::events {
 
+LuaScriptInterface& getScriptInterface();
+
+void load();
+void reload();
 int32_t getScriptId(EventInfoId eventInfoId);
 
 } // namespace tfs::events

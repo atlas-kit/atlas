@@ -5,13 +5,11 @@
 
 #include "../monster.h"
 
-#include "../item.h"
 #include "../lua/env.h"
+#include "events.h"
 #include "monster.h"
 
 namespace {
-
-LuaScriptInterface monsterScriptInterface{"Monster-Events Interface"};
 
 struct MonsterHandlers
 {
@@ -23,14 +21,15 @@ void loadMonsterScripts()
 {
 	monsterHandlers = {};
 
-	if (monsterScriptInterface.loadFile("data/scripts/events/monster.lua") != 0) {
+	auto& scriptInterface = tfs::events::getScriptInterface();
+	if (scriptInterface.loadFile("data/scripts/events/monster.lua") != 0) {
 		std::cout << "[Warning - tfs::events::monster::loadMonsterScripts] Cannot load monster events." << std::endl;
-		std::cout << monsterScriptInterface.getLastLuaError() << std::endl;
+		std::cout << scriptInterface.getLastLuaError() << std::endl;
 		return;
 	}
 
-	monsterHandlers.onDropLoot = monsterScriptInterface.getMetaEvent("Monster", "onDropLoot");
-	monsterHandlers.onSpawn = monsterScriptInterface.getMetaEvent("Monster", "onSpawn");
+	monsterHandlers.onDropLoot = scriptInterface.getMetaEvent("Monster", "onDropLoot");
+	monsterHandlers.onSpawn = scriptInterface.getMetaEvent("Monster", "onSpawn");
 }
 
 } // namespace
@@ -39,15 +38,11 @@ namespace tfs::events::monster {
 
 void load()
 {
-	monsterScriptInterface.initState();
-
 	loadMonsterScripts();
 }
 
 void reload()
 {
-	monsterScriptInterface.reInitState();
-
 	loadMonsterScripts();
 }
 
@@ -66,16 +61,16 @@ bool onSpawn(const std::shared_ptr<Monster>& monster, const Position& position, 
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(monsterHandlers.onSpawn, &monsterScriptInterface);
+	env->setScriptId(monsterHandlers.onSpawn, &tfs::events::getScriptInterface());
 
-	const auto L = monsterScriptInterface.getLuaState();
-	monsterScriptInterface.pushFunction(monsterHandlers.onSpawn);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(monsterHandlers.onSpawn);
 
 	tfs::lua::pushThing(L, monster);
 	tfs::lua::pushPosition(L, position);
 	tfs::lua::pushBoolean(L, startup);
 	tfs::lua::pushBoolean(L, artificial);
-	return monsterScriptInterface.callFunction(4);
+	return tfs::events::getScriptInterface().callFunction(4);
 }
 
 void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<Container>& corpse)
@@ -91,10 +86,10 @@ void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<C
 	}
 
 	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(monsterHandlers.onDropLoot, &monsterScriptInterface);
+	env->setScriptId(monsterHandlers.onDropLoot, &tfs::events::getScriptInterface());
 
-	const auto L = monsterScriptInterface.getLuaState();
-	monsterScriptInterface.pushFunction(monsterHandlers.onDropLoot);
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(monsterHandlers.onDropLoot);
 
 	tfs::lua::pushThing(L, monster);
 
@@ -104,7 +99,7 @@ void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<C
 		lua_pushnil(L);
 	}
 
-	monsterScriptInterface.callVoidFunction(2);
+	tfs::events::getScriptInterface().callVoidFunction(2);
 }
 
 } // namespace tfs::events::monster

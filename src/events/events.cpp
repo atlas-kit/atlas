@@ -5,10 +5,22 @@
 
 #include "events.h"
 
+#include "../lua/env.h"
 #include "creature.h"
+#include "game.h"
 #include "monster.h"
+#include "party.h"
+#include "player.h"
+
+namespace {
+
+LuaScriptInterface scriptInterface{"Event Interface"};
+
+} // namespace
 
 namespace tfs::events {
+
+LuaScriptInterface& getScriptInterface() { return scriptInterface; }
 
 int32_t getScriptId(EventInfoId eventInfoId)
 {
@@ -20,6 +32,28 @@ int32_t getScriptId(EventInfoId eventInfoId)
 		default:
 			return -1;
 	}
+}
+
+void load()
+{
+	scriptInterface.initState();
+
+	tfs::events::creature::load();
+	tfs::events::game::load();
+	tfs::events::monster::load();
+	tfs::events::party::load();
+	tfs::events::player::load();
+}
+
+void reload()
+{
+	scriptInterface.reInitState();
+
+	tfs::events::creature::reload();
+	tfs::events::game::reload();
+	tfs::events::monster::reload();
+	tfs::events::party::reload();
+	tfs::events::player::reload();
 }
 
 } // namespace tfs::events
