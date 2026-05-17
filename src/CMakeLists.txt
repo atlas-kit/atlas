@@ -10,7 +10,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/connection.cpp
 	${CMAKE_CURRENT_LIST_DIR}/container.cpp
 	${CMAKE_CURRENT_LIST_DIR}/creature.cpp
-	${CMAKE_CURRENT_LIST_DIR}/database.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasemanager.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasetasks.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.cpp
@@ -147,6 +146,14 @@ set(tfs_HDR
 
 set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 
+# Select exactly one database backend. The public Database/DBResult API is identical, so nothing
+# else in the tree changes regardless of which backend is compiled.
+if (USE_BOOST_MYSQL)
+	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database_boost.cpp)
+else ()
+	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database.cpp)
+endif ()
+
 add_library(tfslib ${tfs_SRC})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
@@ -158,8 +165,15 @@ target_link_libraries(tfslib PRIVATE
 	ZLIB::ZLIB
 	${CMAKE_THREAD_LIBS_INIT}
 	${LUA_LIBRARIES}
-	${MYSQL_CLIENT_LIBS}
 	)
+
+# Link only the backend actually compiled. The C client libs are pulled in just for the
+# database.cpp backend; the Boost.MySQL backend needs Boost::mysql + OpenSSL::SSL instead.
+if (USE_BOOST_MYSQL)
+	target_link_libraries(tfslib PRIVATE Boost::mysql OpenSSL::SSL)
+else ()
+	target_link_libraries(tfslib PRIVATE ${MYSQL_CLIENT_LIBS})
+endif ()
 
 if (ENABLE_HTTP)
 	add_subdirectory(http)
