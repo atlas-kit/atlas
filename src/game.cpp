@@ -15,7 +15,6 @@
 #include "events/monster.h"
 #include "events/party.h"
 #include "events/player.h"
-#include "globalevent.h"
 #include "housetile.h"
 #include "http/http.h"
 #include "iologindata.h"
