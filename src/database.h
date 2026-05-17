@@ -9,24 +9,20 @@
 
 class DBResult;
 
-namespace tfs::detail {
-
-struct MysqlDeleter
-{
-	void operator()(MYSQL* handle) const { mysql_close(handle); }
-	void operator()(MYSQL_RES* handle) const { mysql_free_result(handle); }
-};
-
-using Mysql_ptr = std::unique_ptr<MYSQL, MysqlDeleter>;
-using MysqlResult_ptr = std::unique_ptr<MYSQL_RES, MysqlDeleter>;
-
-} // namespace tfs::detail
-
 class Database
 {
 public:
+	Database();
+	~Database();
+
+	// non-copyable, non-movable (singleton-friendly; instances may live as members of other classes)
+	Database(const Database&) = delete;
+	Database& operator=(const Database&) = delete;
+	Database(Database&&) = delete;
+	Database& operator=(Database&&) = delete;
+
 	/**
-	 * Singleton implementation.
+	 * Singleton accessor.
 	 *
 	 * @return database connection handler singleton
 	 */
@@ -37,17 +33,14 @@ public:
 	}
 
 	/**
-	 * Connects to the database
+	 * Connects to the database.
 	 *
 	 * @return true on successful connection, false on error
 	 */
 	bool connect();
 
 	/**
-	 * Executes command.
-	 *
-	 * Executes query which doesn't generates results (eg. INSERT, UPDATE,
-	 * DELETE...).
+	 * Executes a command that does not produce a result set (INSERT, UPDATE, DELETE, ...).
 	 *
 	 * @param query command
 	 * @return true on success, false on error
@@ -55,58 +48,39 @@ public:
 	bool executeQuery(const std::string& query);
 
 	/**
-	 * Queries database.
+	 * Executes a query that produces a result set (typically SELECT).
 	 *
-	 * Executes query which generates results (mostly SELECT).
-	 *
-	 * @return results object (nullptr on error)
+	 * @return results object (nullptr on error or empty result)
 	 */
 	std::shared_ptr<DBResult> storeQuery(std::string_view query);
 
 	/**
-	 * Escapes string for query.
-	 *
-	 * Prepares string to fit SQL queries including quoting it.
-	 *
-	 * @param s string to be escaped
-	 * @return quoted string
+	 * Escapes a string for inclusion in a SQL query, returning the escaped value wrapped in
+	 * single quotes.
 	 */
-	std::string escapeString(std::string_view s) const { return escapeBlob(s.data(), s.length()); }
+	std::string escapeString(std::string_view s) const;
 
 	/**
-	 * Escapes binary stream for query.
-	 *
-	 * Prepares binary stream to fit SQL queries.
-	 *
-	 * @param s binary stream
-	 * @param length stream length
-	 * @return quoted string
+	 * Escapes a binary stream for inclusion in a SQL query, returning the escaped value wrapped
+	 * in single quotes.
 	 */
 	std::string escapeBlob(const char* s, uint32_t length) const;
 
 	/**
-	 * Retrieve id of last inserted row
-	 *
-	 * @return id on success, 0 if last query did not result on any rows with
-	 * auto_increment keys
+	 * @return id of the last inserted row, or 0 if the last query did not produce one
 	 */
-	uint64_t getLastInsertId() const { return static_cast<uint64_t>(mysql_insert_id(handle.get())); }
+	uint64_t getLastInsertId() const;
 
 	/**
-	 * Get database engine version
-	 *
-	 * @return the database engine version
+	 * @return the database client library version string
 	 */
-	static const char* getClientVersion() { return mysql_get_client_info(); }
+	static const char* getClientVersion();
 
-	uint64_t getMaxPacketSize() const { return maxPacketSize; }
+	uint64_t getMaxPacketSize() const;
 
 private:
 	/**
-	 * Transaction related methods.
-	 *
-	 * Methods for starting, committing and rolling back transaction. Each of
-	 * the returns boolean value.
+	 * Transaction control. Exposed to DBTransaction via friendship; not intended for direct use.
 	 *
 	 * @return true on success, false on error
 	 */
@@ -114,11 +88,8 @@ private:
 	bool rollback();
 	bool commit();
 
-	tfs::detail::Mysql_ptr handle = nullptr;
-	std::recursive_mutex databaseLock;
-	uint64_t maxPacketSize = 1048576;
-	// Do not retry queries if we are in the middle of a transaction
-	bool retryQueries = true;
+	struct Impl;
+	std::unique_ptr<Impl> impl_;
 
 	friend class DBTransaction;
 };
@@ -126,7 +97,7 @@ private:
 class DBResult
 {
 public:
-	explicit DBResult(tfs::detail::MysqlResult_ptr&& res);
+	~DBResult();
 
 	// non-copyable
 	DBResult(const DBResult&) = delete;
@@ -135,18 +106,10 @@ public:
 	template <typename T>
 	T getNumber(std::string_view column) const
 	{
-		auto it = listNames.find(column);
-		if (it == listNames.end()) {
-			std::cout << "[Error - DBResult::getNumber] Column '" << column << "' doesn't exist in the result set"
-			          << std::endl;
-			return {};
+		if (const char* raw = tryGetColumn(column, "DBResult::getNumber")) {
+			return pugi::cast<T>(raw);
 		}
-
-		if (!row[it->second]) {
-			return {};
-		}
-
-		return pugi::cast<T>(row[it->second]);
+		return {};
 	}
 
 	std::chrono::system_clock::time_point getDateTime(std::string_view column) const;
@@ -156,16 +119,28 @@ public:
 	bool next();
 
 private:
-	tfs::detail::MysqlResult_ptr handle;
-	MYSQL_ROW row;
+	struct Impl;
+	explicit DBResult(std::unique_ptr<Impl> impl);
 
-	std::map<std::string_view, size_t> listNames;
+	/**
+	 * Returns the raw C-string for `column`, or nullptr if the column is missing or its value is
+	 * SQL NULL. Logs an error with the given `context` (typically "DBResult::<method>") when the
+	 * column is not in the result set.
+	 *
+	 * Defined out-of-line so the template `getNumber<T>` does not pull MySQL internals into the
+	 * public header.
+	 */
+	const char* tryGetColumn(std::string_view column, std::string_view context) const;
+
+	std::unique_ptr<Impl> impl_;
 
 	friend class Database;
 };
 
 /**
- * INSERT statement.
+ * Multi-row INSERT statement builder. Buffers rows until either explicit execute() or the
+ * accumulated query size exceeds the server's max_allowed_packet, at which point the buffer is
+ * flushed and reset.
  */
 class DBInsert
 {

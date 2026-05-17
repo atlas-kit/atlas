@@ -1,3 +1,5 @@
+#include "../otpch.h"
+
 #define BOOST_ASIO_NO_DEPRECATED
 
 #include "http.h"

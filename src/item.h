@@ -652,15 +652,42 @@ public:
 		return getIntAttr(ITEM_ATTRIBUTE_CORPSEOWNER);
 	}
 
-	void setDuration(std::chrono::milliseconds time) { attributes->setDuration(time); }
-	void decreaseDuration(std::chrono::milliseconds time) { attributes->decreaseDuration(time); }
+	void setDuration(std::chrono::milliseconds time)
+	{
+		decayStartedAt = {};
+		getAttributes()->setDuration(time);
+	}
 	std::chrono::milliseconds getDuration() const
 	{
 		if (!attributes) {
 			return std::chrono::milliseconds::zero();
 		}
-		return std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+		auto stored = std::chrono::milliseconds{attributes->getIntAttr(ITEM_ATTRIBUTE_DURATION)};
+		if (decayStartedAt != std::chrono::steady_clock::time_point{} && stored > std::chrono::milliseconds::zero()) {
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+			                                                                     decayStartedAt);
+			return std::max(std::chrono::milliseconds::zero(), stored - elapsed);
+		}
+		return stored;
 	}
+
+	void markDecayStart() { decayStartedAt = std::chrono::steady_clock::now(); }
+	void markDecayStart(std::chrono::steady_clock::time_point tp) { decayStartedAt = tp; }
+	void flushDecayDuration()
+	{
+		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
+			auto remaining = getDuration();
+			decayStartedAt = {};
+			getAttributes()->setDuration(remaining);
+		}
+	}
+
+	// Wheel entries are stamped with the generation that was current when they
+	// were inserted. Bumping the generation invalidates every old entry so that
+	// callers wanting a real reschedule (Lua setting/removing a duration) can
+	// re-register the item without leaving duplicate or stale slots behind.
+	uint32_t getDecayGeneration() const { return decayGeneration; }
+	void bumpDecayGeneration() { ++decayGeneration; }
 
 	void setDecaying(ItemDecayState_t decayState) { setIntAttr(ITEM_ATTRIBUTE_DECAYSTATE, decayState); }
 	ItemDecayState_t getDecaying() const
@@ -903,11 +930,12 @@ private:
 
 	std::unique_ptr<ItemAttributes> attributes;
 
+	std::chrono::steady_clock::time_point decayStartedAt{};
+	uint32_t decayGeneration = 0;
+
 	uint8_t count = 1; // number of stacked items
 
 	bool loadedFromMap = false;
-
-	// Don't add variables here, use the ItemAttribute class.
 };
 
 using ItemList = std::list<std::shared_ptr<Item>>;

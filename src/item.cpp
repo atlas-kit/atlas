@@ -143,9 +143,20 @@ std::shared_ptr<Item> Item::clone() const
 	const auto item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
+		// Drop the inherited DECAYSTATE from the copied attributes. Calling
+		// setDecaying(DECAYING_FALSE) would keep the attribute slot with a
+		// residual zero, which still poisons operator== and hasMarketAttributes.
+		// removeAttribute clears both the value and the bit; if the clone is then
+		// registered for decay below, setDecaying(DECAYING_TRUE) recreates it.
+		if (hasAttribute(ITEM_ATTRIBUTE_DECAYSTATE)) {
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
+		}
+		if (decayStartedAt != std::chrono::steady_clock::time_point{}) {
+			item->setDuration(getDuration());
+		}
 		if (item->getDuration() > std::chrono::milliseconds::zero()) {
 			item->setDecaying(DECAYING_TRUE);
-			g_game.toDecayItems.push_back(item);
+			g_game.toDecayItems.push_back({item, item->getDecayGeneration()});
 		}
 	}
 	return item;
@@ -1095,8 +1106,7 @@ bool Item::hasMarketAttributes() const
 				return false;
 			}
 		} else if (attr.type == ITEM_ATTRIBUTE_DURATION) {
-			auto duration = std::chrono::milliseconds{attr.value.integer};
-			if (duration <= getDefaultDurationMin()) {
+			if (getDuration() <= getDefaultDurationMin()) {
 				return false;
 			}
 		} else {

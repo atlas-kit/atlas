@@ -32,6 +32,13 @@ else ()
     list(APPEND VCPKG_MANIFEST_FEATURES "libmariadb")
 endif ()
 
+# Selects the Boost.MySQL backend (src/database_boost.cpp) instead of the libmariadb/libmysql C
+# client backend (src/database.cpp). The public Database/DBResult API is identical either way.
+option(USE_BOOST_MYSQL "Use the Boost.MySQL database backend instead of the C client (vcpkg only)" OFF)
+if (USE_BOOST_MYSQL)
+    list(APPEND VCPKG_MANIFEST_FEATURES "boost-mysql")
+endif ()
+
 option(BUILD_TESTING "Build the testing tree" OFF)
 if (BUILD_TESTING)
     list(APPEND VCPKG_MANIFEST_FEATURES "unit-tests")
@@ -146,7 +153,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Packages / Dependencies
 # *****************************************************************************
 find_package(Lua REQUIRED)
-find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
+# Boost.MySQL needs OpenSSL::SSL for TLS; the C client backend only needs Crypto.
+if (USE_BOOST_MYSQL)
+    find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto SSL)
+else ()
+    find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
+endif ()
 find_package(PugiXML CONFIG REQUIRED)
 find_package(simdutf CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -179,6 +191,12 @@ if (BUILD_TESTING)
     list(APPEND BOOST_REQUIRED_COMPONENTS unit_test_framework)
 endif ()
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
+
+# Boost.MySQL is shipped as a separate vcpkg port exporting the Boost::mysql target. It is only
+# required when the Boost.MySQL backend is selected.
+if (USE_BOOST_MYSQL)
+    find_package(boost_mysql CONFIG REQUIRED)
+endif ()
 
 include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
 

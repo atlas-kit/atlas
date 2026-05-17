@@ -46,7 +46,7 @@ enum GameState_t
 inline constexpr int32_t PLAYER_NAME_LENGTH = 25;
 
 inline constexpr auto EVENT_DECAYINTERVAL = 250ms;
-inline constexpr int32_t EVENT_DECAY_BUCKETS = 4;
+inline constexpr int32_t EVENT_DECAY_BUCKETS = 7200;
 
 inline constexpr auto MOVE_CREATURE_INTERVAL = 1000ms;
 inline constexpr auto RANGE_MOVE_CREATURE_INTERVAL = 1500ms;
@@ -468,7 +468,13 @@ public:
 	Groups groups;
 	Map map;
 
-	std::vector<std::shared_ptr<Item>> toDecayItems;
+	struct PendingDecayEntry
+	{
+		std::shared_ptr<Item> item;
+		uint32_t generation;
+	};
+
+	std::vector<PendingDecayEntry> toDecayItems;
 
 	std::unordered_set<std::shared_ptr<Tile>> getTilesToClean() const { return tilesToClean; }
 	bool isTileInCleanList(const std::shared_ptr<Tile>& tile) { return tilesToClean.find(tile) != tilesToClean.end(); }
@@ -501,6 +507,7 @@ private:
 
 	void checkDecay();
 	void internalDecayItem(const std::shared_ptr<Item>& item);
+	void cleanup(std::chrono::steady_clock::time_point virtualNow);
 
 	std::chrono::steady_clock::time_point worldStart = std::chrono::steady_clock::now();
 
@@ -510,20 +517,27 @@ private:
 	std::unordered_map<uint32_t, std::shared_ptr<Guild>> guilds;
 	std::unordered_map<uint16_t, std::shared_ptr<Item>> uniqueItems;
 
-	std::list<std::weak_ptr<Item>> decayItems[EVENT_DECAY_BUCKETS];
+	struct DecayEntry
+	{
+		std::weak_ptr<Item> item;
+		uint32_t generation;
+	};
+
+	std::list<DecayEntry> decayItems[EVENT_DECAY_BUCKETS];
 	std::list<std::weak_ptr<Creature>> checkCreatureLists[EVENT_CREATURECOUNT];
 
 	size_t lastBucket = 0;
+	std::chrono::steady_clock::time_point nextDecayTick{};
 
 	WildcardTreeNode wildcardTree{false};
 
 	boost::container::flat_map<uint32_t, std::shared_ptr<House>> houses;
 
-	std::map<uint32_t, std::weak_ptr<Npc>> npcs;
-	std::map<uint32_t, std::weak_ptr<Monster>> monsters;
+	std::unordered_map<uint32_t, std::weak_ptr<Npc>> npcs;
+	std::unordered_map<uint32_t, std::weak_ptr<Monster>> monsters;
 
 	// list of items that are in trading state, mapped to the player holding them
-	std::map<std::shared_ptr<Item>, uint32_t> tradeItems;
+	std::unordered_map<std::shared_ptr<Item>, uint32_t> tradeItems;
 
 	std::unordered_set<std::shared_ptr<Tile>> tilesToClean;
 

@@ -113,4 +113,26 @@ private:
 
 } // namespace tfs
 
+struct CaseInsensitiveStringHash
+{
+	using is_transparent = void;
+
+	size_t operator()(std::string_view sv) const noexcept
+	{
+		size_t h = 0xcbf29ce484222325ULL;
+		for (unsigned char c : sv) {
+			h ^= static_cast<size_t>(std::tolower(c));
+			h *= 0x100000001b3ULL;
+		}
+		return h;
+	}
+};
+
+struct CaseInsensitiveStringEqual
+{
+	using is_transparent = void;
+
+	bool operator()(std::string_view a, std::string_view b) const noexcept { return boost::iequals(a, b); }
+};
+
 #endif // FS_TOOLS_H
