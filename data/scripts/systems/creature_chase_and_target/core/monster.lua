@@ -1,3 +1,7 @@
+-- Creature.canTarget(self, creature)
+-- Checks whether a given creature can be selected as an attack target.
+-- Returns false if the creature is removed, not attackable, inside a
+-- protection zone, out of sight, or on a different floor level.
 function Creature.canTarget(self, creature)
 	if creature:isRemoved() then
 		return false

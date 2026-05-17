@@ -1,3 +1,11 @@
+-- 0xA1: Attack / Set Target (client -> server)
+-- Payload:
+-- - creatureId:u32 (0 to stop attacking)
+--
+-- Validates line-of-sight and combat rules (via Combat.canTargetCreature)
+-- before accepting the target. If the target is unreachable or the attack
+-- is not allowed (e.g., protection zone, wrong PVP mode), the request
+-- is rejected and both chase and target are cleared.
 local handler = PacketHandler(0xA1)
 
 function handler.onReceive(player, msg)
