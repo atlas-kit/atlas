@@ -840,6 +840,10 @@ void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindP
 void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 {
 	if (!creature) {
+		if (const auto& oldFollow = getFollowCreature()) {
+			oldFollow->removeFollower(asCreature());
+		}
+
 		followCreature.reset();
 
 		hasFollowPath = false;
