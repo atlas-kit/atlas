@@ -4,17 +4,17 @@ local event = Event()
 
 -- Triggered whenever the creature's target changes (lost, gained, or swapped).
 function event.onCreatureTargetCreatureChanged(creature)
-    -- Ensure the logic only applies if the creature is a monster.
-    local monster = creature:asMonster()
-    if not monster then
-        return
-    end
+	-- Ensure the logic only applies if the creature is a monster.
+	local monster = creature:asMonster()
+	if not monster then
+		return
+	end
 
-    -- Check if the monster currently has no target.
-    -- If the target was lost or cleared, we reset the attack cooldowns (ticks).
-    if not monster:hasTargetCreature() then
-        monster:resetAttackTicks()
-    end
+	-- Check if the monster currently has no target.
+	-- If the target was lost or cleared, we reset the attack cooldowns (ticks).
+	if not monster:hasTargetCreature() then
+		monster:resetAttackTicks()
+	end
 end
 
 event:register()
