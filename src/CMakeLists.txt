@@ -165,11 +165,14 @@ target_link_libraries(tfslib PRIVATE
 	ZLIB::ZLIB
 	${CMAKE_THREAD_LIBS_INIT}
 	${LUA_LIBRARIES}
-	${MYSQL_CLIENT_LIBS}
 	)
 
+# Link only the backend actually compiled. The C client libs are pulled in just for the
+# database.cpp backend; the Boost.MySQL backend needs Boost::mysql + OpenSSL::SSL instead.
 if (USE_BOOST_MYSQL)
 	target_link_libraries(tfslib PRIVATE Boost::mysql OpenSSL::SSL)
+else ()
+	target_link_libraries(tfslib PRIVATE ${MYSQL_CLIENT_LIBS})
 endif ()
 
 if (ENABLE_HTTP)

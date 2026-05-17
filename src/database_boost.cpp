@@ -11,6 +11,11 @@
 #include "configmanager.h"
 #include "database.h"
 
+// Codacy's cppcheck cannot resolve the Boost.MySQL/Asio headers in its analysis sandbox and emits
+// missingIncludeSystem for each. The headers are genuinely required and available at compile time;
+// the warning is a tooling limitation ("Cppcheck does not need standard library headers to get
+// proper results"). Suppress the false positive for this include block.
+// cppcheck-suppress-begin missingIncludeSystem
 #include <boost/asio/error.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/mysql/any_connection.hpp>
@@ -26,6 +31,7 @@
 #include <boost/mysql/results.hpp>
 #include <boost/mysql/row_view.hpp>
 #include <boost/mysql/ssl_mode.hpp>
+// cppcheck-suppress-end missingIncludeSystem
 
 namespace {
 
@@ -319,9 +325,20 @@ std::string Database::escapeString(std::string_view s) const
 	if (!opts.has_value()) {
 		return "''";
 	}
-	// Text data is expected to be valid in the connection character set (utf8mb4). Formatting it
-	// as a string literal preserves charset/collation semantics for WHERE comparisons.
-	return mysql::format_sql(*opts, "{}", s);
+
+	// Prefer a charset-correct quoted string literal so text columns keep collation-aware
+	// comparison semantics (player/account name lookups, etc.). Boost.MySQL rejects values that
+	// are not valid in the connection character set, but the codebase also routes binary data
+	// (session tokens, packed IPs, ...) through escapeString, relying on the C client's byte-wise
+	// mysql_real_escape_string. For such data fall back to a binary-safe hex literal, which
+	// round-trips identically through BINARY/VARBINARY/BLOB columns. The error is reported via
+	// the result of get() rather than thrown.
+	mysql::format_context ctx(*opts);
+	ctx.append_value(s);
+	if (auto formatted = std::move(ctx).get()) {
+		return *formatted;
+	}
+	return escapeBlob(s.data(), s.size());
 }
 
 std::string Database::escapeBlob(const char* s, uint32_t length) const
