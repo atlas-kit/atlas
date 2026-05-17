@@ -362,10 +362,6 @@ void Creature::onChangeZone(ZoneType_t zone)
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
 		}
 	}
 }
