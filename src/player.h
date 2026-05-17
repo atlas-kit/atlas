@@ -110,8 +110,7 @@ public:
 		return std::static_pointer_cast<const Player>(shared_from_this());
 	}
 
-	Player* getPlayer() override { return this; }
-	const Player* getPlayer() const override { return this; }
+	bool isPlayer() const override { return true; }
 
 	void setID() final;
 
