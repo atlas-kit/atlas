@@ -7,6 +7,7 @@
 
 #include "../lua/env.h"
 #include "../lua/error.h"
+#include "../lua/script.h"
 #include "events.h"
 
 namespace {

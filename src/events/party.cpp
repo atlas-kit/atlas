@@ -7,6 +7,7 @@
 
 #include "../lua/env.h"
 #include "../lua/error.h"
+#include "../lua/script.h"
 #include "../player.h"
 #include "events.h"
 

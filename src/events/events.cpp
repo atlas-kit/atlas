@@ -6,6 +6,7 @@
 #include "events.h"
 
 #include "../lua/env.h"
+#include "../lua/script.h"
 #include "creature.h"
 #include "game.h"
 #include "monster.h"
