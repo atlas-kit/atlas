@@ -814,7 +814,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 void ProtocolGame::GetTileDescription(const std::shared_ptr<const Tile>& tile, NetworkMessage& msg)
 {
 	int32_t count;
-	if (const auto& ground = tile->getGroundRef()) {
+	if (const auto& ground = tile->getGround()) {
 		msg.addItem(ground);
 		count = 1;
 	} else {
