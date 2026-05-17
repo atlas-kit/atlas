@@ -147,9 +147,13 @@ set(tfs_HDR
 
 set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 
+# Add protobuf subdirectory
+add_subdirectory(protobuf)
+
 add_library(tfslib ${tfs_SRC})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
+	appearances_proto
 	Boost::iostreams
 	OpenSSL::Crypto
 	pugixml::pugixml

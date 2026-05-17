@@ -9,6 +9,11 @@
     "boost-lockfree",
     "boost-stacktrace",
     "boost-system",
+    "protobuf",
+    {
+      "name": "libiconv",
+      "platform": "osx"
+    },
     "lua",
     "openssl",
     "pugixml",

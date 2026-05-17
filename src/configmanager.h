@@ -45,6 +45,7 @@ enum boolean_config_t
 	MANASHIELD_BREAKABLE,
 	CHECK_DUPLICATE_STORAGE_KEYS,
 	MONSTER_OVERSPAWN,
+	USE_APPEARANCES,
 
 	LAST_BOOLEAN_CONFIG /* this must be the last one */
 };
@@ -68,6 +69,7 @@ enum string_config_t
 	DEFAULT_PRIORITY,
 	MAP_AUTHOR,
 	CONFIG_FILE,
+	APPEARANCES_FILE,
 
 	LAST_STRING_CONFIG /* this must be the last one */
 };

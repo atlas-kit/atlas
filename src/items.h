@@ -376,7 +376,13 @@ public:
 	uint8_t lightColor = 0;
 	uint8_t shootRange = 1;
 	uint8_t classification = 0;
+	uint8_t imbuementSlots = 0;
 	int8_t hitChance = 0;
+
+	uint16_t gemQualityId = 0;
+	uint16_t gemVocationId = 0;
+	uint16_t proficiencyId = 0;
+	uint16_t cyclopediaType = 0;
 
 	bool storeItem = false;
 	bool forceUse = false;
@@ -410,6 +416,7 @@ public:
 	bool showClientCharges = false;
 	bool showClientDuration = false;
 	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
+	bool dualWielding = false;
 };
 
 class Items
@@ -430,6 +437,7 @@ public:
 	void clear();
 
 	bool loadFromOtb(const std::string& file);
+	bool loadFromAppearances(const std::string& file);
 
 	const ItemType& operator[](size_t id) const { return getItemType(id); }
 	const ItemType& getItemType(size_t id) const;
@@ -455,35 +463,6 @@ public:
 private:
 	std::vector<ItemType> items;
 	InventoryVector inventory;
-	class ClientIdToServerIdMap
-	{
-	public:
-		ClientIdToServerIdMap() { vec.reserve(45000); }
-
-		void emplace(uint16_t clientId, uint16_t serverId)
-		{
-			if (clientId >= vec.size()) {
-				vec.resize(clientId + 1, 0);
-			}
-			if (vec[clientId] == 0) {
-				vec[clientId] = serverId;
-			}
-		}
-
-		uint16_t getServerId(uint16_t clientId) const
-		{
-			uint16_t serverId = 0;
-			if (clientId < vec.size()) {
-				serverId = vec[clientId];
-			}
-			return serverId;
-		}
-
-		void clear() { vec.clear(); }
-
-	private:
-		std::vector<uint16_t> vec;
-	} clientIdToServerIdMap;
 };
 
 #endif // FS_ITEMS_H

@@ -220,6 +220,7 @@
     <ClCompile Include="..\src\player.cpp" />
     <ClCompile Include="..\src\podium.cpp" />
     <ClCompile Include="..\src\position.cpp" />
+    <ClCompile Include="..\src\protobuf\appearances.cpp" />
     <ClCompile Include="..\src\protocol.cpp" />
     <ClCompile Include="..\src\protocolgame.cpp" />
     <ClCompile Include="..\src\protocolstatus.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="..\src\player.h" />
     <ClInclude Include="..\src\podium.h" />
     <ClInclude Include="..\src\position.h" />
+    <ClInclude Include="..\src\protobuf\appearances.h" />
     <ClInclude Include="..\src\protocol.h" />
     <ClInclude Include="..\src\protocolgame.h" />
     <ClInclude Include="..\src\protocolstatus.h" />

@@ -5,7 +5,9 @@
 
 #include "items.h"
 
+#include "configmanager.h"
 #include "movement.h"
+#include "protobuf/appearances.h"
 #include "pugicast.h"
 #include "weapons.h"
 
@@ -335,7 +337,6 @@ Items::Items()
 void Items::clear()
 {
 	items.clear();
-	clientIdToServerIdMap.clear();
 	nameToItems.clear();
 	currencyItems.clear();
 	inventory.clear();
@@ -344,7 +345,17 @@ void Items::clear()
 bool Items::reload()
 {
 	clear();
-	loadFromOtb("data/items/items.otb");
+
+	if (ConfigManager::getBoolean(ConfigManager::USE_APPEARANCES)) {
+		const std::string& appearancesFile = ConfigManager::getString(ConfigManager::APPEARANCES_FILE);
+		if (!loadFromAppearances(appearancesFile)) {
+			return false;
+		}
+	} else {
+		if (!loadFromOtb("data/items/items.otb")) {
+			return false;
+		}
+	}
 
 	if (!loadFromXml()) {
 		return false;
@@ -489,13 +500,16 @@ bool Items::loadFromOtb(const std::string& file)
 			}
 		}
 
-		clientIdToServerIdMap.emplace(clientId, serverId);
-
-		// store the found item
-		if (serverId >= items.size()) {
-			items.resize(serverId + 1);
+		// Store using clientId as the primary index (for dual OTB/Appearances compatibility)
+		// All data (maps, scripts, items.xml) should use clientId
+		if (clientId == 0) {
+			continue; // Skip items without clientId
 		}
-		ItemType& iType = items[serverId];
+
+		if (clientId >= items.size()) {
+			items.resize(clientId + 1);
+		}
+		ItemType& iType = items[clientId];
 
 		iType.group = static_cast<itemgroup_t>(itemNode.type);
 		switch (itemNode.type) {
@@ -551,7 +565,7 @@ bool Items::loadFromOtb(const std::string& file)
 		iType.showClientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 		iType.showClientDuration = hasBitSet(FLAG_CLIENTDURATION, flags);
 
-		iType.id = serverId;
+		iType.id = clientId; // Use clientId as primary ID
 		iType.clientId = clientId;
 		iType.speed = speed;
 		iType.lightLevel = lightLevel;
@@ -1853,10 +1867,9 @@ const ItemType& Items::getItemType(size_t id) const
 
 const ItemType& Items::getItemIdByClientId(uint16_t spriteId) const
 {
-	if (spriteId >= 100) {
-		if (uint16_t serverId = clientIdToServerIdMap.getServerId(spriteId)) {
-			return getItemType(serverId);
-		}
+	// Now that we always use clientId as primary index, this is simple
+	if (spriteId >= 100 && spriteId < items.size() && items[spriteId].id != 0) {
+		return getItemType(spriteId);
 	}
 	return items.front();
 }
@@ -1871,4 +1884,232 @@ uint16_t Items::getItemIdByName(const std::string& name)
 	if (result == nameToItems.end()) return 0;
 
 	return result->second;
+}
+
+// The appearances.dat (protobuf) only contains client-side visual/behavioral flags.
+// Server-side gameplay data (armor, attack, defense, weight, decay, charges, abilities,
+// ammo/shoot types, corpse type, floor change, etc.) must still come from items.xml.
+//
+// Proto fields mapped to ItemType:
+//   weaponType → WeaponType_t (proto→server enum conversion)
+//   minimumLevel → minReqLevel + WIELDINFO_LEVEL
+//   restrictToVocation → wieldInfo WIELDINFO_VOCREQ (details come from items.xml)
+//   expireStop → stopTime
+//   imbueableSlotCount → imbuementSlots
+//   dualWielding → dualWielding
+//   gemQualityId/gemVocationId → gemQualityId/gemVocationId
+//   proficiencyId → proficiencyId
+//   cyclopediaType → cyclopediaType
+//
+// Proto fields parsed into AppearanceInfo but NOT mapped to ItemType (no matching field):
+//   automapColor, isLyingObject, isDontHide, isTopEffect, defaultAction, elevation (value), lensHelp,
+//   noMovementAnimation, reverseAddons(E/W/S/N), wearout, clockExpire, expire, decoItemKit,
+//   formerObjectTypeId, npcSaleData (still accessible via g_appearances.getObjectAppearance(id))
+//
+// Proto fields NOT mapped because proto data is insufficient:
+//   isCorpse/isPlayerCorpse — proto is bool, but corpseType needs a RaceType_t enum (blood/fire/etc)
+//   isAmmo — proto is bool, but ammoType needs the specific Ammo_t enum
+//
+// Proto fields that COULD be mapped but are left to items.xml for consistency:
+//   show_off_socket → ITEM_TYPE_PODIUM (proto marks podiums, but XML already handles type assignment)
+//   fullbank → walkStack (fullground = not walkable on top, but reference implementations use XML for this)
+bool Items::loadFromAppearances(const std::string& file)
+{
+	if (!g_appearances.loadFromFile(file)) {
+		return false;
+	}
+
+	const auto& objects = g_appearances.getObjects();
+	for (const auto& [id, appearance] : objects) {
+		if (id == 0) {
+			continue;
+		}
+
+		// Resize items vector if needed
+		if (id >= items.size()) {
+			items.resize(id + 1);
+		}
+
+		ItemType& iType = items[id];
+
+		// Set IDs - with appearances, id == clientId (no serverId separation)
+		iType.id = id;
+		iType.clientId = id;
+
+		// Set name and description from appearances
+		if (!appearance.name.empty()) {
+			iType.name = appearance.name;
+		}
+		if (!appearance.description.empty()) {
+			iType.description = appearance.description;
+		}
+
+		// Map appearance flags to ItemType properties
+		if (appearance.isGround) {
+			iType.group = ITEM_GROUP_GROUND;
+			iType.speed = static_cast<uint16_t>(appearance.groundSpeed);
+		}
+
+		if (appearance.isContainer) {
+			iType.group = ITEM_GROUP_CONTAINER;
+			iType.type = ITEM_TYPE_CONTAINER;
+		}
+
+		if (appearance.isFluidPool) {
+			iType.group = ITEM_GROUP_SPLASH;
+		}
+
+		if (appearance.isFluidContainer) {
+			iType.group = ITEM_GROUP_FLUID;
+		}
+
+		// Boolean properties
+		iType.blockSolid = appearance.isUnpassable;
+		iType.blockProjectile = appearance.isBlockMissile;
+		iType.blockPathFind = appearance.isBlockPath;
+		iType.hasHeight = appearance.hasElevation;
+		iType.useable = appearance.isUsable || appearance.isMultiUse;
+		iType.pickupable = appearance.isPickupable;
+		iType.moveable = !appearance.isUnmovable;
+		iType.stackable = appearance.isStackable;
+		iType.alwaysOnTop = appearance.isOnTop;
+		iType.isVertical = (appearance.hookDirection == 1);
+		iType.isHorizontal = (appearance.hookDirection == 2);
+		iType.isHangable = appearance.isHangable;
+		iType.allowDistRead = false;
+		iType.rotatable = appearance.isRotatable;
+		iType.canReadText = appearance.isWritable || appearance.isWritableOnce;
+		iType.canWriteText = appearance.isWritable;
+		iType.lookThrough = appearance.isIgnoreLook;
+		iType.isAnimation = appearance.isAnimateAlways;
+		iType.forceUse = appearance.isForceUse;
+		iType.wrapContainer = appearance.isWrap || appearance.isUnwrap;
+
+		// Light properties
+		if (appearance.hasLight) {
+			iType.lightLevel = appearance.lightLevel;
+			iType.lightColor = appearance.lightColor;
+		}
+
+		// Text properties
+		if (appearance.isWritable || appearance.isWritableOnce) {
+			iType.maxTextLen = appearance.maxTextLength;
+		}
+
+		// Cloth/Equipment slot
+		if (appearance.isCloth) {
+			// Map cloth slot from appearances to slotPosition
+			switch (appearance.clothSlot) {
+				case 1:
+					iType.slotPosition = SLOTP_HEAD;
+					break;
+				case 2:
+					iType.slotPosition = SLOTP_NECKLACE;
+					break;
+				case 3:
+					iType.slotPosition = SLOTP_BACKPACK;
+					break;
+				case 4:
+					iType.slotPosition = SLOTP_ARMOR;
+					break;
+				case 5:
+					iType.slotPosition = SLOTP_RIGHT;
+					break;
+				case 6:
+					iType.slotPosition = SLOTP_LEFT;
+					break;
+				case 7:
+					iType.slotPosition = SLOTP_LEGS;
+					break;
+				case 8:
+					iType.slotPosition = SLOTP_FEET;
+					break;
+				case 9:
+					iType.slotPosition = SLOTP_RING;
+					break;
+				case 10:
+					iType.slotPosition = SLOTP_AMMO;
+					break;
+				default:
+					iType.slotPosition = SLOTP_HAND;
+					break;
+			}
+		}
+
+		// Classification (tier upgrade)
+		iType.classification = appearance.classification;
+
+		// Market properties
+		if (appearance.marketCategory > 0) {
+			iType.wareId = appearance.marketTradeAs > 0 ? appearance.marketTradeAs : id;
+		}
+
+		// AlwaysOnTop order
+		if (appearance.isGroundBorder) {
+			iType.alwaysOnTopOrder = 1;
+		} else if (appearance.isOnBottom) {
+			iType.alwaysOnTopOrder = 2;
+		} else if (appearance.isOnTop) {
+			iType.alwaysOnTopOrder = 3;
+		}
+
+		// Expiration flags
+		iType.stopTime = appearance.expireStop;
+
+		// Weapon type (proto enum → server enum)
+		if (appearance.weaponType > 0) {
+			switch (appearance.weaponType) {
+				case 1: // WEAPON_TYPE_SWORD
+					iType.weaponType = WEAPON_SWORD;
+					break;
+				case 2: // WEAPON_TYPE_AXE
+					iType.weaponType = WEAPON_AXE;
+					break;
+				case 3: // WEAPON_TYPE_CLUB
+					iType.weaponType = WEAPON_CLUB;
+					break;
+				case 5: // WEAPON_TYPE_BOW
+				case 6: // WEAPON_TYPE_CROSSBOW
+				case 8: // WEAPON_TYPE_THROW
+					iType.weaponType = WEAPON_DISTANCE;
+					break;
+				case 7: // WEAPON_TYPE_WAND_ROD
+					iType.weaponType = WEAPON_WAND;
+					break;
+				default:
+					break;
+			}
+		}
+
+		// Minimum level requirement
+		if (appearance.minimumLevel > 0) {
+			iType.minReqLevel = appearance.minimumLevel;
+			iType.wieldInfo |= WIELDINFO_LEVEL;
+		}
+
+		// Vocation restrictions
+		if (!appearance.restrictedVocations.empty()) {
+			iType.wieldInfo |= WIELDINFO_VOCREQ;
+		}
+
+		// Imbuement slots
+		iType.imbuementSlots = static_cast<uint8_t>(appearance.imbueableSlotCount);
+
+		// Dual wielding
+		iType.dualWielding = appearance.dualWielding;
+
+		// Skill wheel gem (server-side identifiers for gem system)
+		iType.gemQualityId = static_cast<uint16_t>(appearance.gemQualityId);
+		iType.gemVocationId = static_cast<uint16_t>(appearance.gemVocationId);
+
+		// Proficiency (proficiency system identifier)
+		iType.proficiencyId = static_cast<uint16_t>(appearance.proficiencyId);
+
+		// Cyclopedia entry type
+		iType.cyclopediaType = static_cast<uint16_t>(appearance.cyclopediaType);
+	}
+
+	items.shrink_to_fit();
+	std::cout << ">> Loaded " << objects.size() << " items from appearances" << std::endl;
+	return true;
 }
