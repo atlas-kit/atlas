@@ -284,10 +284,12 @@ bool Database::executeQuery(const std::string& query)
 	if (!runStatement(impl_->conn, query, result, impl_->retryQueries)) {
 		return false;
 	}
-	// Match mysql_insert_id() semantics: it reflects the *last* statement, returning 0 when that
-	// statement did not generate an AUTO_INCREMENT value. Update unconditionally so a later
-	// non-insert statement resets it to 0, exactly like the C client backend.
-	impl_->lastInsertId = result.last_insert_id();
+	// Match mysql_insert_id(): it carries the id from the last INSERT/UPDATE and is NOT reset by
+	// an intervening SELECT (verified against the C client backend in the CI matrix). A SELECT
+	// reports last_insert_id() == 0, so only overwrite when the statement actually produced one.
+	if (const auto id = result.last_insert_id(); id != 0) {
+		impl_->lastInsertId = id;
+	}
 	return true;
 }
 
@@ -299,8 +301,11 @@ std::shared_ptr<DBResult> Database::storeQuery(std::string_view query)
 	if (!runStatement(impl_->conn, query, resultImpl->result, impl_->retryQueries)) {
 		return nullptr;
 	}
-	// See executeQuery: keep last-insert-id semantics identical to the C client backend.
-	impl_->lastInsertId = resultImpl->result.last_insert_id();
+	// See executeQuery: keep last-insert-id semantics identical to the C client backend (a SELECT
+	// must not clobber the id from a preceding INSERT).
+	if (const auto id = resultImpl->result.last_insert_id(); id != 0) {
+		impl_->lastInsertId = id;
+	}
 
 	const auto meta = resultImpl->result.meta();
 	resultImpl->columnCount = meta.size();

@@ -109,17 +109,19 @@ BOOST_AUTO_TEST_CASE(get_last_insert_id_returns_inserted_row_id)
 	BOOST_TEST(result->getString("name") == "last_id");
 }
 
-BOOST_AUTO_TEST_CASE(get_last_insert_id_resets_after_non_insert_statement)
+BOOST_AUTO_TEST_CASE(get_last_insert_id_retained_after_non_insert_statement)
 {
 	BOOST_TEST(db.executeQuery(
-	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('lid_reset', 'lid_reset@example.com', SHA1('x'))"));
-	BOOST_TEST(db.getLastInsertId() > 0);
+	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('lid_keep', 'lid_keep@example.com', SHA1('x'))"));
+	const uint64_t insertId = db.getLastInsertId();
+	BOOST_TEST(insertId > 0);
 
-	// getLastInsertId() mirrors mysql_insert_id(): it reflects the *last* statement and returns 0
-	// when that statement did not generate an AUTO_INCREMENT value. This must hold identically for
-	// every backend (the suite runs against each one in the CI matrix).
+	// getLastInsertId() mirrors mysql_insert_id(): it carries the id of the last INSERT/UPDATE and
+	// is NOT reset by an intervening SELECT. getLastInsertId() must therefore still return the
+	// inserted id. This must hold identically for every backend (the suite runs against each one
+	// in the CI matrix).
 	BOOST_REQUIRE(db.storeQuery("SELECT 1 AS `n`"));
-	BOOST_TEST(db.getLastInsertId() == 0);
+	BOOST_TEST(db.getLastInsertId() == insertId);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
