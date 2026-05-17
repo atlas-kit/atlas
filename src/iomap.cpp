@@ -332,26 +332,7 @@ MapAttributes loadMap(Map& map, std::filesystem::path fileName)
 
 	auto width = OTB::read<uint16_t>(first, last);
 	auto height = OTB::read<uint16_t>(first, last);
-	auto majorVersionItems = OTB::read<uint32_t>(first, last);
-	auto minorVersionItems = OTB::read<uint32_t>(first, last);
-
-	if (majorVersionItems < 3) {
-		throw std::invalid_argument(
-		    "This map need to be upgraded by using the latest map editor version to be able to load correctly.");
-	}
-
-	if (majorVersionItems > Item::items.majorVersion) {
-		throw std::invalid_argument(
-		    "The map was saved with a different items.otb version, an upgraded items.otb is required.");
-	}
-
-	if (minorVersionItems < CLIENT_VERSION_810) {
-		throw std::invalid_argument("This map needs to be updated.");
-	}
-
-	if (minorVersionItems > Item::items.minorVersion) {
-		std::println("[Warning - IOMap::loadMap] This map needs an updated items.otb.");
-	}
+	OTB::skip(first, last, sizeof(uint32_t) + sizeof(uint32_t)); // skip legacy OTB version fields
 
 	std::println("> Map size: {:d}x{:d}.", width, height);
 

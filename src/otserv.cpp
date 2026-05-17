@@ -172,22 +172,10 @@ void mainLoader(ServiceManager* services)
 	}
 
 	// load item data
-	std::cout << ">> Loading items... " << std::endl;
-	if (ConfigManager::getBoolean(ConfigManager::USE_APPEARANCES)) {
-		const std::string& appearancesFile = ConfigManager::getString(ConfigManager::APPEARANCES_FILE);
-		std::cout << ">> Using appearances file: " << appearancesFile << std::endl;
-		if (!Item::items.loadFromAppearances(appearancesFile)) {
-			startupErrorMessage("Unable to load items (Appearances)!");
-			return;
-		}
-	} else {
-		if (!Item::items.loadFromOtb("data/items/items.otb")) {
-			startupErrorMessage("Unable to load items (OTB)!");
-			return;
-		}
-		std::cout << std::format("OTB v{:d}.{:d}.{:d}", Item::items.majorVersion, Item::items.minorVersion,
-		                         Item::items.buildNumber)
-		          << std::endl;
+	std::cout << ">> Loading items..." << std::endl;
+	if (!Item::items.loadFromAppearances("data/items/appearances.dat")) {
+		startupErrorMessage("Unable to load items (Appearances)!");
+		return;
 	}
 
 	if (!Item::items.loadFromXml()) {

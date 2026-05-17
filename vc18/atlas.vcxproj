@@ -285,7 +285,6 @@
     <ClInclude Include="..\src\iomapserialize.h" />
     <ClInclude Include="..\src\iomarket.h" />
     <ClInclude Include="..\src\item.h" />
-    <ClInclude Include="..\src\itemloader.h" />
     <ClInclude Include="..\src\items.h" />
     <ClInclude Include="..\src\lockfree.h" />
     <ClInclude Include="..\src\lua\api.h" />

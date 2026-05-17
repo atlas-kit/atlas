@@ -511,9 +511,6 @@
     <ClInclude Include="..\src\item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\itemloader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
