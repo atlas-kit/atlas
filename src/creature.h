@@ -308,7 +308,7 @@ public:
 	virtual void onThink(std::chrono::milliseconds interval);
 	virtual void onAttacking(std::chrono::milliseconds) {}
 
-	void updateFollowPath();
+	virtual void updateFollowPath() final;
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
