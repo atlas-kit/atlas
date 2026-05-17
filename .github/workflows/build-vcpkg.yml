@@ -13,6 +13,8 @@ on:
       - .github/workflows/build-vcpkg.yml
       - cmake/**
       - src/**
+      - atlas.rc
+      - atlas.ico
       - CMakeLists.txt
       - CMakePresets.json
       - vcpkg.json
@@ -22,6 +24,8 @@ on:
       - .github/workflows/build-vcpkg.yml
       - cmake/**
       - src/**
+      - atlas.rc
+      - atlas.ico
       - CMakeLists.txt
       - CMakePresets.json
       - vcpkg.json
