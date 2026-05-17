@@ -185,6 +185,7 @@ target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
 add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
 
+set(tfs_RC "")
 if (WIN32)
     set(tfs_RC ${CMAKE_SOURCE_DIR}/atlas.rc)
 endif ()
