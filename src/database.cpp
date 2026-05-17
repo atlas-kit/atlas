@@ -7,6 +7,16 @@
 
 #include "configmanager.h"
 
+// The MySQL/MariaDB C client headers are included here, in the only translation unit that uses
+// the C API, rather than globally in otpch.h. This keeps the Boost.MySQL backend
+// (database_boost.cpp) free of any C-client dependency, so USE_BOOST_MYSQL builds neither need
+// nor link the C client.
+#if __has_include(<mariadb/mysql.h>)
+#include <mariadb/mysql.h>
+#else
+#include <mysql/mysql.h>
+#endif
+
 #if __has_include(<mariadb/errmsg.h>)
 #include <mariadb/errmsg.h>
 #else

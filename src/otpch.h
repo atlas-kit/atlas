@@ -54,18 +54,6 @@
 #include <variant>
 #include <vector>
 
-#if __has_include(<mariadb/mysql.h>)
-#include <mariadb/mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
-
-#if __has_include("mariadb/mysql.h")
-#include <mariadb/mysql.h>
-#else
-#include <mysql/mysql.h>
-#endif
-
 using namespace std::chrono_literals;
 
 #endif // FS_OTPCH_H

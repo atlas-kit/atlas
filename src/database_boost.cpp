@@ -42,11 +42,13 @@ namespace mysql = boost::mysql;
 // constraint violation, ...) are reported to the caller as-is and never retried.
 bool isConnectionError(const boost::system::error_code& ec)
 {
+	// operation_aborted is intentionally excluded: it signals a deliberately cancelled operation,
+	// not a lost connection, and must not be turned into a reconnect/retry.
 	return ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset ||
 	       ec == boost::asio::error::connection_aborted || ec == boost::asio::error::broken_pipe ||
-	       ec == boost::asio::error::not_connected || ec == boost::asio::error::operation_aborted ||
-	       ec == boost::asio::error::network_down || ec == boost::asio::error::network_reset ||
-	       ec == boost::asio::error::timed_out || ec == mysql::client_errc::server_unsupported;
+	       ec == boost::asio::error::not_connected || ec == boost::asio::error::network_down ||
+	       ec == boost::asio::error::network_reset || ec == boost::asio::error::timed_out ||
+	       ec == mysql::client_errc::server_unsupported;
 }
 
 } // namespace
@@ -282,11 +284,10 @@ bool Database::executeQuery(const std::string& query)
 	if (!runStatement(impl_->conn, query, result, impl_->retryQueries)) {
 		return false;
 	}
-	// Mirror mysql_insert_id(): only statements that generate an AUTO_INCREMENT value update the
-	// remembered id, so a later SELECT does not clobber it before getLastInsertId() is read.
-	if (const auto id = result.last_insert_id(); id != 0) {
-		impl_->lastInsertId = id;
-	}
+	// Match mysql_insert_id() semantics: it reflects the *last* statement, returning 0 when that
+	// statement did not generate an AUTO_INCREMENT value. Update unconditionally so a later
+	// non-insert statement resets it to 0, exactly like the C client backend.
+	impl_->lastInsertId = result.last_insert_id();
 	return true;
 }
 
@@ -298,9 +299,8 @@ std::shared_ptr<DBResult> Database::storeQuery(std::string_view query)
 	if (!runStatement(impl_->conn, query, resultImpl->result, impl_->retryQueries)) {
 		return nullptr;
 	}
-	if (const auto id = resultImpl->result.last_insert_id(); id != 0) {
-		impl_->lastInsertId = id;
-	}
+	// See executeQuery: keep last-insert-id semantics identical to the C client backend.
+	impl_->lastInsertId = resultImpl->result.last_insert_id();
 
 	const auto meta = resultImpl->result.meta();
 	resultImpl->columnCount = meta.size();

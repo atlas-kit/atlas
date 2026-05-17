@@ -26,17 +26,18 @@ if (ENABLE_HTTP)
 endif ()
 
 option(USE_LIBMYSQL "Use libmysql instead of libmariadb (vcpkg only)" OFF)
-if (USE_LIBMYSQL)
-    list(APPEND VCPKG_MANIFEST_FEATURES "libmysql")
-else ()
-    list(APPEND VCPKG_MANIFEST_FEATURES "libmariadb")
-endif ()
 
 # Selects the Boost.MySQL backend (src/database_boost.cpp) instead of the libmariadb/libmysql C
 # client backend (src/database.cpp). The public Database/DBResult API is identical either way.
+# The two are mutually exclusive: with USE_BOOST_MYSQL the C client is neither pulled by vcpkg
+# nor required by find_package, so the Boost backend has no C-client dependency at all.
 option(USE_BOOST_MYSQL "Use the Boost.MySQL database backend instead of the C client (vcpkg only)" OFF)
 if (USE_BOOST_MYSQL)
     list(APPEND VCPKG_MANIFEST_FEATURES "boost-mysql")
+elseif (USE_LIBMYSQL)
+    list(APPEND VCPKG_MANIFEST_FEATURES "libmysql")
+else ()
+    list(APPEND VCPKG_MANIFEST_FEATURES "libmariadb")
 endif ()
 
 option(BUILD_TESTING "Build the testing tree" OFF)
@@ -165,22 +166,27 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
-# Look for vcpkg-provided packages first
-if (USE_LIBMYSQL)
-    find_package(unofficial-libmysql CONFIG)
-    if (unofficial-libmysql_FOUND)
-        set(MYSQL_CLIENT_LIBS "unofficial::libmysql::libmysql")
+# The MySQL/MariaDB C client is only needed by the C-client backend (src/database.cpp). The
+# Boost.MySQL backend does not use it at all, so skip the lookup entirely to keep that build
+# free of any C-client dependency (no find_package(MySQL REQUIRED) failure when it is absent).
+if (NOT USE_BOOST_MYSQL)
+    # Look for vcpkg-provided packages first
+    if (USE_LIBMYSQL)
+        find_package(unofficial-libmysql CONFIG)
+        if (unofficial-libmysql_FOUND)
+            set(MYSQL_CLIENT_LIBS "unofficial::libmysql::libmysql")
+        endif ()
+    else ()
+        find_package(unofficial-libmariadb CONFIG)
+        if (unofficial-libmariadb_FOUND)
+            set(MYSQL_CLIENT_LIBS "unofficial::libmariadb")
+        endif ()
     endif ()
-else ()
-    find_package(unofficial-libmariadb CONFIG)
-    if (unofficial-libmariadb_FOUND)
-        set(MYSQL_CLIENT_LIBS "unofficial::libmariadb")
-    endif ()
-endif ()
 
-if (NOT MYSQL_CLIENT_LIBS)
-    message(STATUS "Using MySQL client library from system")
-    find_package(MySQL REQUIRED)
+    if (NOT MYSQL_CLIENT_LIBS)
+        message(STATUS "Using MySQL client library from system")
+        find_package(MySQL REQUIRED)
+    endif ()
 endif ()
 
 set(BOOST_REQUIRED_COMPONENTS iostreams)

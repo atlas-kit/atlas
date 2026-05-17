@@ -109,6 +109,19 @@ BOOST_AUTO_TEST_CASE(get_last_insert_id_returns_inserted_row_id)
 	BOOST_TEST(result->getString("name") == "last_id");
 }
 
+BOOST_AUTO_TEST_CASE(get_last_insert_id_resets_after_non_insert_statement)
+{
+	BOOST_TEST(db.executeQuery(
+	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('lid_reset', 'lid_reset@example.com', SHA1('x'))"));
+	BOOST_TEST(db.getLastInsertId() > 0);
+
+	// getLastInsertId() mirrors mysql_insert_id(): it reflects the *last* statement and returns 0
+	// when that statement did not generate an AUTO_INCREMENT value. This must hold identically for
+	// every backend (the suite runs against each one in the CI matrix).
+	BOOST_REQUIRE(db.storeQuery("SELECT 1 AS `n`"));
+	BOOST_TEST(db.getLastInsertId() == 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_FIXTURE_TEST_SUITE(dbresult_column_access, DatabaseFixture)
