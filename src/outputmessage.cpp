@@ -13,7 +13,7 @@ extern Scheduler g_scheduler;
 
 namespace {
 
-const uint16_t OUTPUTMESSAGE_FREE_LIST_CAPACITY = 2048;
+const uint16_t OUTPUTMESSAGE_FREE_LIST_CAPACITY = 8192;
 const auto OUTPUTMESSAGE_AUTOSEND_DELAY = 10ms;
 
 // NOTE: A vector is used here because this container is mostly read and relatively rarely modified (only when a
