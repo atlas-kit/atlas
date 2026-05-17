@@ -297,10 +297,14 @@ bool DBInsert::addRow(const std::string& row)
 {
 	// adds new row to buffer
 	const size_t rowLength = row.length();
-	length += rowLength;
-	if (length > Database::getInstance().getMaxPacketSize() && !execute()) {
+	// Flush the buffer before adding this row if it would push the statement past the packet
+	// limit. execute() resets length to query.length(), so the current row must be accounted for
+	// *after* the potential flush; incrementing before the check loses this row's bytes from the
+	// running total whenever a flush happens, letting later checks undercount.
+	if (length + rowLength > Database::getInstance().getMaxPacketSize() && !execute()) {
 		return false;
 	}
+	length += rowLength;
 
 	if (values.empty()) {
 		values.reserve(rowLength + 2);
