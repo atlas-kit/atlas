@@ -26,7 +26,6 @@ struct PlayerHandlers
 	int32_t onMoveCreature = -1;
 	int32_t onReportRuleViolation = -1;
 	int32_t onRotateItem = -1;
-	int32_t onTurn = -1;
 	int32_t onTradeRequest = -1;
 	int32_t onTradeAccept = -1;
 	int32_t onTradeCompleted = -1;
@@ -71,7 +70,6 @@ void loadPlayerScripts()
 	playerHandlers.onMoveCreature = scriptInterface.getMetaEvent("Player", "onMoveCreature");
 	playerHandlers.onReportRuleViolation = scriptInterface.getMetaEvent("Player", "onReportRuleViolation");
 	playerHandlers.onRotateItem = scriptInterface.getMetaEvent("Player", "onRotateItem");
-	playerHandlers.onTurn = scriptInterface.getMetaEvent("Player", "onTurn");
 	playerHandlers.onTradeRequest = scriptInterface.getMetaEvent("Player", "onTradeRequest");
 	playerHandlers.onTradeAccept = scriptInterface.getMetaEvent("Player", "onTradeAccept");
 	playerHandlers.onTradeCompleted = scriptInterface.getMetaEvent("Player", "onTradeCompleted");
@@ -401,29 +399,6 @@ void onRotateItem(const std::shared_ptr<Player>& player, const std::shared_ptr<I
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushThing(L, item);
 	tfs::events::getScriptInterface().callVoidFunction(2);
-}
-
-bool onTurn(const std::shared_ptr<Player>& player, Direction direction)
-{
-	// Player:onTurn(direction)
-	if (playerHandlers.onTurn == -1) {
-		return true;
-	}
-
-	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::player::onTurn] Call stack overflow" << std::endl;
-		return false;
-	}
-
-	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(playerHandlers.onTurn, &tfs::events::getScriptInterface());
-
-	const auto L = tfs::events::getScriptInterface().getLuaState();
-	tfs::events::getScriptInterface().pushFunction(playerHandlers.onTurn);
-
-	tfs::lua::pushThing(L, player);
-	tfs::lua::pushNumber(L, direction);
-	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 bool onTradeRequest(const std::shared_ptr<Player>& player, const std::shared_ptr<Player>& target,
