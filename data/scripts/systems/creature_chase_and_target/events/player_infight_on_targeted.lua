@@ -1,4 +1,7 @@
 -- player_infight_on_targeted.lua
+-- Applies the in-fight condition (PZ-lock timer) when a player selects
+-- an attack target. Also clears targets for players who log in while
+-- inside a Protection Zone with an active target.
 
 do
 	local function addInFightTicks(player)

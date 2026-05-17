@@ -1,4 +1,9 @@
 -- monster_select_target.lua
+-- Allows monsters to select or switch attack targets when nearby
+-- creatures move. Handles target acquisition (idle monster), target
+-- switching (opponent blocking the path), and respects the monster
+-- type configuration (changeTargetChance).
+
 local event = Event()
 
 -- Triggered when a nearby creature moves, allowing the monster to evaluate or switch targets.

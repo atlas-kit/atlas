@@ -1,4 +1,9 @@
 -- player_untarget_on_pz_enter.lua
+-- Clears the player's attack target (and chase sync) when either the
+-- player or their target enters a restricted zone. Handles Protection
+-- Zones, No-PVP zones, and Optional-PVP world type rules. Respects
+-- the IgnoreProtectionZone GM flag.
+
 do
 	local event = Event()
 

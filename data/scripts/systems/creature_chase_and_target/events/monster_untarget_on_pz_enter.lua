@@ -1,4 +1,8 @@
 -- monster_untarget_on_pz_enter.lua
+-- Clears monster targets when either the monster or its target enters a
+-- Protection Zone. Also clears the chase target and resets attack ticks
+-- to prevent the monster from attacking into or from safe zones.
+
 do
 	local event = Event()
 

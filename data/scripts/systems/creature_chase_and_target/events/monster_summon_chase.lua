@@ -1,4 +1,7 @@
--- monster_chase.lua
+-- monster_summon_chase.lua
+-- Periodic Think handler for summoned monsters. Ensures summons follow
+-- their master's attack target when in combat, or follow the master
+-- itself when idle. Handles self-target safety checks and chase sync.
 local event = Event()
 
 -- Periodic check to manage the monster's behavior (targeting or following).

@@ -1,4 +1,7 @@
 -- cancel_target_on_lost_visibility.lua
+-- Cancels the attack target (and chase sync) when the target becomes
+-- invisible, changes floor, or is removed. Applies to both players and
+-- monsters, with special handling for master-target relationships.
 
 do
 	local event = Event()

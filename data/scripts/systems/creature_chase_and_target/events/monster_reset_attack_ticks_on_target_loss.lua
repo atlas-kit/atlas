@@ -1,4 +1,7 @@
 -- monster_reset_attack_ticks_on_target_loss.lua
+-- Resets the monster's attack cooldown (attack ticks) when the current
+-- target is lost or cleared. Prevents the monster from attacking
+-- immediately upon re-targeting after losing the previous target.
 
 local event = Event()
 

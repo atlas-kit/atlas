@@ -1,4 +1,8 @@
 -- player_stop_walking_on_chase_loss.lua
+-- Forces the player to stop walking when their chase/follow target is
+-- lost or cleared. Prevents the player from continuing toward the last
+-- known position of a target that no longer exists.
+
 local event = Event()
 
 -- Triggered whenever the player's chase/follow target changes.

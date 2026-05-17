@@ -1,4 +1,7 @@
 -- monster_cancel_chase_on_lost_visibility.lua
+-- Monster-specific chase cancellation on visibility loss.
+-- Separate from the generic cancel_chase handler because monsters
+-- only check on move events, not on Think or creature removal.
 
 do
 	local event = Event()

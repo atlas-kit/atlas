@@ -1,4 +1,8 @@
 -- player_stop_walking_on_target_loss.lua
+-- Forces the player to stop walking when their attack target is lost
+-- or cleared. Stops the player from walking into danger toward a now-
+-- invalid target.
+
 local event = Event()
 
 -- Triggered whenever the player's attack target changes or is lost.

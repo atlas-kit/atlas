@@ -1,4 +1,8 @@
 -- player_cancel_target_on_chase.lua
+-- Cancels the player's attack target if they start chasing/following a
+-- different creature. Ensures a player cannot attack one creature while
+-- following another.
+
 local event = Event()
 
 -- Triggered whenever the player's chase/follow target changes.

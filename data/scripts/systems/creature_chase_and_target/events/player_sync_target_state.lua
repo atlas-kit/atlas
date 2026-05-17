@@ -1,4 +1,8 @@
 -- player_sync_target_state.lua
+-- Synchronizes the server-side target state with the game client.
+-- Ensures the red attack square is cleared in the UI when the player
+-- loses their target.
+
 local event = Event()
 
 -- Triggered when a player's combat target changes.

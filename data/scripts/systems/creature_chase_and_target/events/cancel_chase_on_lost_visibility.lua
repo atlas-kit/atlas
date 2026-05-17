@@ -1,4 +1,7 @@
 -- cancel_chase_on_lost_visibility.lua
+-- Handles automatic chase/follow cancellation when the followed creature
+-- goes out of sight, changes floor, or is removed from the game world.
+-- Uses both event-driven (move, remove) and periodic (Think) checks.
 
 do
 	local event = Event()

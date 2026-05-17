@@ -1,4 +1,8 @@
 -- player_auto_chase_on_target.lua
+-- Automatically starts or stops the player's chase/follow when their
+-- attack target changes. Respects the Secure Mode (Hand icon) setting:
+-- if enabled the player auto-chases the target, if disabled stays still.
+
 local event = Event()
 
 -- Triggered when a player selects a new target or loses their current one.

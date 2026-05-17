@@ -1,4 +1,8 @@
 -- player_lost_chase_on_remove.lua
+-- Cancels the player's chase target when a creature is removed from the
+-- game world (death, logout, teleport), but only if the player has a
+-- pending walk action. Prevents the visual "sliding" toward a now-
+-- removed entity.
 
 local event = Event()
 
