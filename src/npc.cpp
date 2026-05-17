@@ -260,7 +260,7 @@ void Npc::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, Magi
 	}
 }
 
-void Npc::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout)
+void Npc::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool /*isLogout*/)
 {
 	if (creature.get() == this) {
 		closeAllShopWindows();

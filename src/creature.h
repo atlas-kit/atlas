@@ -282,7 +282,7 @@ public:
 	virtual void onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>& target);
 	virtual void onAttackedCreatureBlockHit(BlockType_t) {}
 	virtual void onBlockHit() {}
-	virtual void onChangeZone(ZoneType_t zone) {}
+	virtual void onChangeZone(ZoneType_t) {}
 	virtual void onIdleStatus();
 
 	virtual LightInfo getCreatureLight() const;
@@ -305,7 +305,7 @@ public:
 	{}
 
 	virtual void onCreatureAppear(const std::shared_ptr<Creature>&, bool, MagicEffectClasses) {}
-	virtual void onRemoveCreature(const std::shared_ptr<Creature>& creature, bool isLogout) {}
+	virtual void onRemoveCreature(const std::shared_ptr<Creature>&, bool) {}
 	virtual void onCreatureMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<const Tile>& newTile,
 	                            const Position& newPos, const std::shared_ptr<const Tile>& oldTile,
 	                            const Position& oldPos, bool teleport);
