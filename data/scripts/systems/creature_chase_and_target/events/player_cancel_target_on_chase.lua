@@ -1,25 +1,30 @@
--- player_cancel_chase_on_untarget.lua
+-- player_cancel_target_on_chase.lua
 local event = Event()
 
--- Triggered whenever a creature's target changes.
--- This handles stopping the chase movement when the player stops attacking.
-function event.onCreatureTargetCreatureChanged(creature)
-    -- Verify that the creature is a player.
+-- Triggered whenever the player's chase/follow target changes.
+-- This script ensures that if a player starts following a different creature, they stop attacking their current target.
+function event.onCreatureChaseCreatureChanged(creature)
+    -- Ensure the entity is a player.
     local player = creature:asPlayer()
     if not player then
         return
     end
 
-    -- If the player isn't chasing anyone, there's no movement to cancel.
-    if not player:hasChaseCreature() then
+    -- Get the current attack target.
+    local targetCreature = player:getTargetCreature()
+    if not targetCreature then
         return
     end
 
-    -- Check if the player no longer has an active target.
-    -- This occurs when the target dies, logs out, or the player manually stops the attack.
-    if not player:hasTargetCreature() then
-        -- Stop the player from chasing/following since there is no longer a target.
-        player:setChaseCreature(nil)
+    -- Get the new chase/follow target.
+    local chaseCreature = player:getChaseCreature()
+    if not chaseCreature then
+        return
+    end
+
+    -- Only cancel the attack if the creature being chased is not the creature being attacked.
+    if targetCreature ~= chaseCreature then
+        player:setTargetCreature(nil)
     end
 end
 

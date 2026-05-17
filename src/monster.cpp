@@ -1924,15 +1924,6 @@ bool Monster::canPushItems() const
 	return mType->info.canPushItems;
 }
 
-void Monster::removeTargetCreature(const std::shared_ptr<Creature>& creature)
-{
-	auto it = std::ranges::find_if(targetCreatures,
-	                               [&creature](const auto& target) { return tfs::owner_equal(target, creature); });
-	if (it != targetCreatures.end()) {
-		targetCreatures.erase(it);
-	}
-}
-
 bool Monster::isFriendCreature(const std::shared_ptr<const Creature>& creature) const
 {
 	{

@@ -725,9 +725,6 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0xB3:
 			parseWeaponProficiency(msg);
 			break;
-		case 0xBE:
-			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerCancelAttackAndFollow(playerID); });
-			break;
 		// case 0xC7: break; // request tournament leaderboard
 		case 0xC9: /* update tile */
 			break;

@@ -32,7 +32,7 @@ MuteCountMap Player::muteCountMap;
 uint32_t Player::playerAutoID = 0x10000000;
 uint32_t Player::playerIDLimit = 0x20000000;
 
-Player::Player(ProtocolGame_ptr p) : Creature{}, client{std::move(p)} {}
+Player::Player(std::shared_ptr<ProtocolGame> protocol) : Creature{}, client{std::move(protocol)} {}
 
 void Player::setID()
 {
@@ -1380,7 +1380,7 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(SchedulerTask_ptr task)
+void Player::setNextWalkActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (walkTaskEvent != 0) {
 		g_scheduler.stopEvent(walkTaskEvent);
@@ -1390,7 +1390,7 @@ void Player::setNextWalkActionTask(SchedulerTask_ptr task)
 	walkTask = std::move(task);
 }
 
-void Player::setNextActionTask(SchedulerTask_ptr task)
+void Player::setNextActionTask(std::unique_ptr<SchedulerTask> task)
 {
 	if (actionTaskEvent != 0) {
 		g_scheduler.stopEvent(actionTaskEvent);

@@ -27,7 +27,10 @@ do
         end
 
         -- Cancel target because the attacker entered a safe zone.
-        -- Print format updated with [FileName:EventName]
+        if player:getChaseCreature() == player:getTargetCreature() then
+            player:setChaseCreature(nil)
+        end
+        player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
         player:setTargetCreature(nil)
     end
 
@@ -64,11 +67,19 @@ do
         -- Logic for different zone types:
         if zone == ZONE_PROTECTION then
             -- Case 1: Target entered a Protection Zone.
+            if player:getChaseCreature() == targetCreature then
+                player:setChaseCreature(nil)
+            end
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
             player:setTargetCreature(nil)
             
         elseif zone == ZONE_NOPVP then
             -- Case 2: Target entered a No-PVP zone and the target is a player.
             if targetCreature:isPlayer() then
+                if player:getChaseCreature() == targetCreature then
+                    player:setChaseCreature(nil)
+                end
+                player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
                 player:setTargetCreature(nil)
             end
             
@@ -76,6 +87,10 @@ do
             -- Case 3: In Optional-PVP (No-PVP) worlds, players cannot be targeted in normal zones.
             if targetCreature:isPlayer() then
                 if Game.getWorldType() == WORLD_TYPE_NO_PVP then
+                    if player:getChaseCreature() == targetCreature then
+                        player:setChaseCreature(nil)
+                    end
+                    player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
                     player:setTargetCreature(nil)
                 end
             end

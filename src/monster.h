@@ -109,6 +109,7 @@ public:
 	bool selectTarget(const std::shared_ptr<Creature>& creature);
 
 	const auto& getFriendList() const { return friendList; }
+	const auto& getTargetList() const { return targetList; }
 
 	bool isTarget(const std::shared_ptr<const Creature>& creature) const;
 	bool isFleeing() const
@@ -139,6 +140,9 @@ public:
 	void addTarget(const std::shared_ptr<Creature>& creature, bool pushFront = false);
 	void removeTarget(const std::shared_ptr<Creature>& creature);
 
+	bool isFriend(const std::shared_ptr<const Creature>& creature) const { return isFriendCreature(creature); }
+	bool isOpponent(const std::shared_ptr<const Creature>& creature) const { return isOpponentCreature(creature); }
+
 	void setIdle(bool idle);
 	bool getIdleStatus() const { return isIdle; }
 
@@ -151,16 +155,16 @@ public:
 
 	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
 
-	const auto& getTargetCreatures() const { return targetCreatures; }
-	void addTargetCreature(const std::shared_ptr<Creature>& creature) { targetCreatures.push_back(creature); }
-	void removeTargetCreature(const std::shared_ptr<Creature>& creature);
+	const auto& getTargetCreatures() const { return targetList; }
+	void addTargetCreature(const std::shared_ptr<Creature>& creature) { addTarget(creature); }
+	void removeTargetCreature(const std::shared_ptr<Creature>& creature) { removeTarget(creature); }
 
 	bool isFriendCreature(const std::shared_ptr<const Creature>& creature) const;
 	bool isOpponentCreature(const std::shared_ptr<const Creature>& creature) const;
 
 private:
-	std::deque<std::weak_ptr<Creature>> targetCreatures;
-	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendCreatures;
+	std::deque<std::weak_ptr<Creature>> targetList;
+	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
 
 	MonsterIconHashMap monsterIcons;
 

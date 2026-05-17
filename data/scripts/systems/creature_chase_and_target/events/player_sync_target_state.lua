@@ -14,10 +14,6 @@ function event.onCreatureTargetCreatureChanged(creature)
     if not player:hasTargetCreature() then
         -- Force the game client to clear the red attack square.
         player:sendCancelTarget()
-        
-        -- Notify the player via the status message area (bottom of the screen).
-        player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
-        
     end
 end
 

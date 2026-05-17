@@ -20,6 +20,11 @@ do
         end
 
         -- Stop chasing if visibility is lost after the move.
+        local player = creature:asPlayer()
+        if player then
+            player:sendCancelTarget()
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setChaseCreature(nil)
     end
 
@@ -50,6 +55,11 @@ do
         end
 
         -- Stop chasing if the target moved out of sight or changed floors.
+        local player = creature:asPlayer()
+        if player then
+            player:sendCancelTarget()
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setChaseCreature(nil)
     end
 
@@ -78,6 +88,11 @@ do
         end
         
         -- Cancel chase if visibility is lost during the think cycle.
+        local player = creature:asPlayer()
+        if player then
+            player:sendCancelTarget()
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setChaseCreature(nil)
     end
 
@@ -97,6 +112,11 @@ do
         -- If the removed creature is the chase target, clear the chase.
         if chaseCreature ~= nearbyCreature then
             return
+        end
+
+        local player = creature:asPlayer()
+        if player then
+            player:sendCancelTarget()
         end
 
         creature:setChaseCreature(nil)

@@ -4,6 +4,7 @@ function handler.onReceive(player, msg)
     local targetCreatureId = msg:getU32()
 
     if targetCreatureId == 0 then
+        player:setChaseCreature(nil)
         player:setTargetCreature(nil)
         return
     end
@@ -26,6 +27,7 @@ function handler.onReceive(player, msg)
     if returnValue ~= RETURNVALUE_NOERROR then
         player:sendCancelMessage(returnValue)
         player:sendCancelTarget()
+        player:setChaseCreature(nil)
         player:setTargetCreature(nil)
         return
     end

@@ -1288,6 +1288,10 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 			return;
 		}
 
+		if (const auto& oldChase = getChaseCreature()) {
+			oldChase->removeFollower(asCreature());
+		}
+
 		chaseCreature = creature;
 		creature->addFollower(asCreature());
 
@@ -1300,6 +1304,10 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 	} else {
 		if (chaseCreature.expired()) {
 			return;
+		}
+
+		if (const auto& oldChase = getChaseCreature()) {
+			oldChase->removeFollower(asCreature());
 		}
 
 		chaseCreature.reset();

@@ -20,6 +20,13 @@ do
         end
 
         -- Clear target because it's no longer visible after moving.
+        local player = creature:asPlayer()
+        if player then
+            if player:getChaseCreature() == targetCreature then
+                player:setChaseCreature(nil)
+            end
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setTargetCreature(nil)
     end
 
@@ -51,6 +58,13 @@ do
         end
 
         -- Target moved to a different floor or behind an obstacle.
+        local player = creature:asPlayer()
+        if player then
+            if player:getChaseCreature() == targetCreature then
+                player:setChaseCreature(nil)
+            end
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setTargetCreature(nil)
     end
 
@@ -79,6 +93,13 @@ do
         end
 
         -- Target lost during the periodic think cycle.
+        local player = creature:asPlayer()
+        if player then
+            if player:getChaseCreature() == targetCreature then
+                player:setChaseCreature(nil)
+            end
+            player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
+        end
         creature:setTargetCreature(nil)
     end
 
@@ -98,6 +119,11 @@ do
         -- If the creature being removed is our current target, clear it.
         if targetCreature ~= nearbyCreature then
             return
+        end
+
+        local player = creature:asPlayer()
+        if player and player:getChaseCreature() == targetCreature then
+            player:setChaseCreature(nil)
         end
 
         creature:setTargetCreature(nil)
