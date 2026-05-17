@@ -312,10 +312,6 @@ void Creature::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool)
 		if (const auto& player = asPlayer()) {
 			player->sendCancelTarget();
 		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
 	}
 
 	if (const auto& followCreature = getFollowCreature(); creature == followCreature) {
@@ -414,10 +410,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 			if (const auto& player = asPlayer()) {
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
 			}
 		}
 	}
