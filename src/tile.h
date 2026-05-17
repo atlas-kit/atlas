@@ -248,6 +248,10 @@ public:
 	std::shared_ptr<Item> getUseItem(int32_t index) const;
 
 	std::shared_ptr<Item> getGround() const { return ground; }
+	// Non-owning view of the ground item, for transient reads in hot paths (e.g. tile
+	// serialization) where no ownership is taken and the tile outlives the access.
+	// Avoids the atomic shared_ptr copy that getGround() performs on every call.
+	const std::shared_ptr<Item>& getGroundRef() const { return ground; }
 	void setGround(std::shared_ptr<Item> item) { ground = std::move(item); }
 
 private:
