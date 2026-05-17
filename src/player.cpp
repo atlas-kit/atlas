@@ -1024,13 +1024,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		updateRegeneration();
 
-		if (getZone() == ZONE_PROTECTION) {
-			if (getTargetCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-				setTargetCreature(nullptr);
-				sendCancelTarget();
-				sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-		}
 
 		IOLoginData::updateOnlineStatus(guid, true);
 
