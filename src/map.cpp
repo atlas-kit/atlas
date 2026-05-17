@@ -376,6 +376,11 @@ void Map::getSpectatorsInternal(SpectatorVec& spectators, const Position& center
                                 int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ,
                                 int32_t maxRangeZ, bool onlyPlayers) const
 {
+	// Pre-grow the backing storage so the per-creature emplace loop below does not trigger
+	// incremental flat_set reallocations. reserve() only raises capacity; it never changes
+	// the set's contents, ordering or uniqueness.
+	spectators.reserve(spectators.size() + spectatorReserveSize);
+
 	auto min_y = centerPos.y + minRangeY;
 	auto min_x = centerPos.x + minRangeX;
 	auto max_y = centerPos.y + maxRangeY;

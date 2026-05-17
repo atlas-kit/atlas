@@ -176,6 +176,9 @@ public:
 	static constexpr int32_t maxClientViewportX = 8;
 	static constexpr int32_t maxClientViewportY = 6;
 	static constexpr int16_t nodeReserveSize = static_cast<int16_t>((maxViewportX * maxViewportY * 3) / 2);
+	// Typical spectator count for a full multifloor viewport under load is a few dozen; reserving
+	// up front avoids the incremental flat_set reallocations observed in profiling.
+	static constexpr size_t spectatorReserveSize = 64;
 
 	uint32_t clean() const;
 
