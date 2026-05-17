@@ -247,7 +247,9 @@ public:
 
 	std::shared_ptr<Item> getUseItem(int32_t index) const;
 
+	bool hasGround() const { return ground != nullptr; }
 	std::shared_ptr<Item> getGround() const { return ground; }
+	const std::shared_ptr<Item>& getGroundRef() const { return ground; }
 	void setGround(std::shared_ptr<Item> item) { ground = std::move(item); }
 
 private:
