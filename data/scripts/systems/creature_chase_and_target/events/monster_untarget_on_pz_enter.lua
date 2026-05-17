@@ -23,6 +23,8 @@ do
 
 		-- Clear target because the opponent is in a safe zone.
 		monster:setTargetCreature(nil)
+		monster:setChaseCreature(nil)
+		monster:resetAttackTicks()
 	end
 
 	event:register()
@@ -55,6 +57,8 @@ do
 		end
 
 		monster:setTargetCreature(nil)
+		monster:setChaseCreature(nil)
+		monster:resetAttackTicks()
 	end
 
 	event:register()

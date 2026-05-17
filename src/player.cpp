@@ -1111,14 +1111,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 void Player::onChangeZone(ZoneType_t zone)
 {
-	if (zone == ZONE_PROTECTION) {
-		if (getTargetCreature() && !hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-			setTargetCreature(nullptr);
-			sendCancelTarget();
-			sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-		}
-	}
-
 	g_game.updateCreatureWalkthrough(asPlayer());
 	sendIcons();
 }
@@ -3402,7 +3394,6 @@ void Player::onAttackedCreature(const std::shared_ptr<Creature>& target)
 	}
 
 	if (target.get() == this) {
-		addInFightTicks();
 		return;
 	}
 
@@ -3416,8 +3407,6 @@ void Player::onAttackedCreature(const std::shared_ptr<Creature>& target)
 			pzLocked = true;
 			sendIcons();
 		}
-
-		targetPlayer->addInFightTicks();
 
 		if (getSkull() == SKULL_NONE && getCombatSkull(targetPlayer) == SKULL_YELLOW) {
 			addAttacked(targetPlayer);
@@ -3442,8 +3431,6 @@ void Player::onAttackedCreature(const std::shared_ptr<Creature>& target)
 			}
 		}
 	}
-
-	addInFightTicks();
 }
 
 void Player::onIdleStatus()

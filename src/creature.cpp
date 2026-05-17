@@ -342,46 +342,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 				// our target is moving lets see if we can get in hit
 				g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
 			}
-
-			if (newTile->getZone() != oldTile->getZone()) {
-				const auto zone = targetCreature->getZone();
-
-				if (const auto& player = asPlayer()) {
-					if (zone == ZONE_PROTECTION) {
-						if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-							player->setTargetCreature(nullptr);
-							player->sendCancelTarget();
-							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-						}
-					} else if (zone == ZONE_NOPVP) {
-						if (targetCreature->asPlayer()) {
-							if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
-								player->setTargetCreature(nullptr);
-								player->sendCancelTarget();
-								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-							}
-						}
-					} else if (zone == ZONE_NORMAL) {
-						// targetCreature can leave a pvp zone if not pzlocked
-						if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-							if (targetCreature->asPlayer()) {
-								player->setTargetCreature(nullptr);
-								player->sendCancelTarget();
-								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-							}
-						}
-					}
-				} else {
-					if (zone == ZONE_PROTECTION) {
-						setTargetCreature(nullptr);
-						setChaseCreature(nullptr);
-
-						if (const auto& monster = asMonster()) {
-							monster->resetAttackTicks();
-						}
-					}
-				}
-			}
 		}
 	}
 }
