@@ -170,7 +170,7 @@ target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 add_subdirectory(events)
 target_sources(tfslib PRIVATE $<TARGET_OBJECTS:events>)
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN} ${events_HDR})
 
 add_executable(tfs ${tfs_MAIN})
 target_link_libraries(tfs PRIVATE tfslib)
