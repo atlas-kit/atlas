@@ -16,6 +16,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Default backend: the libmariadb/libmysql C client (src/database.cpp).
+          - backend: c-client
+            cmake_args: "[]"
+          # Boost.MySQL backend (src/database_boost.cpp). Runs the exact same test suite against
+          # the same MariaDB service to prove behavioral parity between the two backends.
+          - backend: boost-mysql
+            cmake_args: "['-DUSE_BOOST_MYSQL=ON']"
+
+    name: test (${{ matrix.backend }})
+
     services:
       db:
         image: mariadb
@@ -35,7 +49,7 @@ jobs:
     env:
       CXX: g++-14
       VCPKG_BUILD_TYPE: debug
-      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux-debug-asan
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux-debug-asan-${{ matrix.backend }}
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
 
@@ -53,9 +67,9 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-binary-ubuntu-test-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          key: vcpkg-binary-ubuntu-test-${{ matrix.backend }}-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
           restore-keys: |
-            vcpkg-binary-ubuntu-test-
+            vcpkg-binary-ubuntu-test-${{ matrix.backend }}-
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
@@ -73,5 +87,6 @@ jobs:
           LSAN_OPTIONS: exitcode=0
         with:
           configurePreset: linux-debug-asan
+          configurePresetAdditionalArgs: ${{ matrix.cmake_args }}
           buildPreset: linux-debug-asan
           testPreset: linux-debug-asan

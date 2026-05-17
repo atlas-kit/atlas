@@ -17,6 +17,12 @@
     "zlib"
   ],
   "features": {
+    "boost-mysql": {
+      "description": "Use the Boost.MySQL backend instead of the libmariadb/libmysql C client",
+      "dependencies": [
+        "boost-mysql"
+      ]
+    },
     "http": {
       "description": "Enable HTTP support",
       "dependencies": [

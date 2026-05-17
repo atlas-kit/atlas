@@ -476,6 +476,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 				} else {
 					if (zone == ZONE_PROTECTION) {
 						setAttackedCreature(nullptr);
+						setFollowCreature(nullptr);
 
 						if (const auto& monster = asMonster()) {
 							monster->resetAttackTicks();
