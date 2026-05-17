@@ -11,11 +11,17 @@
 // the C API, rather than globally in otpch.h. This keeps the Boost.MySQL backend
 // (database_boost.cpp) free of any C-client dependency, so USE_BOOST_MYSQL builds neither need
 // nor link the C client.
+//
+// Codacy's cppcheck cannot resolve the client headers in its analysis sandbox and emits
+// missingIncludeSystem; the headers are required and present at compile time (tooling
+// limitation, same suppression already used elsewhere in the codebase).
+// cppcheck-suppress-begin missingIncludeSystem
 #if __has_include(<mariadb/mysql.h>)
 #include <mariadb/mysql.h>
 #else
 #include <mysql/mysql.h>
 #endif
+// cppcheck-suppress-end missingIncludeSystem
 
 #if __has_include(<mariadb/errmsg.h>)
 #include <mariadb/errmsg.h>
