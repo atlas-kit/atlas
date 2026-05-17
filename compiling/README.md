@@ -5,8 +5,7 @@ Atlas can be compiled in multiple ways. Pick the guide that matches your environ
 | Platform | Guide | Notes |
 |---|---|---|
 | Linux | [linux.md](linux.md) | Recommended for production. CMake + vcpkg or system packages. |
-| Windows (CMake) | [windows-cmake.md](windows-cmake.md) | Recommended for Windows. Uses vcpkg manifest and Ninja via CMake presets. |
-| Windows (Visual Studio) | [windows-visual-studio.md](windows-visual-studio.md) | IDE-based build with the bundled `.slnx` solution. |
+| Windows | [windows-cmake.md](windows-cmake.md) | Uses vcpkg manifest and Ninja via CMake presets. |
 | Docker | [docker.md](docker.md) | Self-contained image build, no host toolchain required. |
 
 ## Build options
