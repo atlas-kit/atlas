@@ -404,7 +404,7 @@ void Map::getSpectatorsInternal(SpectatorVec& spectators, const Position& center
 		for (int_fast32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE) {
 			if (leafE) {
 				for (auto&& creature : leafE->creatures | std::views::filter([onlyPlayers](const auto& creature) {
-					                       return !onlyPlayers || creature->asPlayer() != nullptr;
+					                       return !onlyPlayers || creature->getPlayer() != nullptr;
 				                       })) {
 					const Position& cpos = creature->getPosition();
 					if (minRangeZ > cpos.z || maxRangeZ < cpos.z) {
@@ -476,7 +476,7 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 					// Filter players from cached spectators
 					const SpectatorVec& cachedSpectators = it->second;
 					for (const auto& spectator : cachedSpectators) {
-						if (spectator->asPlayer()) {
+						if (spectator->getPlayer()) {
 							spectators.emplace(spectator);
 						}
 					}
@@ -694,7 +694,7 @@ const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>
 		}
 
 		uint32_t flags = FLAG_PATHFINDING;
-		if (!creature->asPlayer()) {
+		if (!creature->getPlayer()) {
 			flags |= FLAG_IGNOREFIELDDAMAGE;
 		}
 

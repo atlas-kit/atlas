@@ -110,6 +110,9 @@ public:
 		return std::static_pointer_cast<const Player>(shared_from_this());
 	}
 
+	Player* getPlayer() override { return this; }
+	const Player* getPlayer() const override { return this; }
+
 	void setID() final;
 
 	static MuteCountMap muteCountMap;

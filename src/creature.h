@@ -99,6 +99,13 @@ public:
 
 	virtual std::shared_ptr<Player> asPlayer() { return nullptr; }
 	virtual std::shared_ptr<const Player> asPlayer() const { return nullptr; }
+
+	// Non-owning equivalents of asPlayer(): for transient "is this a player" checks and
+	// short-lived access, these avoid the atomic shared_ptr ref-count churn that
+	// asPlayer() (shared_from_this) incurs on every call.
+	virtual Player* getPlayer() { return nullptr; }
+	virtual const Player* getPlayer() const { return nullptr; }
+
 	virtual std::shared_ptr<Npc> asNpc() { return nullptr; }
 	virtual std::shared_ptr<const Npc> asNpc() const { return nullptr; }
 	virtual std::shared_ptr<Monster> asMonster() { return nullptr; }
