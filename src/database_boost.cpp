@@ -133,7 +133,11 @@ namespace {
 
 // Establishes (or re-establishes) the connection. Mirrors connectToDatabase() in the C API
 // backend: blocks, optionally retrying forever with a 1s backoff between attempts.
-bool connectToDatabase(Database::Impl& impl, const bool retryIfError, const bool isReconnect)
+//
+// Operates on the connection object rather than on Database::Impl, because Database::Impl is a
+// private nested type and cannot be named by namespace-scope free functions (the C API backend
+// passes the raw handle for the same reason).
+bool connectToDatabase(mysql::any_connection& conn, const bool retryIfError, const bool isReconnect)
 {
 	bool isFirstAttemptToConnect = true;
 	bool reconnecting = isReconnect;
@@ -148,7 +152,7 @@ bool connectToDatabase(Database::Impl& impl, const bool retryIfError, const bool
 		if (reconnecting) {
 			boost::system::error_code closeEc;
 			mysql::diagnostics closeDiag;
-			impl.conn.close(closeEc, closeDiag);
+			conn.close(closeEc, closeDiag);
 		}
 		reconnecting = true;
 
@@ -172,7 +176,7 @@ bool connectToDatabase(Database::Impl& impl, const bool retryIfError, const bool
 
 		boost::system::error_code ec;
 		mysql::diagnostics diag;
-		impl.conn.connect(params, ec, diag);
+		conn.connect(params, ec, diag);
 		if (!ec) {
 			return true;
 		}
@@ -190,15 +194,17 @@ bool connectToDatabase(Database::Impl& impl, const bool retryIfError, const bool
 }
 
 // Executes a statement, transparently reconnecting and retrying on connection-level failures when
-// retryIfLostConnection is set. Returns false for SQL errors (which the caller surfaces).
-bool runStatement(Database::Impl& impl, std::string_view query, mysql::results& out, const bool retryIfLostConnection)
+// retryIfLostConnection is set. Returns false for SQL errors (which the caller surfaces). The
+// caller (a Database member) is responsible for updating Database::Impl::lastInsertId from
+// `out.last_insert_id()`, since Database::Impl is private to this free function.
+bool runStatement(mysql::any_connection& conn, std::string_view query, mysql::results& out,
+                  const bool retryIfLostConnection)
 {
 	for (;;) {
 		boost::system::error_code ec;
 		mysql::diagnostics diag;
-		impl.conn.execute(query, out, ec, diag);
+		conn.execute(query, out, ec, diag);
 		if (!ec) {
-			impl.lastInsertId = out.last_insert_id();
 			return true;
 		}
 
@@ -212,7 +218,7 @@ bool runStatement(Database::Impl& impl, std::string_view query, mysql::results& 
 		if (!isConnectionError(ec) || !retryIfLostConnection) {
 			return false;
 		}
-		if (!connectToDatabase(impl, true, true)) {
+		if (!connectToDatabase(conn, true, true)) {
 			return false;
 		}
 	}
@@ -226,7 +232,7 @@ Database::~Database() = default;
 
 bool Database::connect()
 {
-	if (!connectToDatabase(*impl_, false, false)) {
+	if (!connectToDatabase(impl_->conn, false, false)) {
 		return false;
 	}
 
@@ -267,7 +273,15 @@ bool Database::executeQuery(const std::string& query)
 {
 	std::lock_guard<std::recursive_mutex> lockGuard(impl_->databaseLock);
 	mysql::results result;
-	return runStatement(*impl_, query, result, impl_->retryQueries);
+	if (!runStatement(impl_->conn, query, result, impl_->retryQueries)) {
+		return false;
+	}
+	// Mirror mysql_insert_id(): only statements that generate an AUTO_INCREMENT value update the
+	// remembered id, so a later SELECT does not clobber it before getLastInsertId() is read.
+	if (const auto id = result.last_insert_id(); id != 0) {
+		impl_->lastInsertId = id;
+	}
+	return true;
 }
 
 std::shared_ptr<DBResult> Database::storeQuery(std::string_view query)
@@ -275,8 +289,11 @@ std::shared_ptr<DBResult> Database::storeQuery(std::string_view query)
 	std::lock_guard<std::recursive_mutex> lockGuard(impl_->databaseLock);
 
 	auto resultImpl = std::make_unique<DBResult::Impl>();
-	if (!runStatement(*impl_, query, resultImpl->result, impl_->retryQueries)) {
+	if (!runStatement(impl_->conn, query, resultImpl->result, impl_->retryQueries)) {
 		return nullptr;
+	}
+	if (const auto id = resultImpl->result.last_insert_id(); id != 0) {
+		impl_->lastInsertId = id;
 	}
 
 	const auto meta = resultImpl->result.meta();
