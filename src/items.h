@@ -6,8 +6,31 @@
 
 #include "const.h"
 #include "enums.h"
-#include "itemloader.h"
+#include "fileloader.h"
 #include "position.h"
+
+enum itemgroup_t
+{
+	ITEM_GROUP_NONE,
+
+	ITEM_GROUP_GROUND,
+	ITEM_GROUP_CONTAINER,
+	ITEM_GROUP_WEAPON,     // deprecated
+	ITEM_GROUP_AMMUNITION, // deprecated
+	ITEM_GROUP_ARMOR,      // deprecated
+	ITEM_GROUP_CHARGES,
+	ITEM_GROUP_TELEPORT,   // deprecated
+	ITEM_GROUP_MAGICFIELD, // deprecated
+	ITEM_GROUP_WRITEABLE,  // deprecated
+	ITEM_GROUP_KEY,        // deprecated
+	ITEM_GROUP_SPLASH,
+	ITEM_GROUP_FLUID,
+	ITEM_GROUP_DOOR, // deprecated
+	ITEM_GROUP_DEPRECATED,
+	ITEM_GROUP_PODIUM,
+
+	ITEM_GROUP_LAST
+};
 
 class ConditionDamage;
 
@@ -376,7 +399,13 @@ public:
 	uint8_t lightColor = 0;
 	uint8_t shootRange = 1;
 	uint8_t classification = 0;
+	uint8_t imbuementSlots = 0;
 	int8_t hitChance = 0;
+
+	uint16_t gemQualityId = 0;
+	uint16_t gemVocationId = 0;
+	uint16_t proficiencyId = 0;
+	uint16_t cyclopediaType = 0;
 
 	bool storeItem = false;
 	bool forceUse = false;
@@ -410,6 +439,7 @@ public:
 	bool showClientCharges = false;
 	bool showClientDuration = false;
 	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
+	bool dualWielding = false;
 };
 
 class Items
@@ -429,7 +459,7 @@ public:
 	bool reload();
 	void clear();
 
-	bool loadFromOtb(const std::string& file);
+	bool loadFromAppearances(const std::string& file);
 
 	const ItemType& operator[](size_t id) const { return getItemType(id); }
 	const ItemType& getItemType(size_t id) const;
@@ -437,10 +467,6 @@ public:
 	const ItemType& getItemIdByClientId(uint16_t spriteId) const;
 
 	uint16_t getItemIdByName(const std::string& name);
-
-	uint32_t majorVersion = 0;
-	uint32_t minorVersion = 0;
-	uint32_t buildNumber = 0;
 
 	bool loadFromXml();
 	void parseItemNode(const pugi::xml_node& itemNode, uint16_t id);
@@ -455,35 +481,6 @@ public:
 private:
 	std::vector<ItemType> items;
 	InventoryVector inventory;
-	class ClientIdToServerIdMap
-	{
-	public:
-		ClientIdToServerIdMap() { vec.reserve(45000); }
-
-		void emplace(uint16_t clientId, uint16_t serverId)
-		{
-			if (clientId >= vec.size()) {
-				vec.resize(clientId + 1, 0);
-			}
-			if (vec[clientId] == 0) {
-				vec[clientId] = serverId;
-			}
-		}
-
-		uint16_t getServerId(uint16_t clientId) const
-		{
-			uint16_t serverId = 0;
-			if (clientId < vec.size()) {
-				serverId = vec[clientId];
-			}
-			return serverId;
-		}
-
-		void clear() { vec.clear(); }
-
-	private:
-		std::vector<uint16_t> vec;
-	} clientIdToServerIdMap;
 };
 
 #endif // FS_ITEMS_H

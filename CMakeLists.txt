@@ -164,6 +164,12 @@ if (USE_BOOST_MYSQL)
 else ()
     find_package(OpenSSL 3.0.0 REQUIRED COMPONENTS Crypto)
 endif ()
+# vcpkg ships protobuf's CMake package config; Debian's libprotobuf-dev only
+# ships the CMake-bundled FindProtobuf module. Prefer CONFIG, fall back to it.
+find_package(Protobuf CONFIG QUIET)
+if (NOT Protobuf_FOUND)
+    find_package(Protobuf REQUIRED)
+endif ()
 find_package(PugiXML CONFIG REQUIRED)
 find_package(simdutf CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)

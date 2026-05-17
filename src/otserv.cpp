@@ -172,14 +172,11 @@ void mainLoader(ServiceManager* services)
 	}
 
 	// load item data
-	std::cout << ">> Loading items... ";
-	if (!Item::items.loadFromOtb("data/items/items.otb")) {
-		startupErrorMessage("Unable to load items (OTB)!");
+	std::cout << ">> Loading items..." << std::endl;
+	if (!Item::items.loadFromAppearances("data/items/appearances.dat")) {
+		startupErrorMessage("Unable to load items (Appearances)!");
 		return;
 	}
-	std::cout << std::format("OTB v{:d}.{:d}.{:d}", Item::items.majorVersion, Item::items.minorVersion,
-	                         Item::items.buildNumber)
-	          << std::endl;
 
 	if (!Item::items.loadFromXml()) {
 		startupErrorMessage("Unable to load items (XML)!");

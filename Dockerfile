@@ -7,11 +7,13 @@ RUN apt-get update -q && apt-get install -yq \
   libboost-system1.83-dev \
   liblua5.4-dev \
   libmariadb-dev \
+  libprotobuf-dev \
   libpugixml-dev \
   libsimdutf-dev \
   libspdlog-dev \
   libssl-dev \
-  ninja-build
+  ninja-build \
+  protobuf-compiler
 
 COPY cmake /usr/src/atlas/cmake/
 COPY src /usr/src/atlas/src/
@@ -26,6 +28,7 @@ RUN apt-get update -q && apt-get install -yq \
   libboost-json1.83.0 \
   liblua5.4-0 \
   libmariadb3 \
+  libprotobuf32 \
   libpugixml1v5 \
   libsimdutf33 \
   libspdlog1.15 \

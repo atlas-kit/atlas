@@ -523,86 +523,86 @@ enum GuildEmblems_t : uint8_t
 	GUILDEMBLEM_OTHER = 5,
 };
 
-inline constexpr uint16_t ITEM_BROWSEFIELD = 460; // for internal use
-inline constexpr uint16_t ITEM_DECORATION_KIT = 26054;
+inline constexpr uint16_t ITEM_BROWSEFIELD = 470; // for internal use
+inline constexpr uint16_t ITEM_DECORATION_KIT = 23398;
 
-inline constexpr uint16_t ITEM_FIREFIELD_PVP_FULL = 1487;
-inline constexpr uint16_t ITEM_FIREFIELD_PVP_MEDIUM = 1488;
-inline constexpr uint16_t ITEM_FIREFIELD_PVP_SMALL = 1489;
-inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_FULL = 1492;
-inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_MEDIUM = 1493;
-inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_SMALL = 1494;
-inline constexpr uint16_t ITEM_FIREFIELD_NOPVP = 1500;
-inline constexpr uint16_t ITEM_FIREFIELD_NOPVP_MEDIUM = 1501;
+inline constexpr uint16_t ITEM_FIREFIELD_PVP_FULL = 2118;
+inline constexpr uint16_t ITEM_FIREFIELD_PVP_MEDIUM = 2119;
+inline constexpr uint16_t ITEM_FIREFIELD_PVP_SMALL = 2120;
+inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_FULL = 2123;
+inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_MEDIUM = 2124;
+inline constexpr uint16_t ITEM_FIREFIELD_PERSISTENT_SMALL = 2125;
+inline constexpr uint16_t ITEM_FIREFIELD_NOPVP = 21465;
+inline constexpr uint16_t ITEM_FIREFIELD_NOPVP_MEDIUM = 2132;
 
-inline constexpr uint16_t ITEM_POISONFIELD_PVP = 1490;
-inline constexpr uint16_t ITEM_POISONFIELD_PERSISTENT = 1496;
-inline constexpr uint16_t ITEM_POISONFIELD_NOPVP = 1503;
+inline constexpr uint16_t ITEM_POISONFIELD_PVP = 105;
+inline constexpr uint16_t ITEM_POISONFIELD_PERSISTENT = 2121;
+inline constexpr uint16_t ITEM_POISONFIELD_NOPVP = 2134;
 
-inline constexpr uint16_t ITEM_ENERGYFIELD_PVP = 1491;
-inline constexpr uint16_t ITEM_ENERGYFIELD_PERSISTENT = 1495;
-inline constexpr uint16_t ITEM_ENERGYFIELD_NOPVP = 1504;
+inline constexpr uint16_t ITEM_ENERGYFIELD_PVP = 2122;
+inline constexpr uint16_t ITEM_ENERGYFIELD_PERSISTENT = 2126;
+inline constexpr uint16_t ITEM_ENERGYFIELD_NOPVP = 2135;
 
-inline constexpr uint16_t ITEM_MAGICWALL = 1497;
-inline constexpr uint16_t ITEM_MAGICWALL_PERSISTENT = 1498;
-inline constexpr uint16_t ITEM_MAGICWALL_SAFE = 11098;
-inline constexpr uint16_t ITEM_MAGICWALL_NOPVP = 20669;
+inline constexpr uint16_t ITEM_MAGICWALL = 2129;
+inline constexpr uint16_t ITEM_MAGICWALL_PERSISTENT = 2129;
+inline constexpr uint16_t ITEM_MAGICWALL_SAFE = 2128;
+inline constexpr uint16_t ITEM_MAGICWALL_NOPVP = 10181;
 
-inline constexpr uint16_t ITEM_WILDGROWTH = 1499;
-inline constexpr uint16_t ITEM_WILDGROWTH_PERSISTENT = 2721;
-inline constexpr uint16_t ITEM_WILDGROWTH_SAFE = 11099;
-inline constexpr uint16_t ITEM_WILDGROWTH_NOPVP = 20670;
+inline constexpr uint16_t ITEM_WILDGROWTH = 2130;
+inline constexpr uint16_t ITEM_WILDGROWTH_PERSISTENT = 3635;
+inline constexpr uint16_t ITEM_WILDGROWTH_SAFE = 2130;
+inline constexpr uint16_t ITEM_WILDGROWTH_NOPVP = 10182;
 
-inline constexpr uint16_t ITEM_BAG = 1987;
-inline constexpr uint16_t ITEM_SHOPPING_BAG = 23782;
+inline constexpr uint16_t ITEM_BAG = 2853;
+inline constexpr uint16_t ITEM_SHOPPING_BAG = 21411;
 
-inline constexpr uint16_t ITEM_GOLD_COIN = 2148;
-inline constexpr uint16_t ITEM_PLATINUM_COIN = 2152;
-inline constexpr uint16_t ITEM_CRYSTAL_COIN = 2160;
-inline constexpr uint16_t ITEM_STORE_COIN = 24774; // in-game store currency
+inline constexpr uint16_t ITEM_GOLD_COIN = 3031;
+inline constexpr uint16_t ITEM_PLATINUM_COIN = 3035;
+inline constexpr uint16_t ITEM_CRYSTAL_COIN = 3043;
+inline constexpr uint16_t ITEM_STORE_COIN = 22118; // in-game store currency
 
-inline constexpr uint16_t ITEM_DEPOT = 2594;
-inline constexpr uint16_t ITEM_LOCKER = 2589;
-inline constexpr uint16_t ITEM_INBOX = 14404;
-inline constexpr uint16_t ITEM_MARKET = 14405;
-inline constexpr uint16_t ITEM_STORE_INBOX = 26052;
+inline constexpr uint16_t ITEM_DEPOT = 3502;
+inline constexpr uint16_t ITEM_LOCKER = 3497;
+inline constexpr uint16_t ITEM_INBOX = 12902;
+inline constexpr uint16_t ITEM_MARKET = 12903;
+inline constexpr uint16_t ITEM_STORE_INBOX = 23396;
 
 // move to separate enum class?
-inline constexpr uint16_t ITEM_DEPOT_BOX_I = 25453;
-inline constexpr uint16_t ITEM_DEPOT_BOX_II = 25454;
-inline constexpr uint16_t ITEM_DEPOT_BOX_III = 25455;
-inline constexpr uint16_t ITEM_DEPOT_BOX_IV = 25456;
-inline constexpr uint16_t ITEM_DEPOT_BOX_V = 25457;
-inline constexpr uint16_t ITEM_DEPOT_BOX_VI = 25458;
-inline constexpr uint16_t ITEM_DEPOT_BOX_VII = 25459;
-inline constexpr uint16_t ITEM_DEPOT_BOX_VIII = 25460;
-inline constexpr uint16_t ITEM_DEPOT_BOX_IX = 25461;
-inline constexpr uint16_t ITEM_DEPOT_BOX_X = 25462;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XI = 25463;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XII = 25464;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XIII = 25465;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XIV = 25466;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XV = 25467;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XVI = 25468;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XVII = 25469;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XVIII = 34571;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XIX = 44714;
-inline constexpr uint16_t ITEM_DEPOT_BOX_XX = 44715;
+inline constexpr uint16_t ITEM_DEPOT_BOX_I = 22797;
+inline constexpr uint16_t ITEM_DEPOT_BOX_II = 22798;
+inline constexpr uint16_t ITEM_DEPOT_BOX_III = 22799;
+inline constexpr uint16_t ITEM_DEPOT_BOX_IV = 22800;
+inline constexpr uint16_t ITEM_DEPOT_BOX_V = 22801;
+inline constexpr uint16_t ITEM_DEPOT_BOX_VI = 22802;
+inline constexpr uint16_t ITEM_DEPOT_BOX_VII = 22803;
+inline constexpr uint16_t ITEM_DEPOT_BOX_VIII = 22804;
+inline constexpr uint16_t ITEM_DEPOT_BOX_IX = 22805;
+inline constexpr uint16_t ITEM_DEPOT_BOX_X = 22806;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XI = 22807;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XII = 22808;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XIII = 22809;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XIV = 22810;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XV = 22811;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XVI = 22812;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XVII = 22813;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XVIII = 31915;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XIX = 39723;
+inline constexpr uint16_t ITEM_DEPOT_BOX_XX = 39724;
 
-inline constexpr uint16_t ITEM_MALE_CORPSE = 3058;
-inline constexpr uint16_t ITEM_FEMALE_CORPSE = 3065;
+inline constexpr uint16_t ITEM_MALE_CORPSE = 4240;
+inline constexpr uint16_t ITEM_FEMALE_CORPSE = 4247;
 
-inline constexpr uint16_t ITEM_FULLSPLASH = 2016;
-inline constexpr uint16_t ITEM_SMALLSPLASH = 2019;
+inline constexpr uint16_t ITEM_FULLSPLASH = 2886;
+inline constexpr uint16_t ITEM_SMALLSPLASH = 2889;
 
-inline constexpr uint16_t ITEM_PARCEL = 2595;
-inline constexpr uint16_t ITEM_LETTER = 2597;
-inline constexpr uint16_t ITEM_LETTER_STAMPED = 2598;
-inline constexpr uint16_t ITEM_LABEL = 2599;
+inline constexpr uint16_t ITEM_PARCEL = 3503;
+inline constexpr uint16_t ITEM_LETTER = 3505;
+inline constexpr uint16_t ITEM_LETTER_STAMPED = 3506;
+inline constexpr uint16_t ITEM_LABEL = 3507;
 
-inline constexpr uint16_t ITEM_AMULETOFLOSS = 2173;
+inline constexpr uint16_t ITEM_AMULETOFLOSS = 3057;
 
-inline constexpr uint16_t ITEM_DOCUMENT_RO = 1968; // read-only
+inline constexpr uint16_t ITEM_DOCUMENT_RO = 2834; // read-only
 
 enum ResourceTypes_t : uint8_t
 {
