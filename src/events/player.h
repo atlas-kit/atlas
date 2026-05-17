@@ -1,80 +1,19 @@
 // Copyright 2023 The Forgotten Server Authors. All rights reserved.
 // Use of this source code is governed by the GPL-2.0 License that can be found in the LICENSE file.
 
-#ifndef FS_EVENTS_H
-#define FS_EVENTS_H
+#pragma once
 
-#include "const.h"
-#include "creature.h"
-#include "lua/script.h"
-#include "networkmessage.h"
+#include "../creature.h"
+#include "../networkmessage.h"
 
 class ItemType;
-class Party;
 class Spell;
 class Tile;
 
-enum class EventInfoId
-{
-	// Creature
-	CREATURE_ONHEAR,
-
-	// Monster
-	MONSTER_ONSPAWN
-};
-
-namespace tfs::events {
+namespace tfs::events::player {
 
 void load();
 void reload();
-int32_t getScriptId(EventInfoId eventInfoId);
-
-} // namespace tfs::events
-
-namespace tfs::events::game {
-
-void onStartup();
-void onShutdown();
-void onSave();
-
-} // namespace tfs::events::game
-
-namespace tfs::events::creature {
-
-bool onChangeOutfit(const std::shared_ptr<Creature>& creature, const Outfit_t& outfit);
-ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& tile, bool aggressive);
-ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target);
-void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& speaker,
-            const std::string& words, SpeakClasses type);
-void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone);
-void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
-                     std::optional<int32_t> oldValue, bool isSpawn);
-void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
-                    CombatDamage& damage);
-void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
-                  CombatDamage& damage);
-void onThink(const std::shared_ptr<Creature>& creature, std::chrono::milliseconds interval);
-bool onPrepareDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& killer);
-void onDeath(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Item>& corpse,
-             const std::shared_ptr<Creature>& killer, const std::shared_ptr<Creature>& mostDamageKiller,
-             bool lastHitUnjustified, bool mostDamageUnjustified);
-void onKill(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target);
-
-} // namespace tfs::events::creature
-
-namespace tfs::events::party {
-
-bool onJoin(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
-bool onLeave(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
-bool onDisband(const std::shared_ptr<Party>& party);
-void onShareExperience(const std::shared_ptr<Party>& party, uint64_t& exp);
-bool onInvite(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
-bool onRevokeInvitation(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
-bool onPassLeadership(const std::shared_ptr<Party>& party, const std::shared_ptr<Player>& player);
-
-} // namespace tfs::events::party
-
-namespace tfs::events::player {
 
 bool onBrowseField(const std::shared_ptr<Player>& player, const Position& position);
 void onLook(const std::shared_ptr<Player>& player, const Position& position, const std::shared_ptr<Thing>& thing,
@@ -125,12 +64,3 @@ bool onTextEdit(const std::shared_ptr<Player>& player, const std::shared_ptr<Ite
 void onExtendedOpcode(const std::shared_ptr<Player>& player, uint8_t opcode, std::string_view buffer);
 
 } // namespace tfs::events::player
-
-namespace tfs::events::monster {
-
-void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<Container>& corpse);
-bool onSpawn(const std::shared_ptr<Monster>& monster, const Position& position, bool startup, bool artificial);
-
-} // namespace tfs::events::monster
-
-#endif // FS_EVENTS_H

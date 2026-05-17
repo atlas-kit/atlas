@@ -9,7 +9,7 @@
 #include "base64.h"
 #include "condition.h"
 #include "configmanager.h"
-#include "events.h"
+#include "events/player.h"
 #include "game.h"
 #include "iologindata.h"
 #include "iomarket.h"

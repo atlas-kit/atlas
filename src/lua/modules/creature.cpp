@@ -3,7 +3,7 @@
 #include "../../creature.h"
 
 #include "../../condition.h"
-#include "../../events.h"
+#include "../../events/events.h"
 #include "../../game.h"
 #include "../api.h"
 #include "../env.h"
