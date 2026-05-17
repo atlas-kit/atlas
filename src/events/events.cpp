@@ -38,22 +38,22 @@ void load()
 {
 	scriptInterface.initState();
 
-	tfs::events::creature::load();
 	tfs::events::game::load();
-	tfs::events::monster::load();
+	tfs::events::creature::load();
 	tfs::events::party::load();
 	tfs::events::player::load();
+	tfs::events::monster::load();
 }
 
 void reload()
 {
 	scriptInterface.reInitState();
 
-	tfs::events::creature::reload();
 	tfs::events::game::reload();
-	tfs::events::monster::reload();
+	tfs::events::creature::reload();
 	tfs::events::party::reload();
 	tfs::events::player::reload();
+	tfs::events::monster::reload();
 }
 
 } // namespace tfs::events

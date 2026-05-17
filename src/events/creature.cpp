@@ -302,8 +302,6 @@ void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared
 
 		if (damage.primary.type != COMBAT_HEALING) {
 			damage.primary.value = -damage.primary.value;
-		}
-		if (damage.secondary.type != COMBAT_HEALING) {
 			damage.secondary.value = -damage.secondary.value;
 		}
 	}
