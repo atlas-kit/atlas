@@ -321,9 +321,10 @@ enum stats_t
 	STAT_MAXMANAPOINTS,
 	STAT_SOULPOINTS, // unused
 	STAT_MAGICPOINTS,
+	STAT_CAPACITY,
 
 	STAT_FIRST = STAT_MAXHITPOINTS,
-	STAT_LAST = STAT_MAGICPOINTS
+	STAT_LAST = STAT_CAPACITY
 };
 
 enum SpecialSkills_t
@@ -563,7 +564,7 @@ struct ShopInfo
 struct MarketOffer
 {
 	uint64_t price;
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint16_t amount;
 	uint16_t counter;
 	uint16_t itemId;
@@ -587,7 +588,7 @@ struct MarketOfferEx
 
 	uint32_t id;
 	uint32_t playerId;
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint64_t price;
 	uint16_t amount;
 	uint16_t counter;
@@ -598,7 +599,7 @@ struct MarketOfferEx
 
 struct HistoryMarketOffer
 {
-	uint32_t timestamp;
+	std::chrono::system_clock::time_point timestamp;
 	uint64_t price;
 	uint16_t itemId;
 	uint16_t amount;
@@ -701,6 +702,30 @@ enum DamageAnalyzerImpactType
 	HEALING = 0,
 	DEALT = 1,
 	RECEIVED = 2
+};
+
+enum InspectObjectType : uint8_t
+{
+	INSPECT_NORMALOBJECT = 0,
+	INSPECT_NPCTRADE = 1,
+	INSPECT_PLAYERTRADE = 2,
+	INSPECT_CYCLOPEDIA = 3,
+	INSPECT_PROFICIENCY = 4,
+};
+
+enum ImbuementWindow_t : uint8_t
+{
+	IMBUEMENT_WINDOW_CHOICE = 0,
+	IMBUEMENT_WINDOW_SELECT_ITEM = 1,
+	IMBUEMENT_WINDOW_SCROLL = 2,
+};
+
+enum WeaponProficiency_t : uint8_t
+{
+	WEAPON_PROFICIENCY_ITEM_INFO = 0,
+	WEAPON_PROFICIENCY_LIST_INFO = 1,
+	WEAPON_PROFICIENCY_RESET_PERKS = 2,
+	WEAPON_PROFICIENCY_APPLY_PERKS = 3,
 };
 
 #endif // FS_ENUMS_H

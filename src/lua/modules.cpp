@@ -25,7 +25,6 @@ void importModules(LuaScriptInterface& lsi)
 	registerPlayer(lsi);  // requires creature
 
 	registerGame(lsi);
-	registerGlobalEvent(lsi);
 	registerGroup(lsi);
 	registerGuild(lsi);
 	registerHouse(lsi);
@@ -40,7 +39,6 @@ void importModules(LuaScriptInterface& lsi)
 	registerMonsters(lsi);
 	registerMoveEvent(lsi);
 	registerNetworkMessage(lsi);
-	registerOutfit(lsi);
 	registerParty(lsi);
 	registerPosition(lsi);
 	registerSpell(lsi);

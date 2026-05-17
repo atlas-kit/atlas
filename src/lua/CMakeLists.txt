@@ -16,7 +16,6 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/modules/creature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/database.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/game.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/modules/globalevent.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/globals.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/group.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/guild.cpp
@@ -29,7 +28,6 @@ set(luamodules_SRC
     ${CMAKE_CURRENT_LIST_DIR}/modules/moveevent.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/networkmessage.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/npc.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/modules/outfit.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/party.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/player.cpp
     ${CMAKE_CURRENT_LIST_DIR}/modules/podium.cpp

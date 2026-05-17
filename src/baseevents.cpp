@@ -80,7 +80,7 @@ void BaseEvents::reInitState(bool fromLua)
 	}
 }
 
-Event::Event(LuaScriptInterface* interface) : scriptInterface(interface) {}
+Event::Event(LuaScriptInterface* luaInterface) : scriptInterface(luaInterface) {}
 
 bool Event::checkScript(const std::string& basePath, const std::string& scriptsName,
                         const std::string& scriptFile) const
@@ -156,14 +156,14 @@ bool Event::loadCallback()
 	return true;
 }
 
-bool CallBack::loadCallBack(LuaScriptInterface* interface, const std::string& name)
+bool CallBack::loadCallBack(LuaScriptInterface* luaInterface, const std::string& name)
 {
-	if (!interface) {
+	if (!luaInterface) {
 		std::cout << "Failure: [CallBack::loadCallBack] scriptInterface == nullptr" << std::endl;
 		return false;
 	}
 
-	scriptInterface = interface;
+	scriptInterface = luaInterface;
 
 	int32_t id = scriptInterface->getEvent(name);
 	if (id == -1) {

@@ -10,15 +10,12 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/connection.cpp
 	${CMAKE_CURRENT_LIST_DIR}/container.cpp
 	${CMAKE_CURRENT_LIST_DIR}/creature.cpp
-	${CMAKE_CURRENT_LIST_DIR}/database.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasemanager.cpp
 	${CMAKE_CURRENT_LIST_DIR}/databasetasks.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.cpp
-	${CMAKE_CURRENT_LIST_DIR}/events.cpp
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.cpp
 	${CMAKE_CURRENT_LIST_DIR}/game.cpp
-	${CMAKE_CURRENT_LIST_DIR}/globalevent.cpp
 	${CMAKE_CURRENT_LIST_DIR}/groups.cpp
 	${CMAKE_CURRENT_LIST_DIR}/guild.cpp
 	${CMAKE_CURRENT_LIST_DIR}/house.cpp
@@ -35,11 +32,9 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.cpp
 	${CMAKE_CURRENT_LIST_DIR}/monster.cpp
 	${CMAKE_CURRENT_LIST_DIR}/monsters.cpp
-	${CMAKE_CURRENT_LIST_DIR}/mounts.cpp
 	${CMAKE_CURRENT_LIST_DIR}/movement.cpp
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/npc.cpp
-	${CMAKE_CURRENT_LIST_DIR}/outfit.cpp
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/party.cpp
 	${CMAKE_CURRENT_LIST_DIR}/player.cpp
@@ -90,10 +85,8 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.h
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.h
 	${CMAKE_CURRENT_LIST_DIR}/enums.h
-	${CMAKE_CURRENT_LIST_DIR}/events.h
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.h
 	${CMAKE_CURRENT_LIST_DIR}/game.h
-	${CMAKE_CURRENT_LIST_DIR}/globalevent.h
 	${CMAKE_CURRENT_LIST_DIR}/groups.h
 	${CMAKE_CURRENT_LIST_DIR}/guild.h
 	${CMAKE_CURRENT_LIST_DIR}/house.h
@@ -113,11 +106,9 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/matrixarea.h
 	${CMAKE_CURRENT_LIST_DIR}/monster.h
 	${CMAKE_CURRENT_LIST_DIR}/monsters.h
-	${CMAKE_CURRENT_LIST_DIR}/mounts.h
 	${CMAKE_CURRENT_LIST_DIR}/movement.h
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.h
 	${CMAKE_CURRENT_LIST_DIR}/npc.h
-	${CMAKE_CURRENT_LIST_DIR}/outfit.h
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.h
 	${CMAKE_CURRENT_LIST_DIR}/party.h
 	${CMAKE_CURRENT_LIST_DIR}/player.h
@@ -153,6 +144,14 @@ set(tfs_HDR
 
 set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 
+# Select exactly one database backend. The public Database/DBResult API is identical, so nothing
+# else in the tree changes regardless of which backend is compiled.
+if (USE_BOOST_MYSQL)
+	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database_boost.cpp)
+else ()
+	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database.cpp)
+endif ()
+
 add_library(tfslib ${tfs_SRC})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
@@ -164,12 +163,15 @@ target_link_libraries(tfslib PRIVATE
 	ZLIB::ZLIB
 	${CMAKE_THREAD_LIBS_INIT}
 	${LUA_LIBRARIES}
-	${MYSQL_CLIENT_LIBS}
 	)
 
-if (APPLE)
-	target_link_libraries(tfslib PRIVATE Iconv::Iconv)
-endif()
+# Link only the backend actually compiled. The C client libs are pulled in just for the
+# database.cpp backend; the Boost.MySQL backend needs Boost::mysql + OpenSSL::SSL instead.
+if (USE_BOOST_MYSQL)
+	target_link_libraries(tfslib PRIVATE Boost::mysql OpenSSL::SSL)
+else ()
+	target_link_libraries(tfslib PRIVATE ${MYSQL_CLIENT_LIBS})
+endif ()
 
 if (ENABLE_HTTP)
 	add_subdirectory(http)
@@ -179,9 +181,17 @@ endif ()
 add_subdirectory(lua)
 target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
+add_subdirectory(events)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:events>)
 
-add_executable(tfs ${tfs_MAIN})
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN} ${events_HDR})
+
+set(tfs_RC "")
+if (WIN32)
+    set(tfs_RC ${CMAKE_SOURCE_DIR}/atlas.rc)
+endif ()
+
+add_executable(tfs ${tfs_MAIN} ${tfs_RC})
 target_link_libraries(tfs PRIVATE tfslib)
 target_precompile_headers(tfs PUBLIC otpch.h)
 

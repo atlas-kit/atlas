@@ -428,7 +428,7 @@ void Weapon::addVocationWeaponSet(const std::string& vocationName)
 	}
 }
 
-WeaponMelee::WeaponMelee(LuaScriptInterface* interface) : Weapon(interface)
+WeaponMelee::WeaponMelee(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
@@ -527,7 +527,7 @@ int32_t WeaponMelee::getWeaponDamage(const std::shared_ptr<const Player>& player
 	return -normal_random(0, maxValue);
 }
 
-WeaponDistance::WeaponDistance(LuaScriptInterface* interface) : Weapon(interface)
+WeaponDistance::WeaponDistance(LuaScriptInterface* luaInterface) : Weapon(luaInterface)
 {
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -693,7 +693,7 @@ bool WeaponDistance::useWeapon(const std::shared_ptr<Player>& player, const std:
 			for (auto&& [dx, dy] : destList | std::views::as_const) {
 				// Blocking tiles or tiles without ground ain't valid targets for spears
 				if (const auto& tmpTile = g_game.map.getTile(destPos.x + dx, destPos.y + dy, destPos.z)) {
-					if (!tmpTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID) && tmpTile->getGround()) {
+					if (!tmpTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID) && tmpTile->hasGround()) {
 						destTile = tmpTile;
 						break;
 					}

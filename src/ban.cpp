@@ -24,12 +24,18 @@ const std::optional<BanInfo> getAccountBanInfo(uint32_t accountId)
 		return std::nullopt;
 	}
 
-	time_t expiresAt = result->getNumber<time_t>("expires_at");
-	if (expiresAt != 0 && std::chrono::system_clock::now() > std::chrono::system_clock::from_time_t(expiresAt)) {
+	const auto expiresAtRaw = result->getNumber<int64_t>("expires_at");
+	const auto expiresAt = expiresAtRaw == 0
+	                           ? std::chrono::system_clock::time_point::min()
+	                           : std::chrono::system_clock::time_point{std::chrono::seconds{expiresAtRaw}};
+	if (expiresAt != std::chrono::system_clock::time_point::min() && std::chrono::system_clock::now() > expiresAt) {
+		auto bannedAt = result->getDateTime("banned_at");
 		// Move the ban to history if it has expired
 		g_databaseTasks.addTask(std::format(
-		    "INSERT INTO `account_ban_history` (`account_id`, `reason`, `banned_at`, `expired_at`, `banned_by`) VALUES ({:d}, {:s}, {:d}, {:d}, {:d})",
-		    accountId, db.escapeString(result->getString("reason")), result->getNumber<time_t>("banned_at"), expiresAt,
+		    "INSERT INTO `account_ban_history` (`account_id`, `reason`, `banned_at`, `expired_at`, `banned_by`) VALUES ({:d}, {:s}, {:%Q}, {:%Q}, {:d})",
+		    accountId, db.escapeString(result->getString("reason")),
+		    duration_cast<std::chrono::seconds>(bannedAt.time_since_epoch()),
+		    duration_cast<std::chrono::seconds>(expiresAt.time_since_epoch()),
 		    result->getNumber<uint32_t>("banned_by")));
 		g_databaseTasks.addTask(std::format("DELETE FROM `account_bans` WHERE `account_id` = {:d}", accountId));
 		return std::nullopt;
@@ -62,8 +68,11 @@ const std::optional<BanInfo> getIpBanInfo(const Connection::Address& clientIP)
 		return std::nullopt;
 	}
 
-	time_t expiresAt = result->getNumber<time_t>("expires_at");
-	if (expiresAt != 0 && std::chrono::system_clock::now() > std::chrono::system_clock::from_time_t(expiresAt)) {
+	const auto expiresAtRaw = result->getNumber<int64_t>("expires_at");
+	const auto expiresAt = expiresAtRaw == 0
+	                           ? std::chrono::system_clock::time_point::min()
+	                           : std::chrono::system_clock::time_point{std::chrono::seconds{expiresAtRaw}};
+	if (expiresAt != std::chrono::system_clock::time_point::min() && std::chrono::system_clock::now() > expiresAt) {
 		g_databaseTasks.addTask(
 		    std::format("DELETE FROM `ip_bans` WHERE `ip` = INET6_ATON('{:s}')", clientIP.to_string()));
 		return std::nullopt;

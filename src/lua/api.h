@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../outfit.h"
+#include "../enums.h"
 #include "error.h"
 #include "variant.h"
 
@@ -15,7 +15,6 @@ class Thing;
 class ItemType;
 
 struct LootBlock;
-struct Mount;
 struct Town;
 
 namespace tfs::lua {
@@ -149,7 +148,6 @@ Position getPosition(lua_State* L, int32_t arg);
 Position getPosition(lua_State* L, int32_t arg, int32_t& stackpos);
 
 Outfit_t getOutfit(lua_State* L, int32_t arg);
-Outfit getOutfitClass(lua_State* L, int32_t arg);
 
 LuaVariant getVariant(lua_State* L, int32_t arg);
 
@@ -160,7 +158,6 @@ std::shared_ptr<Player> getPlayer(lua_State* L, int32_t arg);
 // High-level push helpers (C++ -> Lua)
 void pushPosition(lua_State* L, const Position& position, int32_t stackpos = 0);
 void pushOutfit(lua_State* L, const Outfit_t& outfit);
-void pushOutfit(lua_State* L, const Outfit* outfit);
 
 void pushVariant(lua_State* L, const LuaVariant& var);
 void pushThing(lua_State* L, const std::shared_ptr<Thing>& thing);

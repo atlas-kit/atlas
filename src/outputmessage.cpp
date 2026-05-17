@@ -14,7 +14,7 @@ extern Scheduler g_scheduler;
 namespace {
 
 const uint16_t OUTPUTMESSAGE_FREE_LIST_CAPACITY = 2048;
-const std::chrono::milliseconds OUTPUTMESSAGE_AUTOSEND_DELAY{10};
+const auto OUTPUTMESSAGE_AUTOSEND_DELAY = 10ms;
 
 // NOTE: A vector is used here because this container is mostly read and relatively rarely modified (only when a
 // client connects/disconnects)
@@ -24,7 +24,7 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols);
 
 void scheduleSendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 {
-	g_scheduler.addEvent(createSchedulerTask(OUTPUTMESSAGE_AUTOSEND_DELAY.count(), [&]() { sendAll(protocols); }));
+	g_scheduler.addEvent(createSchedulerTask(OUTPUTMESSAGE_AUTOSEND_DELAY, [&]() { sendAll(protocols); }));
 }
 
 void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)

@@ -409,10 +409,10 @@ int luaWeaponDuration(lua_State* L)
 		ItemType& it = Item::items.getItemType(id);
 
 		if (lua_istable(L, 2)) {
-			it.decayTimeMin = tfs::lua::getField<uint32_t>(L, 2, "min");
-			it.decayTimeMax = tfs::lua::getField<uint32_t>(L, 2, "max");
+			it.decayTimeMin = std::chrono::seconds{tfs::lua::getField<uint32_t>(L, 2, "min")};
+			it.decayTimeMax = std::chrono::seconds{tfs::lua::getField<uint32_t>(L, 2, "max")};
 		} else {
-			it.decayTimeMin = tfs::lua::getNumber<uint32_t>(L, 2);
+			it.decayTimeMin = it.decayTimeMax = std::chrono::seconds{tfs::lua::getNumber<uint32_t>(L, 2)};
 		}
 
 		it.showDuration = showDuration;

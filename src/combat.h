@@ -53,8 +53,8 @@ struct CombatParams
 	CombatType_t combatType = COMBAT_NONE;
 	CombatOrigin origin = ORIGIN_SPELL;
 
-	uint8_t impactEffect = CONST_ME_NONE;
-	uint8_t distanceEffect = CONST_ANI_NONE;
+	uint16_t impactEffect = CONST_ME_NONE;
+	uint16_t distanceEffect = CONST_ANI_NONE;
 
 	bool blockedByArmor = false;
 	bool blockedByShield = false;
@@ -100,7 +100,7 @@ public:
 	                              const CombatParams& params);
 
 	static void addDistanceEffect(const std::shared_ptr<Creature>& caster, const Position& fromPos,
-	                              const Position& toPos, uint8_t effect);
+	                              const Position& toPos, uint16_t effect);
 
 	void doCombat(const std::shared_ptr<Creature>& caster, const std::shared_ptr<Creature>& target) const;
 	void doCombat(const std::shared_ptr<Creature>& caster, const Position& position) const;
@@ -118,7 +118,7 @@ public:
 
 	void setArea(AreaCombat* area);
 	bool hasArea() const { return area != nullptr; }
-	void addCondition(const Condition* condition) { params.conditionList.emplace_back(condition); }
+	void addCondition(std::unique_ptr<Condition> condition) { params.conditionList.emplace_back(std::move(condition)); }
 	void clearConditions() { params.conditionList.clear(); }
 	void setPlayerCombatValues(formulaType_t formulaType, double mina, double minb, double maxa, double maxb);
 	void postCombatEffects(const std::shared_ptr<Creature>& caster, const Position& pos) const
@@ -148,7 +148,7 @@ private:
 class MagicField final : public Item
 {
 public:
-	explicit MagicField(uint16_t type) : Item{type}, createTime(OTSYS_TIME()) {}
+	explicit MagicField(uint16_t type) : Item{type}, createTime{std::chrono::steady_clock::now()} {}
 
 	std::shared_ptr<MagicField> asMagicField() override
 	{
@@ -176,7 +176,7 @@ public:
 	void onStepInField(const std::shared_ptr<Creature>& creature);
 
 private:
-	int64_t createTime;
+	std::chrono::steady_clock::time_point createTime;
 };
 
 #endif // FS_COMBAT_H

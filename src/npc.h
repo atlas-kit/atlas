@@ -101,7 +101,7 @@ public:
 		return std::static_pointer_cast<const Npc>(shared_from_this());
 	}
 
-	bool isPushable() const override { return pushable && walkTicks != 0; }
+	bool isPushable() const override { return pushable && walkTicks != std::chrono::milliseconds::zero(); }
 
 	void setID() override
 	{
@@ -166,7 +166,7 @@ private:
 	                    bool teleport) override;
 
 	void onCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClasses type, const std::string& text) override;
-	void onThink(uint32_t interval) override;
+	void onThink(std::chrono::milliseconds interval) override;
 	std::string getDescription(int32_t lookDistance) const override;
 
 	bool isImmune(CombatType_t) const override { return !attackable; }
@@ -198,7 +198,7 @@ private:
 
 	Position masterPos;
 
-	uint32_t walkTicks;
+	std::chrono::milliseconds walkTicks = std::chrono::milliseconds::zero();
 	int32_t focusCreature;
 	int32_t masterRadius;
 

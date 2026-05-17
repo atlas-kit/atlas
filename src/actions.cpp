@@ -91,7 +91,7 @@ bool Actions::registerLuaEvent(Action* event)
 
 ReturnValue Actions::canUse(const std::shared_ptr<const Player>& player, const Position& pos)
 {
-	if (pos.x != 0xFFFF) {
+	if (pos.x != CONTAINER_POSITION) {
 		const Position& playerPos = player->getPosition();
 		if (playerPos.z != pos.z) {
 			return playerPos.z > pos.z ? RETURNVALUE_FIRSTGOUPSTAIRS : RETURNVALUE_FIRSTGODOWNSTAIRS;
@@ -117,7 +117,7 @@ ReturnValue Actions::canUse(const std::shared_ptr<const Player>& player, const P
 ReturnValue Actions::canUseFar(const std::shared_ptr<const Creature>& creature, const Position& toPos,
                                bool checkLineOfSight, bool checkFloor)
 {
-	if (toPos.x == 0xFFFF) {
+	if (toPos.x == CONTAINER_POSITION) {
 		return RETURNVALUE_NOERROR;
 	}
 
@@ -244,8 +244,8 @@ static void showUseHotkeyMessage(const std::shared_ptr<Player>& player, const st
 bool Actions::useItem(const std::shared_ptr<Player>& player, const Position& pos, uint8_t index,
                       const std::shared_ptr<Item>& item, bool isHotkey)
 {
-	int32_t cooldown = getNumber(ConfigManager::ACTIONS_DELAY_INTERVAL);
-	player->setNextAction(OTSYS_TIME() + cooldown);
+	auto cooldown = std::chrono::milliseconds{getNumber(ConfigManager::ACTIONS_DELAY_INTERVAL)};
+	player->setNextAction(std::chrono::steady_clock::now() + cooldown);
 	player->sendUseItemCooldown(cooldown);
 	if (item->isSupply()) {
 		player->sendSupplyUsed(item->getClientID());
@@ -286,8 +286,8 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
                         uint8_t toStackPos, const std::shared_ptr<Item>& item, bool isHotkey,
                         const std::shared_ptr<Creature>& creature /* = nullptr*/)
 {
-	int32_t cooldown = getNumber(ConfigManager::EX_ACTIONS_DELAY_INTERVAL);
-	player->setNextAction(OTSYS_TIME() + cooldown);
+	auto cooldown = std::chrono::milliseconds(getNumber(ConfigManager::EX_ACTIONS_DELAY_INTERVAL));
+	player->setNextAction(std::chrono::steady_clock::now() + cooldown);
 	player->sendUseItemCooldown(cooldown);
 
 	Action* action = getAction(item);
@@ -331,8 +331,8 @@ bool Actions::useItemEx(const std::shared_ptr<Player>& player, const Position& f
 	return false;
 }
 
-Action::Action(LuaScriptInterface* interface) :
-    Event(interface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
+Action::Action(LuaScriptInterface* luaInterface) :
+    Event(luaInterface), function(nullptr), allowFarUse(false), checkFloor(true), checkLineOfSight(true)
 {}
 
 ReturnValue Action::canExecuteAction(const std::shared_ptr<const Player>& player, const Position& toPos)
