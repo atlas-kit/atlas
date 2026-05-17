@@ -135,7 +135,7 @@ int luaVocationGetHealthGainTicks(lua_State* L)
 	// vocation:getHealthGainTicks()
 	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
 	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getHealthGainTicks());
+		tfs::lua::pushNumber(L, vocation->getHealthGainTicks().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -171,7 +171,7 @@ int luaVocationGetManaGainTicks(lua_State* L)
 	// vocation:getManaGainTicks()
 	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
 	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getManaGainTicks());
+		tfs::lua::pushNumber(L, vocation->getManaGainTicks().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -219,7 +219,7 @@ int luaVocationGetAttackSpeed(lua_State* L)
 	// vocation:getAttackSpeed()
 	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
 	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getAttackSpeed());
+		tfs::lua::pushNumber(L, vocation->getAttackSpeed().count());
 	} else {
 		lua_pushnil(L);
 	}
@@ -305,7 +305,7 @@ int luaVocationGetNoPongKickTime(lua_State* L)
 	// vocation:getNoPongKickTime()
 	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
 	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getNoPongKickTime());
+		tfs::lua::pushNumber(L, vocation->getNoPongKickTime().count());
 	} else {
 		lua_pushnil(L);
 	}

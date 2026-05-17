@@ -176,21 +176,6 @@ do
 end
 
 do
-	local function GlobalEventNewIndex(self, key, value)
-		if key == "onThink" then
-			self:onThink(value)
-			return
-		elseif key == "onTime" then
-			self:type("timer")
-			self:onTime(value)
-			return
-		end
-		rawset(self, key, value)
-	end
-	rawgetmetatable("GlobalEvent").__newindex = GlobalEventNewIndex
-end
-
-do
 	local function WeaponNewIndex(self, key, value)
 		if key == "onUseWeapon" then
 			self:onUseWeapon(value)
@@ -1264,12 +1249,6 @@ function doSetGameState(state)
 	return Game.setGameState(state)
 end
 
-function doExecuteRaid(raidName)
-	debugPrint("Deprecated function, use Game.startEvent('" .. raidName .. "') instead.")
-	return Game.startEvent(raidName)
-end
-Game.startRaid = doExecuteRaid
-
 function Game.convertIpToString(ip)
 	print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Function Game.convertIpToString is deprecated and will be removed in the future. Use the return value of player:getIp() instead.")
 
@@ -1515,17 +1494,6 @@ do
 
 	function getStatName(stat)
 		return stats[stat] or 'unknown'
-	end
-end
-
-do
-	local mounts = {}
-	for _, mountData in pairs(Game.getMounts()) do
-		mounts[mountData.clientId] = mountData.name
-	end
-
-	function getMountNameByLookType(lookType)
-		return mounts[lookType]
 	end
 end
 

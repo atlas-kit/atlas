@@ -7,7 +7,7 @@
 
 #include "combat.h"
 #include "configmanager.h"
-#include "events.h"
+#include "events/creature.h"
 #include "game.h"
 #include "party.h"
 #include "scheduler.h"
@@ -27,7 +27,6 @@ Creature::~Creature()
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
 		summon->removeMaster();
 	}
-	assert(conditions.empty());
 }
 
 bool Creature::canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY)
@@ -73,43 +72,43 @@ bool Creature::canSeeCreature(const std::shared_ptr<const Creature>& creature) c
 	return true;
 }
 
-int64_t Creature::getTimeSinceLastMove() const
+std::chrono::milliseconds Creature::getTimeSinceLastMove() const
 {
-	if (lastStep) {
-		return OTSYS_TIME() - lastStep;
+	if (lastStep != std::chrono::steady_clock::time_point{}) {
+		return duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - lastStep);
 	}
-	return std::numeric_limits<int64_t>::max();
+	return std::numeric_limits<std::chrono::milliseconds>::max();
 }
 
-int32_t Creature::getWalkDelay(Direction dir) const
+std::chrono::milliseconds Creature::getWalkDelay(Direction dir) const
 {
-	if (lastStep == 0) {
-		return 0;
+	if (lastStep == std::chrono::steady_clock::time_point{}) {
+		return std::chrono::milliseconds::zero();
 	}
 
-	int64_t ct = OTSYS_TIME();
-	int64_t stepDuration = getStepDuration(dir);
-	return stepDuration - (ct - lastStep);
+	auto ct = std::chrono::steady_clock::now();
+	auto stepDuration = getStepDuration(dir);
+	return duration_cast<std::chrono::milliseconds>(stepDuration - (ct - lastStep));
 }
 
-int32_t Creature::getWalkDelay() const
+std::chrono::milliseconds Creature::getWalkDelay() const
 {
 	// Used for auto-walking
-	if (lastStep == 0) {
-		return 0;
+	if (lastStep == std::chrono::steady_clock::time_point{}) {
+		return std::chrono::milliseconds::zero();
 	}
 
-	int64_t ct = OTSYS_TIME();
-	int64_t stepDuration = getStepDuration() * lastStepCost;
-	return stepDuration - (ct - lastStep);
+	auto ct = std::chrono::steady_clock::now();
+	auto stepDuration = getStepDuration() * lastStepCost;
+	return duration_cast<std::chrono::milliseconds>(stepDuration - (ct - lastStep));
 }
 
-void Creature::onThink(uint32_t interval)
+void Creature::onThink(std::chrono::milliseconds interval)
 {
 	blockTicks += interval;
-	if (blockTicks >= 1000) {
+	if (blockTicks >= 1s) {
 		blockCount = std::min<uint32_t>(blockCount + 1, 2);
-		blockTicks = 0;
+		blockTicks = std::chrono::milliseconds::zero();
 	}
 
 	tfs::events::creature::onThink(asCreature(), interval);
@@ -121,7 +120,8 @@ void Creature::forceUpdatePath()
 		return;
 	}
 
-	lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
+	lastPathUpdate =
+	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
@@ -135,7 +135,7 @@ void Creature::onIdleStatus()
 
 void Creature::onWalk()
 {
-	if (getWalkDelay() <= 0) {
+	if (getWalkDelay() <= std::chrono::milliseconds::zero()) {
 		Direction dir;
 		uint32_t flags = FLAG_IGNOREFIELDDAMAGE;
 		if (getNextStep(dir, flags)) {
@@ -169,9 +169,10 @@ void Creature::onWalk()
 	}
 
 	if (!targetCreature.expired() || !chaseCreature.expired()) {
-		if (lastPathUpdate < OTSYS_TIME()) {
+		if (lastPathUpdate < std::chrono::steady_clock::now()) {
 			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
-			lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
+			lastPathUpdate = std::chrono::steady_clock::now() +
+			                 std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 		}
 	}
 }
@@ -251,13 +252,13 @@ void Creature::addEventWalk(bool firstStep)
 		return;
 	}
 
-	int64_t ticks = getEventStepTicks(firstStep);
-	if (ticks <= 0) {
+	auto ticks = getEventStepTicks(firstStep);
+	if (ticks <= std::chrono::milliseconds::zero()) {
 		return;
 	}
 
 	// Take first step right away, but still queue the next
-	if (ticks == 1) {
+	if (ticks == 1ms) {
 		g_game.checkCreatureWalk(getID());
 	}
 
@@ -299,7 +300,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
                               const Position& oldPos, bool teleport)
 {
 	if (creature.get() == this) {
-		lastStep = OTSYS_TIME();
+		lastStep = std::chrono::steady_clock::now();
 		lastStepCost = 1;
 
 		if (!teleport) {
@@ -329,6 +330,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 		}
 
 		if (newTile->getZone() != oldTile->getZone()) {
+			tfs::events::creature::onChangeZone(asCreature(), oldTile->getZone(), newTile->getZone());
 			onChangeZone(getZone());
 		}
 	}
@@ -339,6 +341,46 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 			if (hasExtraSwing()) {
 				// our target is moving lets see if we can get in hit
 				g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
+			}
+
+			if (newTile->getZone() != oldTile->getZone()) {
+				const auto zone = targetCreature->getZone();
+
+				if (const auto& player = asPlayer()) {
+					if (zone == ZONE_PROTECTION) {
+						if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
+							player->setTargetCreature(nullptr);
+							player->sendCancelTarget();
+							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+						}
+					} else if (zone == ZONE_NOPVP) {
+						if (targetCreature->asPlayer()) {
+							if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
+								player->setTargetCreature(nullptr);
+								player->sendCancelTarget();
+								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+							}
+						}
+					} else if (zone == ZONE_NORMAL) {
+						// targetCreature can leave a pvp zone if not pzlocked
+						if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
+							if (targetCreature->asPlayer()) {
+								player->setTargetCreature(nullptr);
+								player->sendCancelTarget();
+								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
+							}
+						}
+					}
+				} else {
+					if (zone == ZONE_PROTECTION) {
+						setTargetCreature(nullptr);
+						setChaseCreature(nullptr);
+
+						if (const auto& monster = asMonster()) {
+							monster->resetAttackTicks();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -358,8 +400,8 @@ void Creature::onDeath()
 
 	std::shared_ptr<Creature> mostDamageCreature = nullptr;
 
-	const int64_t timeNow = OTSYS_TIME();
-	const uint32_t inFightTicks = getNumber(ConfigManager::PZ_LOCKED);
+	const auto timeNow = std::chrono::steady_clock::now();
+	const auto inFightTicks = std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
 	int32_t mostDamage = 0;
 	std::map<std::shared_ptr<Creature>, uint64_t> experienceMap;
 	for (const auto& [id, cb] : damageMap | std::views::as_const) {
@@ -418,7 +460,7 @@ void Creature::onDeath()
 		g_game.removeCreature(asCreature(), false);
 	} else {
 		while (!conditions.empty()) {
-			removeCondition(conditions.back(), true);
+			removeCondition(conditions.back().get(), true);
 		}
 	}
 }
@@ -484,7 +526,8 @@ bool Creature::hasBeenAttacked(uint32_t attackerId)
 	if (it == damageMap.end()) {
 		return false;
 	}
-	return (OTSYS_TIME() - it->second.ticks) <= getNumber(ConfigManager::PZ_LOCKED);
+	return (std::chrono::steady_clock::now() - it->second.ticks) <=
+	       std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
 }
 
 std::shared_ptr<Item> Creature::getCorpse(const std::shared_ptr<Creature>&, const std::shared_ptr<Creature>&)
@@ -646,12 +689,13 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate < OTSYS_TIME()) {
+		if (follower->lastPathUpdate >= std::chrono::steady_clock::now()) {
 			continue;
 		}
 
 		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
-		follower->lastPathUpdate = OTSYS_TIME() + getNumber(ConfigManager::PATHFINDING_DELAY);
+		follower->lastPathUpdate =
+		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
 	}
 }
 
@@ -688,7 +732,7 @@ void Creature::addDamagePoints(const std::shared_ptr<Creature>& attacker, int32_
 	uint32_t attackerId = attacker->id;
 
 	auto& cb = damageMap[attackerId];
-	cb.ticks = OTSYS_TIME();
+	cb.ticks = std::chrono::steady_clock::now();
 	cb.total += damagePoints;
 
 	lastAttacker = attacker;
@@ -821,44 +865,43 @@ bool Creature::setMaster(const std::shared_ptr<Creature>& newMaster)
 	return true;
 }
 
-bool Creature::addCondition(Condition* condition, bool force /* = false*/)
+bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* = false*/)
 {
 	if (!condition) {
 		return false;
 	}
 
 	if (!force && condition->getType() == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)) {
-		int64_t walkDelay = getWalkDelay();
-		if (walkDelay > 0) {
+		auto walkDelay = getWalkDelay();
+		if (walkDelay > std::chrono::milliseconds::zero()) {
 			g_scheduler.addEvent(
-			    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceAddCondition(id, condition); }));
+			    createSchedulerTask(walkDelay, [id = getID(), condition = std::move(condition)]() mutable {
+				    g_game.forceAddCondition(id, std::move(condition));
+			    }));
 			return false;
 		}
 	}
 
 	Condition* prevCond = getCondition(condition->getType(), condition->getId(), condition->getSubId());
 	if (prevCond) {
-		prevCond->addCondition(asCreature(), condition);
-		delete condition;
+		prevCond->addCondition(asCreature(), condition.get());
 		return true;
 	}
 
 	if (condition->startCondition(asCreature())) {
-		conditions.push_back(condition);
 		onAddCondition(condition->getType());
+		conditions.push_back(std::move(condition));
 		return true;
 	}
 
-	delete condition;
 	return false;
 }
 
-bool Creature::addCombatCondition(Condition* condition)
+bool Creature::addCombatCondition(std::unique_ptr<Condition> condition)
 {
-	// Caution: condition variable could be deleted after the call to addCondition
 	ConditionType_t type = condition->getType();
 
-	if (!addCondition(condition)) {
+	if (!addCondition(std::move(condition))) {
 		return false;
 	}
 
@@ -870,25 +913,23 @@ void Creature::removeCondition(ConditionType_t type, bool force /* = false*/)
 {
 	auto it = conditions.begin();
 	while (it != conditions.end()) {
-		Condition* condition = *it;
+		auto& condition = *it;
 		if (condition->getType() != type) {
 			++it;
 			continue;
 		}
 
 		if (!force && type == CONDITION_PARALYZE) {
-			int64_t walkDelay = getWalkDelay();
-			if (walkDelay > 0) {
+			auto walkDelay = getWalkDelay();
+			if (walkDelay > std::chrono::milliseconds::zero()) {
 				g_scheduler.addEvent(
 				    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
 				return;
 			}
 		}
 
-		it = conditions.erase(it);
-
 		condition->endCondition(asCreature());
-		delete condition;
+		it = conditions.erase(it);
 
 		onEndCondition(type);
 	}
@@ -898,25 +939,23 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t conditionId, 
 {
 	auto it = conditions.begin();
 	while (it != conditions.end()) {
-		Condition* condition = *it;
+		auto& condition = *it;
 		if (condition->getType() != type || condition->getId() != conditionId) {
 			++it;
 			continue;
 		}
 
 		if (!force && type == CONDITION_PARALYZE) {
-			int64_t walkDelay = getWalkDelay();
-			if (walkDelay > 0) {
+			auto walkDelay = getWalkDelay();
+			if (walkDelay > std::chrono::milliseconds::zero()) {
 				g_scheduler.addEvent(
 				    createSchedulerTask(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); }));
 				return;
 			}
 		}
 
-		it = conditions.erase(it);
-
 		condition->endCondition(asCreature());
-		delete condition;
+		it = conditions.erase(it);
 
 		onEndCondition(type);
 	}
@@ -925,9 +964,9 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t conditionId, 
 void Creature::removeCombatCondition(ConditionType_t type)
 {
 	std::vector<Condition*> removeConditions;
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getType() == type) {
-			removeConditions.push_back(condition);
+			removeConditions.push_back(condition.get());
 		}
 	}
 
@@ -938,32 +977,31 @@ void Creature::removeCombatCondition(ConditionType_t type)
 
 void Creature::removeCondition(Condition* condition, bool force /* = false*/)
 {
-	auto it = std::find(conditions.begin(), conditions.end(), condition);
+	auto it = std::find_if(conditions.begin(), conditions.end(),
+	                       [condition](const std::unique_ptr<Condition>& c) { return c.get() == condition; });
 	if (it == conditions.end()) {
 		return;
 	}
 
 	if (!force && condition->getType() == CONDITION_PARALYZE) {
-		int64_t walkDelay = getWalkDelay();
-		if (walkDelay > 0) {
+		auto walkDelay = getWalkDelay();
+		if (walkDelay > std::chrono::milliseconds::zero()) {
 			g_scheduler.addEvent(createSchedulerTask(
 			    walkDelay, [id = getID(), type = condition->getType()]() { g_game.forceRemoveCondition(id, type); }));
 			return;
 		}
 	}
 
-	conditions.erase(it);
-
 	condition->endCondition(asCreature());
 	onEndCondition(condition->getType());
-	delete condition;
+	conditions.erase(it);
 }
 
 Condition* Creature::getCondition(ConditionType_t type) const
 {
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getType() == type) {
-			return condition;
+			return condition.get();
 		}
 	}
 	return nullptr;
@@ -971,32 +1009,43 @@ Condition* Creature::getCondition(ConditionType_t type) const
 
 Condition* Creature::getCondition(ConditionType_t type, ConditionId_t conditionId, uint32_t subId /* = 0*/) const
 {
-	for (Condition* condition : conditions) {
+	for (const auto& condition : conditions) {
 		if (condition->getType() == type && condition->getId() == conditionId && condition->getSubId() == subId) {
-			return condition;
+			return condition.get();
 		}
 	}
 	return nullptr;
 }
 
-void Creature::executeConditions(uint32_t interval)
+void Creature::executeConditions(std::chrono::milliseconds interval)
 {
-	auto tempConditions = conditions;
-	for (Condition* condition : tempConditions) {
-		auto it = std::find(conditions.begin(), conditions.end(), condition);
+	std::vector<Condition*> snapshot;
+	snapshot.reserve(conditions.size());
+	for (const auto& condition : conditions) {
+		snapshot.push_back(condition.get());
+	}
+
+	auto findOwning = [this](Condition* c) {
+		return std::ranges::find_if(conditions, [c](const std::unique_ptr<Condition>& p) { return p.get() == c; });
+	};
+
+	for (Condition* condition : snapshot) {
+		if (findOwning(condition) == conditions.end()) {
+			continue;
+		}
+
+		if (condition->executeCondition(asCreature(), interval)) {
+			continue;
+		}
+
+		auto it = findOwning(condition);
 		if (it == conditions.end()) {
 			continue;
 		}
 
-		if (!condition->executeCondition(asCreature(), interval)) {
-			it = std::find(conditions.begin(), conditions.end(), condition);
-			if (it != conditions.end()) {
-				conditions.erase(it);
-				condition->endCondition(asCreature());
-				onEndCondition(condition->getType());
-				delete condition;
-			}
-		}
+		condition->endCondition(asCreature());
+		onEndCondition(condition->getType());
+		conditions.erase(it);
 	}
 }
 
@@ -1006,13 +1055,13 @@ bool Creature::hasCondition(ConditionType_t type, uint32_t subId /* = 0*/) const
 		return false;
 	}
 
-	int64_t timeNow = OTSYS_TIME();
-	for (Condition* condition : conditions) {
+	auto timeNow = std::chrono::steady_clock::now();
+	for (const auto& condition : conditions) {
 		if (condition->getType() != type || condition->getSubId() != subId) {
 			continue;
 		}
 
-		if (condition->getEndTime() >= timeNow || condition->getTicks() == -1) {
+		if (condition->getEndTime() >= timeNow || condition->getTicks() < std::chrono::milliseconds::zero()) {
 			return true;
 		}
 	}
@@ -1034,19 +1083,19 @@ bool Creature::isSuppress(ConditionType_t type) const
 	return hasBitSet(static_cast<uint32_t>(type), getConditionSuppressions());
 }
 
-int64_t Creature::getStepDuration(Direction dir) const
+std::chrono::milliseconds Creature::getStepDuration(Direction dir) const
 {
-	int64_t stepDuration = getStepDuration();
+	auto stepDuration = getStepDuration();
 	if ((dir & DIRECTION_DIAGONAL_MASK) != 0) {
 		stepDuration *= 3;
 	}
 	return stepDuration;
 }
 
-int64_t Creature::getStepDuration() const
+std::chrono::milliseconds Creature::getStepDuration() const
 {
 	if (isRemoved()) {
-		return 0;
+		return std::chrono::milliseconds::zero();
 	}
 
 	int32_t stepSpeed = getStepSpeed();
@@ -1077,16 +1126,16 @@ int64_t Creature::getStepDuration() const
 		stepDuration *= 2;
 	}
 
-	return stepDuration;
+	return std::chrono::milliseconds(stepDuration);
 }
 
-int64_t Creature::getEventStepTicks(bool onlyDelay) const
+std::chrono::milliseconds Creature::getEventStepTicks(bool onlyDelay) const
 {
-	int64_t ret = getWalkDelay();
-	if (ret <= 0) {
-		int64_t stepDuration = getStepDuration();
-		if (onlyDelay && stepDuration > 0) {
-			ret = 1;
+	auto ret = getWalkDelay();
+	if (ret <= std::chrono::milliseconds::zero()) {
+		auto stepDuration = getStepDuration();
+		if (onlyDelay && stepDuration > std::chrono::milliseconds::zero()) {
+			ret = 1ms;
 		} else {
 			ret = stepDuration * lastStepCost;
 		}
@@ -1184,7 +1233,7 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 
 bool Creature::isInvisible() const
 {
-	return std::find_if(conditions.begin(), conditions.end(), [](const Condition* condition) {
+	return std::find_if(conditions.begin(), conditions.end(), [](const std::unique_ptr<Condition>& condition) {
 		       return condition->getType() == CONDITION_INVISIBLE;
 	       }) != conditions.end();
 }

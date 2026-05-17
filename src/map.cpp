@@ -7,7 +7,7 @@
 
 #include "combat.h"
 #include "creature.h"
-#include "events.h"
+#include "events/creature.h"
 #include "game.h"
 #include "iomap.h"
 #include "iomapserialize.h"
@@ -301,7 +301,7 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 	Position oldPos = oldTile->getPosition();
 	Position newPos = newTile->getPosition();
 
-	bool teleport = forceTeleport || !newTile->getGround() ||
+	bool teleport = forceTeleport || !newTile->hasGround() ||
 	                !oldPos.isInRange(newPos, maxClientViewportX + (newPos.x > oldPos.x),
 	                                  maxClientViewportY + (newPos.y > oldPos.y), 1);
 
@@ -555,7 +555,7 @@ bool Map::isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor /*= fal
 		return true;
 	}
 
-	if (blockFloor && tile->getGround()) {
+	if (blockFloor && tile->hasGround()) {
 		return false;
 	}
 
@@ -1073,7 +1073,7 @@ Floor* QTreeLeafNode::createFloor(uint32_t z)
 
 uint32_t Map::clean() const
 {
-	uint64_t start = OTSYS_TIME();
+	auto start = std::chrono::steady_clock::now();
 	size_t tiles = 0;
 
 	if (g_game.getGameState() == GAME_STATE_NORMAL) {
@@ -1106,6 +1106,7 @@ uint32_t Map::clean() const
 	}
 
 	std::cout << "> CLEAN: Removed " << count << " item" << (count != 1 ? "s" : "") << " from " << tiles << " tile"
-	          << (tiles != 1 ? "s" : "") << " in " << (OTSYS_TIME() - start) / (1000.) << " seconds." << std::endl;
+	          << (tiles != 1 ? "s" : "") << " in "
+	          << duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start) << "." << std::endl;
 	return count;
 }

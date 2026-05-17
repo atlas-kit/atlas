@@ -35,7 +35,7 @@ bool Scripts::loadScripts(std::string_view folderName, bool isLib, bool reload)
 			size_t found = it->path().filename().string().find(disable);
 			if (found != std::string::npos) {
 				if (getBoolean(ConfigManager::SCRIPTS_CONSOLE_LOGS)) {
-					std::cout << "> " << it->path().filename().string() << " [disabled]" << std::endl;
+					std::cout << "> " << it->path().lexically_relative(dir).string() << " [disabled]" << std::endl;
 				}
 				continue;
 			}
@@ -57,16 +57,16 @@ bool Scripts::loadScripts(std::string_view folderName, bool isLib, bool reload)
 		}
 
 		if (scriptInterface.loadFile(scriptFile) == -1) {
-			std::cout << "> " << it->filename().string() << " [error]" << std::endl;
+			std::cout << "> " << it->lexically_relative(dir).string() << " [error]" << std::endl;
 			std::cout << "^ " << scriptInterface.getLastLuaError() << std::endl;
 			continue;
 		}
 
 		if (getBoolean(ConfigManager::SCRIPTS_CONSOLE_LOGS)) {
 			if (!reload) {
-				std::cout << "> " << it->filename().string() << " [loaded]" << std::endl;
+				std::cout << "> " << it->lexically_relative(dir).string() << " [loaded]" << std::endl;
 			} else {
-				std::cout << "> " << it->filename().string() << " [reloaded]" << std::endl;
+				std::cout << "> " << it->lexically_relative(dir).string() << " [reloaded]" << std::endl;
 			}
 		}
 	}

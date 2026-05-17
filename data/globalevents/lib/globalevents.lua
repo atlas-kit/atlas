@@ -1,1 +1,0 @@
--- See data/scripts/lib/globalevents.lua

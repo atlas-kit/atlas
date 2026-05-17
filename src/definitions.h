@@ -8,9 +8,9 @@ static constexpr auto STATUS_SERVER_NAME = "Atlas";
 
 static constexpr auto STATUS_SERVER_VERSION = "1.7";
 static constexpr auto STATUS_SERVER_DEVELOPERS = "Atlas Team";
-static constexpr auto CLIENT_VERSION_MIN = 1310;
-static constexpr auto CLIENT_VERSION_MAX = 1311;
-static constexpr auto CLIENT_VERSION_STR = "13.10";
+static constexpr auto CLIENT_VERSION_MIN = 1523;
+static constexpr auto CLIENT_VERSION_MAX = 1524;
+static constexpr auto CLIENT_VERSION_STR = "15.24";
 
 static constexpr auto AUTHENTICATOR_DIGITS = 6U;
 static constexpr auto AUTHENTICATOR_PERIOD = 30U;

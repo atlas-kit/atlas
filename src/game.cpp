@@ -9,15 +9,18 @@
 #include "configmanager.h"
 #include "creature.h"
 #include "databasetasks.h"
-#include "events.h"
-#include "globalevent.h"
+#include "events/creature.h"
+#include "events/events.h"
+#include "events/game.h"
+#include "events/monster.h"
+#include "events/party.h"
+#include "events/player.h"
 #include "housetile.h"
 #include "http/http.h"
 #include "iologindata.h"
 #include "iomarket.h"
 #include "items.h"
 #include "movement.h"
-#include "outfit.h"
 #include "party.h"
 #include "podium.h"
 #include "scheduler.h"
@@ -35,7 +38,6 @@ extern Actions* g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
-extern GlobalEvents* g_globalEvents;
 extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
@@ -52,8 +54,8 @@ void Game::start(ServiceManager* manager)
 	serviceManager = manager;
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
-	g_scheduler.addEvent(
-	    createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL), [this]() { updateCreaturesPath(0); }));
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
+	                                         [this]() { updateCreaturesPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 }
 
@@ -78,8 +80,6 @@ void Game::setGameState(GameState_t newState)
 			g_chat.load();
 
 			map.spawns.startup();
-
-			mounts.loadFromXml();
 
 			tfs::events::game::onStartup();
 			break;
@@ -154,7 +154,7 @@ void Game::loadMap(const std::string& path, bool isCalledByLua) { map.loadMap(pa
 
 std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& player, const Position& pos) const
 {
-	if (pos.x != 0xFFFF) {
+	if (pos.x != CONTAINER_POSITION) {
 		return map.getTile(pos);
 	}
 
@@ -171,7 +171,7 @@ std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& pla
 std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& player, const Position& pos, int32_t index,
                                               uint32_t spriteId, stackPosType_t type) const
 {
-	if (pos.x != 0xFFFF) {
+	if (pos.x != CONTAINER_POSITION) {
 		const auto& tile = map.getTile(pos);
 		if (!tile) {
 			return nullptr;
@@ -293,7 +293,7 @@ static std::pair<Position, uint8_t> internalGetPosition(const std::shared_ptr<It
 	if (const auto& topParent = item->getTopParent()) {
 		if (const auto& creature = topParent->asCreature()) {
 			if (const auto& player = creature->asPlayer()) {
-				const uint16_t x = 0xFFFF;
+				const uint16_t x = CONTAINER_POSITION;
 
 				if (const auto& container = std::dynamic_pointer_cast<Container>(item->getTopParent())) {
 					const auto y = static_cast<uint16_t>(static_cast<uint16_t>(0x40) |
@@ -568,8 +568,8 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		creature->setMaster(nullptr);
 	}
 
-	for (const auto& condition : creature->getConditions()) {
-		creature->removeCondition(condition, true);
+	while (!creature->getConditions().empty()) {
+		creature->removeCondition(creature->getConditions().back().get(), true);
 	}
 
 	creature->getParent()->postRemoveNotification(creature, nullptr, 0);
@@ -593,6 +593,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		summon->setSkillLoss(false);
 		removeCreature(summon);
 	}
+
 	return true;
 }
 
@@ -613,7 +614,7 @@ void Game::playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t 
 	}
 
 	uint8_t fromIndex = 0;
-	if (fromPos.x == 0xFFFF) {
+	if (fromPos.x == CONTAINER_POSITION) {
 		if (fromPos.y & 0x40) {
 			fromIndex = fromPos.z;
 		} else {
@@ -683,13 +684,11 @@ void Game::playerMoveCreature(const std::shared_ptr<Player>& player, const std::
                               const Position& movingCreatureOrigPos, const std::shared_ptr<Tile>& toTile)
 {
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task =
-		    createSchedulerTask(delay, [=, this, playerID = player->getID(), movingCreatureID = movingCreature->getID(),
-		                                toPos = toTile->getPosition()]() {
+		player->setNextActionTask(createSchedulerTask(
+		    player->getNextActionTime(), [=, this, playerID = player->getID(),
+		                                  movingCreatureID = movingCreature->getID(), toPos = toTile->getPosition()]() {
 			    playerMoveCreatureByID(playerID, movingCreatureID, movingCreatureOrigPos, toPos);
-		    });
-		player->setNextActionTask(std::move(task));
+		    }));
 		player->resetIdleTime();
 		return;
 	}
@@ -791,9 +790,9 @@ ReturnValue Game::internalMoveCreature(const std::shared_ptr<Creature>& creature
 		// try to go up
 		if (currentPos.z != 8 && creature->getTile()->hasHeight(3)) {
 			const auto& aboveTile = map.getTile(currentPos.x, currentPos.y, currentPos.getZ() - 1);
-			if (!aboveTile || (!aboveTile->getGround() && !aboveTile->hasFlag(TILESTATE_BLOCKSOLID))) {
+			if (!aboveTile || (!aboveTile->hasGround() && !aboveTile->hasFlag(TILESTATE_BLOCKSOLID))) {
 				if (const auto& destAboveTile = map.getTile(destPos.x, destPos.y, destPos.getZ() - 1)) {
-					if (destAboveTile->getGround() && !destAboveTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
+					if (destAboveTile->hasGround() && !destAboveTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
 						flags |= FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 
 						if (!destAboveTile->hasFlag(TILESTATE_FLOORCHANGE)) {
@@ -808,7 +807,7 @@ ReturnValue Game::internalMoveCreature(const std::shared_ptr<Creature>& creature
 		// try to go down
 		if (currentPos.z != 7 && currentPos.z == destPos.z) {
 			const auto& destTile = map.getTile(destPos.x, destPos.y, destPos.z);
-			if (!destTile || (!destTile->getGround() && !destTile->hasFlag(TILESTATE_BLOCKSOLID))) {
+			if (!destTile || (!destTile->hasGround() && !destTile->hasFlag(TILESTATE_BLOCKSOLID))) {
 				if (const auto& destBelowTile = map.getTile(destPos.x, destPos.y, destPos.z + 1)) {
 					if (destBelowTile->hasHeight(3) && !destBelowTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
 						flags |= FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
@@ -899,11 +898,10 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
                           std::shared_ptr<Thing> toThing)
 {
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(delay, [=, this, playerID = player->getID()]() {
-			playerMoveItemByPlayerID(playerID, fromPos, spriteId, fromStackPos, toPos, count);
-		});
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(
+		    createSchedulerTask(player->getNextActionTime(), [=, this, playerID = player->getID()]() {
+			    playerMoveItemByPlayerID(playerID, fromPos, spriteId, fromStackPos, toPos, count);
+		    }));
 		player->resetIdleTime();
 		return;
 	}
@@ -912,7 +910,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 
 	if (!item) {
 		uint8_t fromIndex = 0;
-		if (fromPos.x == 0xFFFF) {
+		if (fromPos.x == CONTAINER_POSITION) {
 			if (fromPos.y & 0x40) {
 				fromIndex = fromPos.z;
 			} else {
@@ -1010,7 +1008,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != 0xFFFF && mapFromPos.isInRange(playerPos, 1, 1) &&
+			if (fromPos.x != CONTAINER_POSITION && mapFromPos.isInRange(playerPos, 1, 1) &&
 			    !mapFromPos.isInRange(walkPos, 1, 1, 0)) {
 				// need to pickup the item first
 				std::shared_ptr<Item> moveItem = nullptr;
@@ -1060,7 +1058,7 @@ void Game::playerMoveItem(const std::shared_ptr<Player>& player, const Position&
 	}
 
 	uint8_t toIndex = 0;
-	if (toPos.x == 0xFFFF) {
+	if (toPos.x == CONTAINER_POSITION) {
 		if (toPos.y & 0x40) {
 			toIndex = toPos.z;
 		} else {
@@ -1276,10 +1274,10 @@ ReturnValue Game::internalMoveItem(std::shared_ptr<Thing> fromThing, std::shared
 		return retMaxCount;
 	}
 
-	if (moveItem && moveItem->getDuration() > 0) {
+	if (moveItem && moveItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (moveItem->getDecaying() != DECAYING_TRUE) {
 			moveItem->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(moveItem);
+			toDecayItems.push_back({moveItem, moveItem->getDecayGeneration()});
 		}
 	}
 
@@ -1374,10 +1372,10 @@ ReturnValue Game::internalAddItem(const std::shared_ptr<Thing>& toThing, const s
 		}
 	}
 
-	if (item->getDuration() > 0) {
+	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		if (item->getDecaying() != DECAYING_TRUE) {
 			item->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(item);
+			toDecayItems.push_back({item, item->getDecayGeneration()});
 		}
 	}
 
@@ -1421,9 +1419,6 @@ ReturnValue Game::internalRemoveItem(const std::shared_ptr<Item>& item, int32_t 
 
 		if (item->isRemoved()) {
 			item->onRemoved();
-			if (item->canDecay()) {
-				decayItems->remove_if([&item](const auto& decayItem) { return decayItem.lock() == item; });
-			}
 		}
 
 		parent->postRemoveNotification(item, nullptr, index);
@@ -1725,10 +1720,10 @@ std::shared_ptr<Item> Game::transformItem(const std::shared_ptr<Item>& item, uin
 	item->setParent(nullptr);
 	parent->postRemoveNotification(item, parent, itemIndex);
 
-	if (newItem->getDuration() > 0) {
+	if (newItem->getDuration() > std::chrono::milliseconds::zero()) {
 		if (newItem->getDecaying() != DECAYING_TRUE) {
 			newItem->setDecaying(DECAYING_TRUE);
-			toDecayItems.push_back(newItem);
+			toDecayItems.push_back({newItem, newItem->getDecayGeneration()});
 		}
 	}
 
@@ -2037,7 +2032,7 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 		return;
 	}
 
-	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
+	bool isHotkey = (fromPos == HOTKEY_POSITION);
 	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
@@ -2068,8 +2063,8 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != 0xFFFF && toPos.x != 0xFFFF && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
-			    !fromPos.isInRange(toPos, 1, 1, 0)) {
+			if (fromPos.x != CONTAINER_POSITION && toPos.x != CONTAINER_POSITION &&
+			    fromPos.isInRange(player->getPosition(), 1, 1, 0) && !fromPos.isInRange(toPos, 1, 1, 0)) {
 				std::shared_ptr<Item> moveItem = nullptr;
 
 				ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), moveItem,
@@ -2105,11 +2100,9 @@ void Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(delay, [=, this]() {
+		player->setNextActionTask(createSchedulerTask(player->getNextActionTime(), [=, this]() {
 			playerUseItemEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId);
-		});
-		player->setNextActionTask(std::move(task));
+		}));
 		return;
 	}
 
@@ -2125,7 +2118,7 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return;
 	}
 
-	bool isHotkey = (pos.x == 0xFFFF && pos.y == 0 && pos.z == 0);
+	bool isHotkey = (pos == HOTKEY_POSITION);
 	if (isHotkey && !getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
 		return;
 	}
@@ -2166,10 +2159,8 @@ void Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task =
-		    createSchedulerTask(delay, [=, this]() { playerUseItem(playerId, pos, stackPos, index, spriteId); });
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(createSchedulerTask(
+		    player->getNextActionTime(), [=, this]() { playerUseItem(playerId, pos, stackPos, index, spriteId); }));
 		return;
 	}
 
@@ -2196,9 +2187,8 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 		return;
 	}
 
-	bool isHotkey = (fromPos.x == 0xFFFF && fromPos.y == 0 && fromPos.z == 0);
 	if (!getBoolean(ConfigManager::AIMBOT_HOTKEY_ENABLED)) {
-		if (creature->asPlayer() || isHotkey) {
+		if (creature->asPlayer() || fromPos == HOTKEY_POSITION) {
 			player->sendCancelMessage(RETURNVALUE_DIRECTPLAYERSHOOT);
 			return;
 		}
@@ -2231,7 +2221,7 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 			Position itemPos = fromPos;
 			uint8_t itemStackPos = fromStackPos;
 
-			if (fromPos.x != 0xFFFF && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
+			if (fromPos.x != CONTAINER_POSITION && fromPos.isInRange(player->getPosition(), 1, 1, 0) &&
 			    !fromPos.isInRange(toPos, 1, 1, 0)) {
 				std::shared_ptr<Item> moveItem = nullptr;
 				ret = internalMoveItem(item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), moveItem,
@@ -2267,17 +2257,16 @@ void Game::playerUseWithCreature(uint32_t playerId, const Position& fromPos, uin
 	player->resetIdleTime();
 
 	if (!player->canDoAction()) {
-		uint32_t delay = player->getNextActionTime();
-		auto task = createSchedulerTask(
-		    delay, [=, this]() { playerUseWithCreature(playerId, fromPos, fromStackPos, creatureId, spriteId); });
-		player->setNextActionTask(std::move(task));
+		player->setNextActionTask(createSchedulerTask(player->getNextActionTime(), [=, this]() {
+			playerUseWithCreature(playerId, fromPos, fromStackPos, creatureId, spriteId);
+		}));
 		return;
 	}
 
 	player->setNextActionTask(nullptr);
 
 	g_actions->useItemEx(player, fromPos, creature->getPosition(), creature->getParent()->getThingIndex(creature), item,
-	                     isHotkey, creature);
+	                     fromPos == HOTKEY_POSITION, creature);
 }
 
 void Game::playerCloseContainer(uint32_t playerId, uint8_t cid)
@@ -2335,7 +2324,7 @@ void Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
 		if (it == browseFields.end()) {
 			parentContainer = createBrowseField(tile);
 			browseFields[tile.get()] = parentContainer;
-			g_scheduler.addEvent(createSchedulerTask(30000, [this, tile]() { browseFields.erase(tile.get()); }));
+			g_scheduler.addEvent(createSchedulerTask(30s, [this, tile]() { browseFields.erase(tile.get()); }));
 		} else {
 			parentContainer = it->second;
 		}
@@ -2373,7 +2362,7 @@ void Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 		return;
 	}
 
-	if (pos.x != 0xFFFF && !pos.isInRange(player->getPosition(), 1, 1, 0)) {
+	if (pos.x != CONTAINER_POSITION && !pos.isInRange(player->getPosition(), 1, 1, 0)) {
 		std::vector<Direction> listDir;
 		if (player->getPathTo(pos, listDir, 0, 1, true, true)) {
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
@@ -2436,7 +2425,7 @@ void Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, std::string
 		if (writeItem->getText() != text) {
 			writeItem->setText(text);
 			writeItem->setWriter(player->getName());
-			writeItem->setDate(time(nullptr));
+			writeItem->setDate(std::chrono::system_clock::now());
 		}
 	} else {
 		writeItem->resetText();
@@ -2495,7 +2484,7 @@ void Game::playerBrowseField(uint32_t playerId, const Position& pos)
 	if (it == browseFields.end()) {
 		container = createBrowseField(tile);
 		browseFields[tile.get()] = container;
-		g_scheduler.addEvent(createSchedulerTask(30000, [this, tile]() { browseFields.erase(tile.get()); }));
+		g_scheduler.addEvent(createSchedulerTask(30s, [this, tile]() { browseFields.erase(tile.get()); }));
 	} else {
 		container = it->second;
 	}
@@ -2568,7 +2557,7 @@ void Game::playerWrapItem(uint32_t playerId, const Position& position, uint8_t s
 		return;
 	}
 
-	if (position.x != 0xFFFF && !position.isInRange(player->getPosition(), 1, 1, 0)) {
+	if (position.x != CONTAINER_POSITION && !position.isInRange(player->getPosition(), 1, 1, 0)) {
 		std::vector<Direction> listDir;
 		if (player->getPathTo(position, listDir, 0, 1, true, true)) {
 			g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
@@ -2809,8 +2798,9 @@ void Game::playerAcceptTrade(uint32_t playerId)
 		}
 
 		if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
-			tradePartnerRet = internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, 0, true);
-			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, 0, true);
+			tradePartnerRet =
+			    internalAddItem(tradePartner, playerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
+			playerRet = internalAddItem(player, partnerTradeItem, INDEX_WHEREEVER, FLAG_IGNOREAUTOSTACK, true);
 			if (tradePartnerRet == RETURNVALUE_NOERROR && playerRet == RETURNVALUE_NOERROR) {
 				playerRet = internalRemoveItem(playerTradeItem, playerTradeItem->getItemCount(), true);
 				tradePartnerRet = internalRemoveItem(partnerTradeItem, partnerTradeItem->getItemCount(), true);
@@ -3242,14 +3232,14 @@ void Game::playerRequestEditPodium(uint32_t playerId, const Position& position, 
 	// player has to walk to podium
 	// gm/god can edit instantly
 	if (!player->isAccessPlayer()) {
-		if (position.x != 0xFFFF && !position.isInRange(player->getPosition(), 1, 1, 0)) {
+		if (position.x != CONTAINER_POSITION && !position.isInRange(player->getPosition(), 1, 1, 0)) {
 			std::vector<Direction> listDir;
 			if (player->getPathTo(position, listDir, 0, 1, true, true)) {
 				g_dispatcher.addTask([this, playerID = player->getID(), listDir = std::move(listDir)]() {
 					playerAutoWalk(playerID, listDir);
 				});
 				auto task = createSchedulerTask(
-				    400, [=, this]() { playerRequestEditPodium(playerId, position, stackPos, spriteId); });
+				    400ms, [=, this]() { playerRequestEditPodium(playerId, position, stackPos, spriteId); });
 				player->setNextWalkActionTask(std::move(task));
 			} else {
 				player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
@@ -3287,82 +3277,6 @@ void Game::playerEditPodium(uint32_t playerId, Outfit_t outfit, const Position& 
 	tfs::events::player::onPodiumEdit(player, item, outfit, podiumVisible, direction);
 }
 
-void Game::playerToggleMount(uint32_t playerId, bool mount)
-{
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	player->toggleMount(mount);
-}
-
-void Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit, bool randomizeMount /* = false*/)
-{
-	if (!getBoolean(ConfigManager::ALLOW_CHANGEOUTFIT)) {
-		return;
-	}
-
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	player->setRandomizeMount(randomizeMount);
-
-	const Outfit* playerOutfit = Outfits::getInstance().getOutfitByLookType(player->getSex(), outfit.lookType);
-	if (!playerOutfit) {
-		outfit.lookMount = 0;
-	}
-
-	if (outfit.lookMount != 0) {
-		Mount* mount = mounts.getMountByClientID(outfit.lookMount);
-		if (!mount) {
-			return;
-		}
-
-		if (!player->hasMount(mount)) {
-			return;
-		}
-
-		int32_t speedChange = mount->speed;
-		if (player->isMounted()) {
-			Mount* prevMount = mounts.getMountByID(player->getCurrentMount());
-			if (prevMount) {
-				speedChange -= prevMount->speed;
-			}
-		}
-
-		changeSpeed(player, speedChange);
-		player->setCurrentMount(mount->id);
-	} else {
-		if (player->isMounted()) {
-			player->dismount();
-		}
-
-		player->setWasMounted(false);
-	}
-
-	if (player->canWear(outfit.lookType, outfit.lookAddons)) {
-		player->defaultOutfit = outfit;
-
-		if (player->hasCondition(CONDITION_OUTFIT)) {
-			return;
-		}
-
-		if (player->getRandomizeMount() && player->hasMounts()) {
-			const Mount* mount = mounts.getMountByID(player->getRandomMount());
-			outfit.lookMount = mount->clientId;
-		}
-
-		internalCreatureChangeOutfit(player, outfit);
-	}
-
-	if (player->isMounted()) {
-		player->onChangeZone(player->getZone());
-	}
-}
-
 void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, const std::string& receiver,
                      const std::string& text)
 {
@@ -3382,9 +3296,9 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		return;
 	}
 
-	uint32_t muteTime = player->isMuted();
-	if (muteTime > 0) {
-		player->sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are still muted for {:d} seconds.", muteTime));
+	auto muteTime = player->isMuted();
+	if (muteTime > std::chrono::seconds::zero()) {
+		player->sendTextMessage(MESSAGE_STATUS_SMALL, std::format("You are still muted for {:%Q} seconds.", muteTime));
 		return;
 	}
 
@@ -3498,8 +3412,8 @@ bool Game::playerYell(const std::shared_ptr<Player>& player, const std::string& 
 			}
 		}
 
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30000, 0);
-		player->addCondition(condition);
+		auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_YELLTICKS, 30s, 0);
+		player->addCondition(std::move(condition));
 	}
 
 	internalCreatureSay(player, TALKTYPE_YELL, boost::algorithm::to_upper_copy(text), false);
@@ -3670,7 +3584,7 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
 		if (!creature->isDead()) {
-			creature->onAttacking(0);
+			creature->onAttacking(std::chrono::milliseconds::zero());
 		}
 	}
 }
@@ -3727,7 +3641,7 @@ void Game::checkCreatures(size_t index)
 
 void Game::updateCreaturesPath(size_t index)
 {
-	g_scheduler.addEvent(createSchedulerTask(getNumber(ConfigManager::PATHFINDING_INTERVAL),
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::PATHFINDING_INTERVAL)),
 	                                         [=, this]() { updateCreaturesPath((index + 1) % EVENT_CREATURECOUNT); }));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
@@ -3815,7 +3729,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 		} else if (blockType == BLOCK_ARMOR) {
 			addMagicEffect(targetPos, CONST_ME_BLOCKHIT);
 		} else if (blockType == BLOCK_IMMUNITY) {
-			uint8_t hitEffect = 0;
+			uint16_t hitEffect = 0;
 			switch (combatType) {
 				case COMBAT_UNDEFINEDDAMAGE: {
 					return;
@@ -3880,7 +3794,7 @@ bool Game::combatBlockHit(CombatDamage& damage, const std::shared_ptr<Creature>&
 }
 
 void Game::combatGetTypeInfo(CombatType_t combatType, const std::shared_ptr<Creature>& target, TextColor_t& color,
-                             uint8_t& effect)
+                             uint16_t& effect)
 {
 	switch (combatType) {
 		case COMBAT_PHYSICALDAMAGE: {
@@ -4123,10 +4037,11 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 			}
 
 			if (getBoolean(ConfigManager::MANASHIELD_BREAKABLE) && targetPlayer) {
-				if (ConditionManaShield* conditionManaShield = dynamic_cast<ConditionManaShield*>(
-				        targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE))) {
-					if (int32_t remainingManaDamage =
-					        conditionManaShield->onDamageTaken(targetPlayer, manaDamage) != 0) {
+				Condition* condition = targetPlayer->getCondition(CONDITION_MANASHIELD_BREAKABLE);
+				if (ConditionManaShield* conditionManaShield =
+				        condition ? condition->getConditionManaShield() : nullptr) {
+					int32_t remainingManaDamage = conditionManaShield->onDamageTaken(targetPlayer, manaDamage);
+					if (remainingManaDamage != 0) {
 						manaDamage -= remainingManaDamage;
 						targetPlayer->removeCondition(CONDITION_MANASHIELD_BREAKABLE);
 					}
@@ -4251,7 +4166,7 @@ bool Game::combatChangeHealth(const std::shared_ptr<Creature>& attacker, const s
 		message.primary.value = damage.primary.value;
 		message.secondary.value = damage.secondary.value;
 
-		uint8_t hitEffect;
+		uint16_t hitEffect;
 		if (message.primary.value) {
 			combatGetTypeInfo(damage.primary.type, target, message.primary.color, hitEffect);
 			if (hitEffect != CONST_ME_NONE) {
@@ -4488,14 +4403,14 @@ void Game::addCreatureHealth(const SpectatorVec& spectators, const std::shared_p
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, uint16_t effect)
 {
 	SpectatorVec spectators;
 	map.getSpectators(spectators, pos, true, true);
 	addMagicEffect(spectators, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4504,7 +4419,7 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect)
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
 	SpectatorVec spectators, toPosSpectators;
 	map.getSpectators(spectators, fromPos, true, true);
@@ -4515,7 +4430,7 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uin
 }
 
 void Game::addDistanceEffect(const SpectatorVec& spectators, const Position& fromPos, const Position& toPos,
-                             uint8_t effect)
+                             uint16_t effect)
 {
 	for (const auto& spectator : spectators) {
 		if (const auto& tmpPlayer = spectator->asPlayer()) {
@@ -4535,9 +4450,13 @@ void Game::startDecay(const std::shared_ptr<Item>& item)
 		return;
 	}
 
-	if (item->getDuration() > 0) {
+	if (item->getDuration() > std::chrono::milliseconds::zero()) {
 		item->setDecaying(DECAYING_TRUE);
-		toDecayItems.push_back(item);
+		// The decay clock starts when cleanup() promotes the item from
+		// toDecayItems into the wheel — not here. Otherwise items registered
+		// during map load would silently lose duration before the scheduler
+		// has even started (a 30s boot can fully consume a splash/field).
+		toDecayItems.push_back({item, item->getDecayGeneration()});
 	} else {
 		internalDecayItem(item);
 	}
@@ -4564,47 +4483,113 @@ void Game::internalDecayItem(const std::shared_ptr<Item>& item)
 
 void Game::checkDecay()
 {
-	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
-	size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
-
-	auto& decayItemBucket = decayItems[bucket];
-	auto it = decayItemBucket.begin();
-	while (it != decayItemBucket.end()) {
-		const auto item = it->lock();
-		if (!item) {
-			it = decayItemBucket.erase(it);
-			continue;
-		}
-
-		if (!item->canDecay()) {
-			item->setDecaying(DECAYING_FALSE);
-			it = decayItemBucket.erase(it);
-			continue;
-		}
-
-		int32_t duration = item->getDuration();
-		int32_t decreaseTime = std::min<int32_t>(EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS, duration);
-
-		duration -= decreaseTime;
-		item->decreaseDuration(decreaseTime);
-
-		if (duration <= 0) {
-			it = decayItems[bucket].erase(it);
-			internalDecayItem(item);
-		} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
-			it = decayItems[bucket].erase(it);
-			size_t newBucket = (bucket + ((duration + EVENT_DECAYINTERVAL / 2) / 1000)) % EVENT_DECAY_BUCKETS;
-			if (newBucket == bucket) {
-				internalDecayItem(item);
-			} else {
-				decayItems[newBucket].push_back(item);
-			}
-		} else {
-			++it;
-		}
+	auto now = std::chrono::steady_clock::now();
+	if (nextDecayTick == std::chrono::steady_clock::time_point{}) {
+		nextDecayTick = now;
 	}
 
-	lastBucket = bucket;
+	// Catch up: if scheduler ran late, advance multiple buckets so the wheel
+	// stays aligned with wall-clock time instead of accumulating drift.
+	size_t bucketsToProcess = 1;
+	auto lag = now - nextDecayTick;
+	if (lag >= EVENT_DECAYINTERVAL) {
+		bucketsToProcess = 1 + static_cast<size_t>(lag / EVENT_DECAYINTERVAL);
+		bucketsToProcess = std::min(bucketsToProcess, static_cast<size_t>(EVENT_DECAY_BUCKETS));
+	}
+	nextDecayTick += EVENT_DECAYINTERVAL * bucketsToProcess;
+
+	auto delay = nextDecayTick - now;
+	if (delay <= std::chrono::milliseconds::zero()) {
+		delay = EVENT_DECAYINTERVAL;
+		nextDecayTick = now + EVENT_DECAYINTERVAL;
+	}
+	g_scheduler.addEvent(
+	    createSchedulerTask(std::chrono::duration_cast<std::chrono::milliseconds>(delay), [this]() { checkDecay(); }));
+
+	// Items queued by gameplay since the last tick (internalMoveItem, clone, ...)
+	// must NOT be drained by the per-bucket cleanup() inside the catch-up loop:
+	// with a small `ticks` they land just ahead of `lastBucket` and the remaining
+	// catch-up iterations would revisit them every tick, re-arming markDecayStart
+	// each time. That makes a short-lived item chase the loop and lose all the
+	// catch-up's virtual time. Snapshot them here and promote them once, after
+	// the loop, anchored at the final lastBucket. The per-bucket cleanup() then
+	// only sees successors that internalDecayItem enqueues for the bucket being
+	// processed (the chained-decay alignment the per-bucket drain is meant for).
+	auto preExisting = std::exchange(toDecayItems, {});
+
+	// Virtual time tracks where the wheel "should be" at each bucket. During
+	// catch-up, real time barely advances between iterations, but each bucket
+	// represents one EVENT_DECAYINTERVAL of virtual time. Using virtualNow for
+	// markDecayStart ensures getDuration() on successors properly consumes the
+	// virtual time that has passed, so chained decays expire on schedule.
+	auto virtualNow = now - (EVENT_DECAYINTERVAL * (bucketsToProcess - 1));
+
+	for (size_t i = 0; i < bucketsToProcess; ++i) {
+		size_t bucket = (lastBucket + 1) % EVENT_DECAY_BUCKETS;
+
+		auto& decayItemBucket = decayItems[bucket];
+		auto it = decayItemBucket.begin();
+		while (it != decayItemBucket.end()) {
+			const auto item = it->item.lock();
+			if (!item) {
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			// Stale entry: the item was rescheduled (Lua duration change, etc.)
+			// and a fresh entry exists in another bucket. Drop this one.
+			if (it->generation != item->getDecayGeneration()) {
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			if (!item->canDecay()) {
+				item->flushDecayDuration();
+				item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
+				it = decayItemBucket.erase(it);
+				continue;
+			}
+
+			item->flushDecayDuration();
+			auto duration = item->getDuration();
+
+			if (duration <= std::chrono::milliseconds::zero()) {
+				it = decayItems[bucket].erase(it);
+				internalDecayItem(item);
+			} else if (duration < EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+				it = decayItems[bucket].erase(it);
+				// Use real time here: flushDecayDuration() already consumed the
+				// real elapsed time, so `duration` is the true remaining value
+				// measured against `now`. Re-arming with virtualNow (in the past)
+				// would cause a subsequent catch-up bucket to double-count the lag.
+				item->markDecayStart(now);
+				size_t ticks =
+				    std::min(static_cast<size_t>((duration + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
+				             static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
+				decayItems[(bucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
+			} else {
+				item->markDecayStart(now);
+				++it;
+			}
+		}
+
+		lastBucket = bucket;
+
+		// Drain only the successors internalDecayItem enqueued for THIS bucket, so
+		// a multi-stage decayTo chain stays aligned during catch-up instead of
+		// falling (bucketsToProcess - 1) ticks behind. toDecayItems was emptied
+		// before the loop, so nothing here is a pre-existing gameplay enqueue.
+		cleanup(virtualNow);
+
+		virtualNow += EVENT_DECAYINTERVAL;
+	}
+
+	// Promote the pre-existing snapshot (and any successor left over from the
+	// last bucket's cleanup) once, relative to the final lastBucket. Their decay
+	// clock starts now — at the end of the catch-up — so they are not chased.
+	for (auto& entry : preExisting) {
+		toDecayItems.push_back(std::move(entry));
+	}
 	cleanup();
 }
 
@@ -4628,17 +4613,45 @@ void Game::shutdown()
 	std::cout << " done!" << std::endl;
 }
 
-void Game::cleanup()
+void Game::cleanup() { cleanup(std::chrono::steady_clock::now()); }
+
+void Game::cleanup(std::chrono::steady_clock::time_point virtualNow)
 {
-	for (const auto& item : toDecayItems) {
-		const uint32_t dur = item->getDuration();
-		if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
-			decayItems[lastBucket].push_back(item);
+	// internalDecayItem -> startDecay can push back into toDecayItems while we're
+	// iterating, which would invalidate the cached end iterator and lose the new
+	// entry to the trailing clear(). Drain the queue into a local first so any
+	// re-entrant push_back goes to a fresh container processed on the next tick.
+	auto pending = std::exchange(toDecayItems, {});
+	for (const auto& [item, generation] : pending) {
+		if (item->getDecaying() != DECAYING_TRUE || generation != item->getDecayGeneration()) {
+			continue;
+		}
+
+		// Enqueue sites (internalMoveItem/internalAddItem/transformItem/clone) only
+		// gate on getDuration() > 0. Items that have a duration but cannot actually
+		// decay (uniqueId, isRemoved, no decayTo) must not enter the wheel — otherwise
+		// markDecayStart() arms the clock and getDuration() would silently bleed down
+		// until the wheel revisits the entry up to 30 minutes later.
+		if (!item->canDecay()) {
+			item->flushDecayDuration();
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
+			continue;
+		}
+
+		item->flushDecayDuration();
+		const auto dur = item->getDuration();
+		if (dur <= std::chrono::milliseconds::zero()) {
+			internalDecayItem(item);
+		} else if (dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+			item->markDecayStart(virtualNow);
+			decayItems[lastBucket].push_back({item, item->getDecayGeneration()});
 		} else {
-			decayItems[(lastBucket + 1 + dur / 1000) % EVENT_DECAY_BUCKETS].push_back(item);
+			item->markDecayStart(virtualNow);
+			size_t ticks = std::min(static_cast<size_t>((dur + EVENT_DECAYINTERVAL - 1ms) / EVENT_DECAYINTERVAL),
+			                        static_cast<size_t>(EVENT_DECAY_BUCKETS - 1));
+			decayItems[(lastBucket + ticks) % EVENT_DECAY_BUCKETS].push_back({item, item->getDecayGeneration()});
 		}
 	}
-	toDecayItems.clear();
 }
 
 void Game::broadcastMessage(const std::string& text, MessageClasses type) const
@@ -5023,7 +5036,7 @@ void Game::playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spr
 	player->sendMarketBrowseItem(it.id, buyOffers, sellOffers);
 }
 
-void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter)
+void Game::playerCancelMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter)
 {
 	const auto& player = getPlayerByID(playerId);
 	if (!player) {
@@ -5078,12 +5091,13 @@ void Game::playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 
 	tfs::iomarket::moveOfferToHistory(offer.id, OFFERSTATE_CANCELLED);
 	offer.amount = 0;
-	offer.timestamp += getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	offer.timestamp += std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 	player->sendMarketCancelOffer(offer);
 	player->sendMarketEnter();
 }
 
-void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount)
+void Game::playerAcceptMarketOffer(uint32_t playerId, std::chrono::system_clock::time_point timestamp, uint16_t counter,
+                                   uint16_t amount)
 {
 	if (amount == 0 || amount > 64000) {
 		return;
@@ -5103,13 +5117,13 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		return;
 	}
 
-	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
-	if (offerAccountId == player->getAccount()) {
-		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
+	if (amount > offer.amount) {
 		return;
 	}
 
-	if (amount > offer.amount) {
+	uint32_t offerAccountId = IOLoginData::getAccountIdByPlayerId(offer.playerId);
+	if (offerAccountId == player->getAccount()) {
+		player->sendTextMessage(MESSAGE_MARKET, "You cannot accept your own offer.");
 		return;
 	}
 
@@ -5235,7 +5249,7 @@ void Game::playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16
 		player->onReceiveMail();
 	}
 
-	const int32_t marketOfferDuration = getNumber(ConfigManager::MARKET_OFFER_DURATION);
+	const auto marketOfferDuration = std::chrono::seconds{getNumber(ConfigManager::MARKET_OFFER_DURATION)};
 
 	tfs::iomarket::appendHistory(player->getGUID(),
 	                             (offer.type == MARKETACTION_BUY ? MARKETACTION_SELL : MARKETACTION_BUY), offer.itemId,
@@ -5320,15 +5334,14 @@ std::vector<std::shared_ptr<Item>> Game::getMarketItemList(uint16_t wareId, uint
 	return {};
 }
 
-void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
+void Game::forceAddCondition(uint32_t creatureId, std::unique_ptr<Condition> condition)
 {
 	const auto& creature = getCreatureByID(creatureId);
 	if (!creature) {
-		delete condition;
 		return;
 	}
 
-	creature->addCondition(condition, true);
+	creature->addCondition(std::move(condition), true);
 }
 
 void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)
@@ -5428,14 +5441,10 @@ bool Game::reload(ReloadTypes_t reloadType)
 		case RELOAD_TYPE_EVENTS:
 			tfs::events::reload();
 			return true;
-		case RELOAD_TYPE_GLOBALEVENTS:
-			return g_globalEvents->reload();
 		case RELOAD_TYPE_ITEMS:
 			return Item::items.reload();
 		case RELOAD_TYPE_MONSTERS:
 			return g_monsters.reload();
-		case RELOAD_TYPE_MOUNTS:
-			return mounts.reload();
 		case RELOAD_TYPE_MOVEMENTS:
 			return g_moveEvents->reload();
 		case RELOAD_TYPE_NPCS: {
@@ -5467,7 +5476,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
-			g_globalEvents->clear(true);
 			g_weapons->clear(true);
 			g_weapons->loadDefaults();
 			g_spells->clear(true);
@@ -5475,7 +5483,6 @@ bool Game::reload(ReloadTypes_t reloadType)
 			/*
 			Npcs::reload();
 			Item::items.reload();
-			mounts.reload();
 			ConfigManager::reload();
 			tfs::events::load();
 			g_chat.load();
@@ -5501,14 +5508,11 @@ bool Game::reload(ReloadTypes_t reloadType)
 			Item::items.reload();
 			g_weapons->clear(true);
 			g_weapons->loadDefaults();
-			mounts.reload();
-			g_globalEvents->reload();
 			tfs::events::reload();
 			g_chat.load();
 			g_actions->clear(true);
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
-			g_globalEvents->clear(true);
 			g_spells->clear(true);
 			g_scripts->loadScripts("scripts", false, true);
 			return true;
@@ -5552,7 +5556,7 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		return;
 	}
 
-	time_t currentTime = time(nullptr);
+	auto currentTime = std::chrono::system_clock::now();
 	for (auto&& house : houses | std::views::values | std::views::as_const) {
 		if (house->getOwner() == 0) {
 			continue;
@@ -5579,19 +5583,19 @@ void Game::payHouses(RentPeriod_t rentPeriod) const
 		if (player->getBankBalance() >= rent) {
 			player->setBankBalance(player->getBankBalance() - rent);
 
-			time_t paidUntil = currentTime;
+			auto paidUntil = currentTime;
 			switch (rentPeriod) {
 				case RENTPERIOD_DAILY:
-					paidUntil += 24 * 60 * 60;
+					paidUntil += std::chrono::days(1);
 					break;
 				case RENTPERIOD_WEEKLY:
-					paidUntil += 24 * 60 * 60 * 7;
+					paidUntil += std::chrono::days(7);
 					break;
 				case RENTPERIOD_MONTHLY:
-					paidUntil += 24 * 60 * 60 * 30;
+					paidUntil += std::chrono::days(30);
 					break;
 				case RENTPERIOD_YEARLY:
-					paidUntil += 24 * 60 * 60 * 365;
+					paidUntil += std::chrono::days(365);
 					break;
 				default:
 					break;

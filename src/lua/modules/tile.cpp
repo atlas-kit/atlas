@@ -71,9 +71,13 @@ int luaTileGetGround(lua_State* L)
 {
 	// tile:getGround()
 	const auto& tile = tfs::lua::getSharedPtr<Tile>(L, 1);
-	if (tile && tile->getGround()) {
-		tfs::lua::pushSharedPtr(L, tile->getGround());
-		tfs::lua::setItemMetatable(L, -1, tile->getGround());
+	if (tile) {
+		if (const auto& ground = tile->getGround()) {
+			tfs::lua::pushSharedPtr(L, ground);
+			tfs::lua::setItemMetatable(L, -1, ground);
+		} else {
+			lua_pushnil(L);
+		}
 	} else {
 		lua_pushnil(L);
 	}

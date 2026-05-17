@@ -3,6 +3,7 @@
 #include "../../item.h"
 
 #include "../../game.h"
+#include "../../podium.h"
 #include "../../tools.h"
 #include "../api.h"
 #include "../env.h"
@@ -33,6 +34,35 @@ int luaItemIsItem(lua_State* L)
 	// item:isItem()
 	if (const auto& thing = tfs::lua::getThing(L, 1)) {
 		tfs::lua::pushBoolean(L, thing->asItem() != nullptr);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaItemIsPodium(lua_State* L)
+{
+	// item:isPodium()
+	if (const auto& item = tfs::lua::getSharedPtr<Item>(L, 1)) {
+		tfs::lua::pushBoolean(L, item->isPodium());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+int luaItemGetPodium(lua_State* L)
+{
+	// item:getPodium()
+	const auto& item = tfs::lua::getSharedPtr<Item>(L, 1);
+	if (!item) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	if (const auto& podium = item->asPodium()) {
+		tfs::lua::pushSharedPtr(L, podium);
+		tfs::lua::setMetatable(L, -1, "Podium");
 	} else {
 		lua_pushnil(L);
 	}
@@ -386,7 +416,11 @@ int luaItemGetAttribute(lua_State* L)
 	}
 
 	if (ItemAttributes::isIntAttrType(attribute)) {
-		tfs::lua::pushNumber(L, item->getIntAttr(attribute));
+		if (attribute == ITEM_ATTRIBUTE_DURATION) {
+			tfs::lua::pushNumber(L, item->getDuration().count());
+		} else {
+			tfs::lua::pushNumber(L, item->getIntAttr(attribute));
+		}
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
 		tfs::lua::pushString(L, item->getStrAttr(attribute));
 	} else {
@@ -418,7 +452,23 @@ int luaItemSetAttribute(lua_State* L)
 			return 1;
 		}
 
-		item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
+		if (attribute == ITEM_ATTRIBUTE_DURATION) {
+			// Bump the decay generation so the old wheel entry is dropped on its
+			// next visit; then re-register so cleanup runs at the new deadline
+			// instead of waiting up to a full wheel rotation when the duration
+			// is shortened.
+			bool wasDecaying = item->getDecaying() == DECAYING_TRUE;
+			if (wasDecaying) {
+				item->bumpDecayGeneration();
+				item->setDecaying(DECAYING_FALSE);
+			}
+			item->setDuration(std::chrono::milliseconds{tfs::lua::getNumber<int32_t>(L, 3)});
+			if (wasDecaying) {
+				g_game.startDecay(item);
+			}
+		} else {
+			item->setIntAttr(attribute, tfs::lua::getNumber<int32_t>(L, 3));
+		}
 		tfs::lua::pushBoolean(L, true);
 	} else if (ItemAttributes::isStrAttrType(attribute)) {
 		item->setStrAttr(attribute, tfs::lua::getString(L, 3));
@@ -447,6 +497,17 @@ int luaItemRemoveAttribute(lua_State* L)
 
 	bool ret = attribute != ITEM_ATTRIBUTE_UNIQUEID;
 	if (ret) {
+		// Removing the duration must also detach the item from the wheel,
+		// otherwise it would be processed once the old bucket fires and a
+		// missing duration would trigger an immediate (and unintended) decay.
+		// Drop ITEM_ATTRIBUTE_DECAYSTATE entirely rather than setting it to
+		// DECAYING_FALSE: setDecaying writes via setIntAttr which keeps the
+		// attribute slot (and the attributeBits flag), so a residual zero
+		// would still poison operator== / hasMarketAttributes for the item.
+		if (attribute == ITEM_ATTRIBUTE_DURATION && item->getDecaying() != DECAYING_FALSE) {
+			item->bumpDecayGeneration();
+			item->removeAttribute(ITEM_ATTRIBUTE_DECAYSTATE);
+		}
 		item->removeAttribute(attribute);
 	} else {
 		tfs::lua::reportError(L, "Attempt to erase protected key \"uid\"");
@@ -809,6 +870,8 @@ void tfs::lua::registerItem(LuaScriptInterface& lsi)
 	lsi.registerMetaMethod("Item", "__gc", tfs::lua::luaSharedPtrDelete<Item>);
 
 	lsi.registerMethod("Item", "isItem", luaItemIsItem);
+	lsi.registerMethod("Item", "isPodium", luaItemIsPodium);
+	lsi.registerMethod("Item", "getPodium", luaItemGetPodium);
 
 	lsi.registerMethod("Item", "hasParent", luaItemHasParent);
 	lsi.registerMethod("Item", "getParent", luaItemGetParent);
