@@ -159,7 +159,7 @@ void onLook(const std::shared_ptr<Player>& player, const Position& position, con
 void onLookInBattleList(const std::shared_ptr<Player>& player, const std::shared_ptr<Creature>& creature,
                         int32_t lookDistance)
 {
-	// Player:onLookInBattleList(creature, position, distance)
+	// Player:onLookInBattleList(creature, distance)
 	if (playerHandlers.onLookInBattleList == -1) {
 		return;
 	}
