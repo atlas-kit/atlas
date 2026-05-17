@@ -47,6 +47,58 @@ struct DBResult::Impl
 	std::map<std::string_view, size_t> listNames;
 };
 
+// Applies the configured TLS/SSL options to a freshly initialized handle. Kept in its own
+// function so the std::string config locals do not have to cross the goto statements in
+// connectToDatabase (jumping over a non-trivial initialization is ill-formed).
+//
+// The default mode "preferred" reproduces the historical behavior exactly: TLS is used if the
+// server offers it but is not required and the server certificate is not verified. This avoids
+// the "SSL is required, but the server does not support it" failure described in
+// forgottenserver issue #4954 ( https://github.com/otland/forgottenserver/issues/4954 ).
+static void applySSLOptions(MYSQL* handle)
+{
+	const std::string& mode = getString(ConfigManager::MYSQL_SSL);
+	const std::string& ca = getString(ConfigManager::MYSQL_SSL_CA_FILE);
+	const std::string& cert = getString(ConfigManager::MYSQL_SSL_CERT_FILE);
+	const std::string& key = getString(ConfigManager::MYSQL_SSL_KEY_FILE);
+
+	const char* caPtr = ca.empty() ? nullptr : ca.c_str();
+	const char* certPtr = cert.empty() ? nullptr : cert.c_str();
+	const char* keyPtr = key.empty() ? nullptr : key.c_str();
+
+	const bool requireTls = (mode == "required" || mode == "verify_ca" || mode == "verify_identity");
+	const bool verifyCert = (mode == "verify_ca" || mode == "verify_identity");
+
+#ifdef MARIADB_VERSION_ID
+	// MariaDB Connector/C uses enforce/verify booleans plus mysql_ssl_set for the key material.
+	bool enforce = requireTls;
+	bool verify = verifyCert;
+	mysql_options(handle, MYSQL_OPT_SSL_ENFORCE, &enforce);
+	mysql_options(handle, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &verify);
+	mysql_ssl_set(handle, keyPtr, certPtr, caPtr, nullptr, nullptr);
+#else
+	// libmysql uses the MYSQL_OPT_SSL_MODE enum plus per-file options.
+	unsigned int sslMode = SSL_MODE_PREFERRED;
+	if (mode == "required") {
+		sslMode = SSL_MODE_REQUIRED;
+	} else if (mode == "verify_ca") {
+		sslMode = SSL_MODE_VERIFY_CA;
+	} else if (mode == "verify_identity") {
+		sslMode = SSL_MODE_VERIFY_IDENTITY;
+	}
+	mysql_options(handle, MYSQL_OPT_SSL_MODE, &sslMode);
+	if (caPtr) {
+		mysql_options(handle, MYSQL_OPT_SSL_CA, caPtr);
+	}
+	if (certPtr) {
+		mysql_options(handle, MYSQL_OPT_SSL_CERT, certPtr);
+	}
+	if (keyPtr) {
+		mysql_options(handle, MYSQL_OPT_SSL_KEY, keyPtr);
+	}
+#endif
+}
+
 static tfs::detail::Mysql_ptr connectToDatabase(const bool retryIfError)
 {
 	bool isFirstAttemptToConnect = true;
@@ -57,27 +109,13 @@ retry:
 	}
 	isFirstAttemptToConnect = false;
 
-// MariaDB requires explicit SSL settings to avoid the following error:
-// "SSL is required, but the server does not support it"
-// For more details see issue #4954 ( https://github.com/otland/forgottenserver/issues/4954 )
-#ifdef MARIADB_VERSION_ID
-	// this needs to be above "goto" otherwise it won't build
-	bool ssl_enforce = false;
-	bool ssl_verify = false;
-#endif
-
 	tfs::detail::Mysql_ptr handle{mysql_init(nullptr)};
 	if (!handle) {
 		std::cout << std::endl << "Failed to initialize MySQL connection handle." << std::endl;
 		goto error;
 	}
 
-// MariaDB explicit SSL settings continued
-#ifdef MARIADB_VERSION_ID
-	mysql_options(handle.get(), MYSQL_OPT_SSL_ENFORCE, &ssl_enforce);
-	mysql_options(handle.get(), MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &ssl_verify);
-	mysql_ssl_set(handle.get(), nullptr, nullptr, nullptr, nullptr, nullptr);
-#endif
+	applySSLOptions(handle.get());
 
 	// connects to database
 	if (!mysql_real_connect(handle.get(), getString(ConfigManager::MYSQL_HOST).c_str(),

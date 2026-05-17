@@ -84,6 +84,19 @@ mysqlDatabase = "atlas"
 mysqlPort = 3306
 mysqlSock = ""
 
+-- Database TLS/SSL
+-- mysqlSSL controls how the connection to the database server is encrypted:
+--   "preferred"       - use TLS if the server supports it, fall back to plaintext, do not verify
+--                       the server certificate (default; historical behavior)
+--   "required"        - require TLS; abort if the server does not support it
+--   "verify_ca"       - require TLS and verify the server certificate against mysqlSSLCAFile
+--   "verify_identity" - like verify_ca and additionally verify the server hostname
+-- mysqlSSLCAFile/CertFile/KeyFile are filesystem paths; leave empty to disable that part.
+mysqlSSL = "preferred"
+mysqlSSLCAFile = ""
+mysqlSSLCertFile = ""
+mysqlSSLKeyFile = ""
+
 -- Misc.
 -- NOTE: classicAttackSpeed set to true makes players constantly attack at regular
 -- intervals regardless of other actions such as item (potion) use. This setting
