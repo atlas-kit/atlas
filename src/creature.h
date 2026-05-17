@@ -206,19 +206,9 @@ public:
 
 	// follow functions
 	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	virtual void setFollowCreature(const std::shared_ptr<Creature>& creature);
-	virtual void removeFollowCreature();
-	bool canFollowCreature(const std::shared_ptr<Creature>& creature);
-	bool isFollowingCreature(const std::shared_ptr<Creature>& creature)
-	{
-		return tfs::owner_equal(followCreature, creature);
-	}
+	void setFollowCreature(const std::shared_ptr<Creature>& creature);
 	void completeEventFollowWalk() { eventFollowPath = 0; }
 	bool hasPathToFollow() const { return hasFollowPath; }
-
-	// follow events
-	virtual void onFollowCreature(const std::shared_ptr<const Creature>&);
-	virtual void onUnfollowCreature();
 
 	// Pathfinding functions
 	void addFollower(const std::shared_ptr<Creature>& creature) { followers.insert(creature); }
@@ -308,7 +298,7 @@ public:
 	virtual void onThink(std::chrono::milliseconds interval);
 	virtual void onAttacking(std::chrono::milliseconds) {}
 
-	virtual void updateFollowPath() final;
+	void updateFollowPath() final;
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 

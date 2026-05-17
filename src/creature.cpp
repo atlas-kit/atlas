@@ -836,7 +836,17 @@ void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindP
 void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 {
 	if (!creature) {
-		removeFollowCreature();
+		if (const auto& oldFollow = getFollowCreature()) {
+			oldFollow->removeFollower(asCreature());
+		}
+
+		if (eventFollowPath != 0) {
+			g_scheduler.stopEvent(eventFollowPath);
+			eventFollowPath = 0;
+		}
+
+		followCreature.reset();
+		hasFollowPath = false;
 
 		if (const auto& player = asPlayer()) {
 			player->stopWalk();
@@ -868,48 +878,13 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 
 	followCreature = creature;
 	hasFollowPath = false;
-	onFollowCreature(creature);
-
-	updateFollowPath();
-}
-
-void Creature::removeFollowCreature()
-{
-	if (const auto& oldFollow = getFollowCreature()) {
-		oldFollow->removeFollower(asCreature());
-	}
-
-	if (eventFollowPath != 0) {
-		g_scheduler.stopEvent(eventFollowPath);
-		eventFollowPath = 0;
-	}
-
-	followCreature.reset();
-	onUnfollowCreature();
-}
-
-bool Creature::canFollowCreature(const std::shared_ptr<Creature>& creature)
-{
-	if (!creature) {
-		return false;
-	}
-
-	const auto& creaturePos = creature->getPosition();
-	if (creaturePos.z != getPosition().z) {
-		return false;
-	}
-	return canSee(creaturePos);
-}
-
-void Creature::onFollowCreature(const std::shared_ptr<const Creature>&)
-{
 	if (!listWalkDir.empty()) {
 		listWalkDir.clear();
 		onWalkAborted();
 	}
-}
 
-void Creature::onUnfollowCreature() { hasFollowPath = false; }
+	updateFollowPath();
+}
 
 // Pathfinding Events
 void Creature::updateFollowersPaths()
