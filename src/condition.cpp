@@ -940,7 +940,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 					message.type = MESSAGE_HEALED_OTHERS;
 					message.text = player->getName() + " was healed for " + healString;
 					for (const auto& spectator : spectators) {
-						assert(spectator->asPlayer() != nullptr);
+						assert(spectator->isPlayer());
 						std::static_pointer_cast<Player>(spectator)->sendTextMessage(message);
 					}
 				}
@@ -972,7 +972,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 					message.type = MESSAGE_HEALED_OTHERS;
 					message.text = player->getName() + " gained " + manaGainString + " mana.";
 					for (const auto& spectator : spectators) {
-						assert(spectator->asPlayer() != nullptr);
+						assert(spectator->isPlayer());
 						std::static_pointer_cast<Player>(spectator)->sendTextMessage(message);
 					}
 				}
@@ -1446,7 +1446,7 @@ bool ConditionDamage::doDamage(const std::shared_ptr<Creature>& creature, int32_
 	damage.primary.type = ConditionToDamageType(conditionType);
 
 	const auto& attacker = g_game.getCreatureByID(owner);
-	if (field && creature->asPlayer() && attacker && attacker->asPlayer()) {
+	if (field && creature->isPlayer() && attacker && attacker->isPlayer()) {
 		damage.primary.value = static_cast<int32_t>(std::round(damage.primary.value / 2.));
 	}
 

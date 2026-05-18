@@ -80,7 +80,7 @@ void Npc::reload()
 	SpectatorVec players;
 	g_game.map.getSpectators(players, getPosition(), true, true);
 	for (const auto& player : players) {
-		assert(player->asPlayer() != nullptr);
+		assert(player->isPlayer());
 		spectators.insert(std::static_pointer_cast<Player>(player));
 	}
 
@@ -236,7 +236,7 @@ void Npc::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, Magi
 		SpectatorVec players;
 		g_game.map.getSpectators(players, getPosition(), true, true);
 		for (const auto& player : players) {
-			assert(player->asPlayer() != nullptr);
+			assert(player->isPlayer());
 			spectators.insert(std::static_pointer_cast<Player>(player));
 		}
 
@@ -285,7 +285,7 @@ void Npc::onCreatureMove(const std::shared_ptr<Creature>& creature, const std::s
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
-	if (creature.get() == this || creature->asPlayer()) {
+	if (creature.get() == this || creature->isPlayer()) {
 		if (npcEventHandler) {
 			npcEventHandler->onCreatureMove(creature, oldPos, newPos);
 		}

@@ -43,6 +43,8 @@ public:
 		return std::static_pointer_cast<const Monster>(shared_from_this());
 	}
 
+	bool isMonster() const final { return true; }
+
 	void setID() override
 	{
 		if (id == 0) {

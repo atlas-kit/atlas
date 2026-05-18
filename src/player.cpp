@@ -664,7 +664,7 @@ bool Player::canSeeCreature(const std::shared_ptr<const Creature>& creature) con
 		return false;
 	}
 
-	if (!creature->asPlayer() && !canSeeInvisibility() && creature->isInvisible()) {
+	if (!creature->isPlayer() && !canSeeInvisibility() && creature->isInvisible()) {
 		return false;
 	}
 	return true;
@@ -1755,7 +1755,7 @@ void Player::removeExperience(uint64_t exp, bool sendText /* = false*/)
 			message.type = MESSAGE_EXPERIENCE_OTHERS;
 			message.text = getName() + " lost " + expString;
 			for (const auto& spectator : spectators) {
-				assert(spectator->asPlayer() != nullptr);
+				assert(spectator->isPlayer());
 				std::static_pointer_cast<Player>(spectator)->sendTextMessage(message);
 			}
 		}
@@ -3507,7 +3507,7 @@ void Player::onTargetCreatureGainHealth(const std::shared_ptr<Creature>& target,
 
 	std::shared_ptr<Player> tmpPlayer = nullptr;
 
-	if (target->asPlayer()) {
+	if (target->isPlayer()) {
 		tmpPlayer = target->asPlayer();
 	} else if (const auto& targetMaster = target->getMaster()) {
 		if (const auto& targetMasterPlayer = targetMaster->asPlayer()) {
@@ -3574,7 +3574,7 @@ void Player::onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature>&
 		return;
 	}
 
-	if (target && !target->asPlayer()) {
+	if (target && !target->isPlayer()) {
 		if (const auto& party = getParty()) {
 			if (party->isSharedExperienceActive() && party->isSharedExperienceEnabled()) {
 				party->shareExperience(gainExp, target);
@@ -3617,12 +3617,12 @@ bool Player::lastHitIsPlayer(const std::shared_ptr<Creature>& lastHitCreature)
 		return false;
 	}
 
-	if (lastHitCreature->asPlayer()) {
+	if (lastHitCreature->isPlayer()) {
 		return true;
 	}
 
 	const auto& lastHitMaster = lastHitCreature->getMaster();
-	return lastHitMaster && lastHitMaster->asPlayer();
+	return lastHitMaster && lastHitMaster->isPlayer();
 }
 
 void Player::changeHealth(int32_t healthChange, bool sendHealthChange /* = true*/)

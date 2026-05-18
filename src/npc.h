@@ -101,6 +101,8 @@ public:
 		return std::static_pointer_cast<const Npc>(shared_from_this());
 	}
 
+	bool isNpc() const final { return true; }
+
 	bool isPushable() const override { return pushable && walkTicks != std::chrono::milliseconds::zero(); }
 
 	void setID() override

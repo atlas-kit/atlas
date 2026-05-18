@@ -727,7 +727,7 @@ int32_t WeaponDistance::getElementDamage(const std::shared_ptr<const Player>& pl
 	int32_t minValue = 0;
 	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 	if (target) {
-		if (target->asPlayer()) {
+		if (target->isPlayer()) {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.1));
 		} else {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.2));
@@ -761,7 +761,7 @@ int32_t WeaponDistance::getWeaponDamage(const std::shared_ptr<const Player>& pla
 
 	int32_t minValue;
 	if (target) {
-		if (target->asPlayer()) {
+		if (target->isPlayer()) {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.1));
 		} else {
 			minValue = static_cast<int32_t>(std::ceil(player->getLevel() * 0.2));

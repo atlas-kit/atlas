@@ -299,7 +299,7 @@ void Creature::updateIcons() const
 	SpectatorVec spectators;
 	g_game.map.getSpectators(spectators, position, true, true);
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->sendUpdateCreatureIcons(asCreature());
 	}
 }
@@ -456,7 +456,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 							player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 						}
 					} else if (zone == ZONE_NOPVP) {
-						if (attackedCreature->asPlayer()) {
+						if (attackedCreature->isPlayer()) {
 							if (!player->hasFlag(PlayerFlag_IgnoreProtectionZone)) {
 								player->setAttackedCreature(nullptr);
 								player->sendCancelTarget();
@@ -466,7 +466,7 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 					} else if (zone == ZONE_NORMAL) {
 						// attackedCreature can leave a pvp zone if not pzlocked
 						if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-							if (attackedCreature->asPlayer()) {
+							if (attackedCreature->isPlayer()) {
 								player->setAttackedCreature(nullptr);
 								player->sendCancelTarget();
 								player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
@@ -1052,7 +1052,7 @@ void Creature::onGainExperience(uint64_t gainExp, const std::shared_ptr<Creature
 	message.primary.value = gainExp;
 
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->sendTextMessage(message);
 	}
 }

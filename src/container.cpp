@@ -56,7 +56,7 @@ bool Container::hasContainerParent() const
 
 	if (hasParent()) {
 		if (const auto& creature = getParent()->asCreature()) {
-			return !creature->asPlayer();
+			return !creature->isPlayer();
 		}
 	}
 	return true;
@@ -147,13 +147,13 @@ void Container::onAddContainerItem(const std::shared_ptr<Item>& item)
 
 	// send to client
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->sendAddContainerItem(asContainer(), item);
 	}
 
 	// event methods
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->onAddContainerItem(item);
 	}
 }
@@ -166,13 +166,13 @@ void Container::onUpdateContainerItem(uint32_t index, const std::shared_ptr<Item
 
 	// send to client
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->sendUpdateContainerItem(asContainer(), index, newItem);
 	}
 
 	// event methods
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->onUpdateContainerItem(asContainer(), oldItem, newItem);
 	}
 }
@@ -184,13 +184,13 @@ void Container::onRemoveContainerItem(uint32_t index, const std::shared_ptr<Item
 
 	// send change to client
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->sendRemoveContainerItem(asContainer(), index);
 	}
 
 	// event methods
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->onRemoveContainerItem(asContainer(), item);
 	}
 }

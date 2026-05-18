@@ -99,13 +99,14 @@ public:
 
 	virtual std::shared_ptr<Player> asPlayer() { return nullptr; }
 	virtual std::shared_ptr<const Player> asPlayer() const { return nullptr; }
-
-	virtual bool isPlayer() const { return false; }
-
 	virtual std::shared_ptr<Npc> asNpc() { return nullptr; }
 	virtual std::shared_ptr<const Npc> asNpc() const { return nullptr; }
 	virtual std::shared_ptr<Monster> asMonster() { return nullptr; }
 	virtual std::shared_ptr<const Monster> asMonster() const { return nullptr; }
+
+	virtual bool isPlayer() const { return false; }
+	virtual bool isNpc() const { return false; }
+	virtual bool isMonster() const { return false; }
 
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
