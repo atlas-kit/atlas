@@ -232,15 +232,7 @@ int luaCreatureSetTarget(lua_State* L)
 		return 1;
 	}
 
-	const auto& target = tfs::lua::getCreature(L, 2);
-	creature->setAttackedCreature(target);
-
-	if (target) {
-		const auto& targetPosition = target->getPosition();
-		tfs::lua::pushBoolean(L, targetPosition.z == creature->getPosition().z && creature->canSee(targetPosition));
-	} else {
-		tfs::lua::pushBoolean(L, true);
-	}
+	tfs::lua::pushBoolean(L, creature->setAttackedCreature(tfs::lua::getCreature(L, 2)));
 	return 1;
 }
 
@@ -271,15 +263,7 @@ int luaCreatureSetFollowCreature(lua_State* L)
 		return 1;
 	}
 
-	const auto& followedCreature = tfs::lua::getCreature(L, 2);
-	creature->setFollowCreature(followedCreature);
-
-	if (followedCreature) {
-		const auto& followedPosition = followedCreature->getPosition();
-		tfs::lua::pushBoolean(L, followedPosition.z == creature->getPosition().z && creature->canSee(followedPosition));
-	} else {
-		tfs::lua::pushBoolean(L, true);
-	}
+	tfs::lua::pushBoolean(L, creature->setFollowCreature(tfs::lua::getCreature(L, 2)));
 	return 1;
 }
 
