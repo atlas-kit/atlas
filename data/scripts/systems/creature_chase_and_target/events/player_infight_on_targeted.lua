@@ -66,11 +66,13 @@ do
 
 	-- Applies in-fight to a player who takes non-healing damage.
 	function event.onCreatureChangeHealth(creature, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
-		if primaryType ~= COMBAT_HEALING then
-			local player = creature:asPlayer()
-			if player then
-				addInFightTicks(player)
-			end
+		if primaryType == COMBAT_HEALING then
+			return primaryDamage, primaryType, secondaryDamage, secondaryType
+		end
+
+		local player = creature:asPlayer()
+		if player then
+			addInFightTicks(player)
 		end
 
 		return primaryDamage, primaryType, secondaryDamage, secondaryType

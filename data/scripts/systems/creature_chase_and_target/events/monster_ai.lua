@@ -39,6 +39,7 @@ end
 do
 	local event = Event()
 
+	-- Clean up per-monster timing state when the creature is removed.
 	function event.onCreatureRemoved(creature)
 		targetChangeTicks[creature:getId()] = nil
 	end
@@ -49,6 +50,7 @@ end
 do
 	local event = Event()
 
+	-- Main AI tick: target acquisition, re-evaluation, and chase/follow.
 	function event.onCreatureThink(creature, interval)
 		local monster = creature:asMonster()
 		if not monster then
