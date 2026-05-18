@@ -1024,7 +1024,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 		updateRegeneration();
 
-
 		IOLoginData::updateOnlineStatus(guid, true);
 
 		if (const auto& guild = getGuild()) {

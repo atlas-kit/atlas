@@ -367,9 +367,7 @@ void Monster::onCreatureLeave(const std::shared_ptr<Creature>& creature)
 	}
 }
 
-void Monster::goToFollowCreature()
-{
-}
+void Monster::goToFollowCreature() {}
 
 BlockType_t Monster::blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
                               bool checkDefense /* = false*/, bool checkArmor /* = false*/, bool /* field = false */,
@@ -435,9 +433,7 @@ void Monster::setIdle(bool idle)
 	}
 }
 
-void Monster::updateIdleStatus()
-{
-}
+void Monster::updateIdleStatus() {}
 
 void Monster::onAddCondition(ConditionType_t) { updateIdleStatus(); }
 

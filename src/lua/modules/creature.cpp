@@ -654,7 +654,7 @@ int luaCreatureGetConditions(lua_State* L)
 	lua_createtable(L, creature->getConditions().size(), 0);
 	int index = 0;
 	for (const auto& condition : creature->getConditions()) {
-		tfs::lua::pushSharedPtr(L, condition, true);
+		tfs::lua::pushUserdata(L, condition);
 		tfs::lua::setMetatable(L, -1, "Condition");
 		lua_rawseti(L, -2, ++index);
 	}
