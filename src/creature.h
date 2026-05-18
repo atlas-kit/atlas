@@ -249,7 +249,6 @@ public:
 	const auto& getConditions() const { return conditions; }
 	void executeConditions(std::chrono::milliseconds interval);
 	bool hasCondition(ConditionType_t type, uint32_t subId = 0) const;
-	bool hasAggressiveCondition() const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(CombatType_t type) const;
 	virtual bool isSuppress(ConditionType_t type) const;
