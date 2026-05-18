@@ -1,3 +1,5 @@
+local handler = PacketHandler(0xA2)
+
 -- 0xA2: Follow / Start Chase (client -> server)
 -- Payload:
 -- - creatureId:u32 (0 to stop following)
@@ -6,9 +8,7 @@
 -- different floor or out of sight, the request is rejected.
 -- If already attacking a different creature, the attack target is
 -- cleared so the player only follows the new chase target.
-local handler = PacketHandler(0xA2)
 
--- Process the follow request: validate the target, set chase or reject.
 function handler.onReceive(player, msg)
 	local chaseCreatureId = msg:getU32()
 
@@ -19,6 +19,12 @@ function handler.onReceive(player, msg)
 
 	local chaseCreature = Creature(chaseCreatureId)
 	if not chaseCreature then
+		player:sendCancelTarget()
+		return
+	end
+
+	-- Prevent self-follow.
+	if chaseCreature == player then
 		return
 	end
 
@@ -34,6 +40,7 @@ function handler.onReceive(player, msg)
 		return
 	end
 
+	-- If attacking a different creature, clear attack target.
 	local targetCreature = player:getTargetCreature()
 	if targetCreature and targetCreature ~= chaseCreature then
 		player:setTargetCreature(nil)

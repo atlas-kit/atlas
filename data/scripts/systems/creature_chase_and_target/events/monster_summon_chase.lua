@@ -20,6 +20,9 @@ function event.onCreatureThink(creature, interval)
 	-- Check if the monster has a master (summons/pets).
 	local master = monster:getMaster()
 	if not master then
+		-- Master is gone; clear any lingering chase/target references.
+		monster:setChaseCreature(nil)
+		monster:setTargetCreature(nil)
 		return
 	end
 

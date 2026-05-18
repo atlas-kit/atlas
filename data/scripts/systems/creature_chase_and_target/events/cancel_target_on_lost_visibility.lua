@@ -31,6 +31,15 @@ do
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 		end
 		creature:setTargetCreature(nil)
+
+		-- Reset monster attack cooldown so it does not immediately attack
+		-- when re-targeting after losing sight of the current target.
+		if not player then
+			local monster = creature:asMonster()
+			if monster then
+				monster:resetAttackTicks()
+			end
+		end
 	end
 
 	event:register()
@@ -69,6 +78,13 @@ do
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 		end
 		creature:setTargetCreature(nil)
+
+		if not player then
+			local monster = creature:asMonster()
+			if monster then
+				monster:resetAttackTicks()
+			end
+		end
 	end
 
 	event:register()
@@ -104,6 +120,13 @@ do
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 		end
 		creature:setTargetCreature(nil)
+
+		if not player then
+			local monster = creature:asMonster()
+			if monster then
+				monster:resetAttackTicks()
+			end
+		end
 	end
 
 	event:register()

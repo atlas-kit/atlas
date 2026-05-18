@@ -1,3 +1,5 @@
+local handler = PacketHandler(0xA1)
+
 -- 0xA1: Attack / Set Target (client -> server)
 -- Payload:
 -- - creatureId:u32 (0 to stop attacking)
@@ -6,10 +8,7 @@
 -- If the target is unreachable or not attackable (protection zone,
 -- wrong PVP mode), the request is rejected and both chase and target
 -- are cleared.
-local handler = PacketHandler(0xA1)
 
--- Process the attack request: validate target visibility and combat
--- rules, set the target or reject.
 function handler.onReceive(player, msg)
 	local targetCreatureId = msg:getU32()
 

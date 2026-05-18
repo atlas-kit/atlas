@@ -8,13 +8,16 @@
 -- changeTargetSpeed, changeTargetChance, and targetDistance.
 
 local targetChangeTicks = {}
+local chaseAttempts = {}
 
 do
 	local event = Event()
 
 	-- Clean up per-monster state when the creature is fully removed.
 	function event.onCreatureRemoved(creature)
-		targetChangeTicks[creature:getId()] = nil
+		local id = creature:getId()
+		targetChangeTicks[id] = nil
+		chaseAttempts[id] = nil
 	end
 
 	event:register()
@@ -83,10 +86,24 @@ do
 		chaseCreature = monster:getChaseCreature()
 		if chaseCreature then
 			local chasePosition = chaseCreature:getPosition()
+			-- A* only works on the same floor; skip if target is on a different Z.
 			if position.z == chasePosition.z then
 				local dirs = monster:getPathTo(chasePosition, 1, 1, true, true, 12)
 				if dirs then
+					-- Valid path found; start walking.
 					monster:startAutoWalk(dirs)
+					chaseAttempts[monster:getId()] = nil
+				else
+					-- No path found; give up after 10 consecutive failures
+					-- to avoid calling getPathTo every tick for unreachable targets.
+					local id = monster:getId()
+					local attempts = (chaseAttempts[id] or 0) + 1
+					if attempts >= 10 then
+						monster:setChaseCreature(nil)
+						chaseAttempts[id] = nil
+					else
+						chaseAttempts[id] = attempts
+					end
 				end
 			end
 		end
