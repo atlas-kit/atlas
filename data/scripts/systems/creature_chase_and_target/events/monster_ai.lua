@@ -9,6 +9,7 @@
 
 local targetChangeTicks = {}
 local chaseAttempts = {}
+local MAX_CHASE_FAILURES = 10
 
 do
 	local event = Event()
@@ -94,11 +95,11 @@ do
 					monster:startAutoWalk(dirs)
 					chaseAttempts[monster:getId()] = nil
 				else
-					-- No path found; give up after 10 consecutive failures
-					-- to avoid calling getPathTo every tick for unreachable targets.
-					local id = monster:getId()
-					local attempts = (chaseAttempts[id] or 0) + 1
-					if attempts >= 10 then
+				-- No path found; give up after MAX_CHASE_FAILURES consecutive attempts
+				-- to avoid calling getPathTo every tick for unreachable targets.
+				local id = monster:getId()
+				local attempts = (chaseAttempts[id] or 0) + 1
+				if attempts >= MAX_CHASE_FAILURES then
 						monster:setChaseCreature(nil)
 						chaseAttempts[id] = nil
 					else
