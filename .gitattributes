@@ -1,6 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Custom for Visual Studio
-*.sln     merge=union
-*.vcxproj merge=union
+# Binary assets
+*.ico binary
+
+# Windows resource files need CRLF for rc.exe
+*.rc text eol=crlf

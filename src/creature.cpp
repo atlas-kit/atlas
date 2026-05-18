@@ -7,7 +7,7 @@
 
 #include "combat.h"
 #include "configmanager.h"
-#include "events.h"
+#include "events/creature.h"
 #include "game.h"
 #include "party.h"
 #include "scheduler.h"
