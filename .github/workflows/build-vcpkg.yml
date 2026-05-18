@@ -60,6 +60,11 @@ jobs:
           restore-keys: |
             vcpkg-linux-
 
+      - name: CCache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt') }}
+
       - name: Run vcpkg
         uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
 
@@ -67,6 +72,7 @@ jobs:
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: linux-release
+          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
           buildPreset: linux-release
 
       - name: Upload build logs
