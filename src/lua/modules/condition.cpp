@@ -173,6 +173,11 @@ int luaConditionGetParameter(lua_State* L)
 	}
 
 	int32_t value = condition->getParam(tfs::lua::getNumber<ConditionParam_t>(L, 2));
+	if (value == std::numeric_limits<int32_t>().max()) {
+		lua_pushnil(L);
+		return 1;
+	}
+
 	tfs::lua::pushNumber(L, value);
 	return 1;
 }
