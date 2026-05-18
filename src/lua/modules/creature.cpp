@@ -908,6 +908,27 @@ int luaCreatureGetPathTo(lua_State* L)
 	return 1;
 }
 
+int luaCreatureStartAutoWalk(lua_State* L)
+{
+	// creature:startAutoWalk(dirList)
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		return 0;
+	}
+
+	std::vector<Direction> dirList;
+	const auto length = lua_rawlen(L, 2);
+	dirList.reserve(length);
+	for (size_t i = 1; i <= length; ++i) {
+		lua_rawgeti(L, 2, i);
+		dirList.push_back(static_cast<Direction>(tfs::lua::getNumber<int32_t>(L, -1)));
+		lua_pop(L, 1);
+	}
+
+	creature->startAutoWalk(dirList);
+	return 0;
+}
+
 int luaCreatureMove(lua_State* L)
 {
 	// creature:move(direction)
@@ -1217,6 +1238,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "getDescription", luaCreatureGetDescription);
 
 	lsi.registerMethod("Creature", "getPathTo", luaCreatureGetPathTo);
+	lsi.registerMethod("Creature", "startAutoWalk", luaCreatureStartAutoWalk);
 	lsi.registerMethod("Creature", "move", luaCreatureMove);
 
 	lsi.registerMethod("Creature", "getZone", luaCreatureGetZone);
