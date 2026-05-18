@@ -14,7 +14,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/databasetasks.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.cpp
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.cpp
-	${CMAKE_CURRENT_LIST_DIR}/events.cpp
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.cpp
 	${CMAKE_CURRENT_LIST_DIR}/game.cpp
 	${CMAKE_CURRENT_LIST_DIR}/groups.cpp
@@ -86,7 +85,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/depotchest.h
 	${CMAKE_CURRENT_LIST_DIR}/depotlocker.h
 	${CMAKE_CURRENT_LIST_DIR}/enums.h
-	${CMAKE_CURRENT_LIST_DIR}/events.h
 	${CMAKE_CURRENT_LIST_DIR}/fileloader.h
 	${CMAKE_CURRENT_LIST_DIR}/game.h
 	${CMAKE_CURRENT_LIST_DIR}/groups.h
@@ -183,7 +181,10 @@ endif ()
 add_subdirectory(lua)
 target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN})
+add_subdirectory(events)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:events>)
+
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN} ${events_HDR})
 
 set(tfs_RC "")
 if (WIN32)

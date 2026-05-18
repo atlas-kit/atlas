@@ -5,7 +5,7 @@
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
-#include "../events.h"
+#include "../events/game.h"
 #include "../game.h"
 #include "../item.h"
 #include "../movement.h"
