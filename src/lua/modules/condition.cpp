@@ -173,6 +173,24 @@ int luaConditionGetParameter(lua_State* L)
 	}
 
 	int32_t value = condition->getParam(tfs::lua::getNumber<ConditionParam_t>(L, 2));
+	tfs::lua::pushNumber(L, value);
+	return 1;
+}
+
+int luaConditionIsAggressive(lua_State* L)
+{
+	// condition:isAggressive()
+	Condition* condition = tfs::lua::getUserdata<Condition>(L, 1);
+	if (!condition) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, condition->isAggressive());
+	return 1;
+}
+
+	int32_t value = condition->getParam(tfs::lua::getNumber<ConditionParam_t>(L, 2));
 	if (value == std::numeric_limits<int32_t>().max()) {
 		lua_pushnil(L);
 		return 1;
@@ -266,6 +284,7 @@ void tfs::lua::registerCondition(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Condition", "setParameter", luaConditionSetParameter);
 	lsi.registerMethod("Condition", "getParameter", luaConditionGetParameter);
+	lsi.registerMethod("Condition", "isAggressive", luaConditionIsAggressive);
 
 	lsi.registerMethod("Condition", "setFormula", luaConditionSetFormula);
 	lsi.registerMethod("Condition", "setOutfit", luaConditionSetOutfit);

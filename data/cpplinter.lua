@@ -313,6 +313,7 @@ Podium = {}
 ---@field getOutfit fun(self: Creature): Outfit
 ---@field setOutfit fun(self: Creature, outfit: Outfit)
 ---@field getCondition fun(self: Creature, conditionType: number): Condition
+---@field getConditions fun(self: Creature): Condition[]
 ---@field addCondition fun(self: Creature, condition: Condition)
 ---@field removeCondition fun(self: Creature, conditionType: number)
 ---@field hasCondition fun(self: Creature, conditionType: number): boolean
@@ -724,6 +725,7 @@ Combat = {}
 ---@field setTicks fun(self: Condition, ticks: number)
 ---@field setParameter fun(self: Condition, key: number, value: any)
 ---@field getParameter fun(self: Condition, key: number): any
+---@field isAggressive fun(self: Condition): boolean
 ---@field setFormula fun(self: Condition, formulaType: number, base: number, variation: number, multiplier: number)
 ---@field setOutfit fun(self: Condition, outfit: Outfit)
 ---@field addDamage fun(self: Condition, amount: number, interval: number)

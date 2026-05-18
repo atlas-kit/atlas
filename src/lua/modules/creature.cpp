@@ -642,6 +642,25 @@ int luaCreatureAddCondition(lua_State* L)
 	return 1;
 }
 
+int luaCreatureGetConditions(lua_State* L)
+{
+	// creature:getConditions()
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	lua_createtable(L, creature->getConditions().size(), 0);
+	int index = 0;
+	for (const auto& condition : creature->getConditions()) {
+		tfs::lua::pushSharedPtr(L, condition, true);
+		tfs::lua::setMetatable(L, -1, "Condition");
+		lua_rawseti(L, -2, ++index);
+	}
+	return 1;
+}
+
 int luaCreatureRemoveCondition(lua_State* L)
 {
 	// creature:removeCondition(conditionType[, conditionId = CONDITIONID_COMBAT[, subId = 0[, force = false]]])
@@ -1236,6 +1255,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "setOutfit", luaCreatureSetOutfit);
 
 	lsi.registerMethod("Creature", "getCondition", luaCreatureGetCondition);
+	lsi.registerMethod("Creature", "getConditions", luaCreatureGetConditions);
 	lsi.registerMethod("Creature", "addCondition", luaCreatureAddCondition);
 	lsi.registerMethod("Creature", "removeCondition", luaCreatureRemoveCondition);
 	lsi.registerMethod("Creature", "hasCondition", luaCreatureHasCondition);
