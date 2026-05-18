@@ -153,8 +153,6 @@ public:
 	void addTarget(const std::shared_ptr<Creature>& creature, bool pushFront = false);
 	void removeTarget(const std::shared_ptr<Creature>& creature);
 
-	bool isFriend(const std::shared_ptr<const Creature>& creature) const { return isFriendCreature(creature); }
-	bool isOpponent(const std::shared_ptr<const Creature>& creature) const { return isOpponentCreature(creature); }
 	bool isFriendCreature(const std::shared_ptr<const Creature>& creature) const;
 	bool isOpponentCreature(const std::shared_ptr<const Creature>& creature) const;
 
