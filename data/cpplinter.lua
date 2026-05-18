@@ -288,7 +288,6 @@ Podium = {}
 ---@field setChaseCreature fun(self: Creature, creature: Creature)
 ---@field hasTargetCreature fun(self: Creature): boolean
 ---@field hasChaseCreature fun(self: Creature): boolean
----@field hasAggressiveCondition fun(self: Creature): boolean
 ---@field getMaster fun(self: Creature): Creature
 ---@field setMaster fun(self: Creature, master: Creature)
 ---@field getLight fun(self: Creature): table
