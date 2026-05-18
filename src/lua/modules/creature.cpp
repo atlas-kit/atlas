@@ -645,10 +645,8 @@ int luaCreatureAddCondition(lua_State* L)
 int luaCreatureGetConditions(lua_State* L)
 {
 	// creature:getConditions()
-	// Returns a table of active conditions as raw Condition userdata.
-	// WARNING: Condition objects have the same lifetime as the creature.
-	// Storing returned references across ticks is unsafe — the condition
-	// may expire and the pointer become dangling.
+	// Returns a table of active conditions with {type, ticks, aggressive}.
+	// Plain Lua data — no raw pointers, safe from dangling references.
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
@@ -658,8 +656,13 @@ int luaCreatureGetConditions(lua_State* L)
 	lua_createtable(L, creature->getConditions().size(), 0);
 	int index = 0;
 	for (const auto& condition : creature->getConditions()) {
-		tfs::lua::pushUserdata(L, condition.get());
-		tfs::lua::setMetatable(L, -1, "Condition");
+		lua_createtable(L, 0, 3);
+		tfs::lua::pushNumber(L, condition->getType());
+		lua_setfield(L, -2, "type");
+		tfs::lua::pushNumber(L, condition->getTicks().count());
+		lua_setfield(L, -2, "ticks");
+		tfs::lua::pushBoolean(L, condition->isAggressive());
+		lua_setfield(L, -2, "aggressive");
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
