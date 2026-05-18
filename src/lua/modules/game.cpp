@@ -3,7 +3,7 @@
 #include "../../game.h"
 
 #include "../../configmanager.h"
-#include "../../events.h"
+#include "../../events/monster.h"
 #include "../../monster.h"
 #include "../../npc.h"
 #include "../../script.h"

@@ -6,7 +6,7 @@
 #include "spawn.h"
 
 #include "configmanager.h"
-#include "events.h"
+#include "events/monster.h"
 #include "game.h"
 #include "pugicast.h"
 #include "scheduler.h"

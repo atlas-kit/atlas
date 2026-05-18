@@ -7,7 +7,7 @@
 
 #include "actions.h"
 #include "chat.h"
-#include "events.h"
+#include "events/events.h"
 #include "movement.h"
 #include "script.h"
 #include "spells.h"
