@@ -105,9 +105,24 @@ public:
 
 	bool hasExtraSwing() override { return lastMeleeAttack == std::chrono::steady_clock::time_point::min(); }
 
+	void setIdle(bool idle);
+	bool getIdleStatus() const { return isIdle; }
 
-	const auto& getFriendList() const { return friendList; }
+	bool isInSpawnRange(const Position& pos) const;
+
+	MonsterType* getMonsterType() { return mType; }
+	const MonsterType* getMonsterType() const { return mType; }
+
+	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
+
+	static uint32_t monsterAutoID;
+
+	const auto& getTargetCreatures() const { return targetList; }
+	void addTargetCreature(const std::shared_ptr<Creature>& creature) { addTarget(creature); }
+	void removeTargetCreature(const std::shared_ptr<Creature>& creature) { removeTarget(creature); }
+
 	const auto& getTargetList() const { return targetList; }
+	const auto& getFriendList() const { return friendList; }
 
 	bool isTarget(const std::shared_ptr<const Creature>& creature) const;
 	bool isFleeing() const
@@ -138,14 +153,12 @@ public:
 	void addTarget(const std::shared_ptr<Creature>& creature, bool pushFront = false);
 	void removeTarget(const std::shared_ptr<Creature>& creature);
 
-
-	bool isFriendCreature(const std::shared_ptr<const Creature>& creature) const;
-	bool isOpponentCreature(const std::shared_ptr<const Creature>& creature) const;
+	bool isFriend(const std::shared_ptr<const Creature>& creature) const;
+	bool isOpponent(const std::shared_ptr<const Creature>& creature) const;
 
 private:
-	std::deque<std::weak_ptr<Creature>> targetList;
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
-
+	std::deque<std::weak_ptr<Creature>> targetList;
 	MonsterIconHashMap monsterIcons;
 
 	std::string name;
@@ -157,10 +170,12 @@ private:
 	std::chrono::steady_clock::time_point lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 
 	std::chrono::milliseconds attackTicks = std::chrono::milliseconds::zero();
+	std::chrono::milliseconds targetChangeTicks = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds defenseTicks = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds yellTicks = std::chrono::milliseconds::zero();
 	int32_t minCombatValue = 0;
 	int32_t maxCombatValue = 0;
+	std::chrono::milliseconds targetChangeCooldown = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds challengeFocusDuration = std::chrono::milliseconds::zero();
 	int32_t stepDuration = 0;
 
@@ -191,6 +206,7 @@ private:
 	void onAddCondition(ConditionType_t type) override;
 	void onEndCondition(ConditionType_t type) override;
 
+	bool canUseAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const;
 	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
 	                 std::chrono::milliseconds interval, bool& inRange, bool& resetTicks);
 	bool getRandomStep(const Position& creaturePos, Direction& direction) const;
@@ -198,6 +214,7 @@ private:
 	                  bool keepDistance = true);
 	bool canWalkTo(Position pos, Direction direction) const;
 
+	void onThinkTarget(std::chrono::milliseconds interval);
 	void onThinkYell(std::chrono::milliseconds interval);
 	void onThinkDefense(std::chrono::milliseconds interval);
 
