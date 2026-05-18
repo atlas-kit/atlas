@@ -567,7 +567,7 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 	}
 }
 
-bool Monster::canUseAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const
+bool Monster::canAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const
 {
 	if (isHostile()) {
 		const Position& targetPos = target->getPosition();
@@ -910,7 +910,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 	const auto& targetCreature = getTargetCreature();
 	assert(targetCreature);
 
-	bool canDoAttackNow = canUseAttack(creaturePos, targetCreature);
+	bool canDoAttackNow = canAttack(creaturePos, targetCreature);
 
 	const Position& centerPos = targetCreature->getPosition();
 
@@ -932,7 +932,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), targetCreature));
+				          canAttack(Position(creaturePos.x, creaturePos.y - 1, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -948,7 +948,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), targetCreature));
+				          canAttack(Position(creaturePos.x, creaturePos.y + 1, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -964,7 +964,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), targetCreature));
+				          canAttack(Position(creaturePos.x + 1, creaturePos.y, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -980,7 +980,7 @@ bool Monster::getDanceStep(const Position& creaturePos, Direction& direction, bo
 
 			if (keepAttack) {
 				result = (!canDoAttackNow ||
-				          canUseAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), targetCreature));
+				          canAttack(Position(creaturePos.x - 1, creaturePos.y, creaturePos.z), targetCreature));
 			}
 
 			if (result) {
@@ -1681,7 +1681,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 		} else if (mType->info.targetDistance <= 1) {
 			fpp.fullPathSearch = true;
 		} else {
-			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			fpp.fullPathSearch = !canAttack(getPosition(), creature);
 		}
 	} else if (isFleeing()) {
 		// Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
@@ -1692,7 +1692,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 	} else if (mType->info.targetDistance <= 1) {
 		fpp.fullPathSearch = true;
 	} else {
-		fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+		fpp.fullPathSearch = !canAttack(getPosition(), creature);
 	}
 }
 

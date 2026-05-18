@@ -143,7 +143,7 @@ int luaMonsterCanAttack(lua_State* L)
 		return 1;
 	}
 
-	tfs::lua::pushBoolean(L, monster->canUseAttack(monster->getPosition(), creature));
+	tfs::lua::pushBoolean(L, monster->canAttack(monster->getPosition(), creature));
 	return 1;
 }
 

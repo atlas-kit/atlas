@@ -208,7 +208,7 @@ private:
 	void onAddCondition(ConditionType_t type) override;
 	void onEndCondition(ConditionType_t type) override;
 
-	bool canUseAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const;
+	bool canAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const;
 	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
 	                 std::chrono::milliseconds interval, bool& inRange, bool& resetTicks);
 	bool getRandomStep(const Position& creaturePos, Direction& direction) const;
