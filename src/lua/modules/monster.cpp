@@ -500,8 +500,8 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "setIdle", luaMonsterSetIdle);
 
 	lsi.registerMethod("Monster", "isTarget", luaMonsterIsTarget);
-	lsi.registerMethod("Monster", "isOpponentCreature", luaMonsterIsOpponent);
-	lsi.registerMethod("Monster", "isFriendCreature", luaMonsterIsFriend);
+	lsi.registerMethod("Monster", "isOpponent", luaMonsterIsOpponent);
+	lsi.registerMethod("Monster", "isFriend", luaMonsterIsFriend);
 
 	lsi.registerMethod("Monster", "addFriend", luaMonsterAddFriend);
 	lsi.registerMethod("Monster", "removeFriend", luaMonsterRemoveFriend);

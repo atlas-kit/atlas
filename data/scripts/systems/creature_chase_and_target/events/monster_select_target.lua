@@ -24,7 +24,7 @@ function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile,
 	-- Case: The monster currently has no target/chase.
 	if not chaseCreature then
 		-- If the creature that moved is an opponent, select it as the new target.
-		if monster:isOpponentCreature(nearbyCreature) and monster:isTarget(nearbyCreature) then
+		if monster:isOpponent(nearbyCreature) and monster:isTarget(nearbyCreature) then
 			monster:selectTarget(nearbyCreature)
 		end
 		return
