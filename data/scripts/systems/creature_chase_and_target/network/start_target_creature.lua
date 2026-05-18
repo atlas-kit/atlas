@@ -2,12 +2,14 @@
 -- Payload:
 -- - creatureId:u32 (0 to stop attacking)
 --
--- Validates line-of-sight and combat rules (via Combat.canTargetCreature)
--- before accepting the target. If the target is unreachable or the attack
--- is not allowed (e.g., protection zone, wrong PVP mode), the request
--- is rejected and both chase and target are cleared.
+-- Validates line-of-sight and combat rules before setting the target.
+-- If the target is unreachable or not attackable (protection zone,
+-- wrong PVP mode), the request is rejected and both chase and target
+-- are cleared.
 local handler = PacketHandler(0xA1)
 
+-- Process the attack request: validate target visibility and combat
+-- rules, set the target or reject.
 function handler.onReceive(player, msg)
 	local targetCreatureId = msg:getU32()
 

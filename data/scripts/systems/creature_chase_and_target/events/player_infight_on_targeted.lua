@@ -19,6 +19,8 @@ end
 do
 	local event = Event()
 
+	-- When a player targets a creature (or is targeted), both sides
+	-- gain the in-fight condition.
 	function event.onCreatureTargetCreatureChanged(creature)
 		local targetCreature = creature:getTargetCreature()
 		if not targetCreature then

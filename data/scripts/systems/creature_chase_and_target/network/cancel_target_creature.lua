@@ -2,6 +2,7 @@
 -- Clears both attack target and chase/follow target.
 local handler = PacketHandler(0xBE)
 
+-- Clears both attack target and chase/follow target.
 function handler.onReceive(player, msg)
 	player:setChaseCreature(nil)
 	player:setTargetCreature(nil)

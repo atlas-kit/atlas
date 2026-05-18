@@ -5,6 +5,8 @@
 
 local event = Event()
 
+-- When a player is removed (logout, kick), clear their chase target
+-- to update the followed creature's follower list.
 function event.onCreatureRemoved(creature)
 	-- Only apply to players.
 	local player = creature:asPlayer()

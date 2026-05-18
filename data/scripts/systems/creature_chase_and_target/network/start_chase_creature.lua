@@ -2,12 +2,13 @@
 -- Payload:
 -- - creatureId:u32 (0 to stop following)
 --
--- Validates line-of-sight before starting. If the target is on a different floor
--- or out of sight, the request is rejected and the player stops walking.
--- If already attacking a different creature, the attack target is cleared
--- so the player only follows (does not attack) the new chase target.
+-- Validates line-of-sight before starting. If the target is on a
+-- different floor or out of sight, the request is rejected.
+-- If already attacking a different creature, the attack target is
+-- cleared so the player only follows the new chase target.
 local handler = PacketHandler(0xA2)
 
+-- Process the follow request: validate the target, set chase or reject.
 function handler.onReceive(player, msg)
 	local chaseCreatureId = msg:getU32()
 

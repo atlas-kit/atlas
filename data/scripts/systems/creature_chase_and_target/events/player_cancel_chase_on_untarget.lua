@@ -5,8 +5,9 @@
 
 local event = Event()
 
+-- When the player loses their attack target, also clear chase if
+-- they were following the target.
 function event.onCreatureTargetCreatureChanged(creature)
-	-- Only applies to players.
 	local player = creature:asPlayer()
 	if not player then
 		return
