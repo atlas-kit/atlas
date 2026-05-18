@@ -57,19 +57,20 @@ public:
 	                                const std::shared_ptr<const Tile>& tile);
 
 private:
-	std::vector<AStarNode> nodes = {};
-	std::unordered_map<uint32_t, AStarNode*> nodeMap = {};
-	std::unordered_set<uint32_t> visited = {};
-
 	struct NodeCompare
 	{
-		bool operator()(AStarNode* a, AStarNode* b) const
+		bool operator()(const AStarNode* a, const AStarNode* b) const
 		{
-			return a->f > b->f; // Min-heap based on f score
+			return a->f > b->f;
 		}
 	};
 
-	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
+	// Thread-local pool reused across pathfinding calls to avoid
+	// repeated heap allocations/deallocations of the underlying containers.
+	static thread_local std::vector<AStarNode> nodes;
+	static thread_local std::unordered_map<uint32_t, AStarNode*> nodeMap;
+	static thread_local std::unordered_set<uint32_t> visited;
+	static thread_local std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
 };
 
 using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;

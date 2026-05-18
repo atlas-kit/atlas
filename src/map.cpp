@@ -906,8 +906,20 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 }
 
 // AStarNodes
+thread_local std::vector<AStarNode> AStarNodes::nodes;
+thread_local std::unordered_map<uint32_t, AStarNode*> AStarNodes::nodeMap;
+thread_local std::unordered_set<uint32_t> AStarNodes::visited;
+thread_local std::priority_queue<AStarNode*, std::vector<AStarNode*>, AStarNodes::NodeCompare> AStarNodes::openSet;
+
 AStarNodes::AStarNodes(uint16_t x, uint16_t y)
 {
+	// Clear and reuse capacity from the thread-local pool instead of
+	// allocating fresh containers on every pathfinding call.
+	nodes.clear();
+	nodeMap.clear();
+	visited.clear();
+	openSet = {};
+
 	nodes.reserve(Map::nodeReserveSize);
 	nodeMap.reserve(Map::nodeReserveSize);
 	visited.reserve(Map::nodeReserveSize);
