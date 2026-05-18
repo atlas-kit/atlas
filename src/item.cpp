@@ -1003,24 +1003,8 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, std::string_view value)
 
 void ItemAttributes::removeAttribute(itemAttrTypes type)
 {
-	if (!hasAttribute(type)) {
-		return;
-	}
-
-	auto prev_it = attributes.rbegin();
-	if ((*prev_it).type == type) {
-		attributes.pop_back();
-	} else {
-		auto it = prev_it;
-		while (++it != attributes.rend()) {
-			if ((*it).type == type) {
-				(*it) = attributes.back();
-				attributes.pop_back();
-				break;
-			}
-		}
-	}
 	attributeBits &= ~type;
+	attributes.erase(type);
 }
 
 int64_t ItemAttributes::getIntAttr(itemAttrTypes type) const
@@ -1053,29 +1037,19 @@ void ItemAttributes::increaseIntAttr(itemAttrTypes type, int64_t value) { setInt
 
 const ItemAttributes::Attribute* ItemAttributes::getExistingAttr(itemAttrTypes type) const
 {
-	if (hasAttribute(type)) {
-		for (const Attribute& attribute : attributes) {
-			if (attribute.type == type) {
-				return &attribute;
-			}
-		}
-	}
-	return nullptr;
+	auto it = attributes.find(type);
+	return it != attributes.end() ? &it->second : nullptr;
 }
 
 ItemAttributes::Attribute& ItemAttributes::getAttr(itemAttrTypes type)
 {
-	if (hasAttribute(type)) {
-		for (Attribute& attribute : attributes) {
-			if (attribute.type == type) {
-				return attribute;
-			}
-		}
+	auto it = attributes.find(type);
+	if (it != attributes.end()) {
+		return it->second;
 	}
 
 	attributeBits |= type;
-	attributes.emplace_back(type);
-	return attributes.back();
+	return attributes.emplace(type, Attribute{type}).first->second;
 }
 
 void Item::startDecaying() { g_game.startDecay(asItem()); }

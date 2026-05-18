@@ -312,7 +312,7 @@ private:
 		}
 	};
 
-	std::vector<Attribute> attributes;
+	std::unordered_map<itemAttrTypes, Attribute> attributes;
 	uint32_t attributeBits = 0;
 
 	std::map<CombatType_t, Reflect> reflect;
