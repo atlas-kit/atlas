@@ -273,6 +273,8 @@ Podium = {}
 ---@field isHealthHidden fun(self: Creature): boolean
 ---@field isMovementBlocked fun(self: Creature): boolean
 ---@field isImmune fun(self: Creature): boolean
+---@field isAttackable fun(self: Creature): boolean
+---@field hasNextWalk fun(self: Creature): boolean
 ---@field canSee fun(self: Creature, position: Position): boolean
 ---@field canSeeCreature fun(self: Creature, creature: Creature): boolean
 ---@field canSeeGhostMode fun(self: Creature): boolean
@@ -284,6 +286,8 @@ Podium = {}
 ---@field setTargetCreature fun(self: Creature, target: Creature)
 ---@field getChaseCreature fun(self: Creature): Creature
 ---@field setChaseCreature fun(self: Creature, creature: Creature)
+---@field hasTargetCreature fun(self: Creature): boolean
+---@field hasChaseCreature fun(self: Creature): boolean
 ---@field getMaster fun(self: Creature): Creature
 ---@field setMaster fun(self: Creature, master: Creature)
 ---@field getLight fun(self: Creature): table
@@ -319,6 +323,7 @@ Podium = {}
 ---@field getSummons fun(self: Creature): table
 ---@field getDescription fun(self: Creature): string
 ---@field getPathTo fun(self: Creature, position: Position): table
+---@field startAutoWalk fun(self: Creature, dirList: table)
 ---@field move fun(self: Creature, direction: number)
 ---@field getZone fun(self: Creature): number
 ---@field hasIcon fun(self: Creature): boolean
@@ -479,6 +484,8 @@ Creature = {}
 ---@field setClientStaminaBonusDisplay fun(self: Player, display: number)
 ---@field getClientLowLevelBonusDisplay fun(self: Player): number
 ---@field setClientLowLevelBonusDisplay fun(self: Player, display: number)
+---@field stopWalk fun(self: Player)
+---@field sendCancelTarget fun(self: Player)
 Player = {}
 
 ---@class Monster : Creature
@@ -505,6 +512,7 @@ Player = {}
 ---@field getTargetCount fun(self: Monster): number
 ---@field selectTarget fun(self: Monster, creature: Creature): boolean
 ---@field searchTarget fun(self: Monster, searchType?: integer): boolean
+---@field resetAttackTicks fun(self: Monster)
 ---@field isWalkingToSpawn fun(self: Monster): boolean
 ---@field walkToSpawn fun(self: Monster)
 ---@field hasSpecialIcon fun(self: Monster): boolean
