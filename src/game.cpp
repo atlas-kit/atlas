@@ -784,9 +784,9 @@ ReturnValue Game::internalMoveCreature(const std::shared_ptr<Creature>& creature
 		// try to go up
 		if (currentPos.z != 8 && creature->getTile()->hasHeight(3)) {
 			const auto& aboveTile = map.getTile(currentPos.x, currentPos.y, currentPos.getZ() - 1);
-			if (!aboveTile || (!aboveTile->getGround() && !aboveTile->hasFlag(TILESTATE_BLOCKSOLID))) {
+			if (!aboveTile || (!aboveTile->hasGround() && !aboveTile->hasFlag(TILESTATE_BLOCKSOLID))) {
 				if (const auto& destAboveTile = map.getTile(destPos.x, destPos.y, destPos.getZ() - 1)) {
-					if (destAboveTile->getGround() && !destAboveTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
+					if (destAboveTile->hasGround() && !destAboveTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
 						flags |= FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 
 						if (!destAboveTile->hasFlag(TILESTATE_FLOORCHANGE)) {
@@ -801,7 +801,7 @@ ReturnValue Game::internalMoveCreature(const std::shared_ptr<Creature>& creature
 		// try to go down
 		if (currentPos.z != 7 && currentPos.z == destPos.z) {
 			const auto& destTile = map.getTile(destPos.x, destPos.y, destPos.z);
-			if (!destTile || (!destTile->getGround() && !destTile->hasFlag(TILESTATE_BLOCKSOLID))) {
+			if (!destTile || (!destTile->hasGround() && !destTile->hasFlag(TILESTATE_BLOCKSOLID))) {
 				if (const auto& destBelowTile = map.getTile(destPos.x, destPos.y, destPos.z + 1)) {
 					if (destBelowTile->hasHeight(3) && !destBelowTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)) {
 						flags |= FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
