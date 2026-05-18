@@ -37,7 +37,7 @@ function Monster.searchTarget(self, searchType)
 	local resultList = {}
 	for _, c in ipairs(self:getTargetList()) do
 		if c ~= chaseCreature and self:isTarget(c) then
-			if searchType == TARGETSEARCH_RANDOM or self:canUseAttack(c) then
+			if searchType == TARGETSEARCH_RANDOM or self:canAttack(c) then
 				table.insert(resultList, c)
 			end
 		end
