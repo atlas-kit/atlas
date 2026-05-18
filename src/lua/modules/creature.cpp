@@ -646,8 +646,8 @@ int luaCreatureGetConditions(lua_State* L)
 {
 	// creature:getConditions()
 	// Returns a table of active Condition userdata.
-	// Uses a lightweight metatable without __gc to prevent double-free
-	// — the creature owns the actual conditions, Lua only reads them.
+	// The creature owns the conditions — stored references are unsafe
+	// across ticks as the condition may expire (dangling pointer).
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
@@ -659,14 +659,6 @@ int luaCreatureGetConditions(lua_State* L)
 	for (const auto& condition : creature->getConditions()) {
 		tfs::lua::pushUserdata(L, condition.get());
 		tfs::lua::setMetatable(L, -1, "Condition");
-		// Create a per-object metatable that inherits methods from
-		// Condition but suppresses __gc to avoid double-free.
-		lua_newtable(L);
-		lua_pushnil(L);
-		lua_setfield(L, -2, "__gc");
-		lua_getmetatable(L, -2);
-		lua_setfield(L, -2, "__index");
-		lua_setmetatable(L, -2);
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
