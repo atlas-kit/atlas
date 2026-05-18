@@ -132,7 +132,13 @@ void Creature::onThink(std::chrono::milliseconds interval)
 		blockTicks = std::chrono::milliseconds::zero();
 	}
 
-	tfs::events::creature::onThink(asCreature(), interval);
+	// Lua onThink events are only dispatched for creatures that actually
+	// need them — players (idle timeout, ping/pong), creatures with active
+	// target/chase, and creatures with ongoing conditions. Idle monsters
+	// with nothing to do skip the Lua overhead entirely.
+	if (isPlayer() || !conditions.empty() || getFollowCreature() || getAttackedCreature()) {
+		tfs::events::creature::onThink(asCreature(), interval);
+	}
 }
 
 void Creature::forceUpdatePath()
@@ -1231,6 +1237,10 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t conditionI
 
 void Creature::executeConditions(std::chrono::milliseconds interval)
 {
+	if (conditions.empty()) {
+		return;
+	}
+
 	std::vector<Condition*> snapshot;
 	snapshot.reserve(conditions.size());
 	for (const auto& condition : conditions) {
