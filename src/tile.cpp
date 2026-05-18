@@ -797,10 +797,25 @@ std::shared_ptr<Thing> Tile::queryDestination(int32_t&, const std::shared_ptr<co
 void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 {
 	if (const auto& creature = thing->asCreature()) {
-		g_game.map.clearSpectatorCache();
-		if (creature->asPlayer()) {
+		// Only clear spectator cache for player events. Non-player creature
+		// movement/spawn resolves naturally on next Q-tree walk (cache miss).
+		if (creature->isPlayer()) {
+			g_game.map.clearSpectatorCache();
 			g_game.map.clearPlayersSpectatorCache();
 		}
+
+		creature->setParent(asTile());
+		CreatureVector* creatures = makeCreatures();
+		creatures->insert(creatures->begin(), creature);
+	} else if (const auto& item = thing->asItem()) {
+		TileItemVector* items = getItemList();
+		if (!items) {
+			items = makeItemList();
+		}
+
+		items->insert(items->begin(), item);
+	}
+}
 
 		creature->setParent(asTile());
 		CreatureVector* creatures = makeCreatures();
@@ -1325,8 +1340,8 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 	thing->setParent(asTile());
 
 	if (const auto& creature = thing->asCreature()) {
-		g_game.map.clearSpectatorCache();
-		if (creature->asPlayer()) {
+		if (creature->isPlayer()) {
+			g_game.map.clearSpectatorCache();
 			g_game.map.clearPlayersSpectatorCache();
 		}
 
