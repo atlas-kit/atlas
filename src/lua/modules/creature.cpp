@@ -645,8 +645,9 @@ int luaCreatureAddCondition(lua_State* L)
 int luaCreatureGetConditions(lua_State* L)
 {
 	// creature:getConditions()
-	// Returns a table of active conditions with {type, ticks, aggressive}.
-	// Plain Lua data — no raw pointers, safe from dangling references.
+	// Returns a table of active Condition userdata.
+	// Uses a lightweight metatable without __gc to prevent double-free
+	// — the creature owns the actual conditions, Lua only reads them.
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
@@ -656,13 +657,16 @@ int luaCreatureGetConditions(lua_State* L)
 	lua_createtable(L, creature->getConditions().size(), 0);
 	int index = 0;
 	for (const auto& condition : creature->getConditions()) {
-		lua_createtable(L, 0, 3);
-		tfs::lua::pushNumber(L, condition->getType());
-		lua_setfield(L, -2, "type");
-		tfs::lua::pushNumber(L, condition->getTicks().count());
-		lua_setfield(L, -2, "ticks");
-		tfs::lua::pushBoolean(L, condition->isAggressive());
-		lua_setfield(L, -2, "aggressive");
+		tfs::lua::pushUserdata(L, condition.get());
+		tfs::lua::setMetatable(L, -1, "Condition");
+		// Create a per-object metatable that inherits methods from
+		// Condition but suppresses __gc to avoid double-free.
+		lua_newtable(L);
+		lua_pushnil(L);
+		lua_setfield(L, -2, "__gc");
+		lua_getmetatable(L, -2);
+		lua_setfield(L, -2, "__index");
+		lua_setmetatable(L, -2);
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;

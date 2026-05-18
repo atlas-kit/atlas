@@ -15,7 +15,7 @@ end
 -- condition (fire, poison, energy, etc.).
 function Creature.hasAggressiveCondition(self)
 	for _, cond in ipairs(self:getConditions()) do
-		if cond.aggressive then
+		if cond:isAggressive() then
 			return true
 		end
 	end
