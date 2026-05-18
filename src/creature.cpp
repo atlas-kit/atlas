@@ -852,8 +852,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 
 		followCreature.reset();
 		hasFollowPath = false;
-
-		stopWalk();
+		cancelNextWalk = true;
 		return;
 	}
 
