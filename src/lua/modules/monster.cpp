@@ -190,7 +190,7 @@ int luaMonsterIsOpponent(lua_State* L)
 			return 1;
 		}
 
-		tfs::lua::pushBoolean(L, monster->isOpponent(creature));
+		tfs::lua::pushBoolean(L, monster->isOpponentCreature(creature));
 	} else {
 		lua_pushnil(L);
 	}
@@ -208,7 +208,7 @@ int luaMonsterIsFriend(lua_State* L)
 			return 1;
 		}
 
-		tfs::lua::pushBoolean(L, monster->isFriend(creature));
+		tfs::lua::pushBoolean(L, monster->isFriendCreature(creature));
 	} else {
 		lua_pushnil(L);
 	}
@@ -500,8 +500,8 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "setIdle", luaMonsterSetIdle);
 
 	lsi.registerMethod("Monster", "isTarget", luaMonsterIsTarget);
-	lsi.registerMethod("Monster", "isOpponent", luaMonsterIsOpponent);
-	lsi.registerMethod("Monster", "isFriend", luaMonsterIsFriend);
+	lsi.registerMethod("Monster", "isOpponentCreature", luaMonsterIsOpponent);
+	lsi.registerMethod("Monster", "isFriendCreature", luaMonsterIsFriend);
 
 	lsi.registerMethod("Monster", "addFriend", luaMonsterAddFriend);
 	lsi.registerMethod("Monster", "removeFriend", luaMonsterRemoveFriend);

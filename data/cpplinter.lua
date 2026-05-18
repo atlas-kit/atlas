@@ -504,8 +504,8 @@ Player = {}
 ---@field canAttack fun(self: Monster, creature: Creature): boolean
 ---@field setIdle fun(self: Monster, idle: boolean)
 ---@field isTarget fun(self: Monster, creature: Creature): boolean
----@field isOpponent fun(self: Monster, creature: Creature): boolean
----@field isFriend fun(self: Monster, creature: Creature): boolean
+---@field isOpponentCreature fun(self: Monster, creature: Creature): boolean
+---@field isFriendCreature fun(self: Monster, creature: Creature): boolean
 ---@field addFriend fun(self: Monster, creature: Creature)
 ---@field removeFriend fun(self: Monster, creature: Creature)
 ---@field getFriendList fun(self: Monster): table

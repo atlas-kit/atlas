@@ -138,24 +138,6 @@ public:
 	void addTarget(const std::shared_ptr<Creature>& creature, bool pushFront = false);
 	void removeTarget(const std::shared_ptr<Creature>& creature);
 
-	bool isFriend(const std::shared_ptr<const Creature>& creature) const { return isFriendCreature(creature); }
-	bool isOpponent(const std::shared_ptr<const Creature>& creature) const { return isOpponentCreature(creature); }
-
-	void setIdle(bool idle);
-	bool getIdleStatus() const { return isIdle; }
-
-	bool isInSpawnRange(const Position& pos) const;
-
-	MonsterType* getMonsterType() { return mType; }
-	const MonsterType* getMonsterType() const { return mType; }
-
-	static uint32_t monsterAutoID;
-
-	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
-
-	const auto& getTargetCreatures() const { return targetList; }
-	void addTargetCreature(const std::shared_ptr<Creature>& creature) { addTarget(creature); }
-	void removeTargetCreature(const std::shared_ptr<Creature>& creature) { removeTarget(creature); }
 
 	bool isFriendCreature(const std::shared_ptr<const Creature>& creature) const;
 	bool isOpponentCreature(const std::shared_ptr<const Creature>& creature) const;

@@ -316,11 +316,11 @@ void Monster::onCreatureFound(const std::shared_ptr<Creature>& creature, bool pu
 		return;
 	}
 
-	if (isFriend(creature)) {
+	if (isFriendCreature(creature)) {
 		addFriend(creature);
 	}
 
-	if (isOpponent(creature)) {
+	if (isOpponentCreature(creature)) {
 		addTarget(creature, pushFront);
 	}
 
@@ -349,12 +349,12 @@ void Monster::onCreatureLeave(const std::shared_ptr<Creature>& creature)
 	}
 
 	// update friendList
-	if (isFriend(creature)) {
+	if (isFriendCreature(creature)) {
 		removeFriend(creature);
 	}
 
 	// update targetList
-	if (isOpponent(creature)) {
+	if (isOpponentCreature(creature)) {
 		removeTarget(creature);
 		updateIdleStatus();
 
