@@ -528,7 +528,6 @@ private:
 
 	size_t lastBucket = 0;
 	std::chrono::steady_clock::time_point nextDecayTick{};
-	size_t currentCheckBucket = 0;
 
 	WildcardTreeNode wildcardTree{false};
 
