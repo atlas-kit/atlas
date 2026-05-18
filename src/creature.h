@@ -353,10 +353,16 @@ public:
 	const auto& getStorageMap() const { return storageMap; }
 
 	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	void setFollowCreature(const std::shared_ptr<Creature>& creature);
-
 	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
+	void setFollowCreature(const std::shared_ptr<Creature>& creature);
 	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
+
+	// Fast check: returns false if the creature has no target, no chase,
+	// and no conditions — meaning checkCreatures can skip it entirely.
+	bool needsTick() const
+	{
+		return !conditions.empty() || !followCreature.expired() || !attackedCreature.expired();
+	}
 
 protected:
 	struct CountBlock_t

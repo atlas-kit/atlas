@@ -3648,12 +3648,14 @@ void Game::addCreatureCheck(std::shared_ptr<Creature> creature)
 	creature->creatureCheck = true;
 
 	if (creature->inCheckCreaturesVector) {
-		// already in a vector
 		return;
 	}
 
 	creature->inCheckCreaturesVector = true;
-	checkCreatureLists[uniform_random(0, EVENT_CREATURECOUNT - 1)].push_back(std::move(creature));
+	// Place in the bucket after the one currently being processed,
+	// so the creature gets its first tick after at most one full rotation.
+	size_t nextBucket = (currentCheckBucket + 1) % EVENT_CREATURECOUNT;
+	checkCreatureLists[nextBucket].push_back(std::move(creature));
 }
 
 void Game::removeCreatureCheck(const std::shared_ptr<Creature>& creature)
@@ -3665,29 +3667,43 @@ void Game::removeCreatureCheck(const std::shared_ptr<Creature>& creature)
 
 void Game::checkCreatures(size_t index)
 {
+	currentCheckBucket = index;
+
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CHECK_CREATURE_INTERVAL,
 	                                         [=, this]() { checkCreatures((index + 1) % EVENT_CREATURECOUNT); }));
 
 	auto& checkCreatureList = checkCreatureLists[index];
-	auto it = checkCreatureList.begin();
-	while (it != checkCreatureList.end()) {
-		const auto& creature = it->lock();
+	std::vector<std::shared_ptr<Creature>> keep;
+	keep.reserve(checkCreatureList.size());
+
+	for (const auto& weak : checkCreatureList) {
+		const auto& creature = weak.lock();
 		if (!creature) {
-			it = checkCreatureList.erase(it);
 			continue;
 		}
 
-		if (creature->creatureCheck) {
-			if (!creature->isDead()) {
-				creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
-				creature->onAttacking(EVENT_CREATURE_THINK_INTERVAL);
-				creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
-			}
-			++it;
+		if (!creature->creatureCheck || creature->isDead()) {
+			creature->inCheckCreaturesVector = false;
+			continue;
+		}
+
+		creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
+		creature->onAttacking(EVENT_CREATURE_THINK_INTERVAL);
+		creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
+
+		// Timing wheel: active creatures re-register for the next rotation.
+		// Idle ones (no target, conditions, or chase) drop out.
+		if (creature->isPlayer() || creature->needsTick()) {
+			keep.push_back(creature);
 		} else {
 			creature->inCheckCreaturesVector = false;
-			it = checkCreatureList.erase(it);
+			creature->creatureCheck = false;
 		}
+	}
+
+	checkCreatureList.clear();
+	for (auto& creature : keep) {
+		checkCreatureList.push_back(std::move(creature));
 	}
 
 	cleanup();
