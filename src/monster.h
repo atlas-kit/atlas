@@ -177,12 +177,10 @@ private:
 	std::chrono::steady_clock::time_point lastMeleeAttack = std::chrono::steady_clock::time_point::min();
 
 	std::chrono::milliseconds attackTicks = std::chrono::milliseconds::zero();
-	std::chrono::milliseconds targetChangeTicks = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds defenseTicks = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds yellTicks = std::chrono::milliseconds::zero();
 	int32_t minCombatValue = 0;
 	int32_t maxCombatValue = 0;
-	std::chrono::milliseconds targetChangeCooldown = std::chrono::milliseconds::zero();
 	std::chrono::milliseconds challengeFocusDuration = std::chrono::milliseconds::zero();
 	int32_t stepDuration = 0;
 
@@ -221,7 +219,6 @@ private:
 	                  bool keepDistance = true);
 	bool canWalkTo(Position pos, Direction direction) const;
 
-	void onThinkTarget(std::chrono::milliseconds interval);
 	void onThinkYell(std::chrono::milliseconds interval);
 	void onThinkDefense(std::chrono::milliseconds interval);
 

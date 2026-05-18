@@ -448,39 +448,6 @@ bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAUL
 
 void Monster::goToFollowCreature()
 {
-	const auto& chaseCreature = getChaseCreature();
-	if (!chaseCreature) {
-		return;
-	}
-
-	FindPathParams fpp;
-	getPathSearchParams(chaseCreature, fpp);
-
-	if (!isSummon()) {
-		Direction dir = DIRECTION_NONE;
-
-		if (isFleeing()) {
-			getDistanceStep(chaseCreature->getPosition(), dir, true);
-		} else { // maxTargetDist > 1
-			if (!getDistanceStep(chaseCreature->getPosition(), dir)) {
-				// if we can't get anything then let the A* calculate
-				updateFollowCreaturePath(fpp);
-				return;
-			}
-		}
-
-		if (dir != DIRECTION_NONE) {
-			listWalkDir.clear();
-			listWalkDir.push_back(dir);
-
-			hasFollowPath = true;
-			startAutoWalk();
-		}
-	} else {
-		updateFollowCreaturePath(fpp);
-	}
-
-	onFollowCreatureComplete();
 }
 
 void Monster::onFollowCreatureComplete()
@@ -660,18 +627,6 @@ void Monster::onThink(std::chrono::milliseconds interval)
 		if (!isIdle) {
 			addEventWalk();
 
-			if (!targetList.empty() && !getMaster()) {
-				if (!getChaseCreature() || !hasFollowPath) {
-					searchTarget();
-				} else if (isFleeing()) {
-					if (const auto& targetCreature = getTargetCreature();
-					    targetCreature && !canUseAttack(getPosition(), targetCreature)) {
-						searchTarget(TARGETSEARCH_ATTACKRANGE);
-					}
-				}
-			}
-
-			onThinkTarget(interval);
 			onThinkYell(interval);
 			onThinkDefense(interval);
 		}
@@ -785,55 +740,6 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 		return false;
 	}
 	return true;
-}
-
-void Monster::onThinkTarget(std::chrono::milliseconds interval)
-{
-	if (!isSummon()) {
-		if (mType->info.changeTargetSpeed != std::chrono::milliseconds::zero()) {
-			bool canChangeTarget = true;
-
-			if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
-				challengeFocusDuration -= interval;
-
-				if (challengeFocusDuration <= std::chrono::milliseconds::zero()) {
-					challengeFocusDuration = std::chrono::milliseconds::zero();
-				}
-			}
-
-			if (targetChangeCooldown > std::chrono::milliseconds::zero()) {
-				targetChangeCooldown -= interval;
-
-				if (targetChangeCooldown <= std::chrono::milliseconds::zero()) {
-					targetChangeCooldown = std::chrono::milliseconds::zero();
-					targetChangeTicks = mType->info.changeTargetSpeed;
-				} else {
-					canChangeTarget = false;
-				}
-			}
-
-			if (canChangeTarget) {
-				targetChangeTicks += interval;
-
-				if (targetChangeTicks >= mType->info.changeTargetSpeed) {
-					targetChangeTicks = std::chrono::milliseconds::zero();
-					targetChangeCooldown = mType->info.changeTargetSpeed;
-
-					if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
-						challengeFocusDuration = std::chrono::milliseconds::zero();
-					}
-
-					if (mType->info.changeTargetChance >= uniform_random(1, 100)) {
-						if (mType->info.targetDistance <= 1) {
-							searchTarget(TARGETSEARCH_RANDOM);
-						} else {
-							searchTarget(TARGETSEARCH_NEAREST);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 void Monster::onThinkDefense(std::chrono::milliseconds interval)
@@ -1871,9 +1777,7 @@ bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool 
 
 	bool result = selectTarget(creature);
 	if (result) {
-		targetChangeCooldown = 8s;
-		challengeFocusDuration = targetChangeCooldown;
-		targetChangeTicks = std::chrono::milliseconds::zero();
+		challengeFocusDuration = 8s;
 	}
 	return result;
 }
