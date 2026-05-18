@@ -136,7 +136,7 @@ int luaPlayerIsPlayer(lua_State* L)
 {
 	// player:isPlayer()
 	if (const auto& creature = tfs::lua::getCreature(L, 1)) {
-		tfs::lua::pushBoolean(L, creature->asPlayer() != nullptr);
+		tfs::lua::pushBoolean(L, creature->isPlayer());
 	} else {
 		lua_pushnil(L);
 	}
