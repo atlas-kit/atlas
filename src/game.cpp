@@ -3679,14 +3679,9 @@ void Game::checkCreatures(size_t index)
 
 		if (creature->creatureCheck) {
 			if (!creature->isDead()) {
-				// Players always tick (Lua events: idle timeout, ping/pong).
-				// Monsters/others only tick when they have something to do
-				// (target, conditions, chase) to avoid wasting CPU on idle creatures.
-				if (creature->isPlayer() || creature->needsTick()) {
-					creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
-					creature->onAttacking(EVENT_CREATURE_THINK_INTERVAL);
-					creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
-				}
+				creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
+				creature->onAttacking(EVENT_CREATURE_THINK_INTERVAL);
+				creature->executeConditions(EVENT_CREATURE_THINK_INTERVAL);
 			}
 			++it;
 		} else {

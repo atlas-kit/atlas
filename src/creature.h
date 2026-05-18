@@ -353,14 +353,10 @@ public:
 	const auto& getStorageMap() const { return storageMap; }
 
 	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
 	void setFollowCreature(const std::shared_ptr<Creature>& creature);
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
-	bool needsTick() const
-	{
-		return !conditions.empty() || !followCreature.expired() || !attackedCreature.expired();
-	}
+	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
+	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
 protected:
 	struct CountBlock_t
