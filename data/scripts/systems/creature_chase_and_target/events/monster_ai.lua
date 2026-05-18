@@ -9,10 +9,36 @@
 
 local targetChangeTicks = {}
 
+local function reevaluateTarget(monster, interval)
+	local id = monster:getId()
+	local monsterType = monster:getType()
+
+	if monsterType:changeTargetSpeed() == 0 then
+		return
+	end
+
+	local ticks = (targetChangeTicks[id] or 0) + interval
+	if ticks < monsterType:changeTargetSpeed() then
+		targetChangeTicks[id] = ticks
+		return
+	end
+
+	targetChangeTicks[id] = 0
+
+	if monsterType:changeTargetChance() < math.random(1, 100) then
+		return
+	end
+
+	if monsterType:targetDistance() <= 1 then
+		monster:searchTarget(TARGETSEARCH_RANDOM)
+	else
+		monster:searchTarget(TARGETSEARCH_NEAREST)
+	end
+end
+
 do
 	local event = Event()
 
-	-- Clean up per-monster state when the creature is fully removed.
 	function event.onCreatureRemoved(creature)
 		targetChangeTicks[creature:getId()] = nil
 	end
@@ -23,7 +49,6 @@ end
 do
 	local event = Event()
 
-	-- Main AI tick: target search, re-evaluation, and chase/follow.
 	function event.onCreatureThink(creature, interval)
 		local monster = creature:asMonster()
 		if not monster then
@@ -35,61 +60,42 @@ do
 			return
 		end
 
-		local hasMaster = monster:getMaster() ~= nil
 		local position = monster:getPosition()
-
 		if not monster:isInSpawnRange(position) then
 			targetChangeTicks[monster:getId()] = nil
 			return
 		end
 
+		local hasMaster = monster:getMaster() ~= nil
 		local targetCreature = monster:getTargetCreature()
-		local chaseCreature = monster:getChaseCreature()
-		local hasTargetList = monster:getTargetCount() > 0
 
-		-- Target acquisition: pick a target from the list if we have none.
-		if not targetCreature and not chaseCreature and hasTargetList and not hasMaster then
+		-- Target acquisition.
+		if not targetCreature and not monster:getChaseCreature() and monster:getTargetCount() > 0 and not hasMaster then
 			monster:searchTarget(TARGETSEARCH_NEAREST)
 			targetCreature = monster:getTargetCreature()
-			chaseCreature = monster:getChaseCreature()
 		end
 
-		-- Periodic target re-evaluation for non-summon monsters.
-		if not hasMaster and targetCreature and monster:getTargetCount() > 1 then
-			local monsterType = monster:getType()
-			local changeTargetSpeed = monsterType:changeTargetSpeed()
-			if changeTargetSpeed ~= 0 then
-				local id = monster:getId()
-				local ticks = targetChangeTicks[id] or 0
-				ticks = ticks + interval
-				if ticks >= changeTargetSpeed then
-					targetChangeTicks[id] = 0
-					if monsterType:changeTargetChance() >= math.random(1, 100) then
-						if monsterType:targetDistance() <= 1 then
-							monster:searchTarget(TARGETSEARCH_RANDOM)
-						else
-							monster:searchTarget(TARGETSEARCH_NEAREST)
-						end
-					end
-				else
-					targetChangeTicks[id] = ticks
-				end
-			end
-		elseif not targetCreature then
+		-- Target re-evaluation or state cleanup.
+		if not targetCreature then
 			targetChangeTicks[monster:getId()] = nil
+		elseif not hasMaster and monster:getTargetCount() > 1 then
+			reevaluateTarget(monster, interval)
 		end
 
-		-- Follow the chase target using A* pathfinding.
-		chaseCreature = monster:getChaseCreature()
-		if chaseCreature then
-			local chasePosition = chaseCreature:getPosition()
-			-- A* only works on the same floor.
-			if position.z == chasePosition.z then
-				local dirs = monster:getPathTo(chasePosition, 1, 1, true, true, 0)
-				if dirs then
-					monster:startAutoWalk(dirs)
-				end
-			end
+		-- Chase pathfinding.
+		local chaseCreature = monster:getChaseCreature()
+		if not chaseCreature then
+			return
+		end
+
+		local chasePosition = chaseCreature:getPosition()
+		if position.z ~= chasePosition.z then
+			return
+		end
+
+		local dirs = monster:getPathTo(chasePosition, 1, 1, true, true, 0)
+		if dirs then
+			monster:startAutoWalk(dirs)
 		end
 	end
 
