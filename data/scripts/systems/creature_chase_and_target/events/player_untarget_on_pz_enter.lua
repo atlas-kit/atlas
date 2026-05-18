@@ -73,19 +73,23 @@ do
 		if zone == ZONE_PROTECTION then
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 			player:setTargetCreature(nil)
+			if player:getChaseCreature() == targetCreature then
+				player:setChaseCreature(nil)
+			end
 
 		elseif zone == ZONE_NOPVP and isTargetPlayer then
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 			player:setTargetCreature(nil)
+			if player:getChaseCreature() == targetCreature then
+				player:setChaseCreature(nil)
+			end
 
 		elseif zone == ZONE_NORMAL and isTargetPlayer and Game.getWorldType() == WORLD_TYPE_NO_PVP then
 			player:sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.")
 			player:setTargetCreature(nil)
-		end
-
-		-- Chase clearing is the same regardless of zone type.
-		if player:getChaseCreature() == targetCreature then
-			player:setChaseCreature(nil)
+			if player:getChaseCreature() == targetCreature then
+				player:setChaseCreature(nil)
+			end
 		end
 	end
 

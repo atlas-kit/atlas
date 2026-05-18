@@ -18,12 +18,7 @@ function Monster.selectTarget(self, creature)
 		return false
 	end
 
-	if self:isSummon() then
-		self:setTargetCreature(creature)
-	else
-		self:setTargetCreature(creature)
-	end
-
+	self:setTargetCreature(creature)
 	self:setChaseCreature(creature)
 	return self:getChaseCreature() == creature
 end
@@ -68,6 +63,8 @@ function Monster.searchTarget(self, searchType)
 		return false
 	end
 
+	-- TARGETSEARCH_DEFAULT and TARGETSEARCH_ATTACKRANGE
+	-- return here if resultList has entries.
 	if searchType == TARGETSEARCH_ATTACKRANGE then
 		if #resultList > 0 then
 			return Monster.selectTarget(self, resultList[math.random(#resultList)])
@@ -75,7 +72,7 @@ function Monster.searchTarget(self, searchType)
 		return false
 	end
 
-	-- Fallback: pick the first valid target in the full list.
+	-- TARGETSEARCH_DEFAULT falls through to the first-valid-target loop below.
 	for _, c in ipairs(self:getTargetList()) do
 		if c ~= chaseCreature and Monster.selectTarget(self, c) then
 			return true

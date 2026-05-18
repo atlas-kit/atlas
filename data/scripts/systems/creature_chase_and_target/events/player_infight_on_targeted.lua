@@ -84,12 +84,14 @@ end
 do
 	local event = Event()
 
-	-- Applies in-fight to a player who loses mana.
+	-- Applies in-fight to a player who loses mana from combat.
 	function event.onCreatureChangeMana(creature, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 		local player = creature:asPlayer()
-		if player then
-			addInFightTicks(player)
+		if not player or not attacker then
+			return primaryDamage, primaryType, secondaryDamage, secondaryType
 		end
+
+		addInFightTicks(player)
 
 		return primaryDamage, primaryType, secondaryDamage, secondaryType
 	end

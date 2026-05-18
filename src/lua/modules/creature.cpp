@@ -645,6 +645,10 @@ int luaCreatureAddCondition(lua_State* L)
 int luaCreatureGetConditions(lua_State* L)
 {
 	// creature:getConditions()
+	// Returns a table of active conditions as raw Condition userdata.
+	// WARNING: Condition objects have the same lifetime as the creature.
+	// Storing returned references across ticks is unsafe — the condition
+	// may expire and the pointer become dangling.
 	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
 	if (!creature) {
 		lua_pushnil(L);
