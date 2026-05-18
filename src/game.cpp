@@ -3625,9 +3625,9 @@ void Game::checkCreatureWalk(uint32_t creatureId)
 void Game::updateCreatureWalk(uint32_t creatureId)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
+		creature->completeEventFollowWalk();
 		if (!creature->isDead()) {
 			creature->goToFollowCreature();
-			creature->completeEventFollowWalk();
 		}
 	}
 }

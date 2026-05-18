@@ -52,6 +52,7 @@ struct FindPathParams
 inline constexpr int32_t EVENT_CREATURECOUNT = 10;
 inline constexpr auto EVENT_CREATURE_THINK_INTERVAL = 1000ms;
 inline constexpr auto EVENT_CHECK_CREATURE_INTERVAL = EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT;
+inline constexpr auto FOLLOW_EVENT_INTERVAL = 100ms;
 
 static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
 static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();

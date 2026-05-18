@@ -24,6 +24,11 @@ Creature::Creature() { onIdleStatus(); }
 
 Creature::~Creature()
 {
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
 		summon->setAttackedCreature(nullptr);
 		summon->removeMaster();
@@ -146,7 +151,7 @@ void Creature::updateFollowPath()
 	}
 
 	eventFollowPath = g_scheduler.addEvent(
-	    createSchedulerTask(EVENT_CHECK_CREATURE_INTERVAL, [id = getID()]() { g_game.updateCreatureWalk(id); }));
+	    createSchedulerTask(FOLLOW_EVENT_INTERVAL, [id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
 void Creature::onIdleStatus()
@@ -848,9 +853,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 		followCreature.reset();
 		hasFollowPath = false;
 
-		if (const auto& player = asPlayer()) {
-			player->stopWalk();
-		}
+		stopWalk();
 		return;
 	}
 
@@ -866,7 +869,6 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 			player->setAttackedCreature(nullptr);
 			player->sendCancelTarget();
 			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-			player->stopWalk();
 		}
 		return;
 	}
@@ -883,6 +885,10 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 		onWalkAborted();
 	}
 
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
 	updateFollowPath();
 }
 
