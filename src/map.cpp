@@ -300,7 +300,7 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 	Position oldPos = oldTile->getPosition();
 	Position newPos = newTile->getPosition();
 
-	bool teleport = forceTeleport || !newTile->getGround() ||
+	bool teleport = forceTeleport || !newTile->hasGround() ||
 	                !oldPos.isInRange(newPos, maxClientViewportX + (newPos.x > oldPos.x),
 	                                  maxClientViewportY + (newPos.y > oldPos.y), 1);
 
@@ -548,7 +548,7 @@ bool Map::isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor /*= fal
 		return true;
 	}
 
-	if (blockFloor && tile->getGround()) {
+	if (blockFloor && tile->hasGround()) {
 		return false;
 	}
 

@@ -6,7 +6,7 @@
 #include "combat.h"
 
 #include "configmanager.h"
-#include "events.h"
+#include "events/creature.h"
 #include "game.h"
 #include "lua/env.h"
 #include "lua/error.h"

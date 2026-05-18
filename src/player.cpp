@@ -9,7 +9,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "depotchest.h"
-#include "events.h"
+#include "events/player.h"
 #include "game.h"
 #include "house.h"
 #include "iologindata.h"
