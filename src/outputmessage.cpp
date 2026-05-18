@@ -13,6 +13,12 @@ extern Scheduler g_scheduler;
 
 namespace {
 
+// Capacity of the lock-free free-list backing make_output_message().
+// Each cached slot keeps one raw OutputMessage (~64 KiB) alive; the list
+// never shrinks, so worst-case retained heap = capacity * ~64 KiB
+// (8192 -> ~512 MiB, 2048 -> ~128 MiB). Raise it if a high-concurrency
+// profile shows make_output_message() falling through to operator new;
+// lower it to cap memory on small setups. Hard limit: 65535.
 const uint16_t OUTPUTMESSAGE_FREE_LIST_CAPACITY = 8192;
 const auto OUTPUTMESSAGE_AUTOSEND_DELAY = 10ms;
 
