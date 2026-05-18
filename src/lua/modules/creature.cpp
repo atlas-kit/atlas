@@ -957,6 +957,19 @@ int luaCreatureMove(lua_State* L)
 	return 1;
 }
 
+int luaCreatureHasAggressiveCondition(lua_State* L)
+{
+	// creature:hasAggressiveCondition()
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, creature->hasAggressiveCondition());
+	return 1;
+}
+
 int luaCreatureGetZone(lua_State* L)
 {
 	// creature:getZone()
@@ -1226,6 +1239,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "addCondition", luaCreatureAddCondition);
 	lsi.registerMethod("Creature", "removeCondition", luaCreatureRemoveCondition);
 	lsi.registerMethod("Creature", "hasCondition", luaCreatureHasCondition);
+	lsi.registerMethod("Creature", "hasAggressiveCondition", luaCreatureHasAggressiveCondition);
 
 	lsi.registerMethod("Creature", "remove", luaCreatureRemove);
 	lsi.registerMethod("Creature", "teleportTo", luaCreatureTeleportTo);

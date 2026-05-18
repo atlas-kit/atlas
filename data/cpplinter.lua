@@ -316,6 +316,7 @@ Podium = {}
 ---@field addCondition fun(self: Creature, condition: Condition)
 ---@field removeCondition fun(self: Creature, conditionType: number)
 ---@field hasCondition fun(self: Creature, conditionType: number): boolean
+---@field hasAggressiveCondition fun(self: Creature): boolean
 ---@field remove fun(self: Creature)
 ---@field teleportTo fun(self: Creature, position: Position, createEffect?: boolean)
 ---@field say fun(self: Creature, text: string, type?: number, ghost?: boolean, receiver?: Creature, channelId?: number)
