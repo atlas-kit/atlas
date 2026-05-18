@@ -357,13 +357,6 @@ public:
 	void setFollowCreature(const std::shared_ptr<Creature>& creature);
 	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
-	// Fast check: returns false if the creature has no target, no chase,
-	// and no conditions — meaning checkCreatures can skip it entirely.
-	bool needsTick() const
-	{
-		return !conditions.empty() || !followCreature.expired() || !attackedCreature.expired();
-	}
-
 protected:
 	struct CountBlock_t
 	{
