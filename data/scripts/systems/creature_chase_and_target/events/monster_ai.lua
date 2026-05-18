@@ -84,15 +84,6 @@ function Monster.searchTarget(self, searchType)
 	return false
 end
 
-local function hasAggressiveCondition(creature)
-	for _, cond in ipairs(creature:getConditions()) do
-		if cond:isAggressive() then
-			return true
-		end
-	end
-	return false
-end
-
 local targetChangeTicks = {}
 
 local function reevaluateTarget(monster, interval)
@@ -162,7 +153,7 @@ do
 		-- Return to spawn if there are no targets or friends nearby.
 		-- Keep fighting if the monster has an active damage condition.
 		if not hasMaster and not hasTargets and monster:getFriendCount() == 0
-			and not monster:isFleeing() and not hasAggressiveCondition(monster) then
+			and not monster:isFleeing() and not monster:hasAggressiveCondition() then
 			if not monster:isWalkingToSpawn() then
 				monster:walkToSpawn()
 			end

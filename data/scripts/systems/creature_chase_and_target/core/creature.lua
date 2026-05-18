@@ -9,3 +9,16 @@ end
 function Creature.hasChaseCreature(self)
 	return self:getChaseCreature() ~= nil
 end
+
+-- Creature.hasAggressiveCondition(self)
+-- Returns true if the creature has at least one active aggressive
+-- condition (fire, poison, energy, etc.). Used to decide if a monster
+-- should remain active even when its target list is empty.
+function Creature.hasAggressiveCondition(self)
+	for _, cond in ipairs(self:getConditions()) do
+		if cond:isAggressive() then
+			return true
+		end
+	end
+	return false
+end
