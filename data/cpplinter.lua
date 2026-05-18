@@ -504,7 +504,7 @@ Player = {}
 ---@field getTargetList fun(self: Monster): table
 ---@field getTargetCount fun(self: Monster): number
 ---@field selectTarget fun(self: Monster, creature: Creature): boolean
----@field searchTarget fun(self: Monster): boolean
+---@field searchTarget fun(self: Monster, searchType?: integer): boolean
 ---@field isWalkingToSpawn fun(self: Monster): boolean
 ---@field walkToSpawn fun(self: Monster)
 ---@field hasSpecialIcon fun(self: Monster): boolean
