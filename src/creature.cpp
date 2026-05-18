@@ -1004,6 +1004,11 @@ void Creature::executeConditions(std::chrono::milliseconds interval)
 	}
 }
 
+bool Creature::hasAggressiveCondition() const
+{
+	return std::ranges::any_of(conditions, [](const auto& condition) { return condition->isAggressive(); });
+}
+
 bool Creature::hasCondition(ConditionType_t type, uint32_t subId /* = 0*/) const
 {
 	if (isSuppress(type)) {
