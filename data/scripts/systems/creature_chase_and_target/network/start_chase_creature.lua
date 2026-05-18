@@ -32,7 +32,6 @@ function handler.onReceive(player, msg)
 	local chasePosition = chaseCreature:getPosition()
 
 	if position.z ~= chasePosition.z or not player:canSee(chasePosition) then
-		player:setTargetCreature(nil)
 		player:setChaseCreature(nil)
 		player:sendCancelTarget()
 		player:sendCancelMessage(RETURNVALUE_THEREISNOWAY)
