@@ -61,7 +61,7 @@ jobs:
             vcpkg-linux-
 
       - name: CCache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639 # v1.2
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt') }}
 
@@ -116,13 +116,34 @@ jobs:
           restore-keys: |
             vcpkg-windows-
 
+      - name: Cache sccache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        with:
+          path: ${{ runner.temp }}/sccache
+          key: sccache-windows-${{ hashFiles('src/**', 'CMakeLists.txt') }}
+          restore-keys: |
+            sccache-windows-
+
+      - name: Install sccache
+        run: |
+          $env:SCCACHE_DIR = "${{ runner.temp }}\sccache"
+          if (-not (Test-Path "$env:SCCACHE_DIR\sccache.exe")) {
+            New-Item -ItemType Directory -Force -Path $env:SCCACHE_DIR
+            Invoke-WebRequest -Uri "https://github.com/mozilla/sccache/releases/download/v0.10.0/sccache-v0.10.0-x86_64-pc-windows-msvc.tar.gz" -OutFile "$env:SCCACHE_DIR\sccache.tar.gz"
+            tar -xzf "$env:SCCACHE_DIR\sccache.tar.gz" -C $env:SCCACHE_DIR
+            Move-Item "$env:SCCACHE_DIR\sccache-v0.10.0-x86_64-pc-windows-msvc\sccache.exe" $env:SCCACHE_DIR\
+          }
+          echo "SCCACHE_DIR=$env:SCCACHE_DIR" >> $env:GITHUB_ENV
+          echo "$env:SCCACHE_DIR" >> $env:GITHUB_PATH
+
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25c3b022a9a03bd7a427fb6a2 # v11.6
 
       - name: Build with CMake
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: windows-release
+          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=sccache']"
           buildPreset: windows-release
 
       - name: Upload build logs
