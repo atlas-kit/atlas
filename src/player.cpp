@@ -1416,12 +1416,6 @@ void Player::onAttacking(std::chrono::milliseconds)
 		return;
 	}
 
-	addInFightTicks();
-
-	if (const auto& player = targetCreature->asPlayer()) {
-		player->addInFightTicks();
-	}
-
 	if (hasCondition(CONDITION_PACIFIED)) {
 		return;
 	}
@@ -1526,7 +1520,6 @@ void Player::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t dama
 
 void Player::drainMana(const std::shared_ptr<Creature>& attacker, int32_t manaLoss)
 {
-	addInFightTicks();
 	changeMana(-manaLoss);
 
 	if (attacker) {

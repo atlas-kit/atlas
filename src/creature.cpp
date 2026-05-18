@@ -614,11 +614,6 @@ BlockType_t Creature::blockHit(const std::shared_ptr<Creature>& attacker, Combat
 		}
 	}
 
-	if (combatType != COMBAT_HEALING) {
-		if (const auto& player = asPlayer()) {
-			player->addInFightTicks();
-		}
-	}
 	return blockType;
 }
 

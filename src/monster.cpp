@@ -685,10 +685,6 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 		return;
 	}
 
-	if (const auto& player = targetCreature->asPlayer()) {
-		player->addInFightTicks();
-	}
-
 	if (isSummon() && targetCreature.get() == this) {
 		return;
 	}
