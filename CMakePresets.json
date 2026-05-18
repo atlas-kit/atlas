@@ -30,8 +30,7 @@
         "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-static-release",
         "VCPKG_BUILD_TYPE": "release",
         "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_MSVC_DEBUG_INFORMATION_FORMAT": "Embedded"
+        "CMAKE_CXX_COMPILER": "cl.exe"
       },
       "architecture": {
         "value": "x64",

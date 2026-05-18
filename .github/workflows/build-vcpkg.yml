@@ -147,7 +147,7 @@ jobs:
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: windows-release
-          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=sccache']"
+          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=sccache','-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded']"
           buildPreset: windows-release
 
       - name: Upload build logs
