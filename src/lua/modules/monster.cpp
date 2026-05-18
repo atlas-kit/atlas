@@ -128,6 +128,23 @@ int luaMonsterIsIdle(lua_State* L)
 	return 1;
 }
 
+int luaMonsterCanUseAttack(lua_State* L)
+{
+	// monster:canUseAttack(creature)
+	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
+		const auto& creature = tfs::lua::getCreature(L, 2);
+		if (!creature) {
+			tfs::lua::pushBoolean(L, false);
+			return 1;
+		}
+
+		tfs::lua::pushBoolean(L, monster->canUseAttack(monster->getPosition(), creature));
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int luaMonsterSetIdle(lua_State* L)
 {
 	// monster:setIdle(idle)
@@ -477,6 +494,7 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "isInSpawnRange", luaMonsterIsInSpawnRange);
 
 	lsi.registerMethod("Monster", "isIdle", luaMonsterIsIdle);
+	lsi.registerMethod("Monster", "canUseAttack", luaMonsterCanUseAttack);
 	lsi.registerMethod("Monster", "setIdle", luaMonsterSetIdle);
 
 	lsi.registerMethod("Monster", "isTarget", luaMonsterIsTarget);

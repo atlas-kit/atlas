@@ -498,6 +498,7 @@ Player = {}
 ---@field getSpawnPosition fun(self: Monster): Position
 ---@field isInSpawnRange fun(self: Monster, position: Position): boolean
 ---@field isIdle fun(self: Monster): boolean
+---@field canUseAttack fun(self: Monster, creature: Creature): boolean
 ---@field setIdle fun(self: Monster, idle: boolean)
 ---@field isTarget fun(self: Monster, creature: Creature): boolean
 ---@field isOpponent fun(self: Monster, creature: Creature): boolean

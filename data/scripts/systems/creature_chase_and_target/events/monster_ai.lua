@@ -32,29 +32,28 @@ function Monster.searchTarget(self, searchType)
 	searchType = searchType or TARGETSEARCH_DEFAULT
 	local pos = self:getPosition()
 	local chaseCreature = self:getChaseCreature()
-	local resultList = {}
 
+	-- Tier 1: filter targets by canUseAttack.
+	local resultList = {}
 	for _, c in ipairs(self:getTargetList()) do
 		if c ~= chaseCreature and self:isTarget(c) then
-			table.insert(resultList, c)
+			if searchType == TARGETSEARCH_RANDOM or self:canUseAttack(c) then
+				table.insert(resultList, c)
+			end
 		end
 	end
 
-	if #resultList == 0 then
-		return false
-	end
-
-	if searchType == TARGETSEARCH_RANDOM then
-		return Monster.selectTarget(self, resultList[math.random(#resultList)])
-	end
-
 	if searchType == TARGETSEARCH_NEAREST then
+		-- Try canUseAttack-filtered list first.
 		local best, bestDist = nil, 999999
-		for _, c in ipairs(resultList) do
-			local cp = c:getPosition()
-			local d = math.abs(pos.x - cp.x) + math.abs(pos.y - cp.y)
-			if d < bestDist then
-				best, bestDist = c, d
+		local searchList = #resultList > 0 and resultList or self:getTargetList()
+		for _, c in ipairs(searchList) do
+			if c ~= chaseCreature and self:isTarget(c) then
+				local cp = c:getPosition()
+				local d = math.abs(pos.x - cp.x) + math.abs(pos.y - cp.y)
+				if d < bestDist then
+					best, bestDist = c, d
+				end
 			end
 		end
 		if best and Monster.selectTarget(self, best) then
@@ -62,9 +61,23 @@ function Monster.searchTarget(self, searchType)
 		end
 	end
 
-	-- Fallback: pick the first valid target in the list.
-	for _, c in ipairs(resultList) do
-		if Monster.selectTarget(self, c) then
+	if searchType == TARGETSEARCH_RANDOM then
+		if #resultList > 0 then
+			return Monster.selectTarget(self, resultList[math.random(#resultList)])
+		end
+		return false
+	end
+
+	if searchType == TARGETSEARCH_ATTACKRANGE then
+		if #resultList > 0 then
+			return Monster.selectTarget(self, resultList[math.random(#resultList)])
+		end
+		return false
+	end
+
+	-- Fallback: pick the first valid target in the full list.
+	for _, c in ipairs(self:getTargetList()) do
+		if c ~= chaseCreature and Monster.selectTarget(self, c) then
 			return true
 		end
 	end
