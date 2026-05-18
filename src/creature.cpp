@@ -1231,6 +1231,10 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t conditionI
 
 void Creature::executeConditions(std::chrono::milliseconds interval)
 {
+	if (conditions.empty()) {
+		return;
+	}
+
 	std::vector<Condition*> snapshot;
 	snapshot.reserve(conditions.size());
 	for (const auto& condition : conditions) {
