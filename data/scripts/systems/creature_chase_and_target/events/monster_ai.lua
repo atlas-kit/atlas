@@ -84,6 +84,17 @@ function Monster.searchTarget(self, searchType)
 	return false
 end
 
+local function hasAggressiveCondition(monster)
+	return monster:hasCondition(CONDITION_FIRE)
+		or monster:hasCondition(CONDITION_POISON)
+		or monster:hasCondition(CONDITION_ENERGY)
+		or monster:hasCondition(CONDITION_BLEEDING)
+		or monster:hasCondition(CONDITION_DROWN)
+		or monster:hasCondition(CONDITION_FREEZING)
+		or monster:hasCondition(CONDITION_DAZZLED)
+		or monster:hasCondition(CONDITION_CURSED)
+end
+
 local targetChangeTicks = {}
 
 local function reevaluateTarget(monster, interval)
@@ -150,15 +161,15 @@ do
 		local targetCreature = monster:getTargetCreature()
 		local hasTargets = monster:getTargetCount() > 0
 
-		-- Idle and return to spawn if there are no targets or friends nearby.
-		if not hasMaster and not hasTargets and monster:getFriendCount() == 0 then
-			if not monster:isFleeing() then
-				if not monster:isWalkingToSpawn() then
-					monster:walkToSpawn()
-				end
-				targetChangeTicks[monster:getId()] = nil
-				return
+		-- Return to spawn if there are no targets or friends nearby.
+		-- Keep fighting if the monster has an active damage condition.
+		if not hasMaster and not hasTargets and monster:getFriendCount() == 0
+			and not monster:isFleeing() and not hasAggressiveCondition(monster) then
+			if not monster:isWalkingToSpawn() then
+				monster:walkToSpawn()
 			end
+			targetChangeTicks[monster:getId()] = nil
+			return
 		end
 
 		-- Target acquisition.
