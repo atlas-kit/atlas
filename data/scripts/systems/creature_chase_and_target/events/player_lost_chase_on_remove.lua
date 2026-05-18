@@ -1,34 +1,19 @@
 -- player_lost_chase_on_remove.lua
--- Cancels the player's chase target when a creature is removed from the
--- game world (death, logout, teleport), but only if the player has a
--- pending walk action. Prevents the visual "sliding" toward a now-
--- removed entity.
+-- Cleans up the player's chase target when they are removed from the
+-- game world (logout, kick). Ensures the chased creature's follower
+-- list is properly updated.
 
 local event = Event()
 
--- Triggered when a creature is removed from the game world (death, logout, or teleport).
-function event.onCreatureRemoved(creature)  
-	-- Ensure the entity being handled is a player.
+function event.onCreatureRemoved(creature)
 	local player = creature:asPlayer()
 	if not player then
 		return
 	end
 
-	-- If the player does not have an active target, there is no chase to cancel.
-	local targetCreature = player:getTargetCreature()
-	if not targetCreature then
-		return
+	if player:getChaseCreature() then
+		player:setChaseCreature(nil)
 	end
-
-	-- Check if the player has a pending movement (next walk).
-	-- If they aren't trying to move, we don't need to force a chase cancellation here.
-	if not player:hasNextWalk() then
-		return
-	end
-	
-	-- Stop the player's chase movement.
-	-- This prevents the player from "sliding" or walking toward a creature that was just removed.
-	player:setChaseCreature(nil)
 end
 
 event:register()

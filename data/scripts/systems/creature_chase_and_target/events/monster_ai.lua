@@ -37,6 +37,7 @@ do
 		local position = monster:getPosition()
 
 		if not monster:isInSpawnRange(position) then
+			targetChangeTicks[monster:getId()] = nil
 			return
 		end
 
