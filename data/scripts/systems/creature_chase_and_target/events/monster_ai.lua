@@ -12,6 +12,16 @@ local targetChangeTicks = {}
 do
 	local event = Event()
 
+	function event.onCreatureRemoved(creature)
+		targetChangeTicks[creature:getId()] = nil
+	end
+
+	event:register()
+end
+
+do
+	local event = Event()
+
 	function event.onCreatureThink(creature, interval)
 		local monster = creature:asMonster()
 		if not monster then
