@@ -693,7 +693,7 @@ bool WeaponDistance::useWeapon(const std::shared_ptr<Player>& player, const std:
 			for (auto&& [dx, dy] : destList | std::views::as_const) {
 				// Blocking tiles or tiles without ground ain't valid targets for spears
 				if (const auto& tmpTile = g_game.map.getTile(destPos.x + dx, destPos.y + dy, destPos.z)) {
-					if (!tmpTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID) && tmpTile->getGround()) {
+					if (!tmpTile->hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID) && tmpTile->hasGround()) {
 						destTile = tmpTile;
 						break;
 					}

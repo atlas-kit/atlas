@@ -11,7 +11,13 @@
 class OutputMessage : public NetworkMessage
 {
 public:
-	OutputMessage() = default;
+	// User-provided (non-defaulted) so that std::allocate_shared<OutputMessage> performs
+	// default-initialization instead of value-initialization. Value-initialization would
+	// zero the entire NetworkMessage::buffer (~64 KB) on every construction even though
+	// only buffer[0..length) is ever written/sent. All transmitted bytes are explicitly
+	// written by add*/add_header/addPaddingBytes before send, so leaving the buffer
+	// uninitialized is safe (this already matches plain `NetworkMessage` usage).
+	OutputMessage() noexcept {}
 
 	// non-copyable
 	OutputMessage(const OutputMessage&) = delete;
@@ -66,7 +72,9 @@ private:
 	}
 
 	MsgSize_t outputBufferStart = INITIAL_BUFFER_POSITION;
-	uint32_t sequenceId;
+	// Was incidentally zeroed by value-initialization; keep an explicit default now that
+	// the object is no longer zero-initialized on construction.
+	uint32_t sequenceId = 0;
 };
 
 namespace tfs::net {
