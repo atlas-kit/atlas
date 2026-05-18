@@ -755,6 +755,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 			}
 		}
 
+		// single source of truth: monster attack ticks reset only on attack-target loss (see #257)
 		if (const auto& monster = asMonster()) {
 			monster->resetAttackTicks();
 		}
