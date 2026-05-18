@@ -3693,8 +3693,7 @@ void Game::checkCreatures(size_t index)
 
 		// Timing wheel: active creatures re-register for the next rotation.
 		// Idle ones (no target, conditions, or chase) drop out.
-		if (creature->isPlayer() || !creature->getConditions().empty() ||
-		    creature->getFollowCreature() || creature->getAttackedCreature()) {
+		if (creature->isPlayer() || creature->needsTick()) {
 			keep.push_back(creature);
 		} else {
 			creature->inCheckCreaturesVector = false;
