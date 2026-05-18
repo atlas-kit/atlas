@@ -1,3 +1,9 @@
+-- creature.lua
+-- Lua bridge for creature-level events. Each method is called from C++
+-- via the tfs::events::creature namespace and forwards to the Event
+-- system, allowing script-side handlers (registered via Event()) to
+-- react to game-world events (move, zone change, combat, etc.).
+
 function Creature:onChaseCreatureChanged()
 	if Event.onCreatureChaseCreatureChanged then
 		Event.onCreatureChaseCreatureChanged(self)

@@ -1,3 +1,9 @@
+-- event_callbacks.lua
+-- Event registration system. Defines the ec (event callbacks) table that
+-- lists all valid event names and their parameter mutability. Scripts use
+-- Event() to create event handlers, and the __index metamethod dispatches
+-- calls from the bridge files (events/*.lua) to the registered handlers.
+
 local EventData, callbacks, updateableParameters, autoID = {}, {}, {}, 0
 -- This metatable creates an auto-configuration mechanism to create new types of Events
 local ec = setmetatable({}, { __newindex = function(self, key, value)
