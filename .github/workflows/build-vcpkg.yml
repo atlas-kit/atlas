@@ -64,9 +64,11 @@ jobs:
         uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639 # v1.2
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
+        uses: lukka/run-vcpkg@305c06bd4dee21e23dcf142c85c657a993f7aa1a # v11.6
 
       - name: Build with CMake
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
