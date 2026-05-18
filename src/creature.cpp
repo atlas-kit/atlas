@@ -345,10 +345,6 @@ void Creature::onChangeZone(ZoneType_t zone)
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
 		}
 
 		if (const auto& followCreature = getFollowCreature()) {
@@ -423,10 +419,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
 		} else {
 			if (hasExtraSwing()) {
 				// our target is moving lets see if we can get in hit
@@ -465,10 +457,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 					if (zone == ZONE_PROTECTION) {
 						setAttackedCreature(nullptr);
 						setFollowCreature(nullptr);
-
-						if (const auto& monster = asMonster()) {
-							monster->resetAttackTicks();
-						}
 					}
 				}
 			}
