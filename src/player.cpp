@@ -1102,7 +1102,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	tfs::events::player::onJoin(asPlayer());
 }
 
-void Player::onChangeZone(ZoneType_t zone)
+void Player::onChangeZone(ZoneType_t /*zone*/)
 {
 	g_game.updateCreatureWalkthrough(asPlayer());
 	sendIcons();
