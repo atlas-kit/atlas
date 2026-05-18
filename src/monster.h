@@ -93,7 +93,6 @@ public:
 	void onWalkComplete() override;
 	bool getNextStep(Direction& direction, uint32_t& flags) override;
 	void goToFollowCreature() override;
-	void onFollowCreatureComplete();
 
 	void onThink(std::chrono::milliseconds interval) override;
 	void onAttacking(std::chrono::milliseconds interval) override;
@@ -105,8 +104,6 @@ public:
 
 	bool hasExtraSwing() override { return lastMeleeAttack == std::chrono::steady_clock::time_point::min(); }
 
-	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
-	bool selectTarget(const std::shared_ptr<Creature>& creature);
 
 	const auto& getFriendList() const { return friendList; }
 	const auto& getTargetList() const { return targetList; }

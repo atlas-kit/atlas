@@ -367,103 +367,8 @@ void Monster::onCreatureLeave(const std::shared_ptr<Creature>& creature)
 	}
 }
 
-bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAULT*/)
-{
-	const Position& myPos = getPosition();
-
-	auto resultList = targetList | tfs::views::lock_weak_ptrs |
-	                  std::views::filter([&, chaseCreature = getChaseCreature()](const auto& creature) {
-		                  return chaseCreature != creature && isTarget(creature) &&
-		                         (searchType == TARGETSEARCH_RANDOM || canUseAttack(myPos, creature));
-	                  }) |
-	                  std::ranges::to<std::vector>();
-
-	switch (searchType) {
-		case TARGETSEARCH_NEAREST: {
-			std::shared_ptr<Creature> target = nullptr;
-			if (!resultList.empty()) {
-				auto it = resultList.begin();
-				target = *it;
-
-				if (++it != resultList.end()) {
-					const Position& targetPosition = target->getPosition();
-					int32_t minRange = myPos.getDistanceX(targetPosition) + myPos.getDistanceY(targetPosition);
-					do {
-						const Position& pos = (*it)->getPosition();
-
-						if (int32_t distance = myPos.getDistanceX(pos) + myPos.getDistanceY(pos); distance < minRange) {
-							target = *it;
-							minRange = distance;
-						}
-					} while (++it != resultList.end());
-				}
-			} else {
-				int32_t minRange = std::numeric_limits<int32_t>::max();
-				for (const auto& creature : targetList | tfs::views::lock_weak_ptrs) {
-					if (!isTarget(creature)) {
-						continue;
-					}
-
-					const Position& pos = creature->getPosition();
-					if (int32_t distance = myPos.getDistanceX(pos) + myPos.getDistanceY(pos); distance < minRange) {
-						target = creature;
-						minRange = distance;
-					}
-				}
-			}
-
-			if (target && selectTarget(target)) {
-				return true;
-			}
-			break;
-		}
-
-		case TARGETSEARCH_DEFAULT:
-		case TARGETSEARCH_ATTACKRANGE:
-		case TARGETSEARCH_RANDOM:
-		default: {
-			if (!resultList.empty()) {
-				auto it = resultList.begin();
-				std::advance(it, uniform_random(0, resultList.size() - 1));
-				return selectTarget(*it);
-			}
-
-			if (searchType == TARGETSEARCH_ATTACKRANGE) {
-				return false;
-			}
-
-			break;
-		}
-	}
-
-	// lets just pick the first target in the list
-	const auto& chaseCreature = getChaseCreature();
-	for (const auto& target : targetList | tfs::views::lock_weak_ptrs) {
-		if (chaseCreature != target && selectTarget(target)) {
-			return true;
-		}
-	}
-	return false;
-}
-
 void Monster::goToFollowCreature()
 {
-}
-
-void Monster::onFollowCreatureComplete()
-{
-	auto it = std::ranges::find_if(targetList, [chaseCreature = getChaseCreature()](const auto& target) {
-		return tfs::owner_equal(target, chaseCreature);
-	});
-	if (it != targetList.end()) {
-		if (hasFollowPath) {
-			std::iter_swap(it, targetList.begin());
-		} else if (!isSummon()) {
-			std::iter_swap(it, targetList.end() - 1);
-		} else {
-			targetList.erase(it);
-		}
-	}
 }
 
 BlockType_t Monster::blockHit(const std::shared_ptr<Creature>& attacker, CombatType_t combatType, int32_t& damage,
@@ -512,30 +417,6 @@ bool Monster::isTarget(const std::shared_ptr<const Creature>& creature) const
 	return creature->getPosition().z == getPosition().z;
 }
 
-bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)
-{
-	if (!isTarget(creature)) {
-		return false;
-	}
-
-	auto it = std::ranges::find_if(targetList,
-	                               [&creature](const auto& target) { return tfs::owner_equal(target, creature); });
-	if (it == targetList.end()) {
-		// Target not found in our target list.
-		return false;
-	}
-
-	if (isSummon()) {
-		setTargetCreature(creature);
-	} else if (isHostile()) {
-		setTargetCreature(creature);
-		g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
-	}
-
-	setChaseCreature(creature);
-	return getChaseCreature() == creature;
-}
-
 void Monster::setIdle(bool idle)
 {
 	if (isRemoved() || isDead()) {
@@ -556,14 +437,6 @@ void Monster::setIdle(bool idle)
 
 void Monster::updateIdleStatus()
 {
-	bool idle = false;
-	if (!isSummon() && targetList.empty()) {
-		// check if there are aggressive conditions
-		idle = std::find_if(conditions.begin(), conditions.end(),
-		                    [](const auto& condition) { return condition->isAggressive(); }) == conditions.end();
-	}
-
-	setIdle(idle);
 }
 
 void Monster::onAddCondition(ConditionType_t) { updateIdleStatus(); }
@@ -1775,11 +1648,20 @@ bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool 
 		return false;
 	}
 
-	bool result = selectTarget(creature);
-	if (result) {
-		challengeFocusDuration = 8s;
+	if (!isTarget(creature)) {
+		return false;
 	}
-	return result;
+
+	auto it = std::ranges::find_if(targetList,
+	                               [&creature](const auto& target) { return tfs::owner_equal(target, creature); });
+	if (it == targetList.end()) {
+		return false;
+	}
+
+	setTargetCreature(creature);
+	setChaseCreature(creature);
+	challengeFocusDuration = 8s;
+	return true;
 }
 
 void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const

@@ -3,9 +3,73 @@
 -- re-evaluation, and chase/follow pathfinding. Runs every 1000ms via
 -- the onCreatureThink event.
 --
--- Uses monster:getPathTo() and monster:startAutoWalk() for movement.
--- Target re-evaluation follows the C++ onThinkTarget rules:
--- changeTargetSpeed, changeTargetChance, and targetDistance.
+-- Also replaces the C++ Monster::searchTarget() and Monster::selectTarget()
+-- with Lua implementations using Game.getSpectators() + monster:isTarget().
+-- C++ targetList is preserved for defense/summon systems.
+
+local function isInAttackRange(pos, creaturePos, monsterType)
+	local distX = math.abs(pos.x - creaturePos.x)
+	local distY = math.abs(pos.y - creaturePos.y)
+	return distX <= monsterType:targetDistance() and distY <= monsterType:targetDistance()
+end
+
+function Monster.selectTarget(self, creature)
+	if not self:isTarget(creature) then
+		return false
+	end
+
+	if self:isSummon() then
+		self:setTargetCreature(creature)
+	else
+		self:setTargetCreature(creature)
+	end
+
+	self:setChaseCreature(creature)
+	return self:getChaseCreature() == creature
+end
+
+function Monster.searchTarget(self, searchType)
+	searchType = searchType or TARGETSEARCH_DEFAULT
+	local pos = self:getPosition()
+	local chaseCreature = self:getChaseCreature()
+	local resultList = {}
+
+	for _, c in ipairs(self:getTargetList()) do
+		if c ~= chaseCreature and self:isTarget(c) then
+			table.insert(resultList, c)
+		end
+	end
+
+	if #resultList == 0 then
+		return false
+	end
+
+	if searchType == TARGETSEARCH_RANDOM then
+		return Monster.selectTarget(self, resultList[math.random(#resultList)])
+	end
+
+	if searchType == TARGETSEARCH_NEAREST then
+		local best, bestDist = nil, 999999
+		for _, c in ipairs(resultList) do
+			local cp = c:getPosition()
+			local d = math.abs(pos.x - cp.x) + math.abs(pos.y - cp.y)
+			if d < bestDist then
+				best, bestDist = c, d
+			end
+		end
+		if best and Monster.selectTarget(self, best) then
+			return true
+		end
+	end
+
+	-- Fallback: pick the first valid target in the list.
+	for _, c in ipairs(resultList) do
+		if Monster.selectTarget(self, c) then
+			return true
+		end
+	end
+	return false
+end
 
 local targetChangeTicks = {}
 
@@ -50,7 +114,8 @@ end
 do
 	local event = Event()
 
-	-- Main AI tick: target acquisition, re-evaluation, and chase/follow.
+	-- Main AI tick: idle decision, target acquisition, re-evaluation,
+	-- and chase/follow pathfinding.
 	function event.onCreatureThink(creature, interval)
 		local monster = creature:asMonster()
 		if not monster then
@@ -70,9 +135,21 @@ do
 
 		local hasMaster = monster:getMaster() ~= nil
 		local targetCreature = monster:getTargetCreature()
+		local hasTargets = monster:getTargetCount() > 0
+
+		-- Idle and return to spawn if there are no targets or friends nearby.
+		if not hasMaster and not hasTargets and monster:getFriendCount() == 0 then
+			if not monster:isFleeing() then
+				if not monster:isWalkingToSpawn() then
+					monster:walkToSpawn()
+				end
+				targetChangeTicks[monster:getId()] = nil
+				return
+			end
+		end
 
 		-- Target acquisition.
-		if not targetCreature and not monster:getChaseCreature() and monster:getTargetCount() > 0 and not hasMaster then
+		if not targetCreature and not monster:getChaseCreature() and hasTargets and not hasMaster then
 			monster:searchTarget(TARGETSEARCH_NEAREST)
 			targetCreature = monster:getTargetCreature()
 		end
@@ -80,7 +157,7 @@ do
 		-- Target re-evaluation or state cleanup.
 		if not targetCreature then
 			targetChangeTicks[monster:getId()] = nil
-		elseif not hasMaster and monster:getTargetCount() > 1 then
+		elseif not hasMaster and hasTargets then
 			reevaluateTarget(monster, interval)
 		end
 

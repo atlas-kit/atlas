@@ -340,36 +340,6 @@ int luaMonsterGetTargetCount(lua_State* L)
 	return 1;
 }
 
-int luaMonsterSelectTarget(lua_State* L)
-{
-	// monster:selectTarget(creature)
-	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
-		const auto& creature = tfs::lua::getCreature(L, 2);
-		if (!creature) {
-			tfs::lua::reportError(L, tfs::lua::getErrorDesc(tfs::lua::LUA_ERROR_CREATURE_NOT_FOUND));
-			tfs::lua::pushBoolean(L, false);
-			return 1;
-		}
-
-		tfs::lua::pushBoolean(L, monster->selectTarget(creature));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int luaMonsterSearchTarget(lua_State* L)
-{
-	// monster:searchTarget([searchType = TARGETSEARCH_DEFAULT])
-	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
-		TargetSearchType_t searchType = tfs::lua::getNumber<TargetSearchType_t>(L, 2, TARGETSEARCH_DEFAULT);
-		tfs::lua::pushBoolean(L, monster->searchTarget(searchType));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 int luaMonsterIsWalkingToSpawn(lua_State* L)
 {
 	// monster:isWalkingToSpawn()
@@ -522,9 +492,6 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "removeTarget", luaMonsterRemoveTarget);
 	lsi.registerMethod("Monster", "getTargetList", luaMonsterGetTargetList);
 	lsi.registerMethod("Monster", "getTargetCount", luaMonsterGetTargetCount);
-
-	lsi.registerMethod("Monster", "selectTarget", luaMonsterSelectTarget);
-	lsi.registerMethod("Monster", "searchTarget", luaMonsterSearchTarget);
 
 	lsi.registerMethod("Monster", "isWalkingToSpawn", luaMonsterIsWalkingToSpawn);
 	lsi.registerMethod("Monster", "walkToSpawn", luaMonsterWalkToSpawn);
