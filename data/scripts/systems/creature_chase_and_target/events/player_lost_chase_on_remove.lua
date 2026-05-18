@@ -6,11 +6,14 @@
 local event = Event()
 
 function event.onCreatureRemoved(creature)
+	-- Only apply to players.
 	local player = creature:asPlayer()
 	if not player then
 		return
 	end
 
+	-- Clear the chase target so the followed creature no longer tracks
+	-- this player as a follower.
 	if player:getChaseCreature() then
 		player:setChaseCreature(nil)
 	end
