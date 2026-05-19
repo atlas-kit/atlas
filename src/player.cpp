@@ -2145,6 +2145,8 @@ void Player::addInFightTicks()
 		return;
 	}
 
+	pzLocked = true;
+
 	auto condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT,
 	                                            std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)}, 0);
 	addCondition(std::move(condition));

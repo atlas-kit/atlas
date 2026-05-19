@@ -53,6 +53,7 @@ function event.onCreatureThink(creature, interval)
 	-- Case 2: The monster's target is somehow itself (safety check).
 	elseif targetCreature == monster then
 		monster:setChaseCreature(nil)
+		monster:setTargetCreature(nil)
 		
 	-- Case 3: The monster has a target but is not chasing/following it yet.
 	elseif targetCreature ~= chaseCreature then

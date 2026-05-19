@@ -14,6 +14,12 @@ do
 			return
 		end
 
+		-- Do not cancel if the target is the creature's master (e.g., summons).
+		local master = creature:getMaster()
+		if master == chaseCreature then
+			return
+		end
+
 		local position = creature:getPosition()
 		local targetPosition = chaseCreature:getPosition()
 		
@@ -41,6 +47,12 @@ do
 	function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile, toTile)
 		local chaseCreature = creature:getChaseCreature()
 		if not chaseCreature then
+			return
+		end
+
+		-- Do not cancel if the target is the creature's master (e.g., summons).
+		local master = creature:getMaster()
+		if master == chaseCreature then
 			return
 		end
 

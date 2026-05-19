@@ -1239,7 +1239,7 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 		}
 
 		const auto& creaturePosition = creature->getPosition();
-		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
+		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition) || creature->isInvisible()) {
 			return;
 		}
 
@@ -1263,6 +1263,11 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 			}
 		}
 
+		if (!listWalkDir.empty()) {
+			listWalkDir.clear();
+			onWalkAborted();
+		}
+
 		chaseCreature.reset();
 	}
 
@@ -1279,7 +1284,7 @@ void Creature::setTargetCreature(const std::shared_ptr<Creature>& creature)
 		}
 
 		const auto& creaturePosition = creature->getPosition();
-		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition)) {
+		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition) || creature->isInvisible()) {
 			return;
 		}
 

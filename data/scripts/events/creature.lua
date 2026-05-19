@@ -59,7 +59,7 @@ function Creature:onMoved(fromTile, toTile)
 
 	if fromTile:getZone() ~= toTile:getZone() then
 		if Event.onCreatureZoneChanged then
-			Event.onCreatureZoneChanged(self)
+			Event.onCreatureZoneChanged(self, fromTile:getZone(), toTile:getZone())
 		end
 	end
 end
@@ -71,7 +71,7 @@ function Creature:onNearbyCreatureMoved(nearbyCreature, fromTile, toTile)
 
 	if fromTile:getZone() ~= toTile:getZone() then
 		if Event.onCreatureNearbyCreatureZoneChanged then
-			Event.onCreatureNearbyCreatureZoneChanged(self, nearbyCreature)
+			Event.onCreatureNearbyCreatureZoneChanged(self, nearbyCreature, fromTile:getZone(), toTile:getZone())
 		end
 	end
 end

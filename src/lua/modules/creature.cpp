@@ -658,7 +658,7 @@ int luaCreatureGetConditions(lua_State* L)
 	int index = 0;
 	for (const auto& condition : creature->getConditions()) {
 		tfs::lua::pushUserdata(L, condition.get());
-		tfs::lua::setMetatable(L, -1, "Condition");
+		tfs::lua::setWeakMetatable(L, -1, "Condition");
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
@@ -941,7 +941,7 @@ int luaCreatureStartAutoWalk(lua_State* L)
 	std::vector<Direction> dirList;
 	const auto length = lua_rawlen(L, 2);
 	dirList.reserve(length);
-	for (size_t i = 1; i <= length; ++i) {
+	for (size_t i = length; i >= 1; --i) {
 		lua_rawgeti(L, 2, i);
 		dirList.push_back(static_cast<Direction>(tfs::lua::getNumber<int32_t>(L, -1)));
 		lua_pop(L, 1);

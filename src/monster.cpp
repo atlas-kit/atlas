@@ -1741,6 +1741,11 @@ bool Monster::isFriendCreature(const std::shared_ptr<const Creature>& creature) 
 
 bool Monster::isOpponentCreature(const std::shared_ptr<const Creature>& creature) const
 {
+	// A friend is never an opponent
+	if (isFriendCreature(creature)) {
+		return false;
+	}
+
 	{
 		// Logic for Summons (Monster has a master)
 

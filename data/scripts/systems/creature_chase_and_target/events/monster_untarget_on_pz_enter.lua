@@ -7,10 +7,18 @@ do
 	local event = Event()
 
 	-- Triggered when the monster itself changes zones.
-	-- Checks if its current target is now inside a Protection Zone.
-	function event.onCreatureZoneChanged(creature)
+	-- Checks if either the monster or its target entered a Protection Zone.
+	function event.onCreatureZoneChanged(creature, fromZone, toZone)
 		local monster = creature:asMonster()
 		if not monster then
+			return
+		end
+
+		-- If the monster entered PZ, clear target/chase regardless.
+		if toZone == ZONE_PROTECTION then
+			monster:setTargetCreature(nil)
+			monster:setChaseCreature(nil)
+			monster:resetAttackTicks()
 			return
 		end
 
@@ -38,7 +46,7 @@ do
 	local event = Event()
 
 	-- Triggered when a nearby creature (the target) changes zones.
-	function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature)
+	function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature, fromZone, toZone)
 		local monster = creature:asMonster()
 		if not monster then
 			return
@@ -55,8 +63,7 @@ do
 		end
 
 		-- If the target moved into a Protection Zone, stop the attack.
-		local zone = targetCreature:getZone()
-		if zone ~= ZONE_PROTECTION then
+		if toZone ~= ZONE_PROTECTION then
 			return
 		end
 

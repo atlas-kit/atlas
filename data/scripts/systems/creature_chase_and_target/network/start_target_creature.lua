@@ -21,6 +21,8 @@ function handler.onReceive(player, msg)
 	local targetCreature = Creature(targetCreatureId)
 	if not targetCreature then
 		player:sendCancelTarget()
+		player:setChaseCreature(nil)
+		player:setTargetCreature(nil)
 		return
 	end
 
@@ -29,6 +31,8 @@ function handler.onReceive(player, msg)
 
 	if position.z ~= targetPosition.z or not player:canSee(targetPosition) then
 		player:sendCancelTarget()
+		player:setChaseCreature(nil)
+		player:setTargetCreature(nil)
 		return
 	end
 

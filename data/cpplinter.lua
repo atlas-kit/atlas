@@ -1010,10 +1010,10 @@ Weapon = {}
 ---@field onGameSave fun():nil
 ---@field onCreatureChaseCreatureChanged fun(creature:Creature):nil
 ---@field onCreatureTargetCreatureChanged fun(creature:Creature):nil
----@field onCreatureZoneChanged fun(creature:Creature):nil
----@field onCreatureNearbyCreatureZoneChanged fun(creature:Creature, nearbyCreature:Creature):nil
+---@field onCreatureZoneChanged fun(creature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
+---@field onCreatureNearbyCreatureZoneChanged fun(creature:Creature, nearbyCreature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
 ---@field onCreatureMoved fun(creature:Creature, fromTile:Tile, toTile:Tile):nil
----@field onCreatureNearbyCreatureMoved fun(creature:Creature, fromTile:Tile, toTile:Tile):nil
+---@field onCreatureNearbyCreatureMoved fun(creature:Creature, nearbyCreature:Creature, fromTile:Tile, toTile:Tile):nil
 ---@field onCreatureRemoved fun(creature:Creature):nil
 ---@field onCreatureNearbyCreatureRemoved fun(creature:Creature, nearbyCreature:Creature):nil
 ---@field onCreatureChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean

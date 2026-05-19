@@ -272,9 +272,9 @@ int luaCombatExecute(lua_State* L)
 
 int luaCombatCanTargetCreature(lua_State* L)
 {
-	// Combat.canTargetCreature(player, target)
-	const auto& player = tfs::lua::getPlayer(L, 1);
-	const auto& target = tfs::lua::getCreature(L, 2);
+	// combat:canTargetCreature(player, target)
+	const auto& player = tfs::lua::getPlayer(L, 2);
+	const auto& target = tfs::lua::getCreature(L, 3);
 	if (!player || !target) {
 		tfs::lua::pushNumber(L, RETURNVALUE_CREATUREDOESNOTEXIST);
 		return 1;
