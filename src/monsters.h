@@ -249,7 +249,7 @@ public:
 	bool reload();
 
 	MonsterType* getMonsterType(const std::string& name);
-	bool deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std::string& description = "");
+	bool deserializeSpell(MonsterSpell* spell, spellBlock_t& spellBlock, const std::string& description = "");
 
 	MonsterType* getMonsterType(uint32_t raceId);
 	bool addBestiaryMonsterType(const MonsterType* monsterType);
@@ -263,7 +263,7 @@ private:
 	std::unique_ptr<ConditionDamage> getDamageCondition(ConditionType_t conditionType, int32_t maxDamage,
 	                                                    int32_t minDamage, int32_t startDamage,
 	                                                    std::chrono::milliseconds tickInterval);
-	bool deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, const std::string& description = "");
+	bool deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellBlock, const std::string& description = "");
 
 	MonsterType* loadMonster(const std::string& file, const std::string& monsterName, bool reloading = false);
 
