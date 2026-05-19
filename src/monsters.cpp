@@ -18,12 +18,10 @@ extern Spells* g_spells;
 
 Monsters g_monsters;
 
-spellBlock_t::~spellBlock_t()
-{
-	if (combatSpell) {
-		delete spell;
-	}
-}
+spellBlock_t::spellBlock_t() = default;
+spellBlock_t::~spellBlock_t() = default;
+spellBlock_t::spellBlock_t(spellBlock_t&&) noexcept = default;
+spellBlock_t& spellBlock_t::operator=(spellBlock_t&&) noexcept = default;
 
 void MonsterType::loadLoot(MonsterType* monsterType, LootBlock lootBlock)
 {
@@ -171,7 +169,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::unique_ptr<CombatSpell> combatSpell;
 	bool needTarget = false;
 	bool needDirection = false;
 
@@ -184,17 +182,16 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			needTarget = attr.as_bool();
 		}
 
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, needTarget, needDirection));
-		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
-		                                scriptName)) {
+		combatSpell = std::make_unique<CombatSpell>(nullptr, needTarget, needDirection);
+		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
+		                             scriptName)) {
 			return false;
 		}
 
-		if (!combatSpellPtr->loadScriptCombat()) {
+		if (!combatSpell->loadScriptCombat()) {
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
@@ -209,9 +206,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 					spread = std::max<int32_t>(0, pugi::cast<int32_t>(attr.value()));
 				}
 
-				AreaCombat* area = new AreaCombat();
+				auto area = std::make_unique<AreaCombat>();
 				area->setupArea(length, spread);
-				combat->setArea(area);
+				combat->setArea(std::move(area));
 
 				needDirection = true;
 			}
@@ -225,9 +222,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				needTarget = attr.as_bool();
 			}
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(radius);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if ((attr = node.attribute("ring"))) {
@@ -238,9 +235,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				needTarget = attr.as_bool();
 			}
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupAreaRing(ring);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		std::string tmpName = boost::algorithm::to_lower_copy(name);
@@ -514,7 +511,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		}
 
 		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, needTarget, needDirection);
+		combatSpell = std::make_unique<CombatSpell>(combat, needTarget, needDirection);
 
 		for (auto attributeNode : node.children()) {
 			if ((attr = attributeNode.attribute("key"))) {
@@ -549,9 +546,10 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		}
 	}
 
-	sb.spell = combatSpell;
 	if (combatSpell) {
+		sb.spell = combatSpell.get();
 		sb.combatSpell = true;
+		sb.combatSpellPtr = std::move(combatSpell);
 	}
 	return true;
 }
@@ -592,47 +590,45 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::unique_ptr<CombatSpell> combatSpell;
 
 	if (spell->isScripted) {
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, spell->needTarget, spell->needDirection));
-		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
-		                                spell->scriptName)) {
+		combatSpell = std::make_unique<CombatSpell>(nullptr, spell->needTarget, spell->needDirection);
+		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
+		                             spell->scriptName)) {
 			std::cout << "cannot find file" << std::endl;
 			return false;
 		}
 
-		if (!combatSpellPtr->loadScriptCombat()) {
+		if (!combatSpell->loadScriptCombat()) {
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
 		const auto combat = std::make_shared<Combat>();
-		sb.combatSpell = true;
 
 		if (spell->length > 0) {
 			spell->spread = std::max<int32_t>(0, spell->spread);
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(spell->length, spell->spread);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 
 			spell->needDirection = true;
 		}
 
 		if (spell->radius > 0) {
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(spell->radius);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if (spell->ring > 0) {
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupAreaRing(spell->ring);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if (spell->conditionType != CONDITION_NONE) {
@@ -787,12 +783,13 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		}
 
 		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, spell->needTarget, spell->needDirection);
+		combatSpell = std::make_unique<CombatSpell>(combat, spell->needTarget, spell->needDirection);
 	}
 
-	sb.spell = combatSpell;
 	if (combatSpell) {
+		sb.spell = combatSpell.get();
 		sb.combatSpell = true;
+		sb.combatSpellPtr = std::move(combatSpell);
 	}
 	return true;
 }

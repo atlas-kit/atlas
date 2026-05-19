@@ -62,26 +62,22 @@ struct summonBlock_t
 };
 
 class BaseSpell;
+class CombatSpell;
 struct spellBlock_t
 {
-	constexpr spellBlock_t() = default;
+	spellBlock_t();
 	~spellBlock_t();
 	spellBlock_t(const spellBlock_t& other) = delete;
 	spellBlock_t& operator=(const spellBlock_t& other) = delete;
-	spellBlock_t(spellBlock_t&& other) :
-	    spell(other.spell),
-	    chance(other.chance),
-	    speed(other.speed),
-	    range(other.range),
-	    minCombatValue(other.minCombatValue),
-	    maxCombatValue(other.maxCombatValue),
-	    combatSpell(other.combatSpell),
-	    isMelee(other.isMelee)
-	{
-		other.spell = nullptr;
-	}
+	spellBlock_t(spellBlock_t&& other) noexcept;
+	spellBlock_t& operator=(spellBlock_t&& other) noexcept;
 
+	// Non-owning view of the spell used at runtime. It points either to a globally registered spell
+	// (owned by g_spells) or to the CombatSpell owned by combatSpellPtr below.
 	BaseSpell* spell = nullptr;
+	// Owns the CombatSpell that was built for this monster spell. Empty when spell refers to a
+	// globally registered spell. combatSpell mirrors whether this block owns a CombatSpell.
+	std::unique_ptr<CombatSpell> combatSpellPtr;
 	uint32_t chance = 100;
 	std::chrono::milliseconds speed = 2000ms;
 	uint32_t range = 0;
