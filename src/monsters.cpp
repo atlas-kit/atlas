@@ -18,13 +18,6 @@ extern Spells* g_spells;
 
 Monsters g_monsters;
 
-spellBlock_t::~spellBlock_t()
-{
-	if (combatSpell) {
-		delete spell;
-	}
-}
-
 void MonsterType::loadLoot(MonsterType* monsterType, LootBlock lootBlock)
 {
 	if (lootBlock.childLoot.empty()) {
@@ -549,6 +542,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		}
 	}
 
+	sb.combatSpellPtr.reset(combatSpell);
 	sb.spell = combatSpell;
 	if (combatSpell) {
 		sb.combatSpell = true;
@@ -790,6 +784,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		combatSpell = new CombatSpell(combat, spell->needTarget, spell->needDirection);
 	}
 
+	sb.combatSpellPtr.reset(combatSpell);
 	sb.spell = combatSpell;
 	if (combatSpell) {
 		sb.combatSpell = true;
