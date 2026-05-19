@@ -1859,12 +1859,42 @@ int luaPlayerSendHouseWindow(lua_State* L)
 	return 1;
 }
 
+int luaPlayerGetEditHouse(lua_State* L)
+{
+	// player:getEditHouse()
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	uint32_t windowTextId;
+	uint32_t listId;
+	const auto& house = player->getEditHouse(windowTextId, listId);
+	if (!house) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushSharedPtr(L, house);
+	tfs::lua::setMetatable(L, -1, "House");
+	tfs::lua::pushNumber(L, windowTextId);
+	tfs::lua::pushNumber(L, listId);
+	return 3;
+}
+
 int luaPlayerSetEditHouse(lua_State* L)
 {
 	// player:setEditHouse(house, listId)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
 		lua_pushnil(L);
+		return 1;
+	}
+
+	if (lua_isnoneornil(L, 2)) {
+		player->setEditHouse(nullptr);
+		tfs::lua::pushBoolean(L, true);
 		return 1;
 	}
 
@@ -2492,6 +2522,7 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Player", "getHouse", luaPlayerGetHouse);
 	lsi.registerMethod("Player", "sendHouseWindow", luaPlayerSendHouseWindow);
+	lsi.registerMethod("Player", "getEditHouse", luaPlayerGetEditHouse);
 	lsi.registerMethod("Player", "setEditHouse", luaPlayerSetEditHouse);
 
 	lsi.registerMethod("Player", "setGhostMode", luaPlayerSetGhostMode);

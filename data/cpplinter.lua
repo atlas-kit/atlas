@@ -458,7 +458,8 @@ Creature = {}
 ---@field getClient fun(self: Player): table
 ---@field getHouse fun(self: Player): House
 ---@field sendHouseWindow fun(self: Player, houseId: number)
----@field setEditHouse fun(self: Player, houseId: number, editMode: boolean)
+---@field getEditHouse fun(self: Player): House, number, number
+---@field setEditHouse fun(self: Player, house: House?, listId: number?)
 ---@field setGhostMode fun(self: Player, active: boolean)
 ---@field getContainerId fun(self: Player, index: number): number
 ---@field getContainerById fun(self: Player, containerId: number): Container

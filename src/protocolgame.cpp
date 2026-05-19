@@ -652,9 +652,7 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x89:
 			parseTextWindow(msg);
 			break;
-		case 0x8A:
-			parseHouseWindow(msg);
-			break;
+		// case 0x8A: break; // update house window
 		case 0x8B:
 			parseWrapItem(msg);
 			break;
@@ -1252,16 +1250,6 @@ void ProtocolGame::parseTextWindow(NetworkMessage& msg)
 	auto newText = msg.getString();
 	g_dispatcher.addTask([playerID = player->getID(), windowTextID, newText]() {
 		g_game.playerWriteItem(playerID, windowTextID, newText);
-	});
-}
-
-void ProtocolGame::parseHouseWindow(NetworkMessage& msg)
-{
-	uint8_t doorId = msg.getByte();
-	uint32_t id = msg.get<uint32_t>();
-	auto text = msg.getString();
-	g_dispatcher.addTask([=, playerID = player->getID(), text = std::move(text)]() {
-		g_game.playerUpdateHouseWindow(playerID, doorId, id, text);
 	});
 }
 
