@@ -8,8 +8,8 @@
 #include "../register.h"
 #include "../script.h"
 
-extern Actions* g_actions;
-extern Scripts* g_scripts;
+extern std::unique_ptr<Actions> g_actions;
+extern std::unique_ptr<Scripts> g_scripts;
 
 namespace {
 

@@ -34,16 +34,16 @@
 #include <chrono>
 #include <fstream>
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern Monsters g_monsters;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
-extern Scripts* g_scripts;
-extern Spells* g_spells;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Scripts> g_scripts;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 

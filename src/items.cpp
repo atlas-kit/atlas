@@ -9,7 +9,7 @@
 #include "pugicast.h"
 #include "weapons.h"
 
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {

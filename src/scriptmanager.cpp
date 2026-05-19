@@ -14,24 +14,24 @@
 #include "talkaction.h"
 #include "weapons.h"
 
-Actions* g_actions = nullptr;
+std::unique_ptr<Actions> g_actions = nullptr;
 Chat g_chat;
-Spells* g_spells = nullptr;
-TalkActions* g_talkActions = nullptr;
-MoveEvents* g_moveEvents = nullptr;
+std::unique_ptr<Spells> g_spells = nullptr;
+std::unique_ptr<TalkActions> g_talkActions = nullptr;
+std::unique_ptr<MoveEvents> g_moveEvents = nullptr;
 std::unique_ptr<Weapons> g_weapons = nullptr;
-Scripts* g_scripts = nullptr;
+std::unique_ptr<Scripts> g_scripts = nullptr;
 
 extern LuaEnvironment g_luaEnvironment;
 
 ScriptingManager::~ScriptingManager()
 {
 	g_weapons.reset();
-	delete g_spells;
-	delete g_actions;
-	delete g_talkActions;
-	delete g_moveEvents;
-	delete g_scripts;
+	g_spells.reset();
+	g_actions.reset();
+	g_talkActions.reset();
+	g_moveEvents.reset();
+	g_scripts.reset();
 }
 
 bool ScriptingManager::loadScriptSystems()
@@ -40,7 +40,7 @@ bool ScriptingManager::loadScriptSystems()
 		std::cout << "[Warning - ScriptingManager::loadScriptSystems] Can not load data/global.lua" << std::endl;
 	}
 
-	g_scripts = new Scripts();
+	g_scripts = std::make_unique<Scripts>();
 	std::cout << ">> Loading lua libs" << std::endl;
 	if (!g_scripts->loadScripts("scripts/lib", true, false)) {
 		std::cout << "> ERROR: Unable to load lua libs!" << std::endl;
@@ -50,16 +50,16 @@ bool ScriptingManager::loadScriptSystems()
 	g_weapons = std::make_unique<Weapons>();
 	g_weapons->loadDefaults();
 
-	g_spells = new Spells();
+	g_spells = std::make_unique<Spells>();
 	if (!g_spells->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load spells!" << std::endl;
 		return false;
 	}
 
-	g_actions = new Actions();
-	g_talkActions = new TalkActions();
+	g_actions = std::make_unique<Actions>();
+	g_talkActions = std::make_unique<TalkActions>();
 
-	g_moveEvents = new MoveEvents();
+	g_moveEvents = std::make_unique<MoveEvents>();
 	if (!g_moveEvents->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load move events!" << std::endl;
 		return false;

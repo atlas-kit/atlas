@@ -18,7 +18,7 @@
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
 extern Monsters g_monsters;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 Spells::Spells() { scriptInterface.initState(); }

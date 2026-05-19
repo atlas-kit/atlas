@@ -17,7 +17,7 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 namespace {

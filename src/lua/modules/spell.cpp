@@ -8,7 +8,7 @@
 #include "../register.h"
 #include "../script.h"
 
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 namespace {

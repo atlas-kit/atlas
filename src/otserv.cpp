@@ -28,7 +28,7 @@ extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Monsters g_monsters;
 extern Scheduler g_scheduler;
-extern Scripts* g_scripts;
+extern std::unique_ptr<Scripts> g_scripts;
 extern Vocations g_vocations;
 
 std::mutex g_loaderLock;

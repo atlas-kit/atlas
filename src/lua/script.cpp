@@ -26,11 +26,11 @@ extern Chat g_chat;
 extern Game g_game;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
-extern Spells* g_spells;
-extern Actions* g_actions;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<Actions> g_actions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Scheduler g_scheduler;
-extern Scripts* g_scripts;
+extern std::unique_ptr<Scripts> g_scripts;
 
 LuaEnvironment g_luaEnvironment;
 

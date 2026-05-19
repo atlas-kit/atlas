@@ -8,8 +8,8 @@
 #include "../register.h"
 #include "../script.h"
 
-extern MoveEvents* g_moveEvents;
-extern Scripts* g_scripts;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
+extern std::unique_ptr<Scripts> g_scripts;
 
 namespace {
 
