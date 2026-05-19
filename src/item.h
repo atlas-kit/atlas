@@ -247,69 +247,10 @@ private:
 
 	struct Attribute
 	{
-		union
-		{
-			int64_t integer;
-			std::string* string;
-			CustomAttributeMap* custom;
-		} value;
+		std::variant<std::monostate, int64_t, std::string, CustomAttributeMap> value;
 		itemAttrTypes type;
 
-		explicit Attribute(itemAttrTypes type) : type(type) { memset(&value, 0, sizeof(value)); }
-		Attribute(const Attribute& i)
-		{
-			type = i.type;
-			if (ItemAttributes::isIntAttrType(type)) {
-				value.integer = i.value.integer;
-			} else if (ItemAttributes::isStrAttrType(type)) {
-				value.string = new std::string(*i.value.string);
-			} else if (ItemAttributes::isCustomAttrType(type)) {
-				value.custom = new CustomAttributeMap(*i.value.custom);
-			} else {
-				memset(&value, 0, sizeof(value));
-			}
-		}
-		Attribute(Attribute&& attribute) : value(attribute.value), type(attribute.type)
-		{
-			memset(&attribute.value, 0, sizeof(value));
-			attribute.type = ITEM_ATTRIBUTE_NONE;
-		}
-		~Attribute()
-		{
-			if (ItemAttributes::isStrAttrType(type)) {
-				delete value.string;
-			} else if (ItemAttributes::isCustomAttrType(type)) {
-				delete value.custom;
-			}
-		}
-		Attribute& operator=(Attribute other)
-		{
-			Attribute::swap(*this, other);
-			return *this;
-		}
-		Attribute& operator=(Attribute&& other)
-		{
-			if (this != &other) {
-				if (ItemAttributes::isStrAttrType(type)) {
-					delete value.string;
-				} else if (ItemAttributes::isCustomAttrType(type)) {
-					delete value.custom;
-				}
-
-				value = other.value;
-				type = other.type;
-
-				memset(&other.value, 0, sizeof(value));
-				other.type = ITEM_ATTRIBUTE_NONE;
-			}
-			return *this;
-		}
-
-		static void swap(Attribute& first, Attribute& second)
-		{
-			std::swap(first.value, second.value);
-			std::swap(first.type, second.type);
-		}
+		explicit Attribute(itemAttrTypes type) : type(type) {}
 	};
 
 	std::vector<Attribute> attributes;
@@ -345,7 +286,16 @@ private:
 			return nullptr;
 		}
 
-		return getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom;
+		return std::get_if<CustomAttributeMap>(&getAttr(ITEM_ATTRIBUTE_CUSTOM).value);
+	}
+
+	CustomAttributeMap& getOrCreateCustomAttributeMap()
+	{
+		auto& attrValue = getAttr(ITEM_ATTRIBUTE_CUSTOM).value;
+		if (!std::holds_alternative<CustomAttributeMap>(attrValue)) {
+			attrValue.emplace<CustomAttributeMap>();
+		}
+		return std::get<CustomAttributeMap>(attrValue);
 	}
 
 	template <typename R>
@@ -368,12 +318,8 @@ private:
 			removeCustomAttribute(key);
 		}
 
-		if (!getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom) {
-			getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom = new CustomAttributeMap();
-		}
-
 		auto lowercaseKey = boost::algorithm::to_lower_copy(std::string{key});
-		getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom->emplace(lowercaseKey, value);
+		getOrCreateCustomAttributeMap().emplace(lowercaseKey, value);
 	}
 
 	void setCustomAttribute(std::string_view key, const CustomAttribute& value)
@@ -382,12 +328,8 @@ private:
 			removeCustomAttribute(key);
 		}
 
-		if (!getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom) {
-			getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom = new CustomAttributeMap();
-		}
-
 		auto lowercaseKey = boost::algorithm::to_lower_copy(std::string{key});
-		getAttr(ITEM_ATTRIBUTE_CUSTOM).value.custom->emplace(lowercaseKey, value);
+		getOrCreateCustomAttributeMap().emplace(lowercaseKey, value);
 	}
 
 	const CustomAttribute* getCustomAttribute(int64_t key)
