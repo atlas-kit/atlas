@@ -353,10 +353,10 @@ public:
 	const auto& getStorageMap() const { return storageMap; }
 
 	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	void setFollowCreature(const std::shared_ptr<Creature>& creature);
+	bool setFollowCreature(const std::shared_ptr<Creature>& creature);
 
 	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
-	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
+	bool setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
 protected:
 	struct CountBlock_t

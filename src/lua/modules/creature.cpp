@@ -232,8 +232,7 @@ int luaCreatureSetTarget(lua_State* L)
 		return 1;
 	}
 
-	creature->setAttackedCreature(tfs::lua::getCreature(L, 2));
-	tfs::lua::pushBoolean(L, true);
+	tfs::lua::pushBoolean(L, creature->setAttackedCreature(tfs::lua::getCreature(L, 2)));
 	return 1;
 }
 
@@ -264,8 +263,7 @@ int luaCreatureSetFollowCreature(lua_State* L)
 		return 1;
 	}
 
-	creature->setFollowCreature(tfs::lua::getCreature(L, 2));
-	tfs::lua::pushBoolean(L, true);
+	tfs::lua::pushBoolean(L, creature->setFollowCreature(tfs::lua::getCreature(L, 2)));
 	return 1;
 }
 

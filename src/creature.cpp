@@ -764,7 +764,7 @@ BlockType_t Creature::blockHit(const std::shared_ptr<Creature>& attacker, Combat
 	return blockType;
 }
 
-void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
+bool Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 {
 	if (!creature) {
 		attackedCreature.reset();
@@ -782,11 +782,11 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 		if (const auto& monster = asMonster()) {
 			monster->resetAttackTicks();
 		}
-		return;
+		return true;
 	}
 
 	if (tfs::owner_equal(creature, attackedCreature)) {
-		return;
+		return true;
 	}
 
 	const auto& creaturePosition = creature->getPosition();
@@ -796,7 +796,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 		if (const auto& player = asPlayer()) {
 			player->sendCancelTarget();
 		}
-		return;
+		return false;
 	}
 
 	attackedCreature = creature;
@@ -826,6 +826,8 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 
 		g_dispatcher.addTask([id = player->getID()]() { g_game.checkCreatureAttack(id); });
 	}
+
+	return true;
 }
 
 void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindPathParams& fpp) const
@@ -837,7 +839,7 @@ void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindP
 	fpp.maxTargetDist = 1;
 }
 
-void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
+bool Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 {
 	if (!creature) {
 		followCreature.reset();
@@ -847,11 +849,11 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 		if (const auto& player = asPlayer()) {
 			player->stopWalk();
 		}
-		return;
+		return true;
 	}
 
 	if (tfs::owner_equal(followCreature, creature)) {
-		return;
+		return true;
 	}
 
 	const auto& creaturePosition = creature->getPosition();
@@ -864,7 +866,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
 			player->stopWalk();
 		}
-		return;
+		return false;
 	}
 
 	if (const auto& oldFollow = getFollowCreature()) {
@@ -881,6 +883,8 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 	}
 
 	forceUpdatePath();
+
+	return true;
 }
 
 // Pathfinding Events
