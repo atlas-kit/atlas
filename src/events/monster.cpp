@@ -16,6 +16,7 @@ struct MonsterHandlers
 {
 	int32_t onDropLoot = -1;
 	int32_t onSpawn = -1;
+	int32_t onDespawn = -1;
 } monsterHandlers;
 
 void loadMonsterScripts()
@@ -31,6 +32,7 @@ void loadMonsterScripts()
 
 	monsterHandlers.onDropLoot = scriptInterface.getMetaEvent("Monster", "onDropLoot");
 	monsterHandlers.onSpawn = scriptInterface.getMetaEvent("Monster", "onSpawn");
+	monsterHandlers.onDespawn = scriptInterface.getMetaEvent("Monster", "onDespawn");
 }
 
 } // namespace
@@ -101,6 +103,29 @@ void onDropLoot(const std::shared_ptr<Monster>& monster, const std::shared_ptr<C
 	}
 
 	tfs::events::getScriptInterface().callVoidFunction(2);
+}
+
+void onDespawn(const std::shared_ptr<Monster>& monster)
+{
+	// Monster:onDespawn()
+	if (monsterHandlers.onDespawn == -1) {
+		return;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::monster::onDespawn] Call stack overflow" << std::endl;
+		return;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(monsterHandlers.onDespawn, &tfs::events::getScriptInterface());
+
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(monsterHandlers.onDespawn);
+
+	tfs::lua::pushThing(L, monster);
+
+	tfs::events::getScriptInterface().callVoidFunction(1);
 }
 
 } // namespace tfs::events::monster

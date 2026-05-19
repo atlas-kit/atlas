@@ -147,6 +147,8 @@ public:
 	bool getIdleStatus() const { return isIdle; }
 
 	bool isInSpawnRange(const Position& pos) const;
+	void removeFromSpawn();
+	bool teleportToSpawn();
 
 	MonsterType* getMonsterType() { return mType; }
 	const MonsterType* getMonsterType() const { return mType; }

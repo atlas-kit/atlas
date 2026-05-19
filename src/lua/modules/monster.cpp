@@ -392,6 +392,31 @@ int luaMonsterWalkToSpawn(lua_State* L)
 	return 1;
 }
 
+int luaMonsterRemoveFromSpawn(lua_State* L)
+{
+	// monster:removeFromSpawn()
+	const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1);
+	if (!monster) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	monster->removeFromSpawn();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaMonsterTeleportToSpawn(lua_State* L)
+{
+	// monster:teleportToSpawn()
+	if (const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1)) {
+		tfs::lua::pushBoolean(L, monster->teleportToSpawn());
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int luaMonsterHasIcon(lua_State* L)
 {
 	// monster:hasSpecialIcon(iconId)
@@ -516,6 +541,9 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Monster", "isWalkingToSpawn", luaMonsterIsWalkingToSpawn);
 	lsi.registerMethod("Monster", "walkToSpawn", luaMonsterWalkToSpawn);
+
+	lsi.registerMethod("Monster", "removeFromSpawn", luaMonsterRemoveFromSpawn);
+	lsi.registerMethod("Monster", "teleportToSpawn", luaMonsterTeleportToSpawn);
 
 	lsi.registerMethod("Monster", "hasSpecialIcon", luaMonsterHasIcon);
 	lsi.registerMethod("Monster", "setSpecialIcon", luaMonsterSetIcon);
