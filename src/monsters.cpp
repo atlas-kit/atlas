@@ -183,8 +183,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellB
 		}
 
 		combatSpell = std::make_unique<CombatSpell>(nullptr, needTarget, needDirection);
-		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
-		                             scriptName)) {
+		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" + scriptName)) {
 			return false;
 		}
 
@@ -192,8 +191,8 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellB
 			return false;
 		}
 
-		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
-		                                                0);
+		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0,
+		                                                spellBlock.maxCombatValue, 0);
 	} else {
 		const auto combat = std::make_shared<Combat>();
 		if ((attr = node.attribute("length"))) {
@@ -249,7 +248,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellB
 			if ((attackAttribute = node.attribute("attack")) && (skillAttribute = node.attribute("skill"))) {
 				spellBlock.minCombatValue = 0;
 				spellBlock.maxCombatValue = -getMaxMeleeDamage(pugi::cast<int32_t>(skillAttribute.value()),
-				                                       pugi::cast<int32_t>(attackAttribute.value()));
+				                                               pugi::cast<int32_t>(attackAttribute.value()));
 			}
 
 			ConditionType_t conditionType = CONDITION_NONE;
@@ -510,7 +509,8 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellB
 			return false;
 		}
 
-		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue, 0);
+		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
+		                              0);
 		combatSpell = std::make_unique<CombatSpell>(combat, needTarget, needDirection);
 
 		for (auto attributeNode : node.children()) {
@@ -604,8 +604,8 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& spellBlock, c
 			return false;
 		}
 
-		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
-		                                                0);
+		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0,
+		                                                spellBlock.maxCombatValue, 0);
 	} else {
 		const auto combat = std::make_shared<Combat>();
 
@@ -782,7 +782,8 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& spellBlock, c
 			combat->setParam(COMBAT_PARAM_EFFECT, spell->effect);
 		}
 
-		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue, 0);
+		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
+		                              0);
 		combatSpell = std::make_unique<CombatSpell>(combat, spell->needTarget, spell->needDirection);
 	}
 

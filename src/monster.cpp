@@ -852,7 +852,8 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 		}
 	}
 
-	if (spellBlock.range != 0 && std::max<uint32_t>(pos.getDistanceX(targetPos), pos.getDistanceY(targetPos)) > spellBlock.range) {
+	if (spellBlock.range != 0 &&
+	    std::max<uint32_t>(pos.getDistanceX(targetPos), pos.getDistanceY(targetPos)) > spellBlock.range) {
 		inRange = false;
 		return false;
 	}
