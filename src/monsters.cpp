@@ -694,7 +694,6 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			} else {
 				std::cout << "[Error - Monsters::deserializeSpell] - " << description
 				          << " - missing speedchange/minspeedchange value" << std::endl;
-				delete spell;
 				return false;
 			}
 
