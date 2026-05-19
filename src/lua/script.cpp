@@ -903,7 +903,7 @@ LuaEnvironment::LuaEnvironment() : LuaScriptInterface("Main Interface") {}
 
 LuaEnvironment::~LuaEnvironment()
 {
-	delete testInterface;
+	testInterface.reset();
 	closeState();
 }
 
@@ -963,10 +963,10 @@ bool LuaEnvironment::closeState()
 LuaScriptInterface* LuaEnvironment::getTestInterface()
 {
 	if (!testInterface) {
-		testInterface = new LuaScriptInterface("Test Interface");
+		testInterface = std::make_unique<LuaScriptInterface>("Test Interface");
 		testInterface->initState();
 	}
-	return testInterface;
+	return testInterface.get();
 }
 
 std::shared_ptr<Combat> LuaEnvironment::getCombatObject(uint32_t id) const
@@ -1008,12 +1008,12 @@ AreaCombat* LuaEnvironment::getAreaObject(uint32_t id) const
 	if (it == areaMap.end()) {
 		return nullptr;
 	}
-	return it->second;
+	return it->second.get();
 }
 
 uint32_t LuaEnvironment::createAreaObject(LuaScriptInterface* luaInterface)
 {
-	areaMap[++lastAreaId] = new AreaCombat;
+	areaMap[++lastAreaId] = std::make_unique<AreaCombat>();
 	areaIdMap[luaInterface].push_back(lastAreaId);
 	return lastAreaId;
 }
@@ -1028,7 +1028,6 @@ void LuaEnvironment::clearAreaObjects(LuaScriptInterface* luaInterface)
 	for (uint32_t id : it->second) {
 		auto itt = areaMap.find(id);
 		if (itt != areaMap.end()) {
-			delete itt->second;
 			areaMap.erase(itt);
 		}
 	}
