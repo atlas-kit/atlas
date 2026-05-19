@@ -866,6 +866,7 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 
 		if (const auto& player = asPlayer()) {
 			player->setAttackedCreature(nullptr);
+			player->stopWalk();
 			player->sendCancelTarget();
 			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
 		}
