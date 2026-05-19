@@ -155,6 +155,9 @@ public:
 
 	void resetAttackTicks() { attackTicks = std::chrono::milliseconds::zero(); }
 
+	void clearTargetList() { targetList.clear(); }
+	void clearFriendList() { friendList.clear(); }
+
 private:
 	boost::container::flat_set<std::weak_ptr<Creature>, std::owner_less<std::weak_ptr<Creature>>> friendList;
 	std::deque<std::weak_ptr<Creature>> targetList;
@@ -193,12 +196,6 @@ private:
 	void updateLookDirection();
 
 	void updateTargetList();
-	void clearTargetList() { targetList.clear(); }
-	void clearFriendList() { friendList.clear(); }
-
-	void death(const std::shared_ptr<Creature>& lastHitCreature) override;
-	std::shared_ptr<Item> getCorpse(const std::shared_ptr<Creature>& lastHitCreature,
-	                                const std::shared_ptr<Creature>& mostDamageCreature) override;
 
 	void updateIdleStatus();
 
