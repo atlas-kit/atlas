@@ -124,12 +124,22 @@ enum integer_config_t
 	LAST_INTEGER_CONFIG /* this must be the last one */
 };
 
+struct ExperienceStage
+{
+	uint32_t minLevel;
+	uint32_t maxLevel;
+	float multiplier;
+};
+
+using ExperienceStages = std::vector<ExperienceStage>;
+
 bool load();
 
 const std::string& getString(string_config_t what);
 int32_t getNumber(integer_config_t what);
 bool getBoolean(boolean_config_t what);
 float getExperienceStage(uint32_t level);
+void setExperienceStages(ExperienceStages stages);
 
 bool setString(string_config_t what, std::string_view value);
 bool setNumber(integer_config_t what, int32_t value);

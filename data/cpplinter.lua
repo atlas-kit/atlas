@@ -55,6 +55,7 @@ configManager = {}
 ---@field getMonsters fun(): table
 ---@field loadMap fun(path: string): boolean
 ---@field getExperienceStage fun(level: number): number
+---@field setExperienceStages fun(stages: table): boolean
 ---@field getExperienceForLevel fun(level: number): number
 ---@field getMonsterCount fun(): number
 ---@field getPlayerCount fun(): number

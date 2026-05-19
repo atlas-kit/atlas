@@ -118,6 +118,34 @@ int luaGameGetExperienceStage(lua_State* L)
 	return 1;
 }
 
+int luaGameSetExperienceStages(lua_State* L)
+{
+	// Game.setExperienceStages(stages)
+	if (!lua_istable(L, 1)) {
+		tfs::lua::pushBoolean(L, false);
+		return 1;
+	}
+
+	ConfigManager::ExperienceStages stages;
+	lua_pushnil(L);
+	while (lua_next(L, 1) != 0) {
+		const auto tableIndex = lua_gettop(L);
+		if (!lua_istable(L, tableIndex)) {
+			lua_pop(L, 1); // skip malformed entry, keep key for lua_next
+			continue;
+		}
+		auto minLevel = tfs::lua::getField<uint32_t>(L, tableIndex, "minlevel", 1);
+		auto maxLevel = tfs::lua::getField<uint32_t>(L, tableIndex, "maxlevel", std::numeric_limits<uint32_t>::max());
+		auto multiplier = tfs::lua::getField<float>(L, tableIndex, "multiplier", 1);
+		stages.push_back(ConfigManager::ExperienceStage{minLevel, maxLevel, multiplier});
+		lua_pop(L, 4);
+	}
+
+	ConfigManager::setExperienceStages(std::move(stages));
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
 int luaGameGetExperienceForLevel(lua_State* L)
 {
 	// Game.getExperienceForLevel(level)
@@ -628,6 +656,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerMethod("Game", "loadMap", luaGameLoadMap);
 
 	lsi.registerMethod("Game", "getExperienceStage", luaGameGetExperienceStage);
+	lsi.registerMethod("Game", "setExperienceStages", luaGameSetExperienceStages);
 	lsi.registerMethod("Game", "getExperienceForLevel", luaGameGetExperienceForLevel);
 	lsi.registerMethod("Game", "getMonsterCount", luaGameGetMonsterCount);
 	lsi.registerMethod("Game", "getPlayerCount", luaGameGetPlayerCount);
