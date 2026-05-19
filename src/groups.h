@@ -17,11 +17,19 @@ struct Group
 class Groups
 {
 public:
-	bool load();
 	Group* getGroup(uint16_t id);
 
+	// Registers a group (used by the Lua loader). When a group with the same id
+	// already exists, it is updated in place so that Group* pointers held by
+	// online players stay valid across /reload scripts.
+	Group& addGroup(Group group);
+
+	// Maps a groups.xml-style flag name (e.g. "cannotusecombat") to its
+	// PlayerFlags bitmask value, or 0 when the name is unknown.
+	static uint64_t getFlagFromName(std::string_view name);
+
 private:
-	std::vector<Group> groups;
+	std::deque<Group> groups;
 };
 
 #endif // FS_GROUPS_H

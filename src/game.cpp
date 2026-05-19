@@ -76,7 +76,6 @@ void Game::setGameState(GameState_t newState)
 	gameState = newState;
 	switch (newState) {
 		case GAME_STATE_INIT: {
-			groups.load();
 			g_chat.load();
 
 			map.spawns.startup();

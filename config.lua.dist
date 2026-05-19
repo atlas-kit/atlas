@@ -104,7 +104,7 @@ cleanProtectionZones = false
 checkDuplicateStorageKeys = false
 
 -- VIP and Depot limits
--- NOTE: you can set custom limits per group in data/XML/groups.xml
+-- NOTE: you can set custom limits per group in data/scripts/groups.lua
 vipFreeLimit = 20
 vipPremiumLimit = 100
 depotFreeLimit = 2000
