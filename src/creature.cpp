@@ -312,10 +312,6 @@ void Creature::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool)
 		if (const auto& player = asPlayer()) {
 			player->sendCancelTarget();
 		}
-
-		if (const auto& monster = asMonster()) {
-			monster->resetAttackTicks();
-		}
 	}
 
 	if (const auto& followCreature = getFollowCreature(); creature == followCreature) {
@@ -350,10 +346,6 @@ void Creature::onChangeZone(ZoneType_t zone)
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
 		}
 
 		if (const auto& followCreature = getFollowCreature()) {
@@ -362,10 +354,6 @@ void Creature::onChangeZone(ZoneType_t zone)
 			if (const auto& player = asPlayer()) {
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
 			}
 		}
 	}
@@ -420,10 +408,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
-			}
 		} else {
 			updateFollowPath();
 		}
@@ -437,10 +421,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 			if (const auto& player = asPlayer()) {
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
-			}
-
-			if (const auto& monster = asMonster()) {
-				monster->resetAttackTicks();
 			}
 		} else {
 			if (hasExtraSwing()) {
@@ -480,10 +460,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 					if (zone == ZONE_PROTECTION) {
 						setAttackedCreature(nullptr);
 						setFollowCreature(nullptr);
-
-						if (const auto& monster = asMonster()) {
-							monster->resetAttackTicks();
-						}
 					}
 				}
 			}
@@ -782,6 +758,7 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 			}
 		}
 
+		// single source of truth: monster attack ticks reset only on attack-target loss (see #257)
 		if (const auto& monster = asMonster()) {
 			monster->resetAttackTicks();
 		}
