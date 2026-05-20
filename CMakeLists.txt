@@ -33,6 +33,9 @@ option(USE_LIBMYSQL "Use libmysql instead of libmariadb (vcpkg only)" OFF)
 # nor required by find_package, so the Boost backend has no C-client dependency at all.
 option(USE_BOOST_MYSQL "Use the Boost.MySQL database backend instead of the C client (vcpkg only)" OFF)
 if (USE_BOOST_MYSQL)
+    if (USE_LIBMYSQL)
+        message(WARNING "USE_LIBMYSQL is ignored when USE_BOOST_MYSQL is ON")
+    endif ()
     list(APPEND VCPKG_MANIFEST_FEATURES "boost-mysql")
 elseif (USE_LIBMYSQL)
     list(APPEND VCPKG_MANIFEST_FEATURES "libmysql")
@@ -204,7 +207,12 @@ if (USE_BOOST_MYSQL)
     find_package(boost_mysql CONFIG REQUIRED)
 endif ()
 
-include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
+# Only the C-client backend needs the MySQL/MariaDB headers, and only when the system
+# FindMySQL.cmake fallback is used (vcpkg-provided targets carry their own include dirs).
+if (NOT USE_BOOST_MYSQL AND MYSQL_INCLUDE_DIR)
+    include_directories(${MYSQL_INCLUDE_DIR})
+endif ()
 
 # *****************************************************************************
 # IPO / LTO
