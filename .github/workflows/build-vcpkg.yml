@@ -63,7 +63,7 @@ jobs:
       - name: CCache
         uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
         with:
-          key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt') }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt', 'vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-ccache-
 
