@@ -111,7 +111,7 @@ jobs:
         uses: lukka/get-cmake@f57d5c55bca331a49bdc52a6069f211f1363a275 # v4.3.2
 
       - name: CCache
-        uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639 # v1.2
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
         with:
           key: windows-ccache-${{ hashFiles('src/**', 'CMakeLists.txt') }}
           restore-keys: |
