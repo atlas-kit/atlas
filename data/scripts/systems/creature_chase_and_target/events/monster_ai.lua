@@ -2,10 +2,6 @@
 -- Main AI loop for monsters: target acquisition, periodic target
 -- re-evaluation, and chase/follow pathfinding. Runs every 1000ms via
 -- the onCreatureThink event.
---
--- Also replaces the C++ Monster::searchTarget() and Monster::selectTarget()
--- with Lua implementations using Game.getSpectators() + monster:isTarget().
--- C++ targetList is preserved for defense/summon systems.
 
 local function isInAttackRange(pos, creaturePos, monsterType)
 	local distX = math.abs(pos.x - creaturePos.x)

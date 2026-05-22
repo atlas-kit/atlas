@@ -1704,36 +1704,26 @@ bool Monster::canPushItems() const
 
 bool Monster::isFriendCreature(const std::shared_ptr<const Creature>& creature) const
 {
-	{
-		// Logic for Summons (Monster has a master)
-
-		if (const auto master = getMaster()) {
-			if (const auto masterPlayer = master->asPlayer()) {
-				// Identify the Player responsible for the target (the player itself or the summon's master)
-				std::shared_ptr<const Player> targetPlayer = creature->asPlayer();
-				if (!targetPlayer) {
-					if (const auto targetMaster = creature->getMaster()) {
-						targetPlayer = targetMaster->asPlayer();
-					}
-				}
-
-				// Friendly if the target's owner is the master himself or a partner (Party/Guild)
-				if (targetPlayer) {
-					return (targetPlayer == masterPlayer || masterPlayer->isPartner(targetPlayer));
+	if (const auto master = getMaster()) {
+		if (const auto masterPlayer = master->asPlayer()) {
+			std::shared_ptr<const Player> targetPlayer = creature->asPlayer();
+			if (!targetPlayer) {
+				if (const auto targetMaster = creature->getMaster()) {
+					targetPlayer = targetMaster->asPlayer();
 				}
 			}
-			// Summons of non-players or targets with no player owner are not "friends" by default
+
+			if (targetPlayer) {
+				return (targetPlayer == masterPlayer || masterPlayer->isPartner(targetPlayer));
+			}
 			return false;
 		}
+		// Summon of a non-player monster: fall through to wild-monster logic
 	}
 
-	{
-		// Logic for Wild Monsters (No master)
-
-		// Wild monsters consider other monsters as friends, provided they aren't summons
-		if (const auto targetMonster = creature->asMonster()) {
-			return !targetMonster->isSummon();
-		}
+	// Wild monsters / summon-of-monster: other wild monsters are friends
+	if (const auto targetMonster = creature->asMonster()) {
+		return !targetMonster->isSummon();
 	}
 
 	return false;
@@ -1741,34 +1731,24 @@ bool Monster::isFriendCreature(const std::shared_ptr<const Creature>& creature) 
 
 bool Monster::isOpponentCreature(const std::shared_ptr<const Creature>& creature) const
 {
-	// A friend is never an opponent
 	if (isFriendCreature(creature)) {
 		return false;
 	}
 
-	{
-		// Logic for Summons (Monster has a master)
-
-		if (const auto& master = getMaster()) {
-			const auto& playerMaster = master->asPlayer();
-			// If master is a player, attack everything except the master itself.
-			// If master is not a player, the monster is passive (returns false).
-			return playerMaster && (creature != playerMaster);
+	if (const auto& master = getMaster()) {
+		const auto& playerMaster = master->asPlayer();
+		if (playerMaster) {
+			return creature != playerMaster;
 		}
+		// Summon of a non-player monster: fall through to wild-monster logic
 	}
 
-	{
-		// Logic for Wild Monsters (No master)
+	if (const auto& player = creature->asPlayer()) {
+		return !player->hasFlag(PlayerFlag_IgnoredByMonsters);
+	}
 
-		// Check if the target is a Player
-		if (const auto& player = creature->asPlayer()) {
-			return !player->hasFlag(PlayerFlag_IgnoredByMonsters);
-		}
-
-		// Check if the target is a Summon of a Player
-		if (const auto& creatureMaster = creature->getMaster()) {
-			return creatureMaster->asPlayer() != nullptr;
-		}
+	if (const auto& creatureMaster = creature->getMaster()) {
+		return creatureMaster->asPlayer() != nullptr;
 	}
 
 	return false;
