@@ -1,7 +1,7 @@
 -- player_infight_on_targeted.lua
 -- Manages the in-fight condition (PZ-lock timer) for players.
 -- In-fight is applied in three situations:
---   1. A player selects an attack target → onTargetCreatureChanged
+--   1. A player selects an attack target → onChangeTarget
 --   2. A player takes non-healing damage or loses mana → onChangeHealth / onChangeMana
 --   3. A player maintains an attack target over time → onCreatureThink (renewal)
 -- Also clears targets for players who log in inside a Protection Zone.
@@ -21,7 +21,7 @@ do
 
 	-- When a player targets a creature (or is targeted), both sides
 	-- gain the in-fight condition.
-	function event.onCreatureTargetCreatureChanged(creature)
+	function event.onCreatureChangeTarget(creature)
 		local targetCreature = creature:getTargetCreature()
 		if not targetCreature then
 			return

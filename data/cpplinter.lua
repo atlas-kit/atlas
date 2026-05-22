@@ -1008,8 +1008,8 @@ Weapon = {}
 ---@field onGameStartup fun():nil
 ---@field onGameShutdown fun():nil
 ---@field onGameSave fun():nil
----@field onCreatureChaseCreatureChanged fun(creature:Creature):nil
----@field onCreatureTargetCreatureChanged fun(creature:Creature):nil
+---@field onCreatureChangeChase fun(creature:Creature):nil
+---@field onCreatureChangeTarget fun(creature:Creature):nil
 ---@field onCreatureZoneChanged fun(creature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
 ---@field onCreatureNearbyCreatureZoneChanged fun(creature:Creature, nearbyCreature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
 ---@field onCreatureMoved fun(creature:Creature, fromTile:Tile, toTile:Tile):nil

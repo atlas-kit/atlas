@@ -7,7 +7,7 @@ local event = Event()
 
 -- Triggered whenever the player's chase/follow target changes.
 -- This script ensures that if a player starts following a different creature, they stop attacking their current target.
-function event.onCreatureChaseCreatureChanged(creature)
+function event.onCreatureChangeChase(creature)
 	-- Ensure the entity is a player.
 	local player = creature:asPlayer()
 	if not player then

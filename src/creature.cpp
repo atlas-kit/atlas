@@ -1239,7 +1239,7 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 		chaseCreature.reset();
 		hasFollowPath = false;
 		cancelNextWalk = true;
-		tfs::events::creature::onChaseCreatureChanged(asCreature());
+		tfs::events::creature::onChangeChase(asCreature());
 		return;
 	}
 
@@ -1277,7 +1277,7 @@ void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 	}
 	updateFollowPath();
 
-	tfs::events::creature::onChaseCreatureChanged(asCreature());
+	tfs::events::creature::onChangeChase(asCreature());
 }
 
 void Creature::setTargetCreature(const std::shared_ptr<Creature>& creature)
@@ -1312,5 +1312,5 @@ void Creature::setTargetCreature(const std::shared_ptr<Creature>& creature)
 		summon->setTargetCreature(creature);
 	}
 
-	tfs::events::creature::onTargetCreatureChanged(asCreature());
+	tfs::events::creature::onChangeTarget(asCreature());
 }

@@ -6,7 +6,7 @@
 local event = Event()
 
 -- Triggered when a player selects a new target or loses their current one.
-function event.onCreatureTargetCreatureChanged(creature)
+function event.onCreatureChangeTarget(creature)
 	-- Ensure the logic only applies to players.
 	local player = creature:asPlayer()
 	if not player then

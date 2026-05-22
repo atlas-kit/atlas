@@ -6,7 +6,7 @@
 local event = Event()
 
 -- Triggered whenever the creature's target changes (lost, gained, or swapped).
-function event.onCreatureTargetCreatureChanged(creature)
+function event.onCreatureChangeTarget(creature)
 	-- Ensure the logic only applies if the creature is a monster.
 	local monster = creature:asMonster()
 	if not monster then

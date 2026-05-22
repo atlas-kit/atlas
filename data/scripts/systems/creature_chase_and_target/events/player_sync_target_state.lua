@@ -7,7 +7,7 @@ local event = Event()
 
 -- Triggered when a player's combat target changes.
 -- This ensures the client-side UI stays in sync with the server-side target state.
-function event.onCreatureTargetCreatureChanged(creature)
+function event.onCreatureChangeTarget(creature)
 	-- Ensure the entity is a player.
 	local player = creature:asPlayer()
 	if not player then

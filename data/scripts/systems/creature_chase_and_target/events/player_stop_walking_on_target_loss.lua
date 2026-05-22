@@ -6,7 +6,7 @@
 local event = Event()
 
 -- Triggered whenever the player's attack target changes or is lost.
-function event.onCreatureTargetCreatureChanged(creature)
+function event.onCreatureChangeTarget(creature)
 	-- Verify that the entity is a player.
 	local player = creature:asPlayer()
 	if not player then

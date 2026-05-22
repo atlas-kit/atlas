@@ -12,8 +12,8 @@ void load();
 void reload();
 int32_t getOnHearScriptId();
 
-void onChaseCreatureChanged(const std::shared_ptr<Creature>& creature);
-void onTargetCreatureChanged(const std::shared_ptr<Creature>& creature);
+void onChangeChase(const std::shared_ptr<Creature>& creature);
+void onChangeTarget(const std::shared_ptr<Creature>& creature);
 void onMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& fromTile,
              const std::shared_ptr<Tile>& toTile);
 void onNearbyCreatureMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature,

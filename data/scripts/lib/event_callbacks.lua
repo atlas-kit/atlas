@@ -29,8 +29,8 @@ ec.onGameStartup = {}
 ec.onGameShutdown = {}
 ec.onGameSave = {}
 -- Creature
-ec.onCreatureChaseCreatureChanged = {}
-ec.onCreatureTargetCreatureChanged = {}
+ec.onCreatureChangeChase = {}
+ec.onCreatureChangeTarget = {}
 ec.onCreatureZoneChanged = {}
 ec.onCreatureNearbyCreatureZoneChanged = {}
 ec.onCreatureMoved = {}

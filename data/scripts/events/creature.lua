@@ -4,15 +4,15 @@
 -- system, allowing script-side handlers (registered via Event()) to
 -- react to game-world events (move, zone change, combat, etc.).
 
-function Creature:onChaseCreatureChanged()
-	if Event.onCreatureChaseCreatureChanged then
-		Event.onCreatureChaseCreatureChanged(self)
+function Creature:onChangeChase()
+	if Event.onCreatureChangeChase then
+		Event.onCreatureChangeChase(self)
 	end
 end
 
-function Creature:onTargetCreatureChanged()
-	if Event.onCreatureTargetCreatureChanged then
-		Event.onCreatureTargetCreatureChanged(self)
+function Creature:onChangeTarget()
+	if Event.onCreatureChangeTarget then
+		Event.onCreatureChangeTarget(self)
 	end
 end
 

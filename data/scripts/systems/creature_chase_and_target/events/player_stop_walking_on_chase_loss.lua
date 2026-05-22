@@ -6,7 +6,7 @@
 local event = Event()
 
 -- Triggered whenever the player's chase/follow target changes.
-function event.onCreatureChaseCreatureChanged(creature)
+function event.onCreatureChangeChase(creature)
 	-- Verify that the entity is a player.
 	local player = creature:asPlayer()
 	if not player then
