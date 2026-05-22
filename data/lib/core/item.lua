@@ -77,6 +77,13 @@ do
 				elseif not def.cmp and attr and attr ~= 0 then
 					return attr
 				end
+				-- If the item has the attribute set (even to 0), respect that
+				-- value instead of falling through to the ItemType default.
+				-- This prevents an expired-but-not-yet-cleaned item from
+				-- reporting its template duration as if it were brand-new.
+				if self:hasAttribute(def.key) then
+					return attr
+				end
 				local default = ItemType["get" .. name]
 				return default and default(self:getType()) or nil
 			end

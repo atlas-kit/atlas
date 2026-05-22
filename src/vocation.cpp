@@ -51,17 +51,17 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			} else if (boost::iequals(attrName, "gainmana")) {
 				voc.gainMana = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "gainhpticks")) {
-				voc.gainHealthTicks = pugi::cast<uint32_t>(attrNode.value());
+				voc.gainHealthTicks = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "gainhpamount")) {
 				voc.gainHealthAmount = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "gainmanaticks")) {
-				voc.gainManaTicks = pugi::cast<uint32_t>(attrNode.value());
+				voc.gainManaTicks = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "gainmanaamount")) {
 				voc.gainManaAmount = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "manamultiplier")) {
 				voc.manaMultiplier = pugi::cast<float>(attrNode.value());
 			} else if (boost::iequals(attrName, "attackspeed")) {
-				voc.attackSpeed = pugi::cast<uint32_t>(attrNode.value());
+				voc.attackSpeed = std::chrono::milliseconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else if (boost::iequals(attrName, "basespeed")) {
 				voc.baseSpeed = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "soulmax")) {
@@ -71,7 +71,7 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			} else if (boost::iequals(attrName, "fromvoc")) {
 				voc.fromVocation = pugi::cast<uint32_t>(attrNode.value());
 			} else if (boost::iequals(attrName, "nopongkicktime")) {
-				voc.noPongKickTime = pugi::cast<uint32_t>(attrNode.value()) * 1000;
+				voc.noPongKickTime = std::chrono::seconds{pugi::cast<uint32_t>(attrNode.value())};
 			} else {
 				std::cout << "[Notice - Vocations::loadFromXml] Unknown attribute: \"" << attrName
 				          << "\" for vocation: " << voc.id << std::endl;
@@ -111,6 +111,18 @@ bool Vocations::loadFromXml(std::istream& is, std::string_view filename)
 			}
 		}
 	}
+	vocationByName.clear();
+	vocationByName.reserve(vocationsMap.size());
+
+	promotedVocations.clear();
+	promotedVocations.reserve(vocationsMap.size());
+
+	for (const auto& [id, voc] : vocationsMap) {
+		vocationByName[voc.name] = id;
+		if (voc.fromVocation != VOCATION_NONE && voc.fromVocation != id) {
+			promotedVocations[voc.fromVocation] = id;
+		}
+	}
 	return true;
 }
 
@@ -126,16 +138,14 @@ Vocation* Vocations::getVocation(uint16_t id)
 
 int32_t Vocations::getVocationId(std::string_view name) const
 {
-	auto it = std::find_if(vocationsMap.begin(), vocationsMap.end(),
-	                       [=](auto it) { return boost::iequals(name, it.second.name); });
-	return it != vocationsMap.end() ? it->first : -1;
+	auto it = vocationByName.find(name);
+	return it != vocationByName.end() ? it->second : -1;
 }
 
 uint16_t Vocations::getPromotedVocation(uint16_t id) const
 {
-	auto it = std::find_if(vocationsMap.begin(), vocationsMap.end(),
-	                       [id](auto it) { return it.second.fromVocation == id && it.first != id; });
-	return it != vocationsMap.end() ? it->first : VOCATION_NONE;
+	auto it = promotedVocations.find(id);
+	return it != promotedVocations.end() ? it->second : VOCATION_NONE;
 }
 
 static const uint32_t skillBase[SKILL_LAST + 1] = {50, 50, 50, 50, 30, 100, 20};

@@ -31,7 +31,7 @@ std::string randomBytes(size_t length);
 Position getNextPosition(Direction direction, Position pos);
 Direction getDirectionTo(const Position& from, const Position& to);
 
-std::string formatDateShort(time_t time);
+std::string formatDateShort(std::chrono::system_clock::time_point time);
 
 uint16_t getDepotBoxId(uint16_t index);
 MagicEffectClasses getMagicEffect(const std::string& strValue);
@@ -59,8 +59,6 @@ uint8_t clientFluidToServer(uint8_t clientFluid);
 itemAttrTypes stringToItemAttribute(const std::string& str);
 
 const char* getReturnMessage(ReturnValue value);
-
-int64_t OTSYS_TIME();
 
 SpellGroup_t stringToSpellGroup(const std::string& value);
 
@@ -114,5 +112,27 @@ private:
 };
 
 } // namespace tfs
+
+struct CaseInsensitiveStringHash
+{
+	using is_transparent = void;
+
+	size_t operator()(std::string_view sv) const noexcept
+	{
+		size_t h = 0xcbf29ce484222325ULL;
+		for (unsigned char c : sv) {
+			h ^= static_cast<size_t>(std::tolower(c));
+			h *= 0x100000001b3ULL;
+		}
+		return h;
+	}
+};
+
+struct CaseInsensitiveStringEqual
+{
+	using is_transparent = void;
+
+	bool operator()(std::string_view a, std::string_view b) const noexcept { return boost::iequals(a, b); }
+};
 
 #endif // FS_TOOLS_H

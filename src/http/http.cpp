@@ -1,3 +1,5 @@
+#include "../otpch.h"
+
 #define BOOST_ASIO_NO_DEPRECATED
 
 #include "http.h"
@@ -15,11 +17,7 @@ asio::io_context ioc;
 
 std::vector<std::thread> workers = {};
 
-auto startTimepoint = std::chrono::system_clock::now();
-
 } // namespace
-
-std::chrono::system_clock::duration tfs::http::uptime() { return std::chrono::system_clock::now() - startTimepoint; }
 
 void tfs::http::start(bool bind_to_specific_ip, std::string_view ip, unsigned short port /*= 8080*/,
                       int threads /*= 1*/)

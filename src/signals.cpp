@@ -8,11 +8,10 @@
 #include "actions.h"
 #include "configmanager.h"
 #include "databasetasks.h"
-#include "events.h"
+#include "events/events.h"
+#include "events/game.h"
 #include "game.h"
-#include "globalevent.h"
 #include "monsters.h"
-#include "mounts.h"
 #include "movement.h"
 #include "scheduler.h"
 #include "spells.h"
@@ -33,7 +32,6 @@ extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern std::unique_ptr<Weapons> g_weapons;
 extern Game g_game;
-extern GlobalEvents* g_globalEvents;
 extern Chat g_chat;
 extern LuaEnvironment g_luaEnvironment;
 
@@ -79,12 +77,6 @@ void sighupHandler()
 
 	g_weapons->loadDefaults();
 	std::cout << "Reloaded weapons." << std::endl;
-
-	g_game.mounts.reload();
-	std::cout << "Reloaded mounts." << std::endl;
-
-	g_globalEvents->reload();
-	std::cout << "Reloaded globalevents." << std::endl;
 
 	tfs::events::reload();
 	std::cout << "Reloaded events." << std::endl;

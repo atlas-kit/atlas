@@ -4,7 +4,6 @@ function goldenOutfitMemorial.onUse(player, item, fromPosition, target, toPositi
 	local resultId = db.storeQuery("SELECT `name`, `value` FROM `player_storage` INNER JOIN `players` as `p` ON `p`.`id` = `player_id` WHERE `key` = " .. PlayerStorageKeys.goldenOutfit .. " AND `value` >= 1;")
 	if not resultId then
 		player:showTextDialog(item.itemid, "The Golden Outfit has not been acquired by anyone yet.")
-		result.free(resultId)
 		return true
 	end
 

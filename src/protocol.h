@@ -70,7 +70,6 @@ protected:
 	}
 	void enableXTEAEncryption() { encryptionEnabled = true; }
 	void setXTEAKey(const xtea::key& key) { this->key = xtea::expand_key(key); }
-	void setChecksumMode(checksumMode_t newMode) { checksumMode = newMode; }
 
 	static bool RSA_decrypt(NetworkMessage& msg);
 
@@ -89,7 +88,6 @@ private:
 	xtea::round_keys key;
 	uint32_t sequenceNumber = 0;
 	bool encryptionEnabled = false;
-	checksumMode_t checksumMode = CHECKSUM_ADLER;
 	bool rawMessages = false;
 
 	z_stream zstream{};

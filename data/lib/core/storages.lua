@@ -2,7 +2,6 @@
 Reserved player storage ranges:
 - 300000 to 301000+ reserved for achievements
 - 20000 to 21000+ reserved for achievement progress
-- 10000000 to 20000000 reserved for outfits and mounts on source
 ]]--
 
 AccountStorageKeys = {
@@ -49,4 +48,10 @@ PlayerStorageKeys = {
 	-- Bestiary:
 	bestiaryKillsBase = 400000,
 	bestiaryTrackerBase = 500000,
+
+	-- Outfits and mounts:
+	currentMount = 60000,
+	randomizeMount = 60001,
+	outfitsBase = 600000,
+	mountsBase = 610000,
 }

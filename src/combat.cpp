@@ -6,7 +6,7 @@
 #include "combat.h"
 
 #include "configmanager.h"
-#include "events.h"
+#include "events/creature.h"
 #include "game.h"
 #include "lua/env.h"
 #include "lua/error.h"
@@ -327,12 +327,12 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 		}
 
 		case COMBAT_PARAM_EFFECT: {
-			params.impactEffect = static_cast<uint8_t>(value);
+			params.impactEffect = static_cast<uint16_t>(value);
 			return true;
 		}
 
 		case COMBAT_PARAM_DISTANCEEFFECT: {
-			params.distanceEffect = static_cast<uint8_t>(value);
+			params.distanceEffect = static_cast<uint16_t>(value);
 			return true;
 		}
 
@@ -553,7 +553,7 @@ void Combat::postCombatEffects(const std::shared_ptr<Creature>& caster, const Po
 }
 
 void Combat::addDistanceEffect(const std::shared_ptr<Creature>& caster, const Position& fromPos, const Position& toPos,
-                               uint8_t effect)
+                               uint16_t effect)
 {
 	if (effect == CONST_ANI_WEAPONTYPE) {
 		if (!caster) {
@@ -609,9 +609,9 @@ void Combat::doCombat(const std::shared_ptr<Creature>& caster, const std::shared
 			if (params.origin != ORIGIN_MELEE) {
 				for (const auto& condition : params.conditionList) {
 					if (caster == target || !target->isImmune(condition->getType())) {
-						Condition* conditionCopy = condition->clone();
+						auto conditionCopy = condition->clone();
 						conditionCopy->setParam(CONDITION_PARAM_OWNER, caster->getID());
-						target->addCombatCondition(conditionCopy);
+						target->addCombatCondition(std::move(conditionCopy));
 					}
 				}
 			}
@@ -693,13 +693,13 @@ void Combat::doCombat(const std::shared_ptr<Creature>& caster, const Position& p
 					    (caster != creature && Combat::canDoCombat(caster, creature) == RETURNVALUE_NOERROR)) {
 						for (const auto& condition : params.conditionList) {
 							if (caster == creature || !creature->isImmune(condition->getType())) {
-								Condition* conditionCopy = condition->clone();
+								auto conditionCopy = condition->clone();
 								if (caster) {
 									conditionCopy->setParam(CONDITION_PARAM_OWNER, caster->getID());
 								}
 
 								// TODO: infight condition until all aggressive conditions has ended
-								creature->addCombatCondition(conditionCopy);
+								creature->addCombatCondition(std::move(conditionCopy));
 							}
 						}
 					}
@@ -767,13 +767,13 @@ void Combat::doTargetCombat(const std::shared_ptr<Creature>& caster, const std::
 		if (damage.blockType == BLOCK_NONE || damage.blockType == BLOCK_ARMOR) {
 			for (const auto& condition : params.conditionList) {
 				if (caster == target || !target->isImmune(condition->getType())) {
-					Condition* conditionCopy = condition->clone();
+					auto conditionCopy = condition->clone();
 					if (caster) {
 						conditionCopy->setParam(CONDITION_PARAM_OWNER, caster->getID());
 					}
 
 					// TODO: infight condition until all aggressive conditions has ended
-					target->addCombatCondition(conditionCopy);
+					target->addCombatCondition(std::move(conditionCopy));
 				}
 			}
 		}
@@ -935,13 +935,13 @@ void Combat::doAreaCombat(const std::shared_ptr<Creature>& caster, const Positio
 			if (damage.blockType == BLOCK_NONE || damage.blockType == BLOCK_ARMOR) {
 				for (const auto& condition : params.conditionList) {
 					if (caster == creature || !creature->isImmune(condition->getType())) {
-						Condition* conditionCopy = condition->clone();
+						auto conditionCopy = condition->clone();
 						if (caster) {
 							conditionCopy->setParam(CONDITION_PARAM_OWNER, caster->getID());
 						}
 
 						// TODO: infight condition until all aggressive conditions has ended
-						creature->addCombatCondition(conditionCopy);
+						creature->addCombatCondition(std::move(conditionCopy));
 					}
 				}
 			}
@@ -1334,7 +1334,7 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 	}
 
 	if (const ItemType& it = items[getID()]; it.conditionDamage) {
-		Condition* conditionCopy = it.conditionDamage->clone();
+		auto conditionCopy = it.conditionDamage->clone();
 
 		if (uint32_t ownerId = getOwner()) {
 			bool harmfulField = true;
@@ -1355,11 +1355,12 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 				}
 			}
 
-			if (!harmfulField || (OTSYS_TIME() - createTime <= 5000) || creature->hasBeenAttacked(ownerId)) {
+			if (!harmfulField || (std::chrono::steady_clock::now() - createTime <= 5s) ||
+			    creature->hasBeenAttacked(ownerId)) {
 				conditionCopy->setParam(CONDITION_PARAM_OWNER, ownerId);
 			}
 		}
 
-		creature->addCondition(conditionCopy);
+		creature->addCondition(std::move(conditionCopy));
 	}
 }

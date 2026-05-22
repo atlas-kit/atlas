@@ -9,7 +9,7 @@ class LuaScriptInterface;
 class Event
 {
 public:
-	explicit Event(LuaScriptInterface* interface);
+	explicit Event(LuaScriptInterface* luaInterface);
 	virtual ~Event() = default;
 
 	virtual bool configureEvent(const pugi::xml_node& node) = 0;
@@ -59,7 +59,7 @@ class CallBack
 public:
 	CallBack() = default;
 
-	bool loadCallBack(LuaScriptInterface* interface, const std::string& name);
+	bool loadCallBack(LuaScriptInterface* luaInterface, const std::string& name);
 
 protected:
 	int32_t scriptId = 0;
