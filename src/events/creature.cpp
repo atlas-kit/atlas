@@ -24,7 +24,6 @@ struct CreatureHandlers
 	int32_t onAreaCombat = -1;
 	int32_t onTargetCombat = -1;
 	int32_t onHear = -1;
-	int32_t onChangeZone = -1;
 	int32_t onUpdateStorage = -1;
 	int32_t onChangeHealth = -1;
 	int32_t onChangeMana = -1;
@@ -55,7 +54,6 @@ void loadCreatureScripts()
 	creatureHandlers.onAreaCombat = scriptInterface.getMetaEvent("Creature", "onAreaCombat");
 	creatureHandlers.onTargetCombat = scriptInterface.getMetaEvent("Creature", "onTargetCombat");
 	creatureHandlers.onHear = scriptInterface.getMetaEvent("Creature", "onHear");
-	creatureHandlers.onChangeZone = scriptInterface.getMetaEvent("Creature", "onChangeZone");
 	creatureHandlers.onUpdateStorage = scriptInterface.getMetaEvent("Creature", "onUpdateStorage");
 	creatureHandlers.onChangeHealth = scriptInterface.getMetaEvent("Creature", "onChangeHealth");
 	creatureHandlers.onChangeMana = scriptInterface.getMetaEvent("Creature", "onChangeMana");
@@ -355,29 +353,6 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
-void onChangeZone(const std::shared_ptr<Creature>& creature, ZoneType_t fromZone, ZoneType_t toZone)
-{
-	// Creature:onChangeZone(fromZone, toZone)
-	if (creatureHandlers.onChangeZone == -1) {
-		return;
-	}
-
-	if (!tfs::lua::reserveScriptEnv()) {
-		std::cout << "[Error - tfs::events::creature::onChangeZone] Call stack overflow" << std::endl;
-		return;
-	}
-
-	const auto env = tfs::lua::getScriptEnv();
-	env->setScriptId(creatureHandlers.onChangeZone, &tfs::events::getScriptInterface());
-
-	const auto L = tfs::events::getScriptInterface().getLuaState();
-	tfs::events::getScriptInterface().pushFunction(creatureHandlers.onChangeZone);
-
-	tfs::lua::pushThing(L, creature);
-	tfs::lua::pushNumber(L, fromZone);
-	tfs::lua::pushNumber(L, toZone);
-	tfs::events::getScriptInterface().callVoidFunction(3);
-}
 
 void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
                      std::optional<int32_t> oldValue, bool isSpawn)

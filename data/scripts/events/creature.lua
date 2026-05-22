@@ -46,12 +46,6 @@ function Creature:onHear(speaker, words, type)
 	end
 end
 
-function Creature:onChangeZone(fromZone, toZone)
-	if Event.onCreatureZoneChanged then
-		Event.onCreatureZoneChanged(self, fromZone, toZone)
-	end
-end
-
 function Creature:onMoved(fromTile, toTile)
 	if Event.onCreatureMoved then
 		Event.onCreatureMoved(self, fromTile, toTile)

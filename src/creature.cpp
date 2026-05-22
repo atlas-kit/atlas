@@ -330,7 +330,6 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 		}
 
 		if (newTile->getZone() != oldTile->getZone()) {
-			tfs::events::creature::onChangeZone(asCreature(), oldTile->getZone(), newTile->getZone());
 			onChangeZone(getZone());
 		}
 	}
