@@ -1206,11 +1206,6 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
-	if (const auto& chaseCreature = getChaseCreature();
-	    hasFollowPath && (creature == chaseCreature || (creature.get() == this && chaseCreature))) {
-		g_dispatcher.addTask([id = getID()]() { g_game.updateCreatureWalk(id); });
-	}
-
 	if (creature.get() != this) {
 		return;
 	}

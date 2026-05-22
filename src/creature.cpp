@@ -24,6 +24,11 @@ Creature::Creature() { onIdleStatus(); }
 
 Creature::~Creature()
 {
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
 		summon->removeMaster();
 	}
@@ -114,15 +119,18 @@ void Creature::onThink(std::chrono::milliseconds interval)
 	tfs::events::creature::onThink(asCreature(), interval);
 }
 
-void Creature::forceUpdatePath()
+void Creature::updateFollowPath()
 {
-	if (targetCreature.expired() && chaseCreature.expired()) {
+	if (eventFollowPath != 0) {
 		return;
 	}
 
-	lastPathUpdate =
-	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
-	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
+	if (chaseCreature.expired()) {
+		return;
+	}
+
+	eventFollowPath = g_scheduler.addEvent(
+	    createSchedulerTask(FOLLOW_EVENT_INTERVAL, [id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
 void Creature::onIdleStatus()
@@ -166,14 +174,6 @@ void Creature::onWalk()
 	if (eventWalk != 0) {
 		eventWalk = 0;
 		addEventWalk();
-	}
-
-	if (!targetCreature.expired() || !chaseCreature.expired()) {
-		if (lastPathUpdate < std::chrono::steady_clock::now()) {
-			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
-			lastPathUpdate = std::chrono::steady_clock::now() +
-			                 std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
-		}
 	}
 }
 
@@ -643,13 +643,7 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate >= std::chrono::steady_clock::now()) {
-			continue;
-		}
-
-		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
-		follower->lastPathUpdate =
-		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
+		follower->updateFollowPath();
 	}
 }
 
@@ -1232,45 +1226,56 @@ std::optional<int32_t> Creature::getStorageValue(uint32_t key) const
 
 void Creature::setChaseCreature(const std::shared_ptr<Creature>& creature)
 {
-	if (creature) {
-		if (tfs::owner_equal(chaseCreature, creature)) {
-			return;
-		}
-
-		const auto& creaturePosition = creature->getPosition();
-		if (creaturePosition.z != getPosition().z || !canSee(creaturePosition) || creature->isInvisible()) {
-			return;
-		}
-
+	if (!creature) {
 		if (const auto& oldChase = getChaseCreature()) {
 			oldChase->removeFollower(asCreature());
 		}
 
-		chaseCreature = creature;
-		creature->addFollower(asCreature());
-
-		if (!listWalkDir.empty()) {
-			listWalkDir.clear();
-			onWalkAborted();
-		}
-
-		forceUpdatePath();
-	} else {
-		if (!chaseCreature.expired()) {
-			if (const auto& oldChase = getChaseCreature()) {
-				oldChase->removeFollower(asCreature());
-			}
-		}
-
-		if (!listWalkDir.empty()) {
-			listWalkDir.clear();
-			onWalkAborted();
+		if (eventFollowPath != 0) {
+			g_scheduler.stopEvent(eventFollowPath);
+			eventFollowPath = 0;
 		}
 
 		chaseCreature.reset();
+		hasFollowPath = false;
+		cancelNextWalk = true;
+		tfs::events::creature::onChaseCreatureChanged(asCreature());
+		return;
 	}
 
+	if (tfs::owner_equal(chaseCreature, creature)) {
+		return;
+	}
+
+	const auto& creaturePosition = creature->getPosition();
+	if (creaturePosition.z != getPosition().z || !canSee(creaturePosition) || creature->isInvisible()) {
+		if (const auto& player = asPlayer()) {
+			player->setTargetCreature(nullptr);
+			player->stopWalk();
+			player->sendCancelTarget();
+			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
+		}
+		return;
+	}
+
+	if (const auto& oldChase = getChaseCreature()) {
+		oldChase->removeFollower(asCreature());
+	}
+
+	chaseCreature = creature;
+	creature->addFollower(asCreature());
 	hasFollowPath = false;
+
+	if (!listWalkDir.empty()) {
+		listWalkDir.clear();
+		onWalkAborted();
+	}
+
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+	updateFollowPath();
 
 	tfs::events::creature::onChaseCreatureChanged(asCreature());
 }
@@ -1290,7 +1295,7 @@ void Creature::setTargetCreature(const std::shared_ptr<Creature>& creature)
 		targetCreature = creature;
 		onAttackedCreature(creature);
 
-		forceUpdatePath();
+		updateFollowPath();
 
 		if (const auto& player = asPlayer()) {
 			g_dispatcher.addTask([id = player->getID()]() { g_game.checkCreatureAttack(id); });

@@ -3574,6 +3574,7 @@ void Game::checkCreatureWalk(uint32_t creatureId)
 void Game::updateCreatureWalk(uint32_t creatureId)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
+		creature->completeEventFollowWalk();
 		if (!creature->isDead()) {
 			creature->goToFollowCreature();
 		}
@@ -3645,8 +3646,12 @@ void Game::updateCreaturesFollowPath(size_t index)
 	                                         [=, this]() { updateCreaturesFollowPath((index + 1) % EVENT_CREATURECOUNT); }));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
-		if (!creature->isDead()) {
-			creature->forceUpdatePath();
+		if (creature->isDead()) {
+			continue;
+		}
+
+		if (creature->getChaseCreature() && !creature->hasPathToFollow()) {
+			creature->updateFollowPath();
 		}
 	}
 }

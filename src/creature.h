@@ -52,6 +52,7 @@ struct FindPathParams
 inline constexpr int32_t EVENT_CREATURECOUNT = 10;
 inline constexpr auto EVENT_CREATURE_THINK_INTERVAL = 1000ms;
 inline constexpr auto EVENT_CHECK_CREATURE_INTERVAL = EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT;
+inline constexpr auto FOLLOW_EVENT_INTERVAL = 100ms;
 
 static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
 static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();
@@ -198,6 +199,8 @@ public:
 	void stopEventWalk();
 	virtual void goToFollowCreature() = 0;
 	void updateFollowCreaturePath(FindPathParams& fpp);
+	void completeEventFollowWalk() { eventFollowPath = 0; }
+	bool hasPathToFollow() const { return hasFollowPath; }
 
 	// walk events
 	virtual void onWalk(Direction& dir);
@@ -292,7 +295,7 @@ public:
 	virtual void onThink(std::chrono::milliseconds interval);
 	virtual void onAttacking(std::chrono::milliseconds) {}
 
-	virtual void forceUpdatePath();
+	void updateFollowPath();
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
@@ -373,7 +376,7 @@ protected:
 	std::vector<Direction> listWalkDir;
 
 	std::chrono::steady_clock::time_point lastStep{};
-	std::chrono::steady_clock::time_point lastPathUpdate{};
+	uint32_t eventFollowPath = 0;
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
