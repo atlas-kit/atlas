@@ -121,7 +121,7 @@ void Creature::forceUpdatePath()
 	}
 
 	lastPathUpdate =
-	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
 	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
@@ -172,7 +172,7 @@ void Creature::onWalk()
 		if (lastPathUpdate < std::chrono::steady_clock::now()) {
 			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
 			lastPathUpdate = std::chrono::steady_clock::now() +
-			                 std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+			                 std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
 		}
 	}
 }
@@ -650,7 +650,7 @@ void Creature::updateFollowersPaths()
 
 		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
 		follower->lastPathUpdate =
-		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)};
 	}
 }
 

@@ -54,8 +54,8 @@ void Game::start(ServiceManager* manager)
 	serviceManager = manager;
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
-	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
-	                                         [this]() { updateCreaturesPath(0); }));
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)},
+	                                         [this]() { updateCreaturesFollowPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 }
 
@@ -3639,10 +3639,10 @@ void Game::checkCreatures(size_t index)
 	cleanup();
 }
 
-void Game::updateCreaturesPath(size_t index)
+void Game::updateCreaturesFollowPath(size_t index)
 {
-	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::PATHFINDING_INTERVAL)),
-	                                         [=, this]() { updateCreaturesPath((index + 1) % EVENT_CREATURECOUNT); }));
+	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)),
+	                                         [=, this]() { updateCreaturesFollowPath((index + 1) % EVENT_CREATURECOUNT); }));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
 		if (!creature->isDead()) {
