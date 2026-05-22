@@ -67,15 +67,9 @@ void loadCreatureScripts()
 
 namespace tfs::events::creature {
 
-void load()
-{
-	loadCreatureScripts();
-}
+void load() { loadCreatureScripts(); }
 
-void reload()
-{
-	loadCreatureScripts();
-}
+void reload() { loadCreatureScripts(); }
 
 int32_t getOnHearScriptId() { return creatureHandlers.onHear; }
 
@@ -352,7 +346,6 @@ void onHear(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Cre
 	tfs::lua::pushNumber(L, type);
 	tfs::events::getScriptInterface().callVoidFunction(4);
 }
-
 
 void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, std::optional<int32_t> value,
                      std::optional<int32_t> oldValue, bool isSpawn)
