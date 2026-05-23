@@ -4699,14 +4699,6 @@ void Game::cleanup(std::chrono::steady_clock::time_point virtualNow)
 	}
 }
 
-void Game::broadcastMessage(const std::string& text, MessageClasses type) const
-{
-	std::cout << "> Broadcasted message: \"" << text << "\"." << std::endl;
-	for (const auto& player : getPlayers() | tfs::views::lock_weak_ptrs) {
-		player->sendTextMessage(type, text);
-	}
-}
-
 void Game::updateCreatureWalkthrough(const std::shared_ptr<const Creature>& creature)
 {
 	// send to clients
@@ -5472,98 +5464,6 @@ bool Game::addUniqueItem(uint16_t uniqueId, std::shared_ptr<Item> item)
 		std::cout << "Duplicate unique id: " << uniqueId << std::endl;
 	}
 	return result.second;
-}
-
-bool Game::reload(ReloadTypes_t reloadType)
-{
-	switch (reloadType) {
-		case RELOAD_TYPE_ACTIONS:
-			return g_actions->reload();
-		case RELOAD_TYPE_CHAT:
-			return g_chat.load();
-		case RELOAD_TYPE_CONFIG:
-			return ConfigManager::load();
-		case RELOAD_TYPE_EVENTS:
-			tfs::events::reload();
-			return true;
-		case RELOAD_TYPE_ITEMS:
-			return Item::items.reload();
-		case RELOAD_TYPE_MONSTERS:
-			return g_monsters.reload();
-		case RELOAD_TYPE_MOVEMENTS:
-			return g_moveEvents->reload();
-		case RELOAD_TYPE_NPCS: {
-			Npcs::reload();
-			return true;
-		}
-
-		case RELOAD_TYPE_SPELLS: {
-			if (!g_spells->reload()) {
-				std::cout << "[Error - Game::reload] Failed to reload spells." << std::endl;
-				std::terminate();
-			} else if (!g_monsters.reload()) {
-				std::cout << "[Error - Game::reload] Failed to reload monsters." << std::endl;
-				std::terminate();
-			}
-			return true;
-		}
-
-		case RELOAD_TYPE_TALKACTIONS:
-			return g_talkActions->reload();
-
-		case RELOAD_TYPE_WEAPONS: {
-			g_weapons->loadDefaults();
-			return true;
-		}
-
-		case RELOAD_TYPE_SCRIPTS: {
-			// commented out stuff is TODO, once we approach further in revscriptsys
-			g_actions->clear(true);
-			g_moveEvents->clear(true);
-			g_talkActions->clear(true);
-			g_weapons->clear(true);
-			g_weapons->loadDefaults();
-			g_spells->clear(true);
-			g_scripts->loadScripts("scripts", false, true);
-			/*
-			Npcs::reload();
-			Item::items.reload();
-			ConfigManager::reload();
-			tfs::events::load();
-			g_chat.load();
-			*/
-			return true;
-		}
-
-		default: {
-			if (!g_spells->reload()) {
-				std::cout << "[Error - Game::reload] Failed to reload spells." << std::endl;
-				std::terminate();
-			} else if (!g_monsters.reload()) {
-				std::cout << "[Error - Game::reload] Failed to reload monsters." << std::endl;
-				std::terminate();
-			}
-
-			g_actions->reload();
-			ConfigManager::load();
-			g_monsters.reload();
-			g_moveEvents->reload();
-			Npcs::reload();
-			g_talkActions->reload();
-			Item::items.reload();
-			g_weapons->clear(true);
-			g_weapons->loadDefaults();
-			tfs::events::reload();
-			g_chat.load();
-			g_actions->clear(true);
-			g_moveEvents->clear(true);
-			g_talkActions->clear(true);
-			g_spells->clear(true);
-			g_scripts->loadScripts("scripts", false, true);
-			return true;
-		}
-	}
-	return true;
 }
 
 std::shared_ptr<House> Game::addHouse(uint32_t id)

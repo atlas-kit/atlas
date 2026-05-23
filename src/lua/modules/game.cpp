@@ -2,26 +2,37 @@
 
 #include "../../game.h"
 
+#include "../../actions.h"
+#include "../../chat.h"
 #include "../../configmanager.h"
+#include "../../events/events.h"
 #include "../../events/monster.h"
 #include "../../monster.h"
+#include "../../movement.h"
 #include "../../npc.h"
 #include "../../script.h"
 #include "../../spells.h"
+#include "../../talkaction.h"
 #include "../../tasks.h"
+#include "../../weapons.h"
 #include "../api.h"
 #include "../env.h"
 #include "../meta.h"
 #include "../register.h"
 #include "../script.h"
 
+extern Actions* g_actions;
+extern Chat g_chat;
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
+extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern Monsters g_monsters;
 extern Scripts* g_scripts;
 extern Dispatcher g_dispatcher;
+extern TalkActions* g_talkActions;
 extern Vocations g_vocations;
+extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {
 
@@ -567,19 +578,160 @@ int luaGameGetClientVersion(lua_State* L)
 	return 1;
 }
 
-int luaGameReload(lua_State* L)
+int luaGameSaveMap(lua_State* L)
 {
-	// Game.reload(reloadType)
-	ReloadTypes_t reloadType = tfs::lua::getNumber<ReloadTypes_t>(L, 1);
-	if (reloadType == RELOAD_TYPE_GLOBAL) {
-		tfs::lua::pushBoolean(L, g_luaEnvironment.loadFile("data/global.lua") == 0);
-		tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts/lib", true, true));
-		lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
-		return 2;
+	// Game.saveMap()
+	tfs::lua::pushBoolean(L, Map::save());
+	return 1;
+}
+
+int luaGameReloadActions(lua_State* L)
+{
+	// Game.reloadActions()
+	tfs::lua::pushBoolean(L, g_actions->reload());
+	return 1;
+}
+
+int luaGameReloadChat(lua_State* L)
+{
+	// Game.reloadChat()
+	tfs::lua::pushBoolean(L, g_chat.load());
+	return 1;
+}
+
+int luaGameReloadConfig(lua_State* L)
+{
+	// Game.reloadConfig()
+	tfs::lua::pushBoolean(L, ConfigManager::load());
+	return 1;
+}
+
+int luaGameReloadEvents(lua_State* L)
+{
+	// Game.reloadEvents()
+	tfs::events::reload();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaGameReloadItems(lua_State* L)
+{
+	// Game.reloadItems()
+	tfs::lua::pushBoolean(L, Item::items.reload());
+	return 1;
+}
+
+int luaGameReloadMonsters(lua_State* L)
+{
+	// Game.reloadMonsters()
+	tfs::lua::pushBoolean(L, g_monsters.reload());
+	return 1;
+}
+
+int luaGameReloadMovements(lua_State* L)
+{
+	// Game.reloadMovements()
+	tfs::lua::pushBoolean(L, g_moveEvents->reload());
+	return 1;
+}
+
+int luaGameReloadNpcs(lua_State* L)
+{
+	// Game.reloadNpcs()
+	Npcs::reload();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaGameReloadSpells(lua_State* L)
+{
+	// Game.reloadSpells()
+	// Matches the previous RELOAD_TYPE_SPELLS path: also reloads monsters, and
+	// terminates on failure because partial spell/monster data would leave the
+	// game in an inconsistent state.
+	if (!g_spells->reload()) {
+		std::cout << "[Error - Game.reloadSpells] Failed to reload spells." << std::endl;
+		std::terminate();
+	}
+	if (!g_monsters.reload()) {
+		std::cout << "[Error - Game.reloadSpells] Failed to reload monsters." << std::endl;
+		std::terminate();
+	}
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaGameReloadTalkActions(lua_State* L)
+{
+	// Game.reloadTalkActions()
+	tfs::lua::pushBoolean(L, g_talkActions->reload());
+	return 1;
+}
+
+int luaGameReloadWeapons(lua_State* L)
+{
+	// Game.reloadWeapons()
+	g_weapons->loadDefaults();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaGameReloadScripts(lua_State* L)
+{
+	// Game.reloadScripts()
+	g_actions->clear(true);
+	g_moveEvents->clear(true);
+	g_talkActions->clear(true);
+	g_weapons->clear(true);
+	g_weapons->loadDefaults();
+	g_spells->clear(true);
+	tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts", false, true));
+	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	return 1;
+}
+
+int luaGameReloadGlobal(lua_State* L)
+{
+	// Game.reloadGlobal()
+	tfs::lua::pushBoolean(L, g_luaEnvironment.loadFile("data/global.lua") == 0);
+	tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts/lib", true, true));
+	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	return 2;
+}
+
+int luaGameReloadAll(lua_State* L)
+{
+	// Game.reloadAll()
+	// Matches the previous default branch of Game::reload(): mirrors the exact
+	// order of subsystem reloads, including the duplicate spell/monster passes
+	// that the original sweep performed.
+	if (!g_spells->reload()) {
+		std::cout << "[Error - Game.reloadAll] Failed to reload spells." << std::endl;
+		std::terminate();
+	}
+	if (!g_monsters.reload()) {
+		std::cout << "[Error - Game.reloadAll] Failed to reload monsters." << std::endl;
+		std::terminate();
 	}
 
-	tfs::lua::pushBoolean(L, g_game.reload(reloadType));
+	g_actions->reload();
+	ConfigManager::load();
+	g_monsters.reload();
+	g_moveEvents->reload();
+	Npcs::reload();
+	g_talkActions->reload();
+	Item::items.reload();
+	g_weapons->clear(true);
+	g_weapons->loadDefaults();
+	tfs::events::reload();
+	g_chat.load();
+	g_actions->clear(true);
+	g_moveEvents->clear(true);
+	g_talkActions->clear(true);
+	g_spells->clear(true);
+	g_scripts->loadScripts("scripts", false, true);
 	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
 
@@ -662,7 +814,24 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Game", "getClientVersion", luaGameGetClientVersion);
 
-	lsi.registerMethod("Game", "reload", luaGameReload);
+	lsi.registerMethod("Game", "saveMap", luaGameSaveMap);
+
+	// Per-subsystem reload bindings. Game.reload(type) lives in Lua
+	// (data/scripts/systems/game_state.lua) and dispatches through these.
+	lsi.registerMethod("Game", "reloadActions", luaGameReloadActions);
+	lsi.registerMethod("Game", "reloadChat", luaGameReloadChat);
+	lsi.registerMethod("Game", "reloadConfig", luaGameReloadConfig);
+	lsi.registerMethod("Game", "reloadEvents", luaGameReloadEvents);
+	lsi.registerMethod("Game", "reloadGlobal", luaGameReloadGlobal);
+	lsi.registerMethod("Game", "reloadItems", luaGameReloadItems);
+	lsi.registerMethod("Game", "reloadMonsters", luaGameReloadMonsters);
+	lsi.registerMethod("Game", "reloadMovements", luaGameReloadMovements);
+	lsi.registerMethod("Game", "reloadNpcs", luaGameReloadNpcs);
+	lsi.registerMethod("Game", "reloadScripts", luaGameReloadScripts);
+	lsi.registerMethod("Game", "reloadSpells", luaGameReloadSpells);
+	lsi.registerMethod("Game", "reloadTalkActions", luaGameReloadTalkActions);
+	lsi.registerMethod("Game", "reloadWeapons", luaGameReloadWeapons);
+	lsi.registerMethod("Game", "reloadAll", luaGameReloadAll);
 
 	lsi.registerMethod("Game", "getPlayerRecord", luaGameGetPlayerRecord);
 	lsi.registerMethod("Game", "setPlayerRecord", luaGameSetPlayerRecord);

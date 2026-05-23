@@ -306,7 +306,6 @@ public:
 	                        const std::shared_ptr<Item>& tradeItem);
 	void internalCloseTrade(const std::shared_ptr<Player>& player, bool sendCancel = true);
 	bool playerBroadcastMessage(const std::shared_ptr<Player>& player, const std::string& text) const;
-	void broadcastMessage(const std::string& text, MessageClasses type) const;
 
 	// Implementation of player invoked events
 	void playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
@@ -462,8 +461,6 @@ public:
 	std::shared_ptr<Item> getUniqueItem(uint16_t uniqueId);
 	bool addUniqueItem(uint16_t uniqueId, std::shared_ptr<Item> item);
 	void removeUniqueItem(uint16_t uniqueId) { uniqueItems.erase(uniqueId); }
-
-	bool reload(ReloadTypes_t reloadType);
 
 	Groups groups;
 	Map map;

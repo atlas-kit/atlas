@@ -1,16 +1,26 @@
--- Player-kicking on server close/shutdown. The C++ engine still drives the
--- state machine, thread lifecycle and saveGameState; only the player-facing
--- logic lives here.
+-- Game-state plumbing previously living inside Game::setGameState() and
+-- Game::reload() in src/game.cpp.
 --
--- triggerIndex 1 forces these to run after the default (index 0) save
--- subscribers (e.g. account storage persistence), preserving the exact
--- ordering the engine used before this logic moved to Lua:
---   onSave subscribers -> kick -> C++ saveGameState
+-- What stays in C++:
+--   * The state-machine guard inside Game::setGameState (gameState transitions,
+--     dispatcher/scheduler shutdown, saveGameState bookkeeping).
+--   * The INIT bootstrap (Groups::load, Chat::load, Map::spawns::startup) — these
+--     load native XML/spawn structures and have no Lua API; the onStartup event
+--     fires *after* them so scripts already have the canonical hook point.
+--   * Game::cleanup() — internal decay-wheel maintenance run from checkDecay()
+--     and from shutdown(); not safe to drive from Lua.
+--   * The subsystem reload entry points themselves (Actions, Chat, Items,
+--     Monsters, MoveEvents, Npcs, Spells, TalkActions, Weapons, Scripts) —
+--     exposed as Game.reload<Subsystem>() so this file can compose them.
 
 do
 	-- Server closed: kick everyone without the always-login flag.
 	-- onSave also fires on shutdown and on manual saves (SIGUSR1, saveServer),
 	-- so the state gate isolates the close transition exactly like the engine did.
+	-- triggerIndex 1 forces this to run after the default (index 0) save
+	-- subscribers (e.g. account storage persistence), preserving the exact
+	-- ordering the engine used before this logic moved to Lua:
+	--   onSave subscribers -> kick -> C++ saveGameState
 	local event = Event()
 
 	event.onGameSave = function()
@@ -39,4 +49,34 @@ do
 	end
 
 	event:register(1)
+end
+
+do
+	-- Reload routing: maps each RELOAD_TYPE_X to the C++ subsystem binding that
+	-- knows how to rebuild it. Mirrors the switch that used to live inside
+	-- Game::reload(); RELOAD_TYPE_ALL (and any unknown type) falls back to
+	-- Game.reloadAll(), which preserves the original default sweep order.
+	local handlers = {
+		[RELOAD_TYPE_ACTIONS] = Game.reloadActions,
+		[RELOAD_TYPE_CHAT] = Game.reloadChat,
+		[RELOAD_TYPE_CONFIG] = Game.reloadConfig,
+		[RELOAD_TYPE_EVENTS] = Game.reloadEvents,
+		[RELOAD_TYPE_GLOBAL] = Game.reloadGlobal,
+		[RELOAD_TYPE_ITEMS] = Game.reloadItems,
+		[RELOAD_TYPE_MONSTERS] = Game.reloadMonsters,
+		[RELOAD_TYPE_MOVEMENTS] = Game.reloadMovements,
+		[RELOAD_TYPE_NPCS] = Game.reloadNpcs,
+		[RELOAD_TYPE_SCRIPTS] = Game.reloadScripts,
+		[RELOAD_TYPE_SPELLS] = Game.reloadSpells,
+		[RELOAD_TYPE_TALKACTIONS] = Game.reloadTalkActions,
+		[RELOAD_TYPE_WEAPONS] = Game.reloadWeapons,
+	}
+
+	function Game.reload(reloadType)
+		local handler = handlers[reloadType]
+		if handler then
+			return handler()
+		end
+		return Game.reloadAll()
+	end
 end
