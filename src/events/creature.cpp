@@ -301,8 +301,10 @@ void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared
 		damage.secondary.type = tfs::lua::getNumber<CombatType_t>(L, -1, damage.secondary.type);
 		lua_pop(L, 4);
 
-		if (damage.primary.type != COMBAT_HEALING) {
+		if (damage.primary.type != COMBAT_HEALING && damage.primary.type != COMBAT_NONE) {
 			damage.primary.value = -damage.primary.value;
+		}
+		if (damage.secondary.type != COMBAT_HEALING && damage.secondary.type != COMBAT_NONE) {
 			damage.secondary.value = -damage.secondary.value;
 		}
 	}

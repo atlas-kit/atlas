@@ -54,8 +54,9 @@ void Game::start(ServiceManager* manager)
 	serviceManager = manager;
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_CREATURE_THINK_INTERVAL, [this]() { checkCreatures(0); }));
-	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_INTERVAL)},
-	                                         [this]() { updateCreaturesPath(0); }));
+	g_scheduler.addEvent(
+	    createSchedulerTask(std::chrono::milliseconds{getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)},
+	                        [this]() { updateCreaturesFollowPath(0); }));
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL, [this]() { checkDecay(); }));
 }
 
@@ -3172,8 +3173,6 @@ void Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	player->setAttackedCreature(attackCreature);
-
-	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
 }
 
 void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
@@ -3190,8 +3189,6 @@ void Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	} else {
 		player->setFollowCreature(nullptr);
 	}
-
-	g_dispatcher.addTask([this, id = player->getID()]() { updateCreatureWalk(id); });
 }
 
 void Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, bool chaseMode, bool secureMode)
@@ -3628,6 +3625,7 @@ void Game::checkCreatureWalk(uint32_t creatureId)
 void Game::updateCreatureWalk(uint32_t creatureId)
 {
 	if (const auto& creature = getCreatureByID(creatureId)) {
+		creature->completeEventFollowWalk();
 		if (!creature->isDead()) {
 			creature->goToFollowCreature();
 		}
@@ -3693,14 +3691,19 @@ void Game::checkCreatures(size_t index)
 	cleanup();
 }
 
-void Game::updateCreaturesPath(size_t index)
+void Game::updateCreaturesFollowPath(size_t index)
 {
-	g_scheduler.addEvent(createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::PATHFINDING_INTERVAL)),
-	                                         [=, this]() { updateCreaturesPath((index + 1) % EVENT_CREATURECOUNT); }));
+	g_scheduler.addEvent(
+	    createSchedulerTask(std::chrono::milliseconds(getNumber(ConfigManager::FOLLOW_PATH_CHECK_INTERVAL)),
+	                        [=, this]() { updateCreaturesFollowPath((index + 1) % EVENT_CREATURECOUNT); }));
 
 	for (const auto& creature : checkCreatureLists[index] | tfs::views::lock_weak_ptrs) {
-		if (!creature->isDead()) {
-			creature->forceUpdatePath();
+		if (creature->isDead()) {
+			continue;
+		}
+
+		if (creature->getFollowCreature() && !creature->hasPathToFollow()) {
+			creature->updateFollowPath();
 		}
 	}
 }
