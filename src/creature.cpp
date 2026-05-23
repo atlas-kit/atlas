@@ -24,6 +24,11 @@ Creature::Creature() { onIdleStatus(); }
 
 Creature::~Creature()
 {
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
 		summon->setAttackedCreature(nullptr);
 		summon->removeMaster();
@@ -135,15 +140,18 @@ void Creature::onThink(std::chrono::milliseconds interval)
 	tfs::events::creature::onThink(asCreature(), interval);
 }
 
-void Creature::forceUpdatePath()
+void Creature::updateFollowPath()
 {
-	if (attackedCreature.expired() && followCreature.expired()) {
+	if (eventFollowPath != 0) {
 		return;
 	}
 
-	lastPathUpdate =
-	    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
-	g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
+	if (followCreature.expired()) {
+		return;
+	}
+
+	eventFollowPath = g_scheduler.addEvent(
+	    createSchedulerTask(FOLLOW_EVENT_INTERVAL, [id = getID()]() { g_game.updateCreatureWalk(id); }));
 }
 
 void Creature::onIdleStatus()
@@ -176,8 +184,6 @@ void Creature::onWalk()
 		}
 	}
 
-	updateFollowersPaths();
-
 	if (cancelNextWalk) {
 		listWalkDir.clear();
 		onWalkAborted();
@@ -189,13 +195,7 @@ void Creature::onWalk()
 		addEventWalk();
 	}
 
-	if (!attackedCreature.expired() || !followCreature.expired()) {
-		if (lastPathUpdate < std::chrono::steady_clock::now()) {
-			g_dispatcher.addTask(createTask([id = getID()]() { g_game.updateCreatureWalk(id); }));
-			lastPathUpdate = std::chrono::steady_clock::now() +
-			                 std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
-		}
-	}
+	updateFollowersPaths();
 }
 
 void Creature::onWalk(Direction& dir)
@@ -327,7 +327,8 @@ void Creature::updateFollowCreaturePath(FindPathParams& fpp)
 {
 	listWalkDir.clear();
 
-	if (const auto& followCreature = getFollowCreature(); getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
+	if (const auto& followCreature = getFollowCreature();
+	    followCreature && getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
 		hasFollowPath = true;
 		startAutoWalk();
 	} else {
@@ -407,6 +408,8 @@ void Creature::onCreatureMove(const std::shared_ptr<Creature>& creature, const s
 				player->sendCancelTarget();
 				player->sendTextMessage(MESSAGE_STATUS_SMALL, "Target lost.");
 			}
+		} else {
+			updateFollowPath();
 		}
 	}
 
@@ -784,8 +787,6 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 		player->addInFightTicks();
 	}
 
-	forceUpdatePath();
-
 	for (const auto& summon : summons | tfs::views::lock_weak_ptrs) {
 		summon->setAttackedCreature(creature);
 	}
@@ -821,13 +822,14 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 			oldFollow->removeFollower(asCreature());
 		}
 
-		followCreature.reset();
-
-		hasFollowPath = false;
-
-		if (const auto& player = asPlayer()) {
-			player->stopWalk();
+		if (eventFollowPath != 0) {
+			g_scheduler.stopEvent(eventFollowPath);
+			eventFollowPath = 0;
 		}
+
+		followCreature.reset();
+		hasFollowPath = false;
+		cancelNextWalk = true;
 		return;
 	}
 
@@ -841,9 +843,9 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 
 		if (const auto& player = asPlayer()) {
 			player->setAttackedCreature(nullptr);
+			player->stopWalk();
 			player->sendCancelTarget();
 			player->sendCancelMessage(RETURNVALUE_THEREISNOWAY);
-			player->stopWalk();
 		}
 		return;
 	}
@@ -855,13 +857,16 @@ void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
 
 	followCreature = creature;
 	hasFollowPath = false;
-
 	if (!listWalkDir.empty()) {
 		listWalkDir.clear();
 		onWalkAborted();
 	}
 
-	forceUpdatePath();
+	if (eventFollowPath != 0) {
+		g_scheduler.stopEvent(eventFollowPath);
+		eventFollowPath = 0;
+	}
+	updateFollowPath();
 }
 
 // Pathfinding Events
@@ -882,13 +887,7 @@ void Creature::updateFollowersPaths()
 	            std::ranges::to<decltype(followers)>();
 
 	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		if (follower->lastPathUpdate >= std::chrono::steady_clock::now()) {
-			continue;
-		}
-
-		g_dispatcher.addTask(createTask([id = follower->getID()]() { g_game.updateCreatureWalk(id); }));
-		follower->lastPathUpdate =
-		    std::chrono::steady_clock::now() + std::chrono::milliseconds{getNumber(ConfigManager::PATHFINDING_DELAY)};
+		follower->updateFollowPath();
 	}
 }
 

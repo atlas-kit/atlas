@@ -285,8 +285,7 @@ bool ConfigManager::load()
 	integer[QUEST_TRACKER_PREMIUM_LIMIT] = getGlobalNumber(L, "questTrackerPremiumLimit", 15);
 	integer[STAMINA_REGEN_MINUTE] = getGlobalNumber(L, "timeToRegenMinuteStamina", 3 * 60);
 	integer[STAMINA_REGEN_PREMIUM] = getGlobalNumber(L, "timeToRegenMinutePremiumStamina", 6 * 60);
-	integer[PATHFINDING_INTERVAL] = getGlobalNumber(L, "pathfindingInterval", 200);
-	integer[PATHFINDING_DELAY] = getGlobalNumber(L, "pathfindingDelay", 300);
+	integer[FOLLOW_PATH_CHECK_INTERVAL] = getGlobalNumber(L, "followPathCheckInterval", 200);
 
 	expStages = loadXMLStages();
 	if (expStages.empty()) {

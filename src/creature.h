@@ -52,6 +52,7 @@ struct FindPathParams
 inline constexpr int32_t EVENT_CREATURECOUNT = 10;
 inline constexpr auto EVENT_CREATURE_THINK_INTERVAL = 1000ms;
 inline constexpr auto EVENT_CHECK_CREATURE_INTERVAL = EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT;
+inline constexpr auto FOLLOW_EVENT_INTERVAL = 100ms;
 
 static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
 static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();
@@ -204,6 +205,12 @@ public:
 	virtual void onWalkAborted() {}
 	virtual void onWalkComplete() {}
 
+	// follow functions
+	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
+	void setFollowCreature(const std::shared_ptr<Creature>& creature);
+	void completeEventFollowWalk() { eventFollowPath = 0; }
+	bool hasPathToFollow() const { return hasFollowPath; }
+
 	// Pathfinding functions
 	void addFollower(const std::shared_ptr<Creature>& creature) { followers.insert(creature); }
 	void removeFollower(const std::shared_ptr<Creature>& creature) { followers.erase(creature); }
@@ -292,7 +299,7 @@ public:
 	virtual void onThink(std::chrono::milliseconds interval);
 	virtual void onAttacking(std::chrono::milliseconds) {}
 
-	virtual void forceUpdatePath();
+	void updateFollowPath();
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
@@ -352,9 +359,6 @@ public:
 	virtual std::optional<int32_t> getStorageValue(uint32_t key) const;
 	const auto& getStorageMap() const { return storageMap; }
 
-	std::shared_ptr<Creature> getFollowCreature() const { return followCreature.lock(); }
-	void setFollowCreature(const std::shared_ptr<Creature>& creature);
-
 	std::shared_ptr<Creature> getAttackedCreature() const { return attackedCreature.lock(); }
 	void setAttackedCreature(const std::shared_ptr<Creature>& creature);
 
@@ -371,7 +375,7 @@ protected:
 	std::vector<Direction> listWalkDir;
 
 	std::chrono::steady_clock::time_point lastStep{};
-	std::chrono::steady_clock::time_point lastPathUpdate{};
+	uint32_t eventFollowPath = 0;
 	uint32_t id = 0;
 	uint32_t scriptEventsBitField = 0;
 	uint32_t eventWalk = 0;
