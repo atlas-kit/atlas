@@ -9,7 +9,7 @@ do
 
 	-- Triggered when the player themselves changes zones.
 	-- Prevents players from maintaining an active target while inside a Protection Zone.
-	function event.onCreatureZoneChanged(creature)
+	function event.onCreatureChangeZone(creature)
 		local player = creature:asPlayer()
 		if not player then
 			return
@@ -46,7 +46,7 @@ do
 	local event = Event()
 
 	-- Triggered when a nearby creature (potentially the target) changes zones.
-	function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature)
+	function event.onCreatureChangeNearbyCreatureZone(creature, nearbyCreature)
 		local player = creature:asPlayer()
 		if not player then
 			return

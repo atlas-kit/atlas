@@ -553,12 +553,12 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 		}
 	}
 
-	tfs::events::creature::onRemoved(creature);
+	tfs::events::creature::onRemove(creature);
 
 	// event method
 	for (const auto& spectator : spectators) {
 		if (spectator != creature) {
-			tfs::events::creature::onNearbyCreatureRemoved(spectator, creature);
+			tfs::events::creature::onRemoveNearbyCreature(spectator, creature);
 		}
 
 		spectator->onRemoveCreature(creature, isLogout);

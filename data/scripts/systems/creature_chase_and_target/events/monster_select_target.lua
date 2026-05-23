@@ -7,7 +7,7 @@
 local event = Event()
 
 -- Triggered when a nearby creature moves, allowing the monster to evaluate or switch targets.
-function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile, toTile)
+function event.onCreatureMoveNearbyCreature(creature, nearbyCreature, fromTile, toTile)
 	-- Ensure the creature is a monster.
 	local monster = creature:asMonster()
 	if not monster then

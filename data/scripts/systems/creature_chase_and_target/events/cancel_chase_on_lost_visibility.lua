@@ -8,7 +8,7 @@ do
 
 	-- Triggered when the creature itself moves.
 	-- Checks if the new position still allows visibility of the target.
-	function event.onCreatureMoved(creature, fromTile, toTile)
+	function event.onCreatureMove(creature, fromTile, toTile)
 		local chaseCreature = creature:getChaseCreature()
 		if not chaseCreature then
 			return
@@ -44,7 +44,7 @@ do
 	local event = Event()
 
 	-- Triggered when a nearby creature (potentially the target) moves.
-	function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile, toTile)
+	function event.onCreatureMoveNearbyCreature(creature, nearbyCreature, fromTile, toTile)
 		local chaseCreature = creature:getChaseCreature()
 		if not chaseCreature then
 			return
@@ -118,7 +118,7 @@ do
 	local event = Event()
 
 	-- Triggered when a creature is removed from the vicinity (teleport, logout, or death).
-	function event.onCreatureNearbyCreatureRemoved(creature, nearbyCreature)
+	function event.onCreatureRemoveNearbyCreature(creature, nearbyCreature)
 		local chaseCreature = creature:getChaseCreature()
 		if not chaseCreature then
 			return

@@ -110,7 +110,7 @@ do
 	local event = Event()
 
 	-- Clean up per-monster timing state when the creature is removed.
-	function event.onCreatureRemoved(creature)
+	function event.onCreatureRemove(creature)
 		targetChangeTicks[creature:getId()] = nil
 	end
 

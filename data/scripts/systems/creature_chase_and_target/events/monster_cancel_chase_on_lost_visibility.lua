@@ -8,7 +8,7 @@ do
 
 	-- Triggered when a nearby creature moves.
 	-- This specific block checks if the monster's target has moved out of sight.
-	function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile, toTile)
+	function event.onCreatureMoveNearbyCreature(creature, nearbyCreature, fromTile, toTile)
 		-- Ensure the creature executing this logic is a monster.
 		local monster = creature:asMonster()
 		if not monster then
@@ -43,7 +43,7 @@ do
 
 	-- Triggered when the monster itself moves.
 	-- Verifies if the monster can still see its target from its new position.
-	function event.onCreatureMoved(creature, fromTile, toTile)
+	function event.onCreatureMove(creature, fromTile, toTile)
 		-- Ensure the creature executing this logic is a monster.
 		local monster = creature:asMonster()
 		if not monster then

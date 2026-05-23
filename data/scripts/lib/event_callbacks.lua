@@ -31,12 +31,12 @@ ec.onGameSave = {}
 -- Creature
 ec.onCreatureChangeChase = {}
 ec.onCreatureChangeTarget = {}
-ec.onCreatureZoneChanged = {}
-ec.onCreatureNearbyCreatureZoneChanged = {}
-ec.onCreatureMoved = {}
-ec.onCreatureNearbyCreatureMoved = {}
-ec.onCreatureRemoved = {}
-ec.onCreatureNearbyCreatureRemoved = {}
+ec.onCreatureChangeZone = {}
+ec.onCreatureChangeNearbyCreatureZone = {}
+ec.onCreatureMove = {}
+ec.onCreatureMoveNearbyCreature = {}
+ec.onCreatureRemove = {}
+ec.onCreatureRemoveNearbyCreature = {}
 ec.onCreatureChangeOutfit = {}
 ec.onCreatureChangeMount = {}
 ec.onCreatureAreaCombat = {returnValue=true}

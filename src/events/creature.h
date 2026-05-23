@@ -14,13 +14,12 @@ int32_t getOnHearScriptId();
 
 void onChangeChase(const std::shared_ptr<Creature>& creature);
 void onChangeTarget(const std::shared_ptr<Creature>& creature);
-void onMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& fromTile,
-             const std::shared_ptr<Tile>& toTile);
-void onNearbyCreatureMoved(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature,
-                           const std::shared_ptr<Tile>& fromTile, const std::shared_ptr<Tile>& toTile);
-void onRemoved(const std::shared_ptr<Creature>& creature);
-void onNearbyCreatureRemoved(const std::shared_ptr<Creature>& creature,
-                             const std::shared_ptr<Creature>& nearbyCreature);
+void onMove(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& fromTile,
+            const std::shared_ptr<Tile>& toTile);
+void onMoveNearbyCreature(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature,
+                          const std::shared_ptr<Tile>& fromTile, const std::shared_ptr<Tile>& toTile);
+void onRemove(const std::shared_ptr<Creature>& creature);
+void onRemoveNearbyCreature(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& nearbyCreature);
 bool onChangeOutfit(const std::shared_ptr<Creature>& creature, const Outfit_t& outfit);
 ReturnValue onAreaCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Tile>& tile, bool aggressive);
 ReturnValue onTargetCombat(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& target);

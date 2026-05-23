@@ -46,39 +46,39 @@ function Creature:onHear(speaker, words, type)
 	end
 end
 
-function Creature:onMoved(fromTile, toTile)
-	if Event.onCreatureMoved then
-		Event.onCreatureMoved(self, fromTile, toTile)
+function Creature:onMove(fromTile, toTile)
+	if Event.onCreatureMove then
+		Event.onCreatureMove(self, fromTile, toTile)
 	end
 
 	if fromTile:getZone() ~= toTile:getZone() then
-		if Event.onCreatureZoneChanged then
-			Event.onCreatureZoneChanged(self, fromTile:getZone(), toTile:getZone())
+		if Event.onCreatureChangeZone then
+			Event.onCreatureChangeZone(self, fromTile:getZone(), toTile:getZone())
 		end
 	end
 end
 
-function Creature:onNearbyCreatureMoved(nearbyCreature, fromTile, toTile)
-	if Event.onCreatureNearbyCreatureMoved then
-		Event.onCreatureNearbyCreatureMoved(self, nearbyCreature, fromTile, toTile)
+function Creature:onMoveNearbyCreature(nearbyCreature, fromTile, toTile)
+	if Event.onCreatureMoveNearbyCreature then
+		Event.onCreatureMoveNearbyCreature(self, nearbyCreature, fromTile, toTile)
 	end
 
 	if fromTile:getZone() ~= toTile:getZone() then
-		if Event.onCreatureNearbyCreatureZoneChanged then
-			Event.onCreatureNearbyCreatureZoneChanged(self, nearbyCreature, fromTile:getZone(), toTile:getZone())
+		if Event.onCreatureChangeNearbyCreatureZone then
+			Event.onCreatureChangeNearbyCreatureZone(self, nearbyCreature, fromTile:getZone(), toTile:getZone())
 		end
 	end
 end
 
-function Creature:onRemoved()
-	if Event.onCreatureRemoved then
-		Event.onCreatureRemoved(self)
+function Creature:onRemove()
+	if Event.onCreatureRemove then
+		Event.onCreatureRemove(self)
 	end
 end
 
-function Creature:onNearbyCreatureRemoved(nearbyCreature)
-	if Event.onCreatureNearbyCreatureRemoved then
-		Event.onCreatureNearbyCreatureRemoved(self, nearbyCreature)
+function Creature:onRemoveNearbyCreature(nearbyCreature)
+	if Event.onCreatureRemoveNearbyCreature then
+		Event.onCreatureRemoveNearbyCreature(self, nearbyCreature)
 	end
 end
 

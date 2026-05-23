@@ -26,7 +26,7 @@ do
 	local event = Event()
 
 	-- Target lost after the creature itself moves out of sight.
-	function event.onCreatureMoved(creature, fromTile, toTile)
+	function event.onCreatureMove(creature, fromTile, toTile)
 		local targetCreature = creature:getTargetCreature()
 		if not targetCreature then
 			return
@@ -49,7 +49,7 @@ do
 	local event = Event()
 
 	-- Target lost after a nearby creature (our target) moves out of sight.
-	function event.onCreatureNearbyCreatureMoved(creature, nearbyCreature, fromTile, toTile)
+	function event.onCreatureMoveNearbyCreature(creature, nearbyCreature, fromTile, toTile)
 		local targetCreature = creature:getTargetCreature()
 		if not targetCreature then
 			return
@@ -100,7 +100,7 @@ do
 	local event = Event()
 
 	-- Target lost because the creature was removed (death, teleport, logout).
-	function event.onCreatureNearbyCreatureRemoved(creature, nearbyCreature)
+	function event.onCreatureRemoveNearbyCreature(creature, nearbyCreature)
 		local targetCreature = creature:getTargetCreature()
 		if not targetCreature then
 			return

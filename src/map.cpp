@@ -364,12 +364,12 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 		}
 	}
 
-	tfs::events::creature::onMoved(creature, oldTile, newTile);
+	tfs::events::creature::onMove(creature, oldTile, newTile);
 
 	// event method
 	for (const auto& spectator : spectators) {
 		if (spectator != creature) {
-			tfs::events::creature::onNearbyCreatureMoved(spectator, creature, oldTile, newTile);
+			tfs::events::creature::onMoveNearbyCreature(spectator, creature, oldTile, newTile);
 		}
 
 		spectator->onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);

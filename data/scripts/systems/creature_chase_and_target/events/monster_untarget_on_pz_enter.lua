@@ -8,7 +8,7 @@ do
 
 	-- Triggered when the monster itself changes zones.
 	-- Checks if either the monster or its target entered a Protection Zone.
-	function event.onCreatureZoneChanged(creature, fromZone, toZone)
+	function event.onCreatureChangeZone(creature, fromZone, toZone)
 		local monster = creature:asMonster()
 		if not monster then
 			return
@@ -46,7 +46,7 @@ do
 	local event = Event()
 
 	-- Triggered when a nearby creature (the target) changes zones.
-	function event.onCreatureNearbyCreatureZoneChanged(creature, nearbyCreature, fromZone, toZone)
+	function event.onCreatureChangeNearbyCreatureZone(creature, nearbyCreature, fromZone, toZone)
 		local monster = creature:asMonster()
 		if not monster then
 			return

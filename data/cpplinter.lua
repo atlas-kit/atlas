@@ -1010,12 +1010,12 @@ Weapon = {}
 ---@field onGameSave fun():nil
 ---@field onCreatureChangeChase fun(creature:Creature):nil
 ---@field onCreatureChangeTarget fun(creature:Creature):nil
----@field onCreatureZoneChanged fun(creature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
----@field onCreatureNearbyCreatureZoneChanged fun(creature:Creature, nearbyCreature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
----@field onCreatureMoved fun(creature:Creature, fromTile:Tile, toTile:Tile):nil
----@field onCreatureNearbyCreatureMoved fun(creature:Creature, nearbyCreature:Creature, fromTile:Tile, toTile:Tile):nil
----@field onCreatureRemoved fun(creature:Creature):nil
----@field onCreatureNearbyCreatureRemoved fun(creature:Creature, nearbyCreature:Creature):nil
+---@field onCreatureChangeZone fun(creature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
+---@field onCreatureChangeNearbyCreatureZone fun(creature:Creature, nearbyCreature:Creature, fromZone:ZoneType, toZone:ZoneType):nil
+---@field onCreatureMove fun(creature:Creature, fromTile:Tile, toTile:Tile):nil
+---@field onCreatureMoveNearbyCreature fun(creature:Creature, nearbyCreature:Creature, fromTile:Tile, toTile:Tile):nil
+---@field onCreatureRemove fun(creature:Creature):nil
+---@field onCreatureRemoveNearbyCreature fun(creature:Creature, nearbyCreature:Creature):nil
 ---@field onCreatureChangeOutfit fun(creature:Creature, outfit: Outfit_t):boolean
 ---@field onCreatureAreaCombat fun(creature:Creature, tile:Tile, aggresive:boolean): integer
 ---@field onCreatureTargetCombat fun(creature:Creature, target:Creature): integer
