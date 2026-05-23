@@ -13,14 +13,17 @@
 --     Monsters, MoveEvents, Npcs, Spells, TalkActions, Weapons, Scripts) —
 --     exposed as Game.reload<Subsystem>() so this file can compose them.
 
+-- math.huge as triggerIndex forces these hooks to sort last in the
+-- onGameSave/onGameShutdown chains. The previous C++ implementation ran the
+-- full event chain and *then* kicked, so any third-party callback (no matter
+-- its triggerIndex) used to run before the kick. Using math.huge preserves
+-- that contract: every other subscriber finishes first.
+local KICK_TRIGGER_INDEX = math.huge
+
 do
 	-- Server closed: kick everyone without the always-login flag.
 	-- onSave also fires on shutdown and on manual saves (SIGUSR1, saveServer),
 	-- so the state gate isolates the close transition exactly like the engine did.
-	-- triggerIndex 1 forces this to run after the default (index 0) save
-	-- subscribers (e.g. account storage persistence), preserving the exact
-	-- ordering the engine used before this logic moved to Lua:
-	--   onSave subscribers -> kick -> C++ saveGameState
 	local event = Event()
 
 	event.onGameSave = function()
@@ -35,7 +38,7 @@ do
 		end
 	end
 
-	event:register(1)
+	event:register(KICK_TRIGGER_INDEX)
 end
 
 do
@@ -48,7 +51,7 @@ do
 		end
 	end
 
-	event:register(1)
+	event:register(KICK_TRIGGER_INDEX)
 end
 
 do

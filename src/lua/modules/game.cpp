@@ -578,6 +578,12 @@ int luaGameGetClientVersion(lua_State* L)
 	return 1;
 }
 
+// Mirrors the trailing `lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0)`
+// that the previous luaGameReload(type) ran after every reload type. Reloading
+// XML/Lua data on subsystems can leave many short-lived objects on the main
+// interface; the original collected them eagerly and we preserve that exactly.
+void gcMainInterfaceAfterReload() { lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0); }
+
 int luaGameSaveMap(lua_State* L)
 {
 	// Game.saveMap()
@@ -588,21 +594,27 @@ int luaGameSaveMap(lua_State* L)
 int luaGameReloadActions(lua_State* L)
 {
 	// Game.reloadActions()
-	tfs::lua::pushBoolean(L, g_actions->reload());
+	const bool ok = g_actions->reload();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
 int luaGameReloadChat(lua_State* L)
 {
 	// Game.reloadChat()
-	tfs::lua::pushBoolean(L, g_chat.load());
+	const bool ok = g_chat.load();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
 int luaGameReloadConfig(lua_State* L)
 {
 	// Game.reloadConfig()
-	tfs::lua::pushBoolean(L, ConfigManager::load());
+	const bool ok = ConfigManager::load();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
@@ -610,6 +622,7 @@ int luaGameReloadEvents(lua_State* L)
 {
 	// Game.reloadEvents()
 	tfs::events::reload();
+	gcMainInterfaceAfterReload();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -617,21 +630,27 @@ int luaGameReloadEvents(lua_State* L)
 int luaGameReloadItems(lua_State* L)
 {
 	// Game.reloadItems()
-	tfs::lua::pushBoolean(L, Item::items.reload());
+	const bool ok = Item::items.reload();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
 int luaGameReloadMonsters(lua_State* L)
 {
 	// Game.reloadMonsters()
-	tfs::lua::pushBoolean(L, g_monsters.reload());
+	const bool ok = g_monsters.reload();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
 int luaGameReloadMovements(lua_State* L)
 {
 	// Game.reloadMovements()
-	tfs::lua::pushBoolean(L, g_moveEvents->reload());
+	const bool ok = g_moveEvents->reload();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
@@ -639,6 +658,7 @@ int luaGameReloadNpcs(lua_State* L)
 {
 	// Game.reloadNpcs()
 	Npcs::reload();
+	gcMainInterfaceAfterReload();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -657,6 +677,7 @@ int luaGameReloadSpells(lua_State* L)
 		std::cout << "[Error - Game.reloadSpells] Failed to reload monsters." << std::endl;
 		std::terminate();
 	}
+	gcMainInterfaceAfterReload();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -664,7 +685,9 @@ int luaGameReloadSpells(lua_State* L)
 int luaGameReloadTalkActions(lua_State* L)
 {
 	// Game.reloadTalkActions()
-	tfs::lua::pushBoolean(L, g_talkActions->reload());
+	const bool ok = g_talkActions->reload();
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
@@ -676,6 +699,7 @@ int luaGameReloadWeapons(lua_State* L)
 	// present in `weapons`. The full clear+rebuild happens in reloadScripts()
 	// and reloadAll(), as in the original switch.
 	g_weapons->loadDefaults();
+	gcMainInterfaceAfterReload();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
@@ -689,8 +713,9 @@ int luaGameReloadScripts(lua_State* L)
 	g_weapons->clear(true);
 	g_weapons->loadDefaults();
 	g_spells->clear(true);
-	tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts", false, true));
-	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	const bool ok = g_scripts->loadScripts("scripts", false, true);
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, ok);
 	return 1;
 }
 
@@ -701,9 +726,11 @@ int luaGameReloadGlobal(lua_State* L)
 	// the multi-return contract of the previous luaGameReload(RELOAD_TYPE_GLOBAL)
 	// path. The Lua dispatcher forwards both values, so Game.reload(GLOBAL)
 	// keeps the same return shape it had before this migration.
-	tfs::lua::pushBoolean(L, g_luaEnvironment.loadFile("data/global.lua") == 0);
-	tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts/lib", true, true));
-	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	const bool globalLoaded = g_luaEnvironment.loadFile("data/global.lua") == 0;
+	const bool libsLoaded = g_scripts->loadScripts("scripts/lib", true, true);
+	gcMainInterfaceAfterReload();
+	tfs::lua::pushBoolean(L, globalLoaded);
+	tfs::lua::pushBoolean(L, libsLoaded);
 	return 2;
 }
 
@@ -738,7 +765,7 @@ int luaGameReloadAll(lua_State* L)
 	g_talkActions->clear(true);
 	g_spells->clear(true);
 	g_scripts->loadScripts("scripts", false, true);
-	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);
+	gcMainInterfaceAfterReload();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
 }
