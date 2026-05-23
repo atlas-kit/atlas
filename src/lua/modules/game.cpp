@@ -671,6 +671,10 @@ int luaGameReloadTalkActions(lua_State* L)
 int luaGameReloadWeapons(lua_State* L)
 {
 	// Game.reloadWeapons()
+	// Matches the previous RELOAD_TYPE_WEAPONS path: loadDefaults() only. Repeat
+	// calls are idempotent because Weapons::loadDefaults skips entries already
+	// present in `weapons`. The full clear+rebuild happens in reloadScripts()
+	// and reloadAll(), as in the original switch.
 	g_weapons->loadDefaults();
 	tfs::lua::pushBoolean(L, true);
 	return 1;
@@ -693,6 +697,10 @@ int luaGameReloadScripts(lua_State* L)
 int luaGameReloadGlobal(lua_State* L)
 {
 	// Game.reloadGlobal()
+	// Returns two booleans (global.lua loaded, scripts/lib loaded) to preserve
+	// the multi-return contract of the previous luaGameReload(RELOAD_TYPE_GLOBAL)
+	// path. The Lua dispatcher forwards both values, so Game.reload(GLOBAL)
+	// keeps the same return shape it had before this migration.
 	tfs::lua::pushBoolean(L, g_luaEnvironment.loadFile("data/global.lua") == 0);
 	tfs::lua::pushBoolean(L, g_scripts->loadScripts("scripts/lib", true, true));
 	lua_gc(g_luaEnvironment.getLuaState(), LUA_GCCOLLECT, 0);

@@ -54,8 +54,11 @@ end
 do
 	-- Reload routing: maps each RELOAD_TYPE_X to the C++ subsystem binding that
 	-- knows how to rebuild it. Mirrors the switch that used to live inside
-	-- Game::reload(); RELOAD_TYPE_ALL (and any unknown type) falls back to
-	-- Game.reloadAll(), which preserves the original default sweep order.
+	-- Game::reload(); RELOAD_TYPE_ALL and RELOAD_TYPE_QUESTS (and any unknown
+	-- type) intentionally fall through to Game.reloadAll(), which preserves the
+	-- original default-branch sweep order. The previous C++ switch had no case
+	-- for QUESTS either, so /reload quests has always meant "do a full sweep";
+	-- the per-type quest clear is handled by the /reload talkaction itself.
 	local handlers = {
 		[RELOAD_TYPE_ACTIONS] = Game.reloadActions,
 		[RELOAD_TYPE_CHAT] = Game.reloadChat,
