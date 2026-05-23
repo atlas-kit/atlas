@@ -9,7 +9,7 @@
 #include "combat.h"
 #include "configmanager.h"
 #include "depotchest.h"
-#include "events.h"
+#include "events/player.h"
 #include "game.h"
 #include "house.h"
 #include "iologindata.h"
@@ -1227,11 +1227,6 @@ void Player::onCreatureMove(const std::shared_ptr<Creature>& creature, const std
                             bool teleport)
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
-
-	if (const auto& followCreature = getFollowCreature();
-	    hasFollowPath && (creature == followCreature || (creature.get() == this && followCreature))) {
-		g_dispatcher.addTask([id = getID()]() { g_game.updateCreatureWalk(id); });
-	}
 
 	if (creature.get() != this) {
 		return;
