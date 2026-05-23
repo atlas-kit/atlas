@@ -39,11 +39,11 @@ maxPacketsPerSecond = 25
 enableTwoFactorAuth = true
 
 -- Pathfinding
--- pathfindingInterval handles how often paths are force drawn
--- pathfindingDelay delays any recently drawn paths from drawing again
--- pathfindingDelay does not delay pathfindingInterval
-pathfindingInterval = 200
-pathfindingDelay = 300
+-- followPathCheckInterval: interval (ms) between processing one bucket of the
+-- fallback follow-path check. There are 10 buckets, so a given creature that
+-- lost its path is re-evaluated every bucket * 10 = ~2s worst case at default
+-- 200ms. Lower values make followers recover faster but increase CPU.
+followPathCheckInterval = 200
 
 -- Deaths
 -- NOTE: Leave deathLosePercent as -1 if you want to use the default
