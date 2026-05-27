@@ -29,20 +29,26 @@
 
 
 #-------------- FIND MYSQL_INCLUDE_DIR ------------------
-FIND_PATH(MYSQL_INCLUDE_DIR mysql.h
-		$ENV{MYSQL_INCLUDE_DIR}
-		$ENV{MYSQL_DIR}/include
-		/usr/include/mysql
-		/usr/local/include/mysql
-		/opt/mysql/mysql/include
-		/opt/mysql/mysql/include/mysql
-		/opt/mysql/include
-		/opt/local/include/mysql5
-		/usr/local/mysql/include
-		/usr/local/mysql/include/mysql
-		$ENV{ProgramFiles}/MySQL/*/include
-		$ENV{SystemDrive}/MySQL/*/include
-		PATH_SUFFIXES mysql)
+FIND_PATH(MYSQL_INCLUDE_DIR
+		NAMES mysql.h
+		HINTS
+			$ENV{MYSQL_INCLUDE_DIR}
+			$ENV{MYSQL_DIR}/include
+		PATHS
+			/usr/include/mariadb
+			/usr/local/include/mariadb
+			/usr/include/mysql
+			/usr/local/include/mysql
+			/opt/mysql/mysql/include
+			/opt/mysql/mysql/include/mysql
+			/opt/mysql/include
+			/opt/local/include/mysql5
+			/usr/local/mysql/include
+			/usr/local/mysql/include/mysql
+			$ENV{ProgramFiles}/MySQL/*/include
+			$ENV{SystemDrive}/MySQL/*/include
+		PATH_SUFFIXES mariadb mysql
+		NO_SYSTEM_ENVIRONMENT_PATH)
 
 #----------------- FIND MYSQL_LIB_DIR -------------------
 IF (WIN32)
@@ -73,7 +79,9 @@ ELSE (WIN32)
 				 $ENV{MYSQL_DIR}/libmysql/.libs
 				 $ENV{MYSQL_DIR}/lib
 				 $ENV{MYSQL_DIR}/lib/mysql
+				 /usr/lib/mariadb
 				 /usr/lib/mysql
+				 /usr/local/lib/mariadb
 				 /usr/local/lib/mysql
 				 /usr/local/mysql/lib
 				 /usr/local/mysql/lib/mysql
