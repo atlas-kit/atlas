@@ -110,23 +110,30 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
-		addByte(0x00); // quiver ammo count
+		addByte(0x00);
 	} else if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
 		addByte(0x01);    // is visible (bool)
-	} else if (it.classification > 0) {
+	}
+
+	if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
+	}
+
+	if (it.showClientDuration) {
 		add<uint32_t>(floor<std::chrono::seconds>(it.decayTimeMin).count());
 		addByte(0x00); // is brand new
-	} else if (it.showClientCharges) {
+	}
+
+	if (it.charges > 0) {
 		add<uint32_t>(it.charges);
 		addByte(0x00); // is brand new
-	} else if (it.wrapContainer) {
+	}
+
+	if (it.wrapContainer) {
 		add<uint16_t>(0x00); // unWrapId (no wrapped item by default)
 	}
 }
@@ -147,8 +154,6 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x01);
 			add<uint32_t>(container->getAmmoCount());
-		} else {
-			addByte(0x00);
 		}
 	} else if (it.isPodium()) {
 		const auto& podium = item->asPodium();
@@ -186,15 +191,24 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 		addByte(podium->getDirection());
 		addByte(podium->hasFlag(PODIUM_SHOW_PLATFORM) ? 0x01 : 0x00);
-	} else if (it.classification > 0) {
+	}
+
+	if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
-		add<uint32_t>(floor<std::chrono::seconds>(item->getDuration()).count());
+	}
+
+	const auto durationMs = item->getDuration();
+	if (durationMs.count() > 0) {
+		add<uint32_t>(floor<std::chrono::seconds>(durationMs).count());
 		addByte(0); // is brand new
-	} else if (it.showClientCharges) {
+	}
+
+	if (item->getCharges() > 0) {
 		add<uint32_t>(item->getCharges());
 		addByte(0); // is brand new
-	} else if (it.wrapContainer) {
+	}
+
+	if (it.wrapContainer) {
 		add<uint16_t>(0x00); // unWrapId (atlas does not store wrapped item id yet)
 	}
 }

@@ -6,15 +6,6 @@
 
 #include "networkmessage.h"
 
-enum ConnectionState_t
-{
-	CONNECTION_STATE_DISCONNECTED,
-	CONNECTION_STATE_REQUEST_CHARLIST,
-	CONNECTION_STATE_GAMEWORLD_AUTH,
-	CONNECTION_STATE_GAME,
-	CONNECTION_STATE_PENDING
-};
-
 static constexpr int32_t CONNECTION_WRITE_TIMEOUT = 30;
 static constexpr int32_t CONNECTION_READ_TIMEOUT = 30;
 
@@ -73,7 +64,11 @@ public:
 
 private:
 	void parseHeader(const boost::system::error_code& error);
+	void parseServerName(const boost::system::error_code& error);
 	void parsePacket(const boost::system::error_code& error);
+
+	void readSequencePacket();
+	void readServerNamePacket();
 
 	void onWriteOperation(const boost::system::error_code& error);
 
@@ -102,7 +97,7 @@ private:
 	std::chrono::steady_clock::time_point timeConnected;
 	uint32_t packetsSent = 0;
 
-	ConnectionState_t connectionState = CONNECTION_STATE_PENDING;
+	bool disconnected = false;
 	bool receivedFirst = false;
 	bool receivedName = false;
 	bool receivedLastChar = false;

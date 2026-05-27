@@ -31,6 +31,15 @@ event.onPlayerJoin = function(self)
 	self:sendBlessings()
 	self:sendTrackedBestiary(false)
 	self:sendTrackedBestiary(true)
+	self:sendItemPrices()
+	self:sendPreyPrices()
+	self:sendPreySlot()
+	self:sendHuntingTask()
+	self:sendForgeInfo()
+	self:sendVIPGroups()
+	self:sendLootContainers()
+	self:sendHousesInfo()
+	self:sendBosstiaryCooldownTimer()
 
 	-- achievements points for highscores
 	if not self:getStorageValue(PlayerStorageKeys.achievementsTotal) then

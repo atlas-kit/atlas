@@ -95,8 +95,6 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, CREATURETYPE_PLAYER);
 	registerEnum(lsi, CREATURETYPE_MONSTER);
 	registerEnum(lsi, CREATURETYPE_NPC);
-	registerEnum(lsi, CREATURETYPE_SUMMON_OWN);
-	registerEnum(lsi, CREATURETYPE_SUMMON_OTHERS);
 
 	registerEnum(lsi, CLIENTOS_LINUX);
 	registerEnum(lsi, CLIENTOS_WINDOWS);

@@ -58,18 +58,9 @@ class ProtocolGame final : public Protocol
 {
 public:
 	// static protocol information
-	enum
-	{
-		server_sends_first = true
-	};
-	enum
-	{
-		protocol_identifier = 0
-	}; // Not required as we send first
-	enum
-	{
-		use_checksum = true
-	};
+	static constexpr auto server_sends_first = true;
+	static constexpr uint8_t protocol_identifier = 0; // Not required as we send first
+	static constexpr auto use_checksum = true;
 	static const char* protocol_name() { return "gameworld protocol"; }
 
 	explicit ProtocolGame(std::shared_ptr<Connection> connection) : Protocol(std::move(connection)) {}
@@ -243,17 +234,6 @@ private:
 	void sendClientCheck();
 	void sendGameNews();
 	void sendInventoryIds();
-
-	// Stubs for systems not yet implemented
-	void sendBosstiaryCooldownTimer();
-	void sendItemsPrice();
-	void sendPreyPrices();
-	void sendPreyData();
-	void sendTaskHuntingData();
-	void sendForgingData();
-	void sendVIPGroups();
-	void sendLootContainers();
-	void sendHousesInfo();
 
 	void sendFightModes();
 

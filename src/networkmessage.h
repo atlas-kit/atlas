@@ -13,35 +13,32 @@ class NetworkMessage
 {
 public:
 	using MsgSize_t = uint16_t;
-	// Headers:
-	// 2 bytes for unencrypted message size
-	// 4 bytes for checksum
-	// 1 byte for padding message size
-	static constexpr MsgSize_t INITIAL_BUFFER_POSITION = 7;
-	enum
-	{
-		HEADER_LENGTH = 2
-	};
-	enum
-	{
-		CHECKSUM_LENGTH = 4
-	};
-	enum
-	{
-		XTEA_MULTIPLE = 8
-	};
-	enum
-	{
-		MAX_BODY_LENGTH = NETWORKMESSAGE_MAXSIZE - HEADER_LENGTH - CHECKSUM_LENGTH - XTEA_MULTIPLE
-	};
-	enum
-	{
-		MAX_PROTOCOL_BODY_LENGTH = MAX_BODY_LENGTH - 10
-	};
+
+	// Protocol wire format for an XTEA-encrypted packet:
+	//
+	//   [blockCount:u16]  [checksum:u32]  [paddingAmount:u8]  [encrypted data...]
+	//   ├─ HEADER_LENGTH ─┤├─ CHECKSUM_LENGTH ─┤├─ PADDING_LENGTH ─┤├─ XTEA_MULTIPLE × blockCount ─┤
+	//   └────────────── CRYPTO_HEADER_LENGTH (=6) ──────────────┘
+	//
+	// The first 2 bytes (blockCount) tell the receiver how many 8-byte XTEA blocks follow
+	// (including the padding byte). This replaced the old format where blockCount was
+	// the raw body length — encodes it in XTEA-block units.
+	//
+	// On the wire: [blockCount(2)] [checksum(4)] [paddingAmount(1)] [encrypted(data + 0x33 padding)].
+	// Checksum is the plaintext server sequence number (compression flag in MSB).
+	// PaddingAmount is the last byte BEFORE encryption, so it decrypts first on the receiver.
+	static constexpr MsgSize_t HEADER_LENGTH = 2;      // u16 block count = number of XTEA blocks
+	static constexpr MsgSize_t CHECKSUM_LENGTH = 4;     // u32 sequence number
+	static constexpr MsgSize_t PADDING_LENGTH = 1;      // u8 padding amount (0x00–0x07)
+	static constexpr MsgSize_t CRYPTO_HEADER_LENGTH = HEADER_LENGTH + CHECKSUM_LENGTH; // 6 bytes before encrypted payload
+	static constexpr MsgSize_t INITIAL_BUFFER_POSITION = HEADER_LENGTH + CHECKSUM_LENGTH + PADDING_LENGTH; // 7 = header area reserved in OutputMessage
+	static constexpr MsgSize_t XTEA_MULTIPLE = 8;       // XTEA operates on 8-byte blocks
+	static constexpr MsgSize_t MAX_BODY_LENGTH = NETWORKMESSAGE_MAXSIZE - HEADER_LENGTH - CHECKSUM_LENGTH - XTEA_MULTIPLE;
+	static constexpr MsgSize_t MAX_PROTOCOL_BODY_LENGTH = MAX_BODY_LENGTH - 10;
 
 	NetworkMessage() = default;
 
-	void reset() { info = {}; }
+	void reset() { info.length = 0; info.position = INITIAL_BUFFER_POSITION; info.overrun = false; }
 
 	// simply read functions for incoming message
 	uint8_t getByte()

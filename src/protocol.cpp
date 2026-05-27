@@ -9,41 +9,6 @@
 #include "rsa.h"
 #include "xtea.h"
 
-namespace {
-
-void XTEA_encrypt(OutputMessage& msg, const xtea::round_keys& key)
-{
-	// The message must be a multiple of 8
-	size_t paddingBytes = msg.getLength() % 8u;
-	if (paddingBytes != 0) {
-		msg.addPaddingBytes(8 - paddingBytes);
-	}
-
-	uint8_t* buffer = msg.getOutputBuffer();
-	xtea::encrypt(buffer, msg.getLength(), key);
-}
-
-bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
-{
-	if (((msg.getLength() - 6) & 7) != 0) {
-		return false;
-	}
-
-	uint8_t* buffer = msg.getRemainingBuffer();
-	xtea::decrypt(buffer, msg.getLength() - 6, key);
-
-	uint8_t paddingLength = msg.getByte();
-	uint16_t innerLength = msg.getLength() - 6 - paddingLength;
-	if (innerLength + 7 > msg.getLength()) {
-		return false;
-	}
-
-	msg.setLength(innerLength);
-	return true;
-}
-
-} // namespace
-
 Protocol::~Protocol()
 {
 	const auto zlibEndResult = deflateEnd(&zstream);
@@ -56,31 +21,93 @@ Protocol::~Protocol()
 
 void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 {
-	if (!rawMessages) {
-		if (encryptionEnabled) {
-			uint32_t compressionChecksum = 0;
-			if (msg->getLength() >= 128 && deflateMessage(*msg)) {
-				compressionChecksum = 0x80000000;
-			}
-
-			msg->setSequenceId(compressionChecksum | getNextSequenceId());
-		}
-
-		msg->writeMessageLength();
-
-		if (encryptionEnabled) {
-			msg->writePaddingLength();
-			XTEA_encrypt(*msg, key);
-			msg->addCryptoHeader();
-		}
+	if (rawMessages) {
+		return;
 	}
+
+	if (!encryptionEnabled) {
+		const auto blockCount =
+		    static_cast<uint16_t>((msg->getLength() - NetworkMessage::CHECKSUM_LENGTH) / NetworkMessage::XTEA_MULTIPLE);
+		msg->addHeader(blockCount);
+		return;
+	}
+
+	// The encrypted wire format (built LIFO via addHeader):
+	//
+	// ┌───────┬────────┬────────────────┬───────────────────────────────────┐
+	// │  pos  │ bytes  │     field      │ built by                          │
+	// ├───────┼────────┼────────────────┼───────────────────────────────────┤
+	// │  0-1  │ u16    │ blockCount     │ addHeader                         │
+	// │  2-5  │ u32    │ sequenceId     │ addHeader                         │
+	// │   6   │ u8     │ paddingCount   │ addHeader (after addPaddingBytes) │
+	// │  7+   │ N      │ data + 0x33    │ append + XTEA encrypt in-place   │
+	// └───────┴────────┴────────────────┴───────────────────────────────────┘
+	//
+	// Fields 0–6 are plaintext on the wire. PaddingCount becomes the first
+	// encrypted byte — the receiver reads it to discard trailing 0x33.
+
+	// 1. Optional zlib compression (MSB of sequenceId = 1 when compressed).
+	auto compressionFlag = 0u;
+	if (msg->getLength() >= 128 && deflateMessage(*msg)) {
+		compressionFlag = 0x80000000u;
+	}
+
+	// 2. Append 0x33 padding bytes so that (plaintext + 1) is a multiple of 8.
+	//    Then prepend the padding count as a 1-byte header — this becomes
+	//    the first encrypted byte.
+	const auto paddingCount =
+	    static_cast<uint8_t>(NetworkMessage::XTEA_MULTIPLE - (msg->getLength() % NetworkMessage::XTEA_MULTIPLE) - 1);
+	msg->addPaddingBytes(paddingCount);
+	msg->addHeader(paddingCount);
+
+	// 3. XTEA-encrypt the padded payload in-place.
+	xtea::encrypt(msg->getOutputBuffer(), msg->getLength(), key);
+
+	// 4. Prepend the sequence/checksum (u32, plaintext).
+	const auto sequenceId = compressionFlag | getNextSequenceId();
+	msg->addHeader(sequenceId);
+
+	// 5. Prepend the block count (u16, plaintext) = total encrypted bytes ÷ 8.
+	const auto blockCount =
+	    static_cast<uint16_t>((msg->getLength() - NetworkMessage::CHECKSUM_LENGTH) / NetworkMessage::XTEA_MULTIPLE);
+	msg->addHeader(blockCount);
 }
 
 void Protocol::onRecvMessage(NetworkMessage& msg)
 {
-	if (encryptionEnabled && !XTEA_decrypt(msg, key)) {
+	if (!encryptionEnabled) {
+		parsePacket(msg);
 		return;
 	}
+
+	// The connection layer already consumed the 6-byte plaintext header
+	// (blockCount + checksum) before calling us. The buffer looks like:
+	//
+	// ┌───────┬────────┬──────────────────┬─────────────────────────┐
+	// │  pos  │ bytes  │     field        │       status            │
+	// ├───────┼────────┼──────────────────┼─────────────────────────┤
+	// │  0-1  │ u16    │ blockCount       │ already read by parse   │
+	// │  2-5  │ u32    │ checksum         │ already read by parse   │
+	// │   6   │ u8     │ paddingAmount    │ to be decrypted         │
+	// │  7+   │ N      │ data + 0x33      │ to be decrypted         │
+	// └───────┴────────┴──────────────────┴─────────────────────────┘
+	//
+	// getRemainingBuffer() points at position 6 (start of encrypted data).
+	// After decryption, the first byte is the padding amount.
+
+	// 1. Verify the encrypted payload is a whole number of XTEA blocks.
+	const auto encryptedLen = msg.getLength() - NetworkMessage::CRYPTO_HEADER_LENGTH;
+	if ((encryptedLen & (NetworkMessage::XTEA_MULTIPLE - 1)) != 0) {
+		return;
+	}
+
+	// 2. Decrypt in-place. After this, buffer[6] = paddingAmount,
+	//    buffer[7+] = real data followed by paddingLength bytes of 0x33.
+	xtea::decrypt(msg.getRemainingBuffer(), encryptedLen, key);
+
+	// 3. Read the padding amount (first decrypted byte) and discard the trailing 0x33.
+	const auto paddingLength = msg.getByte();
+	msg.setLength(msg.getLength() - paddingLength);
 
 	parsePacket(msg);
 }
@@ -88,12 +115,17 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 std::shared_ptr<OutputMessage> Protocol::getOutputBuffer(int32_t size)
 {
 	// dispatcher thread
-	if (!outputBuffer) {
-		outputBuffer = tfs::net::make_output_message();
+	/*if (!outputBuffer) {
+	    outputBuffer = tfs::net::make_output_message();
 	} else if ((outputBuffer->getLength() + size) > NetworkMessage::MAX_PROTOCOL_BODY_LENGTH) {
+	    send(outputBuffer);
+	    outputBuffer = tfs::net::make_output_message();
+	}*/
+
+	if (outputBuffer) {
 		send(outputBuffer);
-		outputBuffer = tfs::net::make_output_message();
 	}
+	outputBuffer = tfs::net::make_output_message();
 	return outputBuffer;
 }
 

@@ -814,3 +814,96 @@ function Player.sendTrackedBestiary(self, isBoss)
 	msg:delete()
 	return true
 end
+
+function Player.sendItemPrices(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xCD)
+	msg:addU16(0)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendPreyPrices(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xE9)
+	msg:addU32(0)  -- price
+	msg:addByte(0) -- wildcard
+	msg:addByte(0) -- directly
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendPreySlot(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xE8)
+	msg:addByte(0)    -- slot
+	msg:addByte(1)    -- state = INACTIVE
+	msg:addU32(0)     -- nextFreeReroll
+	msg:addByte(0)    -- wildcards
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendHuntingTask(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xBB)
+	msg:addByte(0)    -- slot
+	msg:addByte(0)    -- state = LOCKED
+	msg:addByte(0)    -- taskSlotUnlocked
+	msg:addU32(0)     -- nextFreeRoll
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendForgeInfo(self)
+	local msg = NetworkMessage()
+	msg:addByte(0x86)
+	msg:addByte(0)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendVIPGroups(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xD4)
+	msg:addByte(0)
+	msg:addByte(1)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendLootContainers(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xC0)
+	msg:addByte(0)
+	msg:addByte(0)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendHousesInfo(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xC6)
+	msg:addU32(0)
+	msg:addByte(0)
+	msg:addByte(0)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end
+
+function Player.sendBosstiaryCooldownTimer(self)
+	local msg = NetworkMessage()
+	msg:addByte(0xBD)
+	msg:addU16(0)
+	msg:sendToPlayer(self)
+	msg:delete()
+	return true
+end

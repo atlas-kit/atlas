@@ -25,16 +25,6 @@ public:
 
 	uint8_t* getOutputBuffer() { return &buffer[outputBufferStart]; }
 
-	void writeMessageLength() { add_header(static_cast<uint16_t>((info.length - 4) / 8)); }
-
-	void writePaddingLength()
-	{
-		uint8_t paddingAmount = static_cast<uint8_t>(8 - (info.length % 8) - 1);
-		add_header(paddingAmount);
-	}
-
-	void addCryptoHeader() { add_header(getSequenceId()); }
-
 	void append(const NetworkMessage& msg)
 	{
 		auto msgLen = msg.getLength();
@@ -57,20 +47,17 @@ public:
 		info.position += msgLen;
 	}
 
-	void setSequenceId(uint32_t sequence) { sequenceId = sequence; }
-	uint32_t getSequenceId() const { return sequenceId; }
-
-private:
 	template <typename T>
-	void add_header(T add)
+	void addHeader(T value)
 	{
 		assert(outputBufferStart >= sizeof(T));
 		outputBufferStart -= sizeof(T);
-		std::memcpy(buffer.data() + outputBufferStart, &add, sizeof(T));
+		std::memcpy(buffer.data() + outputBufferStart, &value, sizeof(T));
 		// added header size to the message size
 		info.length += sizeof(T);
 	}
 
+private:
 	MsgSize_t outputBufferStart = INITIAL_BUFFER_POSITION;
 	// Was incidentally zeroed by value-initialization; keep an explicit default now that
 	// the object is no longer zero-initialized on construction.

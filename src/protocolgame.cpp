@@ -524,6 +524,14 @@ void ProtocolGame::disconnectClient(const std::string& message, DisconnectClient
 
 void ProtocolGame::writeToOutputBuffer(const NetworkMessage& msg)
 {
+	const auto* data = msg.getBuffer() + NetworkMessage::INITIAL_BUFFER_POSITION;
+	const auto len = msg.getLength();
+	std::string hex;
+	for (size_t i = 0; i < len && i < 512; i++) {
+		fmt::format_to(std::back_inserter(hex), "{:02X}", data[i]);
+	}
+	std::cout << "[BUFFER] size=" << len << " data=" << hex << std::endl;
+
 	auto out = getOutputBuffer(msg.getLength());
 	out->append(msg);
 }
@@ -1891,11 +1899,10 @@ void ProtocolGame::sendEmptyContainer(uint8_t cid)
 	msg.add<uint16_t>(0); // first index
 	msg.addByte(0x00);
 
-	// TODO: check if these bytes are required for empty containers, if not remove them
-	// msg.addByte(0); // Category type
-	// msg.addByte(0); // Categories size
-	// msg.addByte(0); // Pickupable/Moveable (?)
-	// msg.addByte(0); // no holding player
+	msg.addByte(0); // Category type
+	msg.addByte(0); // Categories size
+	msg.addByte(0); // Pickupable/Moveable (?)
+	msg.addByte(0); // no holding player
 
 	writeToOutputBuffer(msg);
 }
@@ -2811,9 +2818,13 @@ void ProtocolGame::sendInventoryItem(slots_t slot, const std::shared_ptr<const I
 {
 	NetworkMessage msg;
 	if (item) {
+		const ItemType& it = Item::items[item->getID()];
 		msg.addByte(0x78);
 		msg.addByte(slot);
-		msg.addItem(item);
+		msg.addItemId(item->getID());
+		if (it.classification > 0) {
+			msg.addByte(0x00); // tier (client reads it if classification > 0)
+		}
 	} else {
 		msg.addByte(0x79);
 		msg.addByte(slot);
@@ -3115,16 +3126,11 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
                                uint32_t remove)
 {
 	CreatureType_t creatureType = creature->getType();
-	uint32_t masterId = 0;
 
-	if (creatureType == CREATURETYPE_MONSTER) {
-		if (const auto& master = creature->getMaster()) {
-			if (const auto& masterPlayer = master->asPlayer()) {
-				masterId = master->getID();
-				creatureType = CREATURETYPE_SUMMON_OWN;
-			}
-		}
-	}
+	const bool isSummonPlayer =
+	    creatureType == CREATURETYPE_MONSTER && creature->getMaster() && creature->getMaster()->asPlayer();
+	const uint8_t displayType =
+	    creature->isHealthHidden() ? 5 : static_cast<uint8_t>(isSummonPlayer ? 6 : creatureType);
 
 	if (known) {
 		msg.add<uint16_t>(0x62);
@@ -3133,10 +3139,14 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 		msg.add<uint16_t>(0x61);
 		msg.add<uint32_t>(remove);
 		msg.add<uint32_t>(creature->getID());
-		msg.addByte(creature->isHealthHidden() ? CREATURETYPE_HIDDEN : creatureType);
 
-		if (creatureType == CREATURETYPE_SUMMON_OWN) {
-			msg.add<uint32_t>(masterId);
+		msg.addByte(displayType);
+		if (isSummonPlayer) {
+			if (const auto& master = creature->getMaster()) {
+				msg.add<uint32_t>(master->getID());
+			} else {
+				msg.add<uint32_t>(0);
+			}
 		}
 
 		msg.addString(creature->isHealthHidden() ? "" : creature->getName());
@@ -3176,13 +3186,15 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 		msg.addByte(player->getGuildEmblem(otherPlayer));
 	}
 
-	// Creature type and summon emblem
-	msg.addByte(creature->isHealthHidden() ? CREATURETYPE_HIDDEN : creatureType);
-	if (creatureType == CREATURETYPE_SUMMON_OWN) {
-		msg.add<uint32_t>(masterId);
+	msg.addByte(displayType);
+	if (isSummonPlayer) {
+		if (const auto& master = creature->getMaster()) {
+			msg.add<uint32_t>(master->getID());
+		} else {
+			msg.add<uint32_t>(0);
+		}
 	}
 
-	// Player vocation info
 	if (creatureType == CREATURETYPE_PLAYER) {
 		msg.addByte(otherPlayer ? otherPlayer->getVocation()->getClientId() : 0x00);
 	}
@@ -3194,7 +3206,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 	}
 
 	msg.addByte(0xFF); // MARK_UNMARKED
-	msg.addByte(0x00); // inspection type (bool?)
+	msg.addByte(0x00); // inspection type
 
 	msg.addByte(player->canWalkthroughEx(creature) ? 0x00 : 0x01);
 }
@@ -3232,7 +3244,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint64_t>(player->getExperience());
 
 	msg.add<uint16_t>(player->getLevel());
-	msg.add<uint16_t>(static_cast<uint16_t>(player->getLevelPercent() * 100)); // 15.24: u16 (percent * 100), was u8
+	msg.add<uint16_t>(player->getLevelPercent());
 
 	msg.add<uint16_t>(player->getClientExpDisplay());
 	msg.add<uint16_t>(player->getClientLowLevelBonusDisplay());
@@ -3549,18 +3561,6 @@ void ProtocolGame::sendGameNews()
 	msg.addByte(1);       // 0 = open window, 1 = highlight icon
 	writeToOutputBuffer(msg);
 }
-
-// ===== Stub packets (empty - systems not implemented) =====
-
-void ProtocolGame::sendBosstiaryCooldownTimer() {}
-void ProtocolGame::sendItemsPrice() {}
-void ProtocolGame::sendPreyPrices() {}
-void ProtocolGame::sendPreyData() {}
-void ProtocolGame::sendTaskHuntingData() {}
-void ProtocolGame::sendForgingData() {}
-void ProtocolGame::sendVIPGroups() {}
-void ProtocolGame::sendLootContainers() {}
-void ProtocolGame::sendHousesInfo() {}
 
 // ===== New parse stubs (client -> server) =====
 
