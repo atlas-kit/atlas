@@ -186,8 +186,17 @@ void parseTileArea(const OTB::Node& node, Map& map)
 					auto id = OTB::read<uint16_t>(it, tileNode.propsEnd);
 					auto item = Item::CreateItem(Item::getPersistentId(id));
 					if (!item) [[unlikely]] {
-						throw std::runtime_error(std::format("[{:s}:{:d} - {:s}] Invalid item id: {:d}", __FILE__,
-						                                     __LINE__, __FUNCTION__, id));
+						// Items in items.otb may map to client IDs that
+						// have no entry in the bundled appearances.dat
+						// (deprecated / removed sprites — see
+						// MIGRATION.md). Skip the bad ground reference so
+						// the rest of the tile still loads instead of
+						// taking the whole world down on boot.
+						std::println(
+						    "[Warning - IOMap::loadMap] Skipping invalid ground item ID {}"
+						    " at position [x: {}, y: {}, z: {}].",
+						    id, x, y, z);
+						break;
 					}
 
 					if (isHouseTile && item->isMoveable()) {
@@ -234,8 +243,15 @@ void parseTileArea(const OTB::Node& node, Map& map)
 			auto id = OTB::read<uint16_t>(itemIt, itemNode.propsEnd);
 			auto item = Item::CreateItem(Item::getPersistentId(id));
 			if (!item) [[unlikely]] {
-				throw std::runtime_error(
-				    std::format("[{:s}:{:d} - {:s}] Invalid item id: {:d}", __FILE__, __LINE__, __FUNCTION__, id));
+				// See the matching case in the tile prop loop above:
+				// items.otb maps some entries to client IDs that are not
+				// present in the bundled appearances.dat. Warn and skip
+				// the orphan instead of aborting the whole map load.
+				std::println(
+				    "[Warning - IOMap::loadMap] Skipping invalid item ID {} at"
+				    " position [x: {}, y: {}, z: {}].",
+				    id, x, y, z);
+				continue;
 			}
 
 			item->unserializeItemNode(itemIt, itemNode.propsEnd, itemNode);
