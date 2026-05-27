@@ -66,13 +66,18 @@ void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 			msg->setSequenceId(compressionChecksum | getNextSequenceId());
 		}
 
-		msg->writeMessageLength();
-
 		if (encryptionEnabled) {
 			msg->writePaddingLength();
 			XTEA_encrypt(*msg, key);
 			msg->addCryptoHeader();
 		}
+
+		// writeMessageLength prepends the OUTER u16 block-count that
+		// `Connection::parseHeader` reads via `msg.getLengthHeader() * 8 + CHECKSUM_LENGTH`.
+		// Must run AFTER `addCryptoHeader` so the u16 lands at the very start of the
+		// frame (outside the XTEA payload) and the formula sees the full length
+		// including the 4-byte crypto header.
+		msg->writeMessageLength();
 	}
 }
 
