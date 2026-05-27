@@ -440,6 +440,18 @@ public:
 	bool showClientDuration = false;
 	bool wrapContainer = false; // 15.24: decoration kit; client expects u16 unWrapId
 	bool dualWielding = false;
+
+	// 15.x appearance-derived flags used by NetworkMessage::addItem to decide
+	// which optional sections to write after the itemId. Mirror the parser
+	// expectations on the 15.24 client side (see TibiaTrace/getItem and
+	// Canary winter-update-2025 ProtocolGame::AddItem).
+	bool isCorpse = false;
+	bool isPodiumAppearance = false; // appearance show_off_socket; type==ITEM_TYPE_PODIUM is the authoritative check
+	bool wearOut = false;            // u32 charges + u8 brand-new
+	bool clockExpire = false;        // u32 decayTime + u8 brand-new (any of expire/expireStop/clockExpire writes the block)
+	bool expire = false;
+	bool expireStop = false;
+	bool isWrapKit = false;          // appearance.decoItemKit -> u16 unWrapId on wire
 };
 
 class Items

@@ -1757,6 +1757,18 @@ bool Items::loadFromAppearances(const std::string& file)
 		// Expiration flags
 		iType.stopTime = appearance.expireStop;
 
+		// 15.x wire-format flags consumed by NetworkMessage::addItem.
+		// Mirror Canary winter-update-2025 (items/items.cpp:228-255), which
+		// reads these straight off the proto and uses them to decide what
+		// optional sections to write after the itemId on the network.
+		iType.isCorpse = appearance.isCorpse || appearance.isPlayerCorpse;
+		iType.isPodiumAppearance = appearance.isShowOffSocket;
+		iType.wearOut = appearance.wearout;
+		iType.clockExpire = appearance.clockExpire;
+		iType.expire = appearance.expire;
+		iType.expireStop = appearance.expireStop;
+		iType.isWrapKit = appearance.decoItemKit;
+
 		// Weapon type (proto enum → server enum)
 		if (appearance.weaponType > 0) {
 			switch (appearance.weaponType) {

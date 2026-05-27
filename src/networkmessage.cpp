@@ -99,6 +99,29 @@ void NetworkMessage::addPosition(const Position& pos)
 	addByte(pos.z);
 }
 
+// Wire layout for items in protocol 15.x (verified against the
+// Tibia 15.24 client parser in TibiaTrace/src/protocol/parsers/ServerPackets.hpp
+// `getItem` and Canary winter-update-2025 `ProtocolGame::AddItem`).
+//
+// Every check below is INDEPENDENT — the client reads each optional section
+// in order based on the flags it loaded from its own appearances.dat, so a
+// single item can legitimately carry several sections (e.g. a sword with
+// upgradeClassification > 0 AND clockExpire writes both `tier` and
+// `decay+brandNew`). The previous `else if` cascade collapsed multiple flags
+// into a single branch and made the client read garbage on items that
+// matched more than one condition.
+//
+// Order matters and must match the client's read sequence:
+//   1. clientId               u16
+//   2. stackable              u8 count
+//   3. fluid/splash           u8 fluidType
+//   4. container              u8 containerType + (variant payload)
+//   5. podium                 outfit + mount + u8 direction + u8 visible
+//   6. upgradeClassification  u8 tier
+//   7. clock/expire/expireStop u32 decay + u8 brandNew
+//   8. wearOut                u32 charges + u8 brandNew
+//   9. isWrapKit              u16 unWrapId
+
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
 	const ItemType& it = Item::items[id];
@@ -107,26 +130,43 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 	if (it.stackable) {
 		addByte(count);
-	} else if (it.isSplash() || it.isFluidContainer()) {
+	}
+
+	if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
-	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
-	} else if (it.isPodium()) {
+	}
+
+	if (it.isContainer()) {
+		// ContainerSpecial_t::None — no extra payload. Quiver / loot
+		// categories require an actual Item* to enumerate ammo; the
+		// id-only overload always emits a plain container.
+		addByte(0x00);
+	}
+
+	if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
 		addByte(0x01);    // is visible (bool)
-	} else if (it.classification > 0) {
+	}
+
+	if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
+	}
+
+	if (it.clockExpire || it.expire || it.expireStop) {
 		add<uint32_t>(floor<std::chrono::seconds>(it.decayTimeMin).count());
-		addByte(0x00); // is brand new
-	} else if (it.showClientCharges) {
+		addByte(0x01); // brand-new
+	}
+
+	if (it.wearOut) {
 		add<uint32_t>(it.charges);
-		addByte(0x00); // is brand new
-	} else if (it.wrapContainer) {
-		add<uint16_t>(0x00); // unWrapId (no wrapped item by default)
+		addByte(0x01); // brand-new
+	}
+
+	if (it.isWrapKit) {
+		add<uint16_t>(0x00); // unWrapId — no wrapped item baked into a fresh kit
 	}
 }
 
@@ -138,17 +178,28 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 	if (it.stackable) {
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
-	} else if (it.isSplash() || it.isFluidContainer()) {
+	}
+
+	if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
-	} else if (it.isContainer()) {
+	}
+
+	if (it.isContainer()) {
+		// Mirror Canary's `enumToValue(ContainerSpecial_t)`: 0 = None (no
+		// extra bytes), 2 = ContentCounter (Quiver shows ammo total). We
+		// only support the two categories actually emitted by Atlas; the
+		// rest of the enum (Manager, QuiverLoot, etc.) belongs to UI
+		// features the server doesn't drive yet.
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
-			addByte(0x01);
+			addByte(0x02); // ContainerSpecial_t::ContentCounter
 			add<uint32_t>(container->getAmmoCount());
 		} else {
-			addByte(0x00);
+			addByte(0x00); // ContainerSpecial_t::None
 		}
-	} else if (it.isPodium()) {
+	}
+
+	if (it.isPodium()) {
 		const auto& podium = item->asPodium();
 		const Outfit_t& outfit = podium->getOutfit();
 
@@ -184,16 +235,24 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 		addByte(podium->getDirection());
 		addByte(podium->hasFlag(PODIUM_SHOW_PLATFORM) ? 0x01 : 0x00);
-	} else if (it.classification > 0) {
-		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
+	}
+
+	if (it.classification > 0) {
+		addByte(0x00); // item tier (0-10) — Atlas does not persist tier yet
+	}
+
+	if (it.clockExpire || it.expire || it.expireStop) {
 		add<uint32_t>(floor<std::chrono::seconds>(item->getDuration()).count());
-		addByte(0); // is brand new
-	} else if (it.showClientCharges) {
+		addByte(0x01); // brand-new
+	}
+
+	if (it.wearOut) {
 		add<uint32_t>(item->getCharges());
-		addByte(0); // is brand new
-	} else if (it.wrapContainer) {
-		add<uint16_t>(0x00); // unWrapId (atlas does not store wrapped item id yet)
+		addByte(0x01); // brand-new
+	}
+
+	if (it.isWrapKit) {
+		add<uint16_t>(0x00); // unWrapId — Atlas does not yet persist the wrapped item id
 	}
 }
 
