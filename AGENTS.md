@@ -34,7 +34,7 @@ All presets use Ninja as the generator. `binaryDir` is `${sourceDir}/build/<pres
 Cache variables passed via `-D` or `configurePresetAdditionalArgs`:
 
 - `BUILD_TESTING=ON` — build Boost.Test unit tests
-- `ENABLE_ASAN=ON` — address sanitizer (debug only; set `ASAN_OPTIONS=exitcode=0` in CI)
+- `ENABLE_ASAN=ON` — enable AddressSanitizer for supported toolchains/builds; use for diagnostics/sanitizer-specific runs due to runtime overhead (set `ASAN_OPTIONS=exitcode=0` in CI)
 - `OPTIONS_ENABLE_CCACHE=ON` / `OPTIONS_ENABLE_SCCACHE=ON` — compiler cache
 - `OPTIONS_ENABLE_IPO=ON/OFF` — interprocedural optimization / LTO (default: auto-detected ON)
 
@@ -73,10 +73,14 @@ Ports (defaults in `config.lua`): 7171 (status), 7172 (game protocol), 8080 (HTT
 ### C++
 
 ```bash
-cmake --build --target format
+# Linux
+cmake --build --preset=linux-release --target format
+
+# Windows
+cmake --build --preset=windows-release --target format
 ```
 
-Style: `.clang-format` (Google, 120ch, 4-space indent, `BreakBeforeBraces: Custom`).
+Style: `.clang-format` (Google, 120ch, tabs for indentation with width 4, `BreakBeforeBraces: Custom`).
 
 ### Lua
 
@@ -110,9 +114,10 @@ src/
   events/        — Lua event handlers (creature, monster, party, player)
   http/          — optional HTTP REST server (Boost.Beast, 8 modules)
   tests/         — Boost.Test unit tests (test_*.cpp)
-  cmake/modules/ — custom CMake tooling (FindMySQL, LoggingHelper, MessageColors)
   otserv.cpp     — main entry point
   otpch.h        — precompiled header (all sources `#include <otpch.h>`)
+cmake/
+  modules/       — custom CMake tooling (FindMySQL, LoggingHelper, MessageColors)
 data/
   actions/       — item actions (.xml)
   chatchannels/  — channel routing config (.xml)
