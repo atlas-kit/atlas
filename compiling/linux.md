@@ -1,6 +1,11 @@
 # Compiling on Linux
 
-Atlas builds on any modern Linux distribution with a C++23-capable compiler (GCC 14+ or Clang 17+).
+Atlas builds on any modern Linux distribution with a C++23-capable compiler. You need either:
+
+- **GCC 14+** (provides the C++23 `<print>` header in libstdc++), or
+- **Clang 17+** paired with libstdc++ from GCC 14+ (install `g++-14` alongside) or with `libc++` (`-stdlib=libc++`, requires `libc++-18-dev` or newer).
+
+A bare Clang 18 on Ubuntu 24.04 will fail with `fatal error: 'print' file not found` because the default libstdc++ ships with GCC 13.
 
 You can pick between two paths:
 
@@ -21,6 +26,22 @@ sudo apt install -y \
 ```
 
 > `libboost-dev` is required when `ENABLE_HTTP=ON` (the default) because Boost.Beast is header-only and ships only with that package on Debian/Ubuntu.
+
+> **Ubuntu 24.04 (noble)** does not ship `libsimdutf-dev`. Either upgrade to 24.10+/Debian 13+, or build simdutf from source:
+>
+> ```bash
+> git clone --depth 1 --branch v5.7.2 https://github.com/simdutf/simdutf.git /tmp/simdutf
+> cmake -G Ninja -S /tmp/simdutf -B /tmp/simdutf/build \
+>   -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DSIMDUTF_TOOLS=OFF -DSIMDUTF_BENCHMARKS=OFF
+> cmake --build /tmp/simdutf/build && sudo cmake --install /tmp/simdutf/build
+> ```
+
+> **GCC 13 (Ubuntu 24.04 default)** is too old for `<print>`. Install GCC 14 and use it explicitly:
+>
+> ```bash
+> sudo apt install -y g++-14
+> export CC=gcc-14 CXX=g++-14
+> ```
 
 Configure and build:
 
@@ -91,5 +112,5 @@ After building, copy `config.lua.dist` to `config.lua`, edit it, then run from t
 ## Troubleshooting
 
 - **"Boost not found" / version too old** — Atlas requires Boost 1.71+ (1.75+ when HTTP is enabled). Install a newer Boost from your distro's backports or use the vcpkg path.
-- **GCC version error** — you need GCC 14+ for the C++23 features used by Atlas (`std::move_only_function`, `std::views::as_const`).
+- **GCC version error / `'print' file not found`** — you need GCC 14+ for the C++23 features used by Atlas (`<print>`, `std::move_only_function`, `std::views::as_const`). On Ubuntu 24.04: `sudo apt install g++-14` and `export CC=gcc-14 CXX=g++-14`.
 - **vcpkg builds slow on first run** — vcpkg compiles every dependency from source on the first invocation. Subsequent builds reuse the binary cache.
