@@ -52,7 +52,7 @@ local function schedule(self, callback, delay, ...)
 	eventId = addEvent(function(...)
 		self._eventIds[eventId] = nil
 		callback(...)
-	end, math.max(SCHEDULER_MINTICKS, delay), ...)
+	end, math.max(MIN_TASK_INTERVAL, delay), ...)
 	self._eventIds[eventId] = true
 	return eventId
 end
@@ -100,8 +100,8 @@ local function isValidWeekday(day)
 end
 
 function ScheduleEvent:scheduleInterval(interval)
-	if interval < SCHEDULER_MINTICKS then
-		print("[Warning - ScheduleEvent] Interval must be >= " .. SCHEDULER_MINTICKS .. "ms")
+	if interval < MIN_TASK_INTERVAL then
+		print("[Warning - ScheduleEvent] Interval must be >= " .. MIN_TASK_INTERVAL .. "ms")
 		return false
 	end
 
@@ -116,7 +116,7 @@ function ScheduleEvent:scheduleInterval(interval)
 
 		nextExecution = nextExecution + interval
 		local delay = nextExecution - os.mtime()
-		while delay < SCHEDULER_MINTICKS do
+		while delay < MIN_TASK_INTERVAL do
 			nextExecution = nextExecution + interval
 			delay = nextExecution - os.mtime()
 		end
@@ -279,8 +279,8 @@ function ScheduleEvent:register()
 
 				dayTimes[day] = {{h, m, s}}
 			elseif type(value) == "number" then
-				if value < SCHEDULER_MINTICKS then
-					print("[Warning - ScheduleEvent] Interval must be >= " .. SCHEDULER_MINTICKS .. "ms")
+				if value < MIN_TASK_INTERVAL then
+					print("[Warning - ScheduleEvent] Interval must be >= " .. MIN_TASK_INTERVAL .. "ms")
 					self:stop()
 					return false
 				end

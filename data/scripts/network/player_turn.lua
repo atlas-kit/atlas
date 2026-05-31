@@ -22,7 +22,7 @@ for type, direction in pairs(packetTypes) do
     local handler = PacketHandler(type)
 
     function handler.onReceive(player, msg)
-        addEvent(playerTurn, SCHEDULER_MINTICKS, player:getId(), direction)
+        addEvent(playerTurn, MIN_TASK_INTERVAL, player:getId(), direction)
     end
 
     handler:register()

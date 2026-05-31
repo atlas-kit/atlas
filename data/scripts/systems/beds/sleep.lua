@@ -72,7 +72,7 @@ local function sleep(player, headboardPos)
         if player then
             player:remove()
         end
-    end, SCHEDULER_MINTICKS, player:getId())
+    end, MIN_TASK_INTERVAL, player:getId())
     return true
 end
 

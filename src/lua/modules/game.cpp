@@ -613,7 +613,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	registerEnum(lsi, GAME_STATE_CLOSING);
 	registerEnum(lsi, GAME_STATE_MAINTAIN);
 
-	lsi.registerGlobalVariable("SCHEDULER_MINTICKS", SCHEDULER_MINTICKS.count());
+	lsi.registerGlobalVariable("MIN_TASK_INTERVAL", MIN_TASK_INTERVAL.count());
 
 	registerEnum(lsi, WORLD_TYPE_NO_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP);

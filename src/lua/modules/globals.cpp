@@ -325,7 +325,7 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, RELOAD_TYPE_TALKACTIONS);
 	registerEnum(lsi, RELOAD_TYPE_WEAPONS);
 
-	lsi.registerGlobalVariable("SCHEDULER_MINTICKS", SCHEDULER_MINTICKS.count());
+	lsi.registerGlobalVariable("MIN_TASK_INTERVAL", MIN_TASK_INTERVAL.count());
 
 	lsi.registerGlobalBoolean("VIRTUAL_PARENT", true);
 
