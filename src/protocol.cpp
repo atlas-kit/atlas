@@ -66,13 +66,13 @@ void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 			msg->setSequenceId(compressionChecksum | getNextSequenceId());
 		}
 
-		msg->writeMessageLength();
-
 		if (encryptionEnabled) {
 			msg->writePaddingLength();
 			XTEA_encrypt(*msg, key);
 			msg->addCryptoHeader();
 		}
+
+		msg->writeMessageLength();
 	}
 }
 
