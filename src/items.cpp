@@ -1673,7 +1673,8 @@ bool Items::loadFromAppearances(const std::string& file)
 		iType.pickupable = appearance.isPickupable;
 		iType.moveable = !appearance.isUnmovable;
 		iType.stackable = appearance.isStackable;
-		iType.alwaysOnTop = appearance.isOnTop;
+		// iType.alwaysOnTop is derived from alwaysOnTopOrder below (clip/bottom/top),
+		// not just the `top` flag — see the AlwaysOnTop order block further down.
 		iType.isVertical = (appearance.hookDirection == 1);
 		iType.isHorizontal = (appearance.hookDirection == 2);
 		iType.isHangable = appearance.isHangable;
@@ -1753,6 +1754,16 @@ bool Items::loadFromAppearances(const std::string& file)
 		} else if (appearance.isOnTop) {
 			iType.alwaysOnTopOrder = 3;
 		}
+
+		// Keep the alwaysOnTop flag consistent with the order. Tile stacking
+		// (Tile::addThing / Tile::internalAddThing) classifies an item as a top
+		// item via this flag, while the client-stackpos calculation
+		// (Tile::getClientIndexOfCreature -> Item::isAlwaysOnTop) uses the order.
+		// They must agree: clip (1) and bottom (2) borders are top items too,
+		// not only the `top` flag (3). A mismatch puts creatures at the wrong
+		// stackpos and crashes 15.x clients with
+		// "No creature found at coordinate(...)/position(N)".
+		iType.alwaysOnTop = iType.alwaysOnTopOrder != 0;
 
 		// Expiration flags
 		iType.stopTime = appearance.expireStop;
