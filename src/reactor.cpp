@@ -41,12 +41,9 @@ uint32_t TaskReactor::schedule(std::unique_ptr<DelayedTask>&& delayed)
 	auto fn = delayed->extractFunc();
 
 	{
-		std::lock_guard<std::mutex> lock(scheduleLock);
-		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
-	}
-
-	{
 		std::lock_guard<std::mutex> lock(taskLock);
+		liveIds.insert(id);
+		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
 		taskSignal.notify_one();
 	}
 
@@ -59,12 +56,9 @@ uint32_t TaskReactor::schedule(chrono::milliseconds delay, Closure&& fn)
 	auto fire_at = chrono::steady_clock::now() + delay;
 
 	{
-		std::lock_guard<std::mutex> lock(scheduleLock);
-		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
-	}
-
-	{
 		std::lock_guard<std::mutex> lock(taskLock);
+		liveIds.insert(id);
+		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
 		taskSignal.notify_one();
 	}
 
@@ -78,8 +72,10 @@ void TaskReactor::cancel(uint32_t taskId)
 	}
 
 	{
-		std::lock_guard<std::mutex> lock(scheduleLock);
-		pendingCancels.push_back(taskId);
+		std::lock_guard<std::mutex> lock(taskLock);
+		if (liveIds.find(taskId) != liveIds.end()) {
+			pendingCancels.push_back(taskId);
+		}
 	}
 }
 
@@ -100,48 +96,47 @@ void TaskReactor::run()
 
 void TaskReactor::drain()
 {
-	// 1. Process pending schedules and cancellations
+	std::vector<ImmediateTask> tmpList;
+
+	// Process pending schedules, cancellations, and swap task list
 	{
-		std::lock_guard<std::mutex> lock(scheduleLock);
+		std::lock_guard<std::mutex> lock(taskLock);
+
 		for (auto& [id, fire_at, func] : pendingSchedules) {
 			heap.emplace(fire_at, id, std::move(func));
 		}
 		pendingSchedules.clear();
 
 		for (auto id : pendingCancels) {
-			cancelled.insert(id);
+			if (liveIds.find(id) != liveIds.end()) {
+				cancelled.insert(id);
+			}
 		}
 		pendingCancels.clear();
+
+		tmpList.swap(taskList);
 	}
 
-	// 2. Pop expired timers
+	// Pop expired timers
 	auto now = chrono::steady_clock::now();
 	while (!heap.empty() && heap.top().fire_at <= now) {
 		ScheduledTask task = std::move(const_cast<ScheduledTask&>(heap.top()));
 		heap.pop();
+		liveIds.erase(task.taskId);
 		if (cancelled.erase(task.taskId) == 0) {
 			task.func();
 		}
 	}
 
-	// 3. Process immediate tasks
-	{
-		std::vector<ImmediateTask> tmpList;
-
-		{
-			std::lock_guard<std::mutex> lock(taskLock);
-			tmpList.swap(taskList);
-		}
-
-		now = chrono::steady_clock::now();
-		for (auto& im : tmpList) {
-			if (im.deadline == chrono::steady_clock::time_point::max() || im.deadline > now) {
-				im.func();
-			}
+	// Process immediate tasks
+	now = chrono::steady_clock::now();
+	for (auto& im : tmpList) {
+		if (im.deadline == chrono::steady_clock::time_point::max() || im.deadline > now) {
+			im.func();
 		}
 	}
 
-	// 4. Wait if nothing to do
+	// Wait if nothing to do
 	if (getState() == THREAD_STATE_TERMINATED) {
 		return;
 	}
@@ -150,13 +145,13 @@ void TaskReactor::drain()
 		auto timeout = chrono::duration_cast<chrono::milliseconds>(heap.top().fire_at - chrono::steady_clock::now());
 		if (timeout.count() > 0) {
 			std::unique_lock<std::mutex> lock(taskLock);
-			if (taskList.empty()) {
+			if (taskList.empty() && pendingSchedules.empty()) {
 				taskSignal.wait_for(lock, timeout);
 			}
 		}
 	} else {
 		std::unique_lock<std::mutex> lock(taskLock);
-		if (taskList.empty()) {
+		if (taskList.empty() && pendingSchedules.empty()) {
 			taskSignal.wait_for(lock, chrono::milliseconds(100));
 		}
 	}

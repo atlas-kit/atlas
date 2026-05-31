@@ -76,10 +76,10 @@ private:
 	std::condition_variable taskSignal;
 	std::vector<ImmediateTask> taskList;
 
-	std::mutex scheduleLock;
 	std::vector<std::tuple<uint32_t, chrono::steady_clock::time_point, Closure>> pendingSchedules;
 	std::vector<uint32_t> pendingCancels;
 	std::unordered_set<uint32_t> cancelled;
+	std::unordered_set<uint32_t> liveIds;
 
 	std::priority_queue<ScheduledTask, std::vector<ScheduledTask>, std::greater<>> heap;
 	std::atomic<uint32_t> nextId{0};

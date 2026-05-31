@@ -30,10 +30,6 @@ extern TaskReactor g_reactor;
 extern Scripts* g_scripts;
 extern Vocations g_vocations;
 
-std::mutex g_loaderLock;
-std::condition_variable g_loaderSignal;
-std::unique_lock<std::mutex> g_loaderUniqueLock(g_loaderLock);
-
 #define RESET "\033[0m"
 #define BOLDRED "\033[1m\033[31m"
 
@@ -74,7 +70,6 @@ void printServerVersion()
 void startupErrorMessage(const std::string& errorStr)
 {
 	std::println(BOLDRED "ERROR: {:s}" RESET, errorStr);
-	g_loaderSignal.notify_all();
 }
 
 void mainLoader(ServiceManager* services)
@@ -280,7 +275,6 @@ void mainLoader(ServiceManager* services)
 
 	g_game.start(services);
 	g_game.setGameState(GAME_STATE_NORMAL);
-	g_loaderSignal.notify_all();
 }
 
 [[noreturn]] void badAllocationHandler()
