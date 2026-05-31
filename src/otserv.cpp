@@ -67,10 +67,7 @@ void printServerVersion()
 	std::cout << std::endl;
 }
 
-void startupErrorMessage(const std::string& errorStr)
-{
-	std::println(BOLDRED "ERROR: {:s}" RESET, errorStr);
-}
+void startupErrorMessage(const std::string& errorStr) { std::println(BOLDRED "ERROR: {:s}" RESET, errorStr); }
 
 void mainLoader(ServiceManager* services)
 {
