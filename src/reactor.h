@@ -10,8 +10,10 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <queue>
+#include <tuple>
 #include <unordered_set>
 #include <vector>
 
@@ -75,7 +77,7 @@ private:
 	std::vector<ImmediateTask> taskList;
 
 	std::mutex scheduleLock;
-	std::vector<std::tuple<uint32_t, chrono::milliseconds, Closure>> pendingSchedules;
+	std::vector<std::tuple<uint32_t, chrono::steady_clock::time_point, Closure>> pendingSchedules;
 	std::vector<uint32_t> pendingCancels;
 	std::unordered_set<uint32_t> cancelled;
 

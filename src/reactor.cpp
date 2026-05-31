@@ -29,34 +29,45 @@ void TaskReactor::send(chrono::milliseconds expiration, Closure&& fn)
 
 uint32_t TaskReactor::schedule(std::unique_ptr<DelayedTask>&& delayed)
 {
-	auto id = ++nextId;
-
-	if (delayed->getId() == 0) {
+	auto id = delayed->getId();
+	if (id == 0) {
+		id = ++nextId;
 		delayed->setId(id);
+	} else if (id > nextId) {
+		nextId.store(id, std::memory_order_relaxed);
 	}
 
-	auto delay = delayed->getDelay();
+	auto fire_at = chrono::steady_clock::now() + delayed->getDelay();
 	auto fn = delayed->extractFunc();
 
 	{
 		std::lock_guard<std::mutex> lock(scheduleLock);
-		pendingSchedules.emplace_back(id, delay, std::move(fn));
+		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
 	}
 
-	taskSignal.notify_one();
+	{
+		std::lock_guard<std::mutex> lock(taskLock);
+		taskSignal.notify_one();
+	}
+
 	return id;
 }
 
 uint32_t TaskReactor::schedule(chrono::milliseconds delay, Closure&& fn)
 {
 	auto id = ++nextId;
+	auto fire_at = chrono::steady_clock::now() + delay;
 
 	{
 		std::lock_guard<std::mutex> lock(scheduleLock);
-		pendingSchedules.emplace_back(id, delay, std::move(fn));
+		pendingSchedules.emplace_back(id, fire_at, std::move(fn));
 	}
 
-	taskSignal.notify_one();
+	{
+		std::lock_guard<std::mutex> lock(taskLock);
+		taskSignal.notify_one();
+	}
+
 	return id;
 }
 
@@ -74,7 +85,8 @@ void TaskReactor::cancel(uint32_t taskId)
 
 void TaskReactor::shutdown()
 {
-	send([this]() { threadState.store(THREAD_STATE_TERMINATED, std::memory_order_relaxed); });
+	threadState.store(THREAD_STATE_TERMINATED, std::memory_order_relaxed);
+	taskSignal.notify_one();
 }
 
 void TaskReactor::run()
@@ -91,8 +103,8 @@ void TaskReactor::drain()
 	// 1. Process pending schedules and cancellations
 	{
 		std::lock_guard<std::mutex> lock(scheduleLock);
-		for (auto& [id, delay, func] : pendingSchedules) {
-			heap.emplace(chrono::steady_clock::now() + delay, id, std::move(func));
+		for (auto& [id, fire_at, func] : pendingSchedules) {
+			heap.emplace(fire_at, id, std::move(func));
 		}
 		pendingSchedules.clear();
 
@@ -121,7 +133,7 @@ void TaskReactor::drain()
 			tmpList.swap(taskList);
 		}
 
-		auto now = chrono::steady_clock::now();
+		now = chrono::steady_clock::now();
 		for (auto& im : tmpList) {
 			if (im.deadline == chrono::steady_clock::time_point::max() || im.deadline > now) {
 				im.func();

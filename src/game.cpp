@@ -5404,6 +5404,13 @@ void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type)
 	}
 }
 
+void Game::forceRemoveCondition(uint32_t creatureId, ConditionType_t type, ConditionId_t conditionId)
+{
+	if (const auto& creature = getCreatureByID(creatureId)) {
+		creature->removeCondition(type, conditionId, true);
+	}
+}
+
 void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, uint8_t button, uint8_t choice)
 {
 	const auto& player = getPlayerByID(playerId);

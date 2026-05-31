@@ -28,9 +28,9 @@ std::vector<std::shared_ptr<Protocol>> bufferedProtocols;
 
 void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols);
 
-void scheduleSendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
+void scheduleSendAll()
 {
-	g_reactor.schedule(OUTPUTMESSAGE_AUTOSEND_DELAY, [&]() { sendAll(protocols); });
+	g_reactor.schedule(OUTPUTMESSAGE_AUTOSEND_DELAY, []() { sendAll(bufferedProtocols); });
 }
 
 void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
@@ -43,7 +43,7 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 	}
 
 	if (!protocols.empty()) {
-		scheduleSendAll(protocols);
+		scheduleSendAll();
 	}
 }
 
@@ -60,7 +60,7 @@ void tfs::net::insert_protocol_to_autosend(const std::shared_ptr<Protocol>& prot
 {
 	// dispatcher thread
 	if (bufferedProtocols.empty()) {
-		scheduleSendAll(bufferedProtocols);
+		scheduleSendAll();
 	}
 	bufferedProtocols.emplace_back(protocol);
 }

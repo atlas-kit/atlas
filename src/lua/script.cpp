@@ -427,7 +427,8 @@ int luaAddEvent(lua_State* L)
 		eventDesc.parameters.push_back(luaL_ref(L, LUA_REGISTRYINDEX));
 	}
 
-	auto delay = std::chrono::milliseconds{std::max<uint32_t>(100, tfs::lua::getNumber<uint32_t>(L, 2))};
+	auto requested = tfs::lua::getNumber<uint32_t>(L, 2);
+	auto delay = std::max(MIN_TASK_INTERVAL, std::chrono::milliseconds{requested});
 	lua_pop(L, 1);
 
 	eventDesc.function = luaL_ref(L, LUA_REGISTRYINDEX);

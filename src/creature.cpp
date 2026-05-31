@@ -1136,7 +1136,9 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t conditionId, 
 		if (!force && type == CONDITION_PARALYZE) {
 			auto walkDelay = getWalkDelay();
 			if (walkDelay > std::chrono::milliseconds::zero()) {
-				g_reactor.schedule(walkDelay, [=, id = getID()]() { g_game.forceRemoveCondition(id, type); });
+				g_reactor.schedule(walkDelay, [id = getID(), type, condId = conditionId]() {
+					g_game.forceRemoveCondition(id, type, condId);
+				});
 				return;
 			}
 		}
@@ -1173,8 +1175,9 @@ void Creature::removeCondition(Condition* condition, bool force /* = false*/)
 	if (!force && condition->getType() == CONDITION_PARALYZE) {
 		auto walkDelay = getWalkDelay();
 		if (walkDelay > std::chrono::milliseconds::zero()) {
-			g_reactor.schedule(
-			    walkDelay, [id = getID(), type = condition->getType()]() { g_game.forceRemoveCondition(id, type); });
+			g_reactor.schedule(walkDelay, [id = getID(), type = condition->getType(), condId = condition->getId()]() {
+				g_game.forceRemoveCondition(id, type, condId);
+			});
 			return;
 		}
 	}
