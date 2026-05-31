@@ -1025,7 +1025,13 @@ void ProtocolGame::parseOpenPrivateChannel(NetworkMessage& msg)
 void ProtocolGame::parseAutoWalk(NetworkMessage& msg)
 {
 	uint8_t numdirs = msg.getByte();
-	if (numdirs == 0 || (msg.getBufferPosition() + numdirs) != (msg.getLength() + 8)) {
+	// The directions must fill exactly the rest of the message. The end of the
+	// message in buffer-position terms is INITIAL_BUFFER_POSITION + length;
+	// this used to be hard-coded as +8 (the old header size) but the 15.x
+	// framing made INITIAL_BUFFER_POSITION 7, so the off-by-one rejected every
+	// click-to-walk request and the player never moved.
+	if (numdirs == 0 ||
+	    (msg.getBufferPosition() + numdirs) != (msg.getLength() + NetworkMessage::INITIAL_BUFFER_POSITION)) {
 		return;
 	}
 
