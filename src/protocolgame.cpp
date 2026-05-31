@@ -252,9 +252,9 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 		if (foundPlayer->client) {
 			foundPlayer->disconnect();
 
-			eventConnect = g_scheduler.addEvent(createSchedulerTask(
+			eventConnect = g_reactor.schedule(
 			    1s, [=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
-			         playerID = foundPlayer->getID()]() { self->connect(playerID, operatingSystem); }));
+			         playerID = foundPlayer->getID()]() { self->connect(playerID, operatingSystem); });
 		} else {
 			connect(foundPlayer->getID(), operatingSystem);
 		}
