@@ -11,8 +11,8 @@
 #include "iomarket.h"
 #include "monsters.h"
 #include "protocolstatus.h"
+#include "reactor.h"
 #include "rsa.h"
-#include "scheduler.h"
 #include "script.h"
 #include "scriptmanager.h"
 #include "server.h"
@@ -24,10 +24,9 @@
 #endif
 
 extern DatabaseTasks g_databaseTasks;
-extern Dispatcher g_dispatcher;
 extern Game g_game;
 extern Monsters g_monsters;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 extern Scripts* g_scripts;
 extern Vocations g_vocations;
 
@@ -348,24 +347,18 @@ int main(int argc, const char** argv)
 
 	ServiceManager serviceManager;
 
-	g_dispatcher.start();
-	g_scheduler.start();
-
-	g_dispatcher.addTask([services = &serviceManager]() { mainLoader(services); });
-
-	g_loaderSignal.wait(g_loaderUniqueLock);
+	mainLoader(&serviceManager);
 
 	if (serviceManager.is_running()) {
 		std::cout << ">> " << getString(ConfigManager::SERVER_NAME) << " Server Online!" << std::endl << std::endl;
-		serviceManager.run();
+		std::thread serviceThread([&]() { serviceManager.run(); });
+		g_reactor.run();
+		serviceManager.stop();
+		serviceThread.join();
 	} else {
 		std::cout << ">> No services running. The server is NOT online." << std::endl;
-		g_scheduler.shutdown();
 		g_databaseTasks.shutdown();
-		g_dispatcher.shutdown();
 	}
 
-	g_scheduler.join();
 	g_databaseTasks.join();
-	g_dispatcher.join();
 }

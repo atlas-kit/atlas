@@ -10,11 +10,11 @@
 #include "lua/error.h"
 #include "lua/meta.h"
 #include "pugicast.h"
-#include "scheduler.h"
+#include "reactor.h"
 
 extern Chat g_chat;
 extern Game g_game;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 
 static auto dummyPrivate = std::make_shared<PrivateChatChannel>(CHANNEL_PRIVATE, "Private Chat Channel");
 
@@ -85,8 +85,7 @@ bool ChatChannel::addUser(const std::shared_ptr<Player>& player)
 	// TODO: Move to script when guild channels can be scripted
 	if (id == CHANNEL_GUILD) {
 		if (const auto& guild = player->getGuild(); !guild->getMotd().empty()) {
-			g_scheduler.addEvent(
-			    createSchedulerTask(150ms, [playerID = player->getID()]() { g_game.sendGuildMotd(playerID); }));
+			g_reactor.schedule(150ms, [playerID = player->getID()]() { g_game.sendGuildMotd(playerID); });
 		}
 	}
 

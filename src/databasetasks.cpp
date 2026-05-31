@@ -5,9 +5,9 @@
 
 #include "databasetasks.h"
 
-#include "tasks.h"
+#include "reactor.h"
 
-extern Dispatcher g_dispatcher;
+extern TaskReactor g_reactor;
 
 DatabaseTasks g_databaseTasks;
 
@@ -67,7 +67,7 @@ void DatabaseTasks::runTask(const DatabaseTask& task)
 	}
 
 	if (task.callback) {
-		g_dispatcher.addTask([=, callback = task.callback]() { callback(result, success); });
+		g_reactor.send([=, callback = task.callback]() { callback(result, success); });
 	}
 }
 

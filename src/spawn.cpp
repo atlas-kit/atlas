@@ -9,11 +9,11 @@
 #include "events/monster.h"
 #include "game.h"
 #include "pugicast.h"
-#include "scheduler.h"
+#include "reactor.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 
 static constexpr auto MINSPAWN_INTERVAL = 10s;           // 10 seconds to match RME
 static constexpr auto MAXSPAWN_INTERVAL = 24 * 60 * 60s; // 1 day
@@ -238,7 +238,7 @@ bool Spawns::isInZone(const Position& centerPos, int32_t radius, const Position&
 void Spawn::startSpawnCheck()
 {
 	if (checkSpawnEvent == 0) {
-		checkSpawnEvent = g_scheduler.addEvent(createSchedulerTask(getInterval(), [this]() { checkSpawn(); }));
+		checkSpawnEvent = g_reactor.schedule(getInterval(), [this]() { checkSpawn(); });
 	}
 }
 
@@ -364,7 +364,7 @@ void Spawn::checkSpawn()
 	}
 
 	if (spawnedMap.size() < spawnMap.size()) {
-		checkSpawnEvent = g_scheduler.addEvent(createSchedulerTask(getInterval(), [this]() { checkSpawn(); }));
+		checkSpawnEvent = g_reactor.schedule(getInterval(), [this]() { checkSpawn(); });
 	}
 }
 
@@ -419,7 +419,7 @@ void Spawn::removeMonster(const std::shared_ptr<Monster>& monster)
 void Spawn::stopEvent()
 {
 	if (checkSpawnEvent != 0) {
-		g_scheduler.stopEvent(checkSpawnEvent);
+		g_reactor.cancel(checkSpawnEvent);
 		checkSpawnEvent = 0;
 	}
 }

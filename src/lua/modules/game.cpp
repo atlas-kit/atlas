@@ -6,9 +6,9 @@
 #include "../../events/monster.h"
 #include "../../monster.h"
 #include "../../npc.h"
+#include "../../reactor.h"
 #include "../../script.h"
 #include "../../spells.h"
-#include "../../tasks.h"
 #include "../api.h"
 #include "../env.h"
 #include "../meta.h"
@@ -19,8 +19,8 @@ extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
 extern Spells* g_spells;
 extern Monsters g_monsters;
+extern TaskReactor g_reactor;
 extern Scripts* g_scripts;
-extern Dispatcher g_dispatcher;
 extern Vocations g_vocations;
 
 namespace {
@@ -100,7 +100,7 @@ int luaGameLoadMap(lua_State* L)
 {
 	// Game.loadMap(path)
 	const std::string& path = tfs::lua::getString(L, 1);
-	g_dispatcher.addTask([path]() {
+	g_reactor.send([path]() {
 		try {
 			g_game.loadMap(path, true);
 		} catch (const std::invalid_argument& e) {

@@ -11,10 +11,10 @@
 #include "game.h"
 #include "lua/env.h"
 #include "lua/meta.h"
+#include "reactor.h"
 #include "spells.h"
-#include "tasks.h"
 
-extern Dispatcher g_dispatcher;
+extern TaskReactor g_reactor;
 extern Game g_game;
 extern Monsters g_monsters;
 
@@ -615,7 +615,7 @@ bool Monster::selectTarget(const std::shared_ptr<Creature>& creature)
 		setAttackedCreature(creature);
 	} else if (isHostile()) {
 		setAttackedCreature(creature);
-		g_dispatcher.addTask([id = getID()]() { g_game.checkCreatureAttack(id); });
+		g_reactor.send([id = getID()]() { g_game.checkCreatureAttack(id); });
 	}
 
 	setFollowCreature(creature);

@@ -3,7 +3,7 @@
 #include "../../configmanager.h"
 #include "../../const.h"
 #include "../../enums.h"
-#include "../../scheduler.h"
+#include "../../reactor.h"
 #include "../../script.h"
 #include "../../tools.h"
 #include "../api.h"

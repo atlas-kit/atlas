@@ -12,7 +12,7 @@
 #include "guild.h"
 #include "inbox.h"
 #include "protocolgame.h"
-#include "scheduler.h"
+#include "reactor.h"
 #include "storeinbox.h"
 #include "town.h"
 #include "vocation.h"
@@ -1229,8 +1229,8 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(std::unique_ptr<SchedulerTask> task);
-	void setNextActionTask(std::unique_ptr<SchedulerTask> task);
+	void setNextWalkActionTask(std::unique_ptr<DelayedTask> task);
+	void setNextActionTask(std::unique_ptr<DelayedTask> task);
 
 	void setNextAction(std::chrono::steady_clock::time_point time) { nextAction = std::max(nextAction, time); }
 	bool canDoAction() const { return nextAction <= std::chrono::steady_clock::now(); }
@@ -1357,7 +1357,7 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	std::unique_ptr<SchedulerTask> walkTask;
+	std::unique_ptr<DelayedTask> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;

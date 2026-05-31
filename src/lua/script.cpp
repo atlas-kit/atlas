@@ -11,7 +11,7 @@
 #include "../movement.h"
 #include "../player.h"
 #include "../protocolstatus.h"
-#include "../scheduler.h"
+#include "../reactor.h"
 #include "../spells.h"
 #include "../weapons.h"
 #include "api.h"
@@ -29,7 +29,7 @@ extern Vocations g_vocations;
 extern Spells* g_spells;
 extern Actions* g_actions;
 extern TalkActions* g_talkActions;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 extern Scripts* g_scripts;
 
 LuaEnvironment g_luaEnvironment;
@@ -434,8 +434,7 @@ int luaAddEvent(lua_State* L)
 	eventDesc.scriptId = tfs::lua::getScriptEnv()->getScriptId();
 
 	uint32_t timerId = g_luaEnvironment.lastEventTimerId++;
-	eventDesc.eventId =
-	    g_scheduler.addEvent(createSchedulerTask(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); }));
+	eventDesc.eventId = g_reactor.schedule(delay, [timerId] { g_luaEnvironment.executeTimerEvent(timerId); });
 
 	g_luaEnvironment.timerEvents.emplace(timerId, std::move(eventDesc));
 	tfs::lua::pushNumber(L, timerId);
@@ -457,7 +456,7 @@ int luaStopEvent(lua_State* L)
 	LuaTimerEventDesc timerEventDesc = std::move(it->second);
 	events.erase(it);
 
-	g_scheduler.stopEvent(timerEventDesc.eventId);
+	g_reactor.cancel(timerEventDesc.eventId);
 	luaL_unref(L, LUA_REGISTRYINDEX, timerEventDesc.function);
 
 	for (auto parameter : timerEventDesc.parameters) {

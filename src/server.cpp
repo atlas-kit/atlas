@@ -6,10 +6,10 @@
 #include "server.h"
 
 #include "configmanager.h"
-#include "scheduler.h"
+#include "reactor.h"
 #include "tools.h"
 
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 
 namespace {
 
@@ -162,10 +162,10 @@ void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::
 		if (!pendingStart) {
 			close();
 			pendingStart = true;
-			g_scheduler.addEvent(createSchedulerTask(
+			g_reactor.schedule(
 			    15s, [serverPort = this->serverPort, service = std::weak_ptr<ServicePort>(shared_from_this())]() {
 				    openAcceptor(service, serverPort);
-			    }));
+			    });
 		}
 	}
 }
@@ -217,8 +217,8 @@ void ServicePort::open(uint16_t port)
 		std::cout << "[ServicePort::open] Error: " << e.what() << std::endl;
 
 		pendingStart = true;
-		g_scheduler.addEvent(createSchedulerTask(
-		    15s, [port, service = std::weak_ptr<ServicePort>(shared_from_this())]() { openAcceptor(service, port); }));
+		g_reactor.schedule(
+		    15s, [port, service = std::weak_ptr<ServicePort>(shared_from_this())]() { openAcceptor(service, port); });
 	}
 }
 

@@ -15,15 +15,15 @@
 #include "iologindata.h"
 #include "movement.h"
 #include "party.h"
-#include "scheduler.h"
+#include "reactor.h"
 #include "tools.h"
 #include "weapons.h"
 
 extern Chat g_chat;
-extern Dispatcher g_dispatcher;
+
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 
@@ -1381,31 +1381,31 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(std::unique_ptr<SchedulerTask> task)
+void Player::setNextWalkActionTask(std::unique_ptr<DelayedTask> task)
 {
 	if (walkTaskEvent != 0) {
-		g_scheduler.stopEvent(walkTaskEvent);
+		g_reactor.cancel(walkTaskEvent);
 		walkTaskEvent = 0;
 	}
 
 	walkTask = std::move(task);
 }
 
-void Player::setNextActionTask(std::unique_ptr<SchedulerTask> task)
+void Player::setNextActionTask(std::unique_ptr<DelayedTask> task)
 {
 	if (actionTaskEvent != 0) {
-		g_scheduler.stopEvent(actionTaskEvent);
+		g_reactor.cancel(actionTaskEvent);
 		actionTaskEvent = 0;
 	}
 
 	if (task) {
-		actionTaskEvent = g_scheduler.addEvent(std::move(task));
+		actionTaskEvent = g_reactor.schedule(std::move(task));
 	}
 }
 
 std::chrono::milliseconds Player::getNextActionTime() const
 {
-	return std::max(SCHEDULER_MINTICKS,
+	return std::max(MIN_TASK_INTERVAL,
 	                duration_cast<std::chrono::milliseconds>(nextAction - std::chrono::steady_clock::now()));
 }
 
@@ -1472,13 +1472,13 @@ void Player::onAttacking(std::chrono::milliseconds)
 		result = Weapon::useFist(asPlayer(), getAttackedCreature());
 	}
 
-	auto task =
-	    createSchedulerTask(std::max(SCHEDULER_MINTICKS, delay), [id = getID()]() { g_game.checkCreatureAttack(id); });
+	auto task = std::make_unique<DelayedTask>(std::max(MIN_TASK_INTERVAL, delay),
+	                                          [id = getID()]() { g_game.checkCreatureAttack(id); });
 	if (!classicSpeed) {
 		setNextActionTask(std::move(task));
 	} else {
-		g_scheduler.stopEvent(classicAttackEvent);
-		classicAttackEvent = g_scheduler.addEvent(std::move(task));
+		g_reactor.cancel(classicAttackEvent);
+		classicAttackEvent = g_reactor.schedule(std::move(task));
 	}
 
 	if (result) {
@@ -3265,7 +3265,7 @@ void Player::onWalkAborted()
 void Player::onWalkComplete()
 {
 	if (walkTask) {
-		walkTaskEvent = g_scheduler.addEvent(std::move(walkTask));
+		walkTaskEvent = g_reactor.schedule(std::move(walkTask));
 	}
 }
 

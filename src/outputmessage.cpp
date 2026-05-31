@@ -7,9 +7,9 @@
 
 #include "lockfree.h"
 #include "protocol.h"
-#include "scheduler.h"
+#include "reactor.h"
 
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 
 namespace {
 
@@ -30,7 +30,7 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols);
 
 void scheduleSendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 {
-	g_scheduler.addEvent(createSchedulerTask(OUTPUTMESSAGE_AUTOSEND_DELAY, [&]() { sendAll(protocols); }));
+	g_reactor.schedule(OUTPUTMESSAGE_AUTOSEND_DELAY, [&]() { sendAll(protocols); });
 }
 
 void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)

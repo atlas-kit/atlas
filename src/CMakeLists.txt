@@ -43,8 +43,8 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/protocol.cpp
 	${CMAKE_CURRENT_LIST_DIR}/protocolgame.cpp
 	${CMAKE_CURRENT_LIST_DIR}/protocolstatus.cpp
+	${CMAKE_CURRENT_LIST_DIR}/reactor.cpp
 	${CMAKE_CURRENT_LIST_DIR}/rsa.cpp
-	${CMAKE_CURRENT_LIST_DIR}/scheduler.cpp
 	${CMAKE_CURRENT_LIST_DIR}/script.cpp
 	${CMAKE_CURRENT_LIST_DIR}/scriptmanager.cpp
 	${CMAKE_CURRENT_LIST_DIR}/server.cpp
@@ -53,7 +53,6 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/spells.cpp
 	${CMAKE_CURRENT_LIST_DIR}/storeinbox.cpp
 	${CMAKE_CURRENT_LIST_DIR}/talkaction.cpp
-	${CMAKE_CURRENT_LIST_DIR}/tasks.cpp
 	${CMAKE_CURRENT_LIST_DIR}/teleport.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tile.cpp
 	${CMAKE_CURRENT_LIST_DIR}/tools.cpp
@@ -118,8 +117,8 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/protocol.h
 	${CMAKE_CURRENT_LIST_DIR}/protocolstatus.h
 	${CMAKE_CURRENT_LIST_DIR}/pugicast.h
+	${CMAKE_CURRENT_LIST_DIR}/reactor.h
 	${CMAKE_CURRENT_LIST_DIR}/rsa.h
-	${CMAKE_CURRENT_LIST_DIR}/scheduler.h
 	${CMAKE_CURRENT_LIST_DIR}/script.h
 	${CMAKE_CURRENT_LIST_DIR}/scriptmanager.h
 	${CMAKE_CURRENT_LIST_DIR}/server.h
@@ -128,7 +127,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/spells.h
 	${CMAKE_CURRENT_LIST_DIR}/storeinbox.h
 	${CMAKE_CURRENT_LIST_DIR}/talkaction.h
-	${CMAKE_CURRENT_LIST_DIR}/tasks.h
 	${CMAKE_CURRENT_LIST_DIR}/teleport.h
 	${CMAKE_CURRENT_LIST_DIR}/thing.h
 	${CMAKE_CURRENT_LIST_DIR}/thread_holder_base.h

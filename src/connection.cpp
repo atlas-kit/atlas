@@ -8,12 +8,12 @@
 #include "configmanager.h"
 #include "outputmessage.h"
 #include "protocol.h"
+#include "reactor.h"
 #include "server.h"
-#include "tasks.h"
 
 #include <print>
 
-extern Dispatcher g_dispatcher;
+extern TaskReactor g_reactor;
 
 std::shared_ptr<Connection> ConnectionManager::createConnection(boost::asio::io_context& io_context,
                                                                 std::shared_ptr<const ServicePort> servicePort)
@@ -70,7 +70,7 @@ void Connection::close(bool force)
 	connectionState = CONNECTION_STATE_DISCONNECTED;
 
 	if (protocol) {
-		g_dispatcher.addTask([protocol = protocol]() { protocol->release(); });
+		g_reactor.send([protocol = protocol]() { protocol->release(); });
 	}
 
 	if (messageQueue.empty() || force) {
@@ -101,7 +101,7 @@ Connection::~Connection() { closeSocket(); }
 void Connection::accept(std::shared_ptr<Protocol> protocol)
 {
 	this->protocol = protocol;
-	g_dispatcher.addTask([=]() { protocol->onConnect(); });
+	g_reactor.send([=]() { protocol->onConnect(); });
 	connectionState = CONNECTION_STATE_GAMEWORLD_AUTH;
 	accept();
 }

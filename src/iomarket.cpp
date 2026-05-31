@@ -9,11 +9,11 @@
 #include "databasetasks.h"
 #include "game.h"
 #include "iologindata.h"
-#include "scheduler.h"
+#include "reactor.h"
 
 extern DatabaseTasks g_databaseTasks;
 extern Game g_game;
-extern Scheduler g_scheduler;
+extern TaskReactor g_reactor;
 
 namespace {
 
@@ -197,7 +197,7 @@ void checkExpiredOffers()
 		return;
 	}
 
-	g_scheduler.addEvent(createSchedulerTask(checkExpiredMarketOffersEachMinutes, &checkExpiredOffers));
+	g_reactor.schedule(checkExpiredMarketOffersEachMinutes, &checkExpiredOffers);
 }
 
 uint32_t getPlayerOfferCount(uint32_t playerId)
