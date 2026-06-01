@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(test_scheduled_task_does_not_block_send)
 	TaskReactor reactor;
 	std::vector<int> executionOrder;
 
-	auto identifier = reactor.schedule(1h, [&] { executionOrder.push_back(1); });
+	reactor.schedule(1h, [&] { executionOrder.push_back(1); });
 	reactor.send([&] { executionOrder.push_back(2); });
 	reactor.runOnce();
 
