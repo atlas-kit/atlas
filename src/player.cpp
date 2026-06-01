@@ -1218,7 +1218,7 @@ bool Player::closeShopWindow(bool sendCloseShopWindow /*= true*/)
 void Player::onWalk(Direction& dir)
 {
 	Creature::onWalk(dir);
-	setNextActionTask(nullptr);
+	cancelNextAction();
 	setNextAction(std::chrono::steady_clock::now() + getStepDuration(dir));
 }
 
@@ -1381,25 +1381,41 @@ void Player::checkTradeState(const std::shared_ptr<const Item>& item)
 	}
 }
 
-void Player::setNextWalkActionTask(std::unique_ptr<DelayedTask> task)
+void Player::setNextWalkActionTask(chrono::milliseconds delay, Callback&& callback)
 {
 	if (walkTaskEvent != 0) {
 		g_reactor.cancel(walkTaskEvent);
 		walkTaskEvent = 0;
 	}
 
-	walkTask = std::move(task);
+	walkTask = std::make_unique<WalkAction>(delay, std::move(callback));
 }
 
-void Player::setNextActionTask(std::unique_ptr<DelayedTask> task)
+void Player::cancelNextWalkAction()
+{
+	if (walkTaskEvent != 0) {
+		g_reactor.cancel(walkTaskEvent);
+		walkTaskEvent = 0;
+	}
+
+	walkTask.reset();
+}
+
+void Player::setNextActionTask(chrono::milliseconds delay, Callback&& callback)
 {
 	if (actionTaskEvent != 0) {
 		g_reactor.cancel(actionTaskEvent);
 		actionTaskEvent = 0;
 	}
 
-	if (task) {
-		actionTaskEvent = g_reactor.schedule(std::move(task));
+	actionTaskEvent = g_reactor.schedule(delay, std::move(callback));
+}
+
+void Player::cancelNextAction()
+{
+	if (actionTaskEvent != 0) {
+		g_reactor.cancel(actionTaskEvent);
+		actionTaskEvent = 0;
 	}
 }
 
@@ -1472,13 +1488,13 @@ void Player::onAttacking(std::chrono::milliseconds)
 		result = Weapon::useFist(asPlayer(), getAttackedCreature());
 	}
 
-	auto task = std::make_unique<DelayedTask>(std::max(MIN_TASK_INTERVAL, delay),
-	                                          [id = getID()]() { g_game.checkCreatureAttack(id); });
+	auto attackDelay = std::max(MIN_TASK_INTERVAL, delay);
+	auto attackCallback = [id = getID()]() { g_game.checkCreatureAttack(id); };
 	if (!classicSpeed) {
-		setNextActionTask(std::move(task));
+		setNextActionTask(attackDelay, std::move(attackCallback));
 	} else {
 		g_reactor.cancel(classicAttackEvent);
-		classicAttackEvent = g_reactor.schedule(std::move(task));
+		classicAttackEvent = g_reactor.schedule(attackDelay, std::move(attackCallback));
 	}
 
 	if (result) {
@@ -3258,14 +3274,15 @@ void Player::setChaseMode(bool mode)
 
 void Player::onWalkAborted()
 {
-	setNextWalkActionTask(nullptr);
+	cancelNextWalkAction();
 	sendCancelWalk();
 }
 
 void Player::onWalkComplete()
 {
 	if (walkTask) {
-		walkTaskEvent = g_reactor.schedule(std::move(walkTask));
+		walkTaskEvent = g_reactor.schedule(walkTask->delay, std::move(walkTask->callback));
+		walkTask.reset();
 	}
 }
 

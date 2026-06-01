@@ -1229,8 +1229,10 @@ public:
 	void postRemoveNotification(const std::shared_ptr<Thing>& thing, const std::shared_ptr<const Thing>& newParent,
 	                            int32_t index, ReceiverLink_t link = LINK_OWNER) override;
 
-	void setNextWalkActionTask(std::unique_ptr<DelayedTask> task);
-	void setNextActionTask(std::unique_ptr<DelayedTask> task);
+	void setNextWalkActionTask(chrono::milliseconds delay, Callback&& callback);
+	void cancelNextWalkAction();
+	void setNextActionTask(chrono::milliseconds delay, Callback&& callback);
+	void cancelNextAction();
 
 	void setNextAction(std::chrono::steady_clock::time_point time) { nextAction = std::max(nextAction, time); }
 	bool canDoAction() const { return nextAction <= std::chrono::steady_clock::now(); }
@@ -1357,7 +1359,13 @@ private:
 	std::weak_ptr<Npc> shopOwner;
 	std::weak_ptr<Party> party;
 	std::weak_ptr<Player> tradePartner;
-	std::unique_ptr<DelayedTask> walkTask;
+
+	struct WalkAction
+	{
+		chrono::milliseconds delay;
+		Callback callback;
+	};
+	std::unique_ptr<WalkAction> walkTask;
 	const Town* town = nullptr;
 	Vocation* vocation = nullptr;
 	std::shared_ptr<StoreInbox> storeInbox = nullptr;

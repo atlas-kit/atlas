@@ -343,7 +343,7 @@ int main(int argc, const char** argv)
 	if (serviceManager.is_running()) {
 		std::cout << ">> " << getString(ConfigManager::SERVER_NAME) << " Server Online!" << std::endl << std::endl;
 		std::thread serviceThread([&]() { serviceManager.run(); });
-		g_reactor.run();
+		g_reactor.runLoop();
 		serviceManager.stop();
 		serviceThread.join();
 	} else {

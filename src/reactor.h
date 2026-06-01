@@ -10,79 +10,66 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
-#include <memory>
 #include <mutex>
-#include <queue>
-#include <tuple>
 #include <unordered_set>
 #include <vector>
 
 namespace chrono = std::chrono;
 
-using Closure = std::move_only_function<void(void)>;
+using Callback = std::move_only_function<void(void)>;
 
 inline constexpr auto MIN_TASK_INTERVAL = 50ms;
-inline constexpr auto TASK_EXPIRATION = 2000ms;
-
-class DelayedTask
-{
-public:
-	DelayedTask(chrono::milliseconds delay, Closure&& f) : delay(delay), func(std::move(f)) {}
-
-	void setId(uint32_t id) { id_ = id; }
-	uint32_t getId() const { return id_; }
-	auto getDelay() const { return delay; }
-	Closure extractFunc() { return std::move(func); }
-
-private:
-	uint32_t id_ = 0;
-	chrono::milliseconds delay = chrono::milliseconds::zero();
-	Closure func;
-};
 
 class TaskReactor
 {
 public:
-	void send(Closure&& fn);
-	void send(chrono::milliseconds expiration, Closure&& fn);
-	uint32_t schedule(chrono::milliseconds delay, Closure&& fn);
-	uint32_t schedule(std::unique_ptr<DelayedTask>&& delayed);
-	void cancel(uint32_t taskId);
+	void send(Callback&& callback);
+	void send(chrono::milliseconds expirationTime, Callback&& callback);
+	uint32_t schedule(chrono::milliseconds delay, Callback&& callback);
+	void cancel(uint32_t taskIdentifier);
 
+	void runLoop();
+	void runOnce();
 	void shutdown();
-	void run();
-
-	ThreadState getState() const { return threadState.load(std::memory_order_relaxed); }
 
 private:
-	void drain();
-
-	struct ImmediateTask
+	struct Task
 	{
-		Closure func;
+		chrono::steady_clock::time_point fireAt;
 		chrono::steady_clock::time_point deadline;
+		uint32_t identifier;
+		uint64_t sequence;
+		Callback function;
+
+		bool operator>(const Task& other) const
+		{
+			if (fireAt != other.fireAt) {
+				return fireAt > other.fireAt;
+			}
+			return sequence > other.sequence;
+		}
 	};
 
-	struct ScheduledTask
-	{
-		chrono::steady_clock::time_point fire_at;
-		uint32_t taskId;
-		Closure func;
+	void waitForWork();
 
-		bool operator>(const ScheduledTask& other) const { return fire_at > other.fire_at; }
-	};
+	// Single mutex for all producer inboxes. The reactor thread acquires it
+	// only to drain pending tasks into the task heap (microseconds), never
+	// during callback execution. Producer threads push in O(1) and release
+	// before any application code runs. Lock contention is negligible for
+	// this workload.
+	std::mutex mutex;
+	std::condition_variable conditionVariable;
 
-	std::mutex taskLock;
-	std::condition_variable taskSignal;
-	std::vector<ImmediateTask> taskList;
+	std::vector<Task> sendInbox;
+	std::vector<Task> scheduleInbox;
+	std::vector<uint32_t> cancelInbox;
 
-	std::vector<std::tuple<uint32_t, chrono::steady_clock::time_point, Closure>> pendingSchedules;
-	std::vector<uint32_t> pendingCancels;
 	std::unordered_set<uint32_t> cancelled;
-	std::unordered_set<uint32_t> liveIds;
+	std::unordered_set<uint32_t> activeIdentifiers;
+	std::vector<Task> taskHeap;
 
-	std::priority_queue<ScheduledTask, std::vector<ScheduledTask>, std::greater<>> heap;
-	std::atomic<uint32_t> nextId{0};
+	std::atomic<uint32_t> nextIdentifier{0};
+	std::atomic<uint64_t> nextSequence{0};
 	std::atomic<ThreadState> threadState{THREAD_STATE_TERMINATED};
 };
 
