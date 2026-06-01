@@ -250,6 +250,10 @@ function pushThing(thing)
 	return t
 end
 
+NetworkMessage.delete = function(...)
+	print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Function NetworkMessage.delete is deprecated and will be removed in the future")
+end
+
 createCombatObject = Combat
 addCombatCondition = Combat.addCondition
 setCombatArea = Combat.setArea

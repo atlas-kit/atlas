@@ -112,7 +112,6 @@ function handler.onReceive(player, msg)
 	end
 
 	response:sendToPlayer(player)
-	response:delete()
 end
 
 handler:register()

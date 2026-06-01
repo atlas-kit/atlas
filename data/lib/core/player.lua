@@ -97,7 +97,6 @@ function Player.sendExtendedOpcode(self, opcode, buffer)
 	networkMessage:addByte(opcode)
 	networkMessage:addString(buffer)
 	networkMessage:sendToPlayer(self)
-	networkMessage:delete()
 	return true
 end
 
@@ -328,8 +327,6 @@ function Player.updateKillTracker(self, monster, corpse)
 	else
 		msg:sendToPlayer(self)
 	end
-
-	msg:delete()
 	return true
 end
 
@@ -345,7 +342,6 @@ function Player.setSpecialContainersAvailable(self, available)
 	msg:addByte(available and 0x01 or 0x00) -- market
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -390,7 +386,6 @@ function Player.sendQuestLog(self)
 	end
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -408,7 +403,6 @@ function Player.sendQuestLine(self, quest)
 	end
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -450,7 +444,6 @@ function Player.sendQuestTracker(self, missionsId)
 	end
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -464,7 +457,6 @@ function Player.sendUpdateQuestTracker(self, mission)
 	msg:addString(mission:getDescription(self))
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -500,7 +492,6 @@ function Player.sendBestiaryMilestoneReached(self, raceId)
 	msg:addByte(0xD9)
 	msg:addU16(raceId)
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -598,7 +589,6 @@ function Player.sendHighscores(self, entries, params)
 	msg:addU32(entries.ts)
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -659,7 +649,6 @@ function Player.sendWorldLight(self, color, level)
 	msg:addByte(self:getGroup():getAccess() and 0xFF or level)
 	msg:addByte(color)
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -669,7 +658,6 @@ function Player.sendWorldTime(self, time)
 	msg:addByte(time / 60) -- hour
 	msg:addByte(time % 60) -- min
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -678,7 +666,6 @@ function Player.sendHotkeyPreset(self)
 	msg:addByte(0x9D)
 	msg:addU32(self:getVocation():getClientId())
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -689,7 +676,6 @@ function Player.disableLoginMusic(self)
 	msg:addByte(0x00)
 	msg:addByte(0x00)
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -725,7 +711,6 @@ function Player.sendBlessings(self)
 	msg:addU16(flags)
 	msg:addByte(status)
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end
 
@@ -811,6 +796,5 @@ function Player.sendTrackedBestiary(self, isBoss)
 	end
 
 	msg:sendToPlayer(self)
-	msg:delete()
 	return true
 end

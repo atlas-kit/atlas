@@ -4,6 +4,7 @@
 #include "otpch.h"
 
 #include "networkmessage.h"
+#include "lockfree.h"
 
 #include "container.h"
 #include "podium.h"
@@ -202,3 +203,22 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Item::items[itemId].clientId); }
 
 void NetworkMessage::addBool(bool value) { addByte(value ? 1 : 0); }
+
+namespace {
+
+// Capacity of the lock-free free-list backing make_network_message().
+// Each cached slot keeps one raw NetworkMessage (~64 KiB) alive; the list
+// never shrinks, so worst-case retained heap = capacity * ~64 KiB
+// (2048 -> ~128 MiB). Raise it if a high-concurrency profile shows
+// make_network_message() falling through to operator new; lower it to cap
+// memory on small setups. Hard limit: 65535.
+const uint16_t NETWORKMESSAGE_FREE_LIST_CAPACITY = 2048;
+
+} // namespace
+
+std::shared_ptr<NetworkMessage> tfs::net::make_network_message()
+{
+	// LockfreePoolingAllocator<void,...> will leave (void* allocate) ill-formed because of sizeof(T), so this
+	// guarantees that only one list will be initialized
+	return std::allocate_shared<NetworkMessage>(LockfreePoolingAllocator<void, NETWORKMESSAGE_FREE_LIST_CAPACITY>());
+}

@@ -18,7 +18,6 @@ event.onCreatureThink = function(self, interval)
             local msg = NetworkMessage()
             msg:addByte(0x1D)
             msg:sendToPlayer(self)
-            msg:delete()
         else
             hasLostConnection = true
         end

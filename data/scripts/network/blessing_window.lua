@@ -44,7 +44,6 @@ function handler.onReceive(player)
 	end
 
 	msg:sendToPlayer(player)
-	msg:delete()
 end
 
 handler:register()

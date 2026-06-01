@@ -14,25 +14,15 @@ namespace {
 int luaNetworkMessageCreate(lua_State* L)
 {
 	// NetworkMessage()
-	tfs::lua::pushUserdata(L, new NetworkMessage);
+	tfs::lua::pushSharedPtr(L, tfs::net::make_network_message());
 	tfs::lua::setMetatable(L, -1, "NetworkMessage");
 	return 1;
-}
-
-int luaNetworkMessageDelete(lua_State* L)
-{
-	NetworkMessage** messagePtr = tfs::lua::getRawUserdata<NetworkMessage>(L, 1);
-	if (messagePtr && *messagePtr) {
-		delete *messagePtr;
-		*messagePtr = nullptr;
-	}
-	return 0;
 }
 
 int luaNetworkMessageGetByte(lua_State* L)
 {
 	// networkMessage:getByte()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushNumber(L, message->getByte());
 	} else {
@@ -44,7 +34,7 @@ int luaNetworkMessageGetByte(lua_State* L)
 int luaNetworkMessageGetU16(lua_State* L)
 {
 	// networkMessage:getU16()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushNumber(L, message->get<uint16_t>());
 	} else {
@@ -56,7 +46,7 @@ int luaNetworkMessageGetU16(lua_State* L)
 int luaNetworkMessageGetU32(lua_State* L)
 {
 	// networkMessage:getU32()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushNumber(L, message->get<uint32_t>());
 	} else {
@@ -68,7 +58,7 @@ int luaNetworkMessageGetU32(lua_State* L)
 int luaNetworkMessageGetU64(lua_State* L)
 {
 	// networkMessage:getU64()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushNumber(L, message->get<uint64_t>());
 	} else {
@@ -80,7 +70,7 @@ int luaNetworkMessageGetU64(lua_State* L)
 int luaNetworkMessageGetString(lua_State* L)
 {
 	// networkMessage:getString()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushString(L, message->getString());
 	} else {
@@ -92,7 +82,7 @@ int luaNetworkMessageGetString(lua_State* L)
 int luaNetworkMessageGetPosition(lua_State* L)
 {
 	// networkMessage:getPosition()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushPosition(L, message->getPosition());
 	} else {
@@ -105,7 +95,7 @@ int luaNetworkMessageAddByte(lua_State* L)
 {
 	// networkMessage:addByte(number)
 	uint8_t number = tfs::lua::getNumber<uint8_t>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->addByte(number);
 		tfs::lua::pushBoolean(L, true);
@@ -119,7 +109,7 @@ int luaNetworkMessageAddU16(lua_State* L)
 {
 	// networkMessage:addU16(number)
 	uint16_t number = tfs::lua::getNumber<uint16_t>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->add<uint16_t>(number);
 		tfs::lua::pushBoolean(L, true);
@@ -133,7 +123,7 @@ int luaNetworkMessageAddU32(lua_State* L)
 {
 	// networkMessage:addU32(number)
 	uint32_t number = tfs::lua::getNumber<uint32_t>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->add<uint32_t>(number);
 		tfs::lua::pushBoolean(L, true);
@@ -147,7 +137,7 @@ int luaNetworkMessageAddU64(lua_State* L)
 {
 	// networkMessage:addU64(number)
 	uint64_t number = tfs::lua::getNumber<uint64_t>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->add<uint64_t>(number);
 		tfs::lua::pushBoolean(L, true);
@@ -161,7 +151,7 @@ int luaNetworkMessageAddString(lua_State* L)
 {
 	// networkMessage:addString(string)
 	const std::string& string = tfs::lua::getString(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->addString(string);
 		tfs::lua::pushBoolean(L, true);
@@ -175,7 +165,7 @@ int luaNetworkMessageAddPosition(lua_State* L)
 {
 	// networkMessage:addPosition(position)
 	const Position& position = tfs::lua::getPosition(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->addPosition(position);
 		tfs::lua::pushBoolean(L, true);
@@ -189,7 +179,7 @@ int luaNetworkMessageAddDouble(lua_State* L)
 {
 	// networkMessage:addDouble(number)
 	double number = tfs::lua::getNumber<double>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->addDouble(number);
 		tfs::lua::pushBoolean(L, true);
@@ -209,7 +199,7 @@ int luaNetworkMessageAddItem(lua_State* L)
 		return 1;
 	}
 
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->addItem(item);
 		tfs::lua::pushBoolean(L, true);
@@ -222,7 +212,7 @@ int luaNetworkMessageAddItem(lua_State* L)
 int luaNetworkMessageAddItemId(lua_State* L)
 {
 	// networkMessage:addItemId(itemId)
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (!message) {
 		lua_pushnil(L);
 		return 1;
@@ -247,7 +237,7 @@ int luaNetworkMessageAddItemId(lua_State* L)
 int luaNetworkMessageReset(lua_State* L)
 {
 	// networkMessage:reset()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->reset();
 		tfs::lua::pushBoolean(L, true);
@@ -260,7 +250,7 @@ int luaNetworkMessageReset(lua_State* L)
 int luaNetworkMessageLength(lua_State* L)
 {
 	// networkMessage:len()
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		tfs::lua::pushNumber(L, message->getLength());
 	} else {
@@ -273,7 +263,7 @@ int luaNetworkMessageSkipBytes(lua_State* L)
 {
 	// networkMessage:skipBytes(number)
 	int16_t number = tfs::lua::getNumber<int16_t>(L, 2);
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (message) {
 		message->skipBytes(number);
 		tfs::lua::pushBoolean(L, true);
@@ -286,7 +276,7 @@ int luaNetworkMessageSkipBytes(lua_State* L)
 int luaNetworkMessageSendToPlayer(lua_State* L)
 {
 	// networkMessage:sendToPlayer(player)
-	NetworkMessage* message = tfs::lua::getUserdata<NetworkMessage>(L, 1);
+	const auto& message = tfs::lua::getSharedPtr<NetworkMessage>(L, 1);
 	if (!message) {
 		lua_pushnil(L);
 		return 1;
@@ -308,8 +298,7 @@ void tfs::lua::registerNetworkMessage(LuaScriptInterface& lsi)
 {
 	lsi.registerClass("NetworkMessage", "", luaNetworkMessageCreate);
 	lsi.registerMetaMethod("NetworkMessage", "__eq", tfs::lua::luaUserdataCompare);
-	lsi.registerMetaMethod("NetworkMessage", "__gc", luaNetworkMessageDelete);
-	lsi.registerMethod("NetworkMessage", "delete", luaNetworkMessageDelete);
+	lsi.registerMetaMethod("NetworkMessage", "__gc", tfs::lua::luaSharedPtrDelete<NetworkMessage>);
 
 	lsi.registerMethod("NetworkMessage", "getByte", luaNetworkMessageGetByte);
 	lsi.registerMethod("NetworkMessage", "getU16", luaNetworkMessageGetU16);

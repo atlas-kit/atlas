@@ -6,6 +6,8 @@
 
 #include "const.h"
 
+#include <memory>
+
 class Item;
 struct Position;
 
@@ -39,6 +41,12 @@ public:
 		MAX_PROTOCOL_BODY_LENGTH = MAX_BODY_LENGTH - 10
 	};
 
+	// Defaulted so that std::allocate_shared<NetworkMessage> performs
+	// default-initialization instead of value-initialization. Value-initialization
+	// would zero the entire buffer (~64 KB) on every construction even though
+	// only buffer[0..length) is ever written/sent. All transmitted bytes are
+	// explicitly written by add*/addString/etc before send, so leaving the
+	// buffer uninitialized is safe.
 	NetworkMessage() = default;
 
 	void reset() { info = {}; }
@@ -163,5 +171,11 @@ private:
 		return true;
 	}
 };
+
+namespace tfs::net {
+
+std::shared_ptr<NetworkMessage> make_network_message();
+
+} // namespace tfs::net
 
 #endif // FS_NETWORKMESSAGE_H
