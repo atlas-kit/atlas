@@ -684,7 +684,7 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
 	tfs::events::getScriptInterface().callVoidFunction(4);
 }
 
-void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
+void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, const std::shared_ptr<NetworkMessage>& msg)
 {
 	// Player:onNetworkMessage(recvByte, msg)
 	if (playerHandlers.onNetworkMessage == -1) {
@@ -704,7 +704,7 @@ void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, s
 
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushNumber(L, recvByte);
-	tfs::lua::pushNetworkMessage(L, msg.release());
+	tfs::lua::pushNetworkMessage(L, msg);
 	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 

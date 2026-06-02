@@ -4,9 +4,9 @@
 #include "otpch.h"
 
 #include "networkmessage.h"
-#include "lockfree.h"
 
 #include "container.h"
+#include "lockfree.h"
 #include "podium.h"
 
 #include <simdutf.h>
@@ -221,4 +221,10 @@ std::shared_ptr<NetworkMessage> tfs::net::make_network_message()
 	// LockfreePoolingAllocator<void,...> will leave (void* allocate) ill-formed because of sizeof(T), so this
 	// guarantees that only one list will be initialized
 	return std::allocate_shared<NetworkMessage>(LockfreePoolingAllocator<void, NETWORKMESSAGE_FREE_LIST_CAPACITY>());
+}
+
+std::shared_ptr<NetworkMessage> tfs::net::make_network_message(const NetworkMessage& other)
+{
+	return std::allocate_shared<NetworkMessage>(LockfreePoolingAllocator<void, NETWORKMESSAGE_FREE_LIST_CAPACITY>(),
+	                                            other);
 }

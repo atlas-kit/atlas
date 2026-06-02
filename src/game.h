@@ -390,7 +390,7 @@ public:
 	                             uint16_t amount);
 
 	void parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::string_view buffer);
-	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg);
+	void parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, const std::shared_ptr<NetworkMessage>& msg);
 
 	std::vector<std::shared_ptr<Item>> getMarketItemList(uint16_t wareId, uint16_t sufficientCount, Player& player);
 

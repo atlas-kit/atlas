@@ -175,6 +175,7 @@ private:
 namespace tfs::net {
 
 std::shared_ptr<NetworkMessage> make_network_message();
+std::shared_ptr<NetworkMessage> make_network_message(const NetworkMessage& other);
 
 } // namespace tfs::net
 

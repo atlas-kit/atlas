@@ -5335,10 +5335,10 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, std::str
 	}
 }
 
-void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg)
+void Game::parsePlayerNetworkMessage(uint32_t playerId, uint8_t recvByte, const std::shared_ptr<NetworkMessage>& msg)
 {
 	if (const auto& player = getPlayerByID(playerId)) {
-		tfs::events::player::onNetworkMessage(player, recvByte, std::move(msg));
+		tfs::events::player::onNetworkMessage(player, recvByte, msg);
 	}
 }
 

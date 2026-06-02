@@ -166,7 +166,7 @@ void pushTown(lua_State* L, const Town& town);
 void pushLoot(lua_State* L, const std::vector<LootBlock>& lootList);
 void pushParty(lua_State* L, const std::shared_ptr<Party>& party);
 void pushItemType(lua_State* L, const ItemType* itemType);
-void pushNetworkMessage(lua_State* L, NetworkMessage* msg);
+void pushNetworkMessage(lua_State* L, const std::shared_ptr<NetworkMessage>& msg);
 
 // Callback helpers
 void pushCallback(lua_State* L, int32_t callback);

@@ -798,10 +798,8 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 			// case 0xFE: break; // store window history 2
 
 		default:
-			// we cannot pass an unique_ptr as capture here because
-			// std::function requires the callable object to be *copyable*
-			g_dispatcher.addTask([=, playerID = player->getID(), msg = new NetworkMessage(msg)]() {
-				g_game.parsePlayerNetworkMessage(playerID, recvbyte, std::unique_ptr<NetworkMessage>(msg));
+			g_dispatcher.addTask([=, playerID = player->getID(), msg = tfs::net::make_network_message(msg)]() {
+				g_game.parsePlayerNetworkMessage(playerID, recvbyte, msg);
 			});
 			break;
 	}

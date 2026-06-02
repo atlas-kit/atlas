@@ -376,9 +376,9 @@ void pushItemType(lua_State* L, const ItemType* itemType)
 	setMetatable(L, -1, "ItemType");
 }
 
-void pushNetworkMessage(lua_State* L, NetworkMessage* msg)
+void pushNetworkMessage(lua_State* L, const std::shared_ptr<NetworkMessage>& msg)
 {
-	pushUserdata(L, msg);
+	pushSharedPtr(L, msg);
 	setMetatable(L, -1, "NetworkMessage");
 }
 
