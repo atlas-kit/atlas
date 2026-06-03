@@ -585,9 +585,7 @@ bool Map::isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor /*= fal
 	return !tile->hasProperty(CONST_PROP_BLOCKPROJECTILE);
 }
 
-namespace {
-
-bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding /*= false*/)
+bool Map::checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const
 {
 	float dx = x1 - x0;
 	float slope = (dx == 0) ? 1 : (y1 - y0) / dx;
@@ -595,7 +593,7 @@ bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t 
 
 	for (uint16_t x = x0 + 1; x < x1; ++x) {
 		// 0.1 is necessary to avoid loss of precision during calculation
-		if (!g_game.map.isTileClear(std::floor(yi + 0.1), x, z, false, pathfinding)) {
+		if (!isTileClear(std::floor(yi + 0.1), x, z, false, pathfinding)) {
 			return false;
 		}
 		yi += slope;
@@ -604,7 +602,7 @@ bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t 
 	return true;
 }
 
-bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding /*= false*/)
+bool Map::checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const
 {
 	float dx = x1 - x0;
 	float slope = (dx == 0) ? 1 : (y1 - y0) / dx;
@@ -612,7 +610,7 @@ bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t
 
 	for (uint16_t x = x0 + 1; x < x1; ++x) {
 		// 0.1 is necessary to avoid loss of precision during calculation
-		if (!g_game.map.isTileClear(x, std::floor(yi + 0.1), z, false, pathfinding)) {
+		if (!isTileClear(x, std::floor(yi + 0.1), z, false, pathfinding)) {
 			return false;
 		}
 		yi += slope;
@@ -620,8 +618,6 @@ bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t
 
 	return true;
 }
-
-} // namespace
 
 bool Map::checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z,
                          bool pathfinding /*= false*/) const
@@ -644,19 +640,13 @@ bool Map::checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uin
 	return checkSlightLine(x0, y0, x1, y1, z, pathfinding);
 }
 
-bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor /*= false*/,
-                       bool pathfinding /*= false*/) const
+bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor /*= false*/) const
 {
 	// target is on the same floor
 	if (fromPos.z == toPos.z) {
 		// skip checks if toPos is next to us
 		if (fromPos.getDistanceX(toPos) < 2 && fromPos.getDistanceY(toPos) < 2) {
 			return true;
-		}
-
-		// Check for additional tile properties when pathfinding
-		if (pathfinding) {
-			return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z, true);
 		}
 
 		// sight is clear or sameFloor is enabled
@@ -707,6 +697,16 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool same
 
 	// check if we can throw to the tile above the target
 	return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z);
+}
+
+bool Map::isSightClearPathfinding(const Position& fromPos, const Position& toPos) const
+{
+	// Pathfinding variant — checks additional tile properties (BLOCK_PATHFINDING).
+	// Only called from getPathMatching when determining sight-clear pruning.
+	if (fromPos.getDistanceX(toPos) < 2 && fromPos.getDistanceY(toPos) < 2) {
+		return true;
+	}
+	return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z, true);
 }
 
 const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>& creature, const Position& pos) const
@@ -760,7 +760,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 		return false;
 	}
 
-	const auto sightClear = isSightClear(position, targetPos, true, true);
+	const auto sightClear = isSightClearPathfinding(position, targetPos);
 
 	PathFinder finder(position.x, position.y);
 
@@ -784,7 +784,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 
 		uint16_t cost = 0;
 		if (tile->getTopVisibleCreature(creature)) {
-			cost += MAP_NORMALWALKCOST * 3;
+			cost += PATHFIND_NORMAL_COST * 3;
 		}
 
 		if (const auto& field = tile->getFieldItem()) {
@@ -792,7 +792,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 			const auto& monster = creature->asMonster();
 			if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
 			    (monster && !monster->canWalkOnFieldType(combatType))) {
-				cost += MAP_NORMALWALKCOST * 18;
+				cost += PATHFIND_NORMAL_COST * 18;
 			}
 		}
 

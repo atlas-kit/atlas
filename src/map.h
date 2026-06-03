@@ -16,9 +16,6 @@ class Tile;
 
 static constexpr int32_t MAP_MAX_LAYERS = 16;
 
-static constexpr uint16_t MAP_NORMALWALKCOST = 10;
-static constexpr uint16_t MAP_DIAGONALWALKCOST = 25;
-
 using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::owner_less<std::shared_ptr<Creature>>>;
 
 struct PositionHash
@@ -207,22 +204,10 @@ public:
 	                      int32_t rangey = Map::maxClientViewportY) const;
 
 	/**
-	 * Checks if there are no obstacles on that position
-	 *	\param blockFloor counts the ground tile as an obstacle
-	 *	\returns The result if there is an obstacle or not
+	 * Checks if path is clear from fromPos to toPos.
+	 * This only checks a straight line; for pathfinding use getPathMatching.
 	 */
-	bool isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor = false, bool pathfinding = false) const;
-
-	/**
-	 * Checks if path is clear from fromPos to toPos
-	 * Notice: This only checks a straight line if the path is clear, for path
-	 *finding use getPathTo. \param fromPos from Source point \param toPos
-	 *Destination point \param sameFloor checks if the destination is on same
-	 *floor \returns The result if there is no obstacles
-	 */
-	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor = false,
-	                  bool pathfinding = false) const;
-	bool checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding = false) const;
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor = false) const;
 
 	const std::shared_ptr<Tile> canWalkTo(const std::shared_ptr<const Creature>& creature, const Position& pos) const;
 
@@ -239,6 +224,14 @@ public:
 
 	Spawns spawns;
 	Towns towns;
+
+private:
+	// Line-of-sight helpers (used internally by isSightClear and getPathMatching)
+	bool isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor = false, bool pathfinding = false) const;
+	bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const;
+	bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const;
+	bool checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding = false) const;
+	bool isSightClearPathfinding(const Position& fromPos, const Position& toPos) const;
 
 private:
 	SpectatorCache spectatorCache;
