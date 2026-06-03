@@ -16,9 +16,6 @@ class Tile;
 
 static constexpr int32_t MAP_MAX_LAYERS = 16;
 
-static constexpr uint16_t MAP_NORMALWALKCOST = 10;
-static constexpr uint16_t MAP_DIAGONALWALKCOST = 25;
-
 using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::owner_less<std::shared_ptr<Creature>>>;
 
 struct PositionHash
@@ -33,53 +30,7 @@ struct PositionHash
 	}
 };
 
-struct FindPathParams;
-
-static constexpr int32_t PATHFIND_VIEWPORT_X = 11;
-static constexpr int32_t PATHFIND_VIEWPORT_Y = 11;
-static constexpr int32_t PATHFIND_GRID_W = PATHFIND_VIEWPORT_X * 2 + 1;
-static constexpr int32_t PATHFIND_GRID_H = PATHFIND_VIEWPORT_Y * 2 + 1;
-static constexpr int32_t PATHFIND_RESERVE = (PATHFIND_VIEWPORT_X * PATHFIND_VIEWPORT_Y * 3) / 2;
-
-struct AStarNode
-{
-	AStarNode* parent;
-	uint16_t x, y;
-	uint16_t g, f;
-};
-
-class AStarNodes
-{
-public:
-	AStarNodes(uint16_t startX, uint16_t startY);
-
-	AStarNode* createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f);
-	AStarNode* getBestNode();
-	AStarNode* getNodeByPosition(uint16_t x, uint16_t y);
-	const std::shared_ptr<const Tile>& getTile(uint16_t x, uint16_t y) const;
-	void setTile(uint16_t x, uint16_t y, const std::shared_ptr<const Tile>& tile);
-
-	static uint16_t getMapWalkCost(const AStarNode* node, uint16_t neighborX, uint16_t neighborY);
-	static uint16_t getTileWalkCost(const std::shared_ptr<const Creature>& creature,
-	                                const std::shared_ptr<const Tile>& tile);
-
-private:
-	int32_t startX;
-	int32_t startY;
-	int32_t openCount;
-
-	struct Cell
-	{
-		AStarNode node;
-		uint8_t state;
-		std::shared_ptr<const Tile> tile;
-	};
-
-	Cell grid[PATHFIND_GRID_H][PATHFIND_GRID_W];
-	AStarNode* openList[PATHFIND_RESERVE];
-
-	Cell* getCell(uint16_t x, uint16_t y);
-};
+#include "pathfinding.h"
 
 using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;
 
@@ -98,7 +49,6 @@ struct Floor
 	std::shared_ptr<Tile> tiles[FLOOR_SIZE][FLOOR_SIZE] = {};
 };
 
-class FrozenPathingConditionCall;
 class QTreeLeafNode;
 
 class QTreeNode

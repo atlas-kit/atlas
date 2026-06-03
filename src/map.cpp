@@ -705,377 +705,71 @@ const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>
 	return tile;
 }
 
-static uint16_t calculateHeuristic(const Position& p1, const Position& p2)
-{
-	uint16_t dx = std::abs(p1.getX() - p2.getX());
-	uint16_t dy = std::abs(p1.getY() - p2.getY());
-	return dx * dx + dy * dy;
-}
-
 bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const Position& targetPos,
                           std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
                           const FindPathParams& fpp) const
 {
-	Position pos = creature->getPosition();
-	const Position startPos = pos;
+	const Position startPos = creature->getPosition();
+	uint8_t z = startPos.getZ();
 
-	// We can't walk, no need to create path.
 	if (creature->getSpeed() <= 0) {
 		return false;
 	}
 
-	// We can't get paths up or down floors.
 	if (startPos.getZ() != targetPos.getZ()) {
 		return false;
 	}
 
 	int32_t distanceX = startPos.getDistanceX(targetPos);
 	int32_t distanceY = startPos.getDistanceY(targetPos);
-	// We are next to our target. Let dance step decide.
 	if (fpp.maxTargetDist <= 1 && distanceX <= 1 && distanceY <= 1) {
 		return true;
 	}
 
-	// Don't update path. The target is too far away.
 	int32_t maxDistanceX = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportX + 1;
 	int32_t maxDistanceY = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportY + 1;
 	if (distanceX > maxDistanceX || distanceY > maxDistanceY) {
 		return false;
 	}
 
-	static constexpr std::array<std::pair<int, int>, 8> allNeighbors = {
-	    {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
+	struct MapAccessAdapter final : IPathMap
+	{
+		const Map& map;
+		uint8_t z;
+		const std::shared_ptr<const Creature>& creature;
 
+		MapAccessAdapter(const Map& map, uint8_t z, const std::shared_ptr<const Creature>& creature)
+		    : map(map), z(z), creature(creature) {}
+
+		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t x, uint16_t y) const override
+		{
+			auto tile = map.getTile(x, y, z);
+			if (!tile) {
+				return nullptr;
+			}
+			if (creature->getTile() == tile) {
+				return tile.get();
+			}
+			uint32_t flags = FLAG_PATHFINDING;
+			if (!creature->asPlayer()) {
+				flags |= FLAG_IGNOREFIELDDAMAGE;
+			}
+			if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
+				return nullptr;
+			}
+			return tile.get();
+		}
+	};
+
+	MapAccessAdapter adapter(*this, z, creature);
 	bool sightClear = isSightClear(startPos, targetPos, true, true);
 
-	Position endPos;
-	AStarNodes nodes(pos.x, pos.y);
-	if (const auto& startTile = getTile(pos.x, pos.y, pos.z)) {
-		nodes.setTile(pos.x, pos.y, startTile);
+	PathFinder finder(startPos.x, startPos.y);
+	if (const auto& startTile = getTile(startPos.x, startPos.y, z)) {
+		finder.setStartTile(startTile.get());
 	}
 
-	AStarNode* found = nullptr;
-	int32_t bestMatch = 0;
-	uint16_t iterations = 0;
-	AStarNode* n = nodes.getBestNode();
-	while (n) {
-		iterations++;
-
-		if (iterations >= Map::maxViewportX * Map::maxViewportY) {
-			return false;
-		}
-
-		const int32_t x = n->x;
-		const int32_t y = n->y;
-		pos.x = x;
-		pos.y = y;
-		if (pathCondition(startPos, pos, fpp, bestMatch)) {
-			found = n;
-			endPos = pos;
-			if (bestMatch == 0) {
-				break;
-			}
-		}
-
-		for (uint8_t i = 0; i < 8; ++i) {
-			pos.x = x + allNeighbors[i].first;
-			pos.y = y + allNeighbors[i].second;
-
-			int32_t startDistanceToNode = startPos.getDistanceX(pos) + startPos.getDistanceY(pos);
-			if (fpp.maxSearchDist != 0 && startDistanceToNode > fpp.maxSearchDist) {
-				continue;
-			} else if (fpp.maxSearchDist == 0 && (startDistanceToNode > (Map::maxViewportX + Map::maxViewportY))) {
-				continue;
-			}
-
-			if (fpp.keepDistance && !pathCondition.isInRange(startPos, pos, fpp)) {
-				continue;
-			}
-
-			// If sight is clear we can ignore a lot of nodes.
-			if (sightClear && !fpp.keepDistance && !fpp.summonTargetMaster && fpp.minTargetDist <= 1) {
-				int32_t startX = startPos.getX();
-				int32_t startY = startPos.getY();
-				int32_t targetX = targetPos.getX();
-				int32_t targetY = targetPos.getY();
-
-				// We don't need nodes behind us.
-				// We also do not need nodes on a different x or y if target and start is same x/y.
-				if (startX > targetX && pos.x > startX) {
-					continue;
-				} else if (startX == targetX && pos.x != startX) {
-					continue;
-				} else if (startX < targetX && pos.x < startX) {
-					continue;
-				}
-				if (startY > targetY && pos.y > startY) {
-					continue;
-				} else if (startY == targetY && pos.y != startY) {
-					continue;
-				} else if (startY < targetY && pos.y < startY) {
-					continue;
-				}
-
-				// We don't need nodes past the targetPos
-				if (startX > targetX && pos.x < targetX) {
-					continue;
-				} else if (startX < targetX && pos.x > targetX) {
-					continue;
-				}
-				if (startY > targetY && pos.y < targetY) {
-					continue;
-				} else if (startY < targetY && pos.y > targetY) {
-					continue;
-				}
-			}
-
-			AStarNode* neighborNode = nodes.getNodeByPosition(pos.x, pos.y);
-			if (neighborNode) {
-				uint16_t walkCost = AStarNodes::getMapWalkCost(n, pos.x, pos.y);
-				uint16_t h = calculateHeuristic(pos, targetPos);
-				uint16_t minG = n->g + walkCost;
-
-				if (neighborNode->f <= h + minG) {
-					continue;
-				}
-
-				const auto& tile = nodes.getTile(pos.x, pos.y);
-				uint16_t fullG = minG + AStarNodes::getTileWalkCost(creature, tile);
-				uint16_t newf = h + fullG;
-
-				if (neighborNode->f <= newf) {
-					continue;
-				}
-
-				neighborNode->g = fullG;
-				neighborNode->f = newf;
-				neighborNode->parent = n;
-			} else {
-				const auto& tile = canWalkTo(creature, pos);
-				if (!tile) {
-					continue;
-				}
-
-				uint16_t walkCost = AStarNodes::getMapWalkCost(n, pos.x, pos.y);
-				uint16_t h = calculateHeuristic(pos, targetPos);
-				uint16_t g = n->g + walkCost + AStarNodes::getTileWalkCost(creature, tile);
-				uint16_t newf = h + g;
-
-				AStarNode* newNode = nodes.createNode(n, pos.x, pos.y, g, newf);
-				if (!newNode) {
-					return false;
-				}
-				nodes.setTile(pos.x, pos.y, tile);
-			}
-		}
-
-		n = nodes.getBestNode();
-	}
-
-	if (!found) {
-		return false;
-	}
-
-	int32_t prevx = endPos.getX();
-	int32_t prevy = endPos.getY();
-
-	found = found->parent;
-	while (found) {
-		pos.x = found->x;
-		pos.y = found->y;
-
-		int32_t dx = pos.getX() - prevx;
-		int32_t dy = pos.getY() - prevy;
-
-		prevx = pos.x;
-		prevy = pos.y;
-
-		if (dx == 1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHWEST);
-		} else if (dx == -1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHEAST);
-		} else if (dx == 1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHWEST);
-		} else if (dx == -1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHEAST);
-		} else if (dx == 1) {
-			dirList.push_back(DIRECTION_WEST);
-		} else if (dx == -1) {
-			dirList.push_back(DIRECTION_EAST);
-		} else if (dy == 1) {
-			dirList.push_back(DIRECTION_NORTH);
-		} else if (dy == -1) {
-			dirList.push_back(DIRECTION_SOUTH);
-		}
-
-		found = found->parent;
-	}
-
-	return true;
-}
-
-// AStarNodes
-AStarNodes::AStarNodes(uint16_t x, uint16_t y) : startX(x), startY(y), openCount(0)
-{
-	for (auto& row : grid) {
-		for (auto& cell : row) {
-			cell.state = 0;
-		}
-	}
-	createNode(nullptr, x, y, 0, 0);
-}
-
-AStarNode* AStarNodes::createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f)
-{
-	if (openCount >= PATHFIND_RESERVE) {
-		return nullptr;
-	}
-
-	Cell* cell = getCell(x, y);
-	if (!cell || cell->state != 0) {
-		return nullptr;
-	}
-
-	cell->state = 1;
-	cell->node.parent = parent;
-	cell->node.x = x;
-	cell->node.y = y;
-	cell->node.g = g;
-	cell->node.f = f;
-
-	openList[openCount++] = &cell->node;
-	return &cell->node;
-}
-
-AStarNode* AStarNodes::getBestNode()
-{
-	if (openCount == 0) {
-		return nullptr;
-	}
-
-	AStarNode* best = nullptr;
-	uint16_t bestF = std::numeric_limits<uint16_t>::max();
-	int32_t bestIndex = -1;
-
-	for (int32_t i = 0; i < openCount; ++i) {
-		AStarNode* node = openList[i];
-		if (node->f < bestF) {
-			bestF = node->f;
-			best = node;
-			bestIndex = i;
-		}
-	}
-
-	if (bestIndex == -1) {
-		return nullptr;
-	}
-
-	openList[bestIndex] = openList[--openCount];
-
-	if (Cell* cell = getCell(best->x, best->y)) {
-		cell->state = 2;
-	}
-
-	return best;
-}
-
-AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
-{
-	if (Cell* cell = getCell(x, y)) {
-		if (cell->state != 0) {
-			return &cell->node;
-		}
-	}
-	return nullptr;
-}
-
-	const std::shared_ptr<const Tile>& AStarNodes::getTile(uint16_t x, uint16_t y) const
-{
-	static const std::shared_ptr<const Tile> nullTile;
-	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
-	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
-	if (dx >= 0 && dx < PATHFIND_GRID_W && dy >= 0 && dy < PATHFIND_GRID_H) {
-		return grid[dy][dx].tile;
-	}
-	return nullTile;
-}
-
-void AStarNodes::setTile(uint16_t x, uint16_t y, const std::shared_ptr<const Tile>& tile)
-{
-	if (Cell* cell = getCell(x, y)) {
-		cell->tile = tile;
-	}
-}
-
-AStarNodes::Cell* AStarNodes::getCell(uint16_t x, uint16_t y)
-{
-	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
-	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
-	if (dx >= 0 && dx < PATHFIND_GRID_W && dy >= 0 && dy < PATHFIND_GRID_H) {
-		return &grid[dy][dx];
-	}
-	return nullptr;
-}
-
-uint16_t AStarNodes::getMapWalkCost(const AStarNode* node, uint16_t neighborX, uint16_t neighborY)
-{
-	uint16_t dx = static_cast<uint16_t>(std::abs(static_cast<int16_t>(node->x) - static_cast<int16_t>(neighborX)));
-	uint16_t dy = static_cast<uint16_t>(std::abs(static_cast<int16_t>(node->y) - static_cast<int16_t>(neighborY)));
-	if (dx == dy) {
-		return MAP_DIAGONALWALKCOST;
-	}
-	return MAP_NORMALWALKCOST;
-}
-
-constexpr ConditionType_t DamageToConditionType(CombatType_t type)
-{
-	switch (type) {
-		case COMBAT_FIREDAMAGE:
-			return CONDITION_FIRE;
-
-		case COMBAT_ENERGYDAMAGE:
-			return CONDITION_ENERGY;
-
-		case COMBAT_DROWNDAMAGE:
-			return CONDITION_DROWN;
-
-		case COMBAT_EARTHDAMAGE:
-			return CONDITION_POISON;
-
-		case COMBAT_ICEDAMAGE:
-			return CONDITION_FREEZING;
-
-		case COMBAT_HOLYDAMAGE:
-			return CONDITION_DAZZLED;
-
-		case COMBAT_DEATHDAMAGE:
-			return CONDITION_CURSED;
-
-		case COMBAT_PHYSICALDAMAGE:
-			return CONDITION_BLEEDING;
-
-		default:
-			return CONDITION_NONE;
-	}
-}
-
-uint16_t AStarNodes::getTileWalkCost(const std::shared_ptr<const Creature>& creature,
-                                     const std::shared_ptr<const Tile>& tile)
-{
-	uint16_t cost = 0;
-	if (tile->getTopVisibleCreature(creature)) {
-		cost += MAP_NORMALWALKCOST * 3;
-	}
-
-	if (const auto& field = tile->getFieldItem()) {
-		CombatType_t combatType = field->getCombatType();
-		const auto& monster = creature->asMonster();
-		if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
-		    (monster && !monster->canWalkOnFieldType(combatType))) {
-			cost += MAP_NORMALWALKCOST * 18;
-		}
-	}
-	return cost;
+	return finder.solve(targetPos.x, targetPos.y, creature, fpp, dirList, adapter, pathCondition, sightClear);
 }
 
 // QTreeNode

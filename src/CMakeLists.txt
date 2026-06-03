@@ -36,6 +36,7 @@ set(tfs_SRC
 	${CMAKE_CURRENT_LIST_DIR}/networkmessage.cpp
 	${CMAKE_CURRENT_LIST_DIR}/npc.cpp
 	${CMAKE_CURRENT_LIST_DIR}/outputmessage.cpp
+	${CMAKE_CURRENT_LIST_DIR}/pathfinding.cpp
 	${CMAKE_CURRENT_LIST_DIR}/party.cpp
 	${CMAKE_CURRENT_LIST_DIR}/player.cpp
 	${CMAKE_CURRENT_LIST_DIR}/podium.cpp

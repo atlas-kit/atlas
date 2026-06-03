@@ -7,6 +7,7 @@
 #include "condition.h"
 #include "const.h"
 #include "enums.h"
+#include "pathfinding.h"
 #include "position.h"
 #include "tile.h"
 
@@ -37,18 +38,6 @@ enum slots_t : uint8_t
 	CONST_SLOT_LAST = CONST_SLOT_AMMO,
 };
 
-struct FindPathParams
-{
-	bool fullPathSearch = true;
-	bool clearSight = true;
-	bool allowDiagonal = true;
-	bool keepDistance = false;
-	bool summonTargetMaster = false;
-	int32_t maxSearchDist = 0;
-	int32_t minTargetDist = -1;
-	int32_t maxTargetDist = -1;
-};
-
 inline constexpr int32_t EVENT_CREATURECOUNT = 10;
 inline constexpr auto EVENT_CREATURE_THINK_INTERVAL = 1000ms;
 inline constexpr auto EVENT_CHECK_CREATURE_INTERVAL = EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT;
@@ -56,20 +45,6 @@ inline constexpr auto FOLLOW_EVENT_INTERVAL = 100ms;
 
 static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
 static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();
-
-class FrozenPathingConditionCall
-{
-public:
-	explicit FrozenPathingConditionCall(Position targetPos) : targetPos(std::move(targetPos)) {}
-
-	bool operator()(const Position& startPos, const Position& testPos, const FindPathParams& fpp,
-	                int32_t& bestMatchDist) const;
-
-	bool isInRange(const Position& startPos, const Position& testPos, const FindPathParams& fpp) const;
-
-private:
-	Position targetPos;
-};
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which
