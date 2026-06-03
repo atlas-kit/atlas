@@ -37,356 +37,379 @@ constexpr ConditionType_t DamageToConditionType(CombatType_t type)
 
 } // namespace
 
-bool FrozenPathingConditionCall::isInRange(const Position& startPos, const Position& testPos,
-                                           const FindPathParams& fpp) const
+// PathCondition
+
+bool PathCondition::isInRange(const Position& startPosition, const Position& testPosition,
+                              const FindPathParams& parameters) const
 {
-	if (fpp.fullPathSearch) {
-		if (testPos.x > targetPos.x + fpp.maxTargetDist) {
+	if (parameters.fullPathSearch) {
+		if (testPosition.x > targetPosition.x + parameters.maxTargetDist) {
 			return false;
 		}
-		if (testPos.x < targetPos.x - fpp.maxTargetDist) {
+		if (testPosition.x < targetPosition.x - parameters.maxTargetDist) {
 			return false;
 		}
-		if (testPos.y > targetPos.y + fpp.maxTargetDist) {
+		if (testPosition.y > targetPosition.y + parameters.maxTargetDist) {
 			return false;
 		}
-		if (testPos.y < targetPos.y - fpp.maxTargetDist) {
+		if (testPosition.y < targetPosition.y - parameters.maxTargetDist) {
 			return false;
 		}
 	} else {
-		int32_t dx = startPos.getOffsetX(targetPos);
-		int32_t dxMax = (dx >= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.x > targetPos.x + dxMax) {
+		const auto offsetX = startPosition.getOffsetX(targetPosition);
+		const auto limitHighX = (offsetX >= 0 ? parameters.maxTargetDist : 0);
+		if (testPosition.x > targetPosition.x + limitHighX) {
 			return false;
 		}
-		int32_t dxMin = (dx <= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.x < targetPos.x - dxMin) {
+		const auto limitLowX = (offsetX <= 0 ? parameters.maxTargetDist : 0);
+		if (testPosition.x < targetPosition.x - limitLowX) {
 			return false;
 		}
-		int32_t dy = startPos.getOffsetY(targetPos);
-		int32_t dyMax = (dy >= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.y > targetPos.y + dyMax) {
+		const auto offsetY = startPosition.getOffsetY(targetPosition);
+		const auto limitHighY = (offsetY >= 0 ? parameters.maxTargetDist : 0);
+		if (testPosition.y > targetPosition.y + limitHighY) {
 			return false;
 		}
-		int32_t dyMin = (dy <= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.y < targetPos.y - dyMin) {
+		const auto limitLowY = (offsetY <= 0 ? parameters.maxTargetDist : 0);
+		if (testPosition.y < targetPosition.y - limitLowY) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
-                                            const FindPathParams& fpp, int32_t& bestMatchDist) const
+bool PathCondition::operator()(const Position& startPosition, const Position& testPosition,
+                               const FindPathParams& parameters, int32_t& bestMatchDistance) const
 {
-	if (!isInRange(startPos, testPos, fpp)) {
+	if (!isInRange(startPosition, testPosition, parameters)) {
 		return false;
 	}
 
-	if (fpp.clearSight && !g_game.isSightClear(testPos, targetPos, true)) {
+	// Sight-line check to avoid pathfinding through walls.
+	if (parameters.clearSight && !g_game.isSightClear(testPosition, targetPosition, true)) {
 		return false;
 	}
 
-	int32_t testDist = std::max(targetPos.getDistanceX(testPos), targetPos.getDistanceY(testPos));
-	if (fpp.maxTargetDist == 1) {
-		if (testDist < fpp.minTargetDist || testDist > fpp.maxTargetDist) {
+	const auto testDistance =
+	    std::max(targetPosition.getDistanceX(testPosition), targetPosition.getDistanceY(testPosition));
+	if (parameters.maxTargetDist == 1) {
+		// Most common case: the caller wants to get right next to the target.
+		if (testDistance < parameters.minTargetDist || testDistance > parameters.maxTargetDist) {
 			return false;
 		}
 		return true;
-	} else if (testDist <= fpp.maxTargetDist) {
-		if (testDist < fpp.minTargetDist) {
+	}
+
+	if (testDistance <= parameters.maxTargetDist) {
+		if (testDistance < parameters.minTargetDist) {
 			return false;
 		}
-		if (testDist == fpp.maxTargetDist) {
-			bestMatchDist = 0;
+		// Found a node at exactly the right distance, or the best so far.
+		if (testDistance == parameters.maxTargetDist) {
+			bestMatchDistance = 0;
 			return true;
-		} else if (testDist > bestMatchDist) {
-			bestMatchDist = testDist;
+		}
+		if (testDistance > bestMatchDistance) {
+			bestMatchDistance = testDistance;
 			return true;
 		}
 	}
 	return false;
 }
 
-PathFinder::PathFinder(uint16_t x, uint16_t y) : openCount(0), startX(x), startY(y)
-{
-	for (auto& row : grid) {
-		for (auto& cell : row) {
-			cell.state = 0;
-			cell.tileCost = 0;
-		}
-	}
+// PathFinder
 
-	if (Cell* cell = cellAt(x, y)) {
-		cell->state = 1;
+PathFinder::PathFinder(uint16_t x, uint16_t y) : openListSize(0), startX(x), startY(y)
+{
+	// The start node is always valid — the creature is standing on it.
+	if (Cell* cell = getCell(x, y)) {
+		cell->state = CellState::Open;
 		cell->node.parent = nullptr;
 		cell->node.x = x;
 		cell->node.y = y;
 		cell->node.g = 0;
 		cell->node.f = 0;
-		openList[openCount++] = &cell->node;
+		openList[openListSize++] = &cell->node;
 	}
 }
 
-bool PathFinder::solve(uint16_t targetX, uint16_t targetY, const FindPathParams& fpp, std::vector<Direction>& dirList,
-                       const IPathMap& map, const FrozenPathingConditionCall& condition, bool sightClear)
+bool PathFinder::search(uint16_t targetX, uint16_t targetY, const FindPathParams& parameters,
+                        std::vector<Direction>& directionList, const IPathMap& map, const PathCondition& condition,
+                        bool sightClear)
 {
-	Position startPos(startX, startY, 0);
+	const Position startPosition(startX, startY, 0);
 
 	AStarNode* found = nullptr;
-	int32_t bestMatch = 0;
+	int32_t bestMatchDistance = 0;
 	uint16_t iterations = 0;
-	uint16_t endX = targetX, endY = targetY;
+	uint16_t endX = targetX;
+	uint16_t endY = targetY;
 
-	// Pre-compute pruning flags (constants for this solve call)
-	const bool pruneEnabled = sightClear && !fpp.keepDistance && !fpp.summonTargetMaster && fpp.minTargetDist <= 1;
-	const bool xAligned = (startX == targetX);
-	const bool yAligned = (startY == targetY);
-	const bool xForward = (startX < targetX);
-	const bool yForward = (startY < targetY);
+	// Pre-compute pruning conditions — they are invariant for this call.
+	const auto pruningActive =
+	    sightClear && !parameters.keepDistance && !parameters.summonTargetMaster && parameters.minTargetDist <= 1;
+	const auto sameX = (startX == targetX);
+	const auto sameY = (startY == targetY);
+	const auto movingForwardX = (startX < targetX);
+	const auto movingForwardY = (startY < targetY);
 
-	AStarNode* n = getBestNode();
-	bool capHit = false;
-	while (n && !capHit) {
-		if (++iterations >= MAX_NODES) {
+	AStarNode* currentNode = popBestNode();
+	bool capacityReached = false;
+
+	while (currentNode && !capacityReached) {
+		// Limit the number of expansions to avoid pathological cases
+		// (e.g., unreachable targets behind walls).
+		if (++iterations >= maximumNodes) {
 			if (found) {
 				break;
 			}
 			return false;
 		}
 
+		// Check if the current node satisfies the goal condition.
 		{
-			Position pos(n->x, n->y, 0);
-			if (condition(startPos, pos, fpp, bestMatch)) {
-				found = n;
-				endX = n->x;
-				endY = n->y;
-				if (bestMatch == 0) {
+			const Position currentPosition(currentNode->x, currentNode->y, 0);
+			if (condition(startPosition, currentPosition, parameters, bestMatchDistance)) {
+				found = currentNode;
+				endX = currentNode->x;
+				endY = currentNode->y;
+				if (bestMatchDistance == 0) {
 					break;
 				}
 			}
 		}
 
-		int32_t nx, ny;
-		for (uint8_t i = 0; i < 8; ++i) {
-			nx = static_cast<int32_t>(n->x) + NEIGHBORS[i].first;
-			ny = static_cast<int32_t>(n->y) + NEIGHBORS[i].second;
+		// Expand all eight neighbours.
+		int32_t neighbourX, neighbourY;
+		for (const auto& offset : neighbourOffsets) {
+			neighbourX = static_cast<int32_t>(currentNode->x) + offset.first;
+			neighbourY = static_cast<int32_t>(currentNode->y) + offset.second;
 
-			// Distance check from start
-			int32_t sdx = nx - startX;
-			int32_t sdy = ny - startY;
-			int32_t startDist = (sdx >= 0 ? sdx : -sdx) + (sdy >= 0 ? sdy : -sdy);
-			if (fpp.maxSearchDist != 0) {
-				if (startDist > fpp.maxSearchDist) {
+			// Skip nodes beyond the configured search radius.
+			const auto distanceX = neighbourX - startX;
+			const auto distanceY = neighbourY - startY;
+			const auto manhattanDistance =
+			    (distanceX >= 0 ? distanceX : -distanceX) + (distanceY >= 0 ? distanceY : -distanceY);
+
+			if (parameters.maxSearchDist != 0) {
+				if (manhattanDistance > parameters.maxSearchDist) {
 					continue;
 				}
-			} else if (startDist > PATHFIND_VIEWPORT_X + PATHFIND_VIEWPORT_Y) {
+			} else if (manhattanDistance > PATHFIND_VIEWPORT_X + PATHFIND_VIEWPORT_Y) {
 				continue;
 			}
 
-			// keepDistance pruning
-			if (fpp.keepDistance) {
-				int32_t dx = nx - static_cast<int32_t>(targetX);
-				int32_t dy = ny - static_cast<int32_t>(targetY);
-				int32_t dist =
-				    (dx >= 0 ? dx : -dx) > (dy >= 0 ? dy : -dy) ? (dx >= 0 ? dx : -dx) : (dy >= 0 ? dy : -dy);
-				if (dist < fpp.minTargetDist || dist > fpp.maxTargetDist) {
+			// keepDistance prunes nodes outside the desired range from the target.
+			if (parameters.keepDistance) {
+				const auto deltaX = neighbourX - static_cast<int32_t>(targetX);
+				const auto deltaY = neighbourY - static_cast<int32_t>(targetY);
+				const auto chebyshevDistance = (deltaX >= 0 ? deltaX : -deltaX) > (deltaY >= 0 ? deltaY : -deltaY)
+				                                   ? (deltaX >= 0 ? deltaX : -deltaX)
+				                                   : (deltaY >= 0 ? deltaY : -deltaY);
+				if (chebyshevDistance < parameters.minTargetDist || chebyshevDistance > parameters.maxTargetDist) {
 					continue;
 				}
 			}
 
-			// sight-clear pruning
-			if (pruneEnabled) {
-				if (xAligned) {
-					if (nx != startX) {
+			// When the line of sight is clear we can restrict the search
+			// to the rectangle between start and target.
+			if (pruningActive) {
+				if (sameX) {
+					if (neighbourX != startX) {
 						continue;
 					}
-				} else if (xForward) {
-					if (nx < startX) {
+				} else if (movingForwardX) {
+					if (neighbourX < startX) {
 						continue;
 					}
-					if (nx > targetX) {
+					if (neighbourX > targetX) {
 						continue;
 					}
 				} else {
-					if (nx > startX) {
+					if (neighbourX > startX) {
 						continue;
 					}
-					if (nx < targetX) {
+					if (neighbourX < targetX) {
 						continue;
 					}
 				}
 
-				if (yAligned) {
-					if (ny != startY) {
+				if (sameY) {
+					if (neighbourY != startY) {
 						continue;
 					}
-				} else if (yForward) {
-					if (ny < startY) {
+				} else if (movingForwardY) {
+					if (neighbourY < startY) {
 						continue;
 					}
-					if (ny > targetY) {
+					if (neighbourY > targetY) {
 						continue;
 					}
 				} else {
-					if (ny > startY) {
+					if (neighbourY > startY) {
 						continue;
 					}
-					if (ny < targetY) {
+					if (neighbourY < targetY) {
 						continue;
 					}
 				}
 			}
 
-			uint16_t nx16 = static_cast<uint16_t>(nx);
-			uint16_t ny16 = static_cast<uint16_t>(ny);
+			const auto packedX = static_cast<uint16_t>(neighbourX);
+			const auto packedY = static_cast<uint16_t>(neighbourY);
 
-			// Single grid lookup
-			Cell* cell = cellAt(nx16, ny16);
+			Cell* cell = getCell(packedX, packedY);
 			if (!cell) {
 				continue;
 			}
 
-			uint16_t walkCost = (nx != n->x && ny != n->y) ? MAP_DIAGONALWALKCOST : MAP_NORMALWALKCOST;
+			// Diagonal movement costs more than cardinal.
+			const uint16_t movementCost = (neighbourX != currentNode->x && neighbourY != currentNode->y)
+			                                  ? MAP_DIAGONALWALKCOST
+			                                  : MAP_NORMALWALKCOST;
 
-			if (cell->state != 0) {
-				// Already in open or closed set
-				uint16_t h = heuristic(nx16, ny16, targetX, targetY);
-				uint16_t minG = n->g + walkCost;
+			if (cell->state != CellState::Empty) {
+				// Node was already reached through a different path;
+				// check whether this new path is cheaper.
+				const auto heuristicValue = heuristic(packedX, packedY, targetX, targetY);
+				const auto minimumG = currentNode->g + movementCost;
 
-				if (cell->node.f <= h + minG) {
+				if (cell->node.f <= heuristicValue + minimumG) {
 					continue;
 				}
 
-				uint16_t fullG = minG + cell->tileCost;
-				uint16_t newf = h + fullG;
+				const auto exactG = minimumG + cell->tileCost;
+				const auto totalF = heuristicValue + exactG;
 
-				if (cell->node.f > newf) {
-					cell->node.g = fullG;
-					cell->node.f = newf;
-					cell->node.parent = n;
+				if (cell->node.f > totalF) {
+					cell->node.g = exactG;
+					cell->node.f = totalF;
+					cell->node.parent = currentNode;
 				}
 			} else {
-				// New node
-				uint16_t tileCost = map.getWalkCost(nx16, ny16);
+				// First time we visit this node — query the map for walkability.
+				const auto tileCost = map.getWalkCost(packedX, packedY);
 				if (tileCost == 0) {
 					continue;
 				}
 
-				uint16_t h = heuristic(nx16, ny16, targetX, targetY);
-				uint16_t g = n->g + walkCost + tileCost;
-				uint16_t newf = h + g;
+				const auto heuristicValue = heuristic(packedX, packedY, targetX, targetY);
+				const auto exactG = currentNode->g + movementCost + tileCost;
+				const auto totalF = heuristicValue + exactG;
 
-				cell->state = 1;
-				cell->node.parent = n;
-				cell->node.x = nx16;
-				cell->node.y = ny16;
-				cell->node.g = g;
-				cell->node.f = newf;
+				cell->state = CellState::Open;
+				cell->node.parent = currentNode;
+				cell->node.x = packedX;
+				cell->node.y = packedY;
+				cell->node.g = exactG;
+				cell->node.f = totalF;
 				cell->tileCost = tileCost;
 
-				if (openCount >= MAX_NODES) {
+				// If we run out of room and already have a result, use it.
+				if (openListSize >= maximumNodes) {
 					if (found) {
-						capHit = true;
+						capacityReached = true;
 						break;
 					}
 					return false;
 				}
-				openList[openCount++] = &cell->node;
+				openList[openListSize++] = &cell->node;
 			}
 		}
 
-		if (!capHit) {
-			n = getBestNode();
+		if (!capacityReached) {
+			currentNode = popBestNode();
 		}
 	}
 
-	if (capHit && !found) {
+	if (capacityReached && !found) {
 		return false;
 	}
-
 	if (!found) {
 		return false;
 	}
 
-	reconstructPath(found, endX, endY, dirList);
+	reconstructPath(found, endX, endY, directionList);
 	return true;
 }
 
-void PathFinder::reconstructPath(AStarNode* node, uint16_t endX, uint16_t endY, std::vector<Direction>& dirList) const
+void PathFinder::reconstructPath(AStarNode* node, uint16_t endX, uint16_t endY,
+                                 std::vector<Direction>& directionList) const
 {
-	AStarNode* n = node->parent;
-	int32_t prevX = endX;
-	int32_t prevY = endY;
+	// Walk the parent chain from the end back to the start, pushing the
+	// opposite direction so that the caller reads them from start to end.
+	AStarNode* currentNode = node->parent;
+	auto previousX = static_cast<int32_t>(endX);
+	auto previousY = static_cast<int32_t>(endY);
 
-	while (n) {
-		int32_t dx = static_cast<int32_t>(n->x) - prevX;
-		int32_t dy = static_cast<int32_t>(n->y) - prevY;
+	while (currentNode) {
+		const auto deltaX = static_cast<int32_t>(currentNode->x) - previousX;
+		const auto deltaY = static_cast<int32_t>(currentNode->y) - previousY;
 
-		prevX = n->x;
-		prevY = n->y;
+		previousX = currentNode->x;
+		previousY = currentNode->y;
 
-		if (dx == 1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHWEST);
-		} else if (dx == -1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHEAST);
-		} else if (dx == 1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHWEST);
-		} else if (dx == -1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHEAST);
-		} else if (dx == 1) {
-			dirList.push_back(DIRECTION_WEST);
-		} else if (dx == -1) {
-			dirList.push_back(DIRECTION_EAST);
-		} else if (dy == 1) {
-			dirList.push_back(DIRECTION_NORTH);
-		} else if (dy == -1) {
-			dirList.push_back(DIRECTION_SOUTH);
+		if (deltaX == 1 && deltaY == 1) {
+			directionList.push_back(DIRECTION_NORTHWEST);
+		} else if (deltaX == -1 && deltaY == 1) {
+			directionList.push_back(DIRECTION_NORTHEAST);
+		} else if (deltaX == 1 && deltaY == -1) {
+			directionList.push_back(DIRECTION_SOUTHWEST);
+		} else if (deltaX == -1 && deltaY == -1) {
+			directionList.push_back(DIRECTION_SOUTHEAST);
+		} else if (deltaX == 1) {
+			directionList.push_back(DIRECTION_WEST);
+		} else if (deltaX == -1) {
+			directionList.push_back(DIRECTION_EAST);
+		} else if (deltaY == 1) {
+			directionList.push_back(DIRECTION_NORTH);
+		} else if (deltaY == -1) {
+			directionList.push_back(DIRECTION_SOUTH);
 		}
 
-		n = n->parent;
+		currentNode = currentNode->parent;
 	}
 }
 
-PathFinder::Cell* PathFinder::cellAt(uint16_t x, uint16_t y)
+PathFinder::Cell* PathFinder::getCell(uint16_t x, uint16_t y)
 {
-	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
-	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
-	if (dx >= 0 && dx < GRID_W && dy >= 0 && dy < GRID_H) {
-		return &grid[dy][dx];
+	const auto gridX = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
+	const auto gridY = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
+	if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight) {
+		return &grid[gridY][gridX];
 	}
 	return nullptr;
 }
 
-AStarNode* PathFinder::getNodeByPosition(uint16_t x, uint16_t y) const
+AStarNode* PathFinder::getNodeAt(uint16_t x, uint16_t y) const
 {
-	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
-	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
-	if (dx >= 0 && dx < GRID_W && dy >= 0 && dy < GRID_H) {
-		const Cell& cell = grid[dy][dx];
-		if (cell.state != 0) {
+	const auto gridX = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
+	const auto gridY = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
+	if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight) {
+		const Cell& cell = grid[gridY][gridX];
+		if (cell.state != CellState::Empty) {
 			return const_cast<AStarNode*>(&cell.node);
 		}
 	}
 	return nullptr;
 }
 
-AStarNode* PathFinder::getBestNode()
+AStarNode* PathFinder::popBestNode()
 {
-	if (openCount == 0) {
+	if (openListSize == 0) {
 		return nullptr;
 	}
 
-	AStarNode* best = nullptr;
-	uint16_t bestF = std::numeric_limits<uint16_t>::max();
+	AStarNode* bestNode = nullptr;
+	auto minimumF = std::numeric_limits<uint16_t>::max();
 	int32_t bestIndex = -1;
 
-	for (int32_t i = 0; i < openCount; ++i) {
-		AStarNode* node = openList[i];
-		if (node->f < bestF) {
-			bestF = node->f;
-			best = node;
-			bestIndex = i;
+	for (int32_t index = 0; index < openListSize; ++index) {
+		AStarNode* node = openList[index];
+		if (node->f < minimumF) {
+			minimumF = node->f;
+			bestNode = node;
+			bestIndex = index;
 		}
 	}
 
@@ -394,18 +417,20 @@ AStarNode* PathFinder::getBestNode()
 		return nullptr;
 	}
 
-	openList[bestIndex] = openList[--openCount];
+	// Remove the node from the open list by swapping with the last element.
+	openList[bestIndex] = openList[--openListSize];
 
-	if (Cell* cell = cellAt(best->x, best->y)) {
-		cell->state = 2;
+	if (Cell* cell = getCell(bestNode->x, bestNode->y)) {
+		cell->state = CellState::Closed;
 	}
 
-	return best;
+	return bestNode;
 }
 
 uint16_t PathFinder::heuristic(uint16_t x, uint16_t y, uint16_t targetX, uint16_t targetY)
 {
-	int32_t dx = static_cast<int32_t>(x) - static_cast<int32_t>(targetX);
-	int32_t dy = static_cast<int32_t>(y) - static_cast<int32_t>(targetY);
-	return static_cast<uint16_t>(dx * dx + dy * dy);
+	// Squared Euclidean distance — fast and admissible for this cost model.
+	const auto differenceX = static_cast<int32_t>(x) - static_cast<int32_t>(targetX);
+	const auto differenceY = static_cast<int32_t>(y) - static_cast<int32_t>(targetY);
+	return static_cast<uint16_t>(differenceX * differenceX + differenceY * differenceY);
 }

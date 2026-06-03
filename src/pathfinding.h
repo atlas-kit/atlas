@@ -17,18 +17,18 @@ struct FindPathParams
 	int32_t maxTargetDist = -1;
 };
 
-class FrozenPathingConditionCall
+class PathCondition
 {
 public:
-	explicit FrozenPathingConditionCall(Position targetPos) : targetPos(std::move(targetPos)) {}
+	explicit PathCondition(Position targetPosition) : targetPosition(std::move(targetPosition)) {}
 
-	bool operator()(const Position& startPos, const Position& testPos, const FindPathParams& fpp,
-	                int32_t& bestMatchDist) const;
+	bool operator()(const Position& startPosition, const Position& testPosition, const FindPathParams& parameters,
+	                int32_t& bestMatchDistance) const;
 
-	bool isInRange(const Position& startPos, const Position& testPos, const FindPathParams& fpp) const;
+	bool isInRange(const Position& startPosition, const Position& testPosition, const FindPathParams& parameters) const;
 
 private:
-	Position targetPos;
+	Position targetPosition;
 };
 
 static constexpr int32_t PATHFIND_VIEWPORT_X = 11;
@@ -54,33 +54,43 @@ class PathFinder
 public:
 	PathFinder(uint16_t startX, uint16_t startY);
 
-	bool solve(uint16_t targetX, uint16_t targetY, const FindPathParams& fpp, std::vector<Direction>& dirList,
-	           const IPathMap& map, const FrozenPathingConditionCall& condition, bool sightClear);
+	bool search(uint16_t targetX, uint16_t targetY, const FindPathParams& parameters,
+	            std::vector<Direction>& directionList, const IPathMap& map, const PathCondition& condition,
+	            bool sightClear);
 
 private:
-	static constexpr int32_t GRID_W = PATHFIND_VIEWPORT_X * 2 + 1;
-	static constexpr int32_t GRID_H = PATHFIND_VIEWPORT_Y * 2 + 1;
-	static constexpr int32_t MAX_NODES = PATHFIND_VIEWPORT_X * PATHFIND_VIEWPORT_Y;
+	static constexpr int32_t gridWidth = PATHFIND_VIEWPORT_X * 2 + 1;
+	static constexpr int32_t gridHeight = PATHFIND_VIEWPORT_Y * 2 + 1;
+	static constexpr int32_t maximumNodes = PATHFIND_VIEWPORT_X * PATHFIND_VIEWPORT_Y;
 
-	static constexpr std::pair<int8_t, int8_t> NEIGHBORS[8] = {{-1, 0},  {0, 1},  {1, 0}, {0, -1},
-	                                                           {-1, -1}, {1, -1}, {1, 1}, {-1, 1}};
+	static constexpr std::pair<int8_t, int8_t> neighbourOffsets[8] = {{-1, 0},  {0, 1},  {1, 0}, {0, -1},
+	                                                                  {-1, -1}, {1, -1}, {1, 1}, {-1, 1}};
+
+	enum class CellState : uint8_t
+	{
+		Empty = 0,
+		Open = 1,
+		Closed = 2,
+	};
 
 	struct Cell
 	{
 		AStarNode node;
-		uint8_t state;
-		uint16_t tileCost;
+		CellState state = CellState::Empty;
+		uint16_t tileCost = 0;
 	};
 
-	Cell grid[GRID_H][GRID_W];
-	AStarNode* openList[MAX_NODES];
-	int32_t openCount;
-	int32_t startX, startY;
+	Cell grid[gridHeight][gridWidth];
+	AStarNode* openList[maximumNodes];
+	int32_t openListSize;
+	const int32_t startX;
+	const int32_t startY;
 
-	Cell* cellAt(uint16_t x, uint16_t y);
-	AStarNode* getNodeByPosition(uint16_t x, uint16_t y) const;
-	AStarNode* getBestNode();
-	void reconstructPath(AStarNode* node, uint16_t endX, uint16_t endY, std::vector<Direction>& dirList) const;
+	Cell* getCell(uint16_t x, uint16_t y);
+	AStarNode* getNodeAt(uint16_t x, uint16_t y) const;
+
+	AStarNode* popBestNode();
+	void reconstructPath(AStarNode* node, uint16_t endX, uint16_t endY, std::vector<Direction>& directionList) const;
 
 	static uint16_t heuristic(uint16_t x, uint16_t y, uint16_t targetX, uint16_t targetY);
 };

@@ -227,7 +227,7 @@ public:
 	const std::shared_ptr<Tile> canWalkTo(const std::shared_ptr<const Creature>& creature, const Position& pos) const;
 
 	bool getPathMatching(const std::shared_ptr<const Creature>& creature, const Position& targetPos,
-	                     std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
+	                     std::vector<Direction>& dirList, const PathCondition& pathCondition,
 	                     const FindPathParams& fpp) const;
 
 	std::map<std::string, Position> waypoints;

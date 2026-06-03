@@ -730,7 +730,7 @@ const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>
 }
 
 bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const Position& targetPos,
-                          std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
+                          std::vector<Direction>& dirList, const PathCondition& pathCondition,
                           const FindPathParams& fpp) const
 {
 	const auto& position = creature->getPosition();
@@ -810,7 +810,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 	const auto sightClear = isSightClear(position, targetPos, true, true);
 
 	PathFinder finder(position.x, position.y);
-	return finder.solve(targetPos.x, targetPos.y, fpp, dirList, adapter, pathCondition, sightClear);
+	return finder.search(targetPos.x, targetPos.y, fpp, dirList, adapter, pathCondition, sightClear);
 }
 
 // QTreeNode
