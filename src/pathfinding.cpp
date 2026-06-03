@@ -117,8 +117,7 @@ PathFinder::PathFinder(uint16_t x, uint16_t y) : openCount(0), startX(x), startY
 		}
 	}
 
-	Cell* cell = cellAt(x, y);
-	if (cell) {
+	if (Cell* cell = cellAt(x, y)) {
 		cell->state = 1;
 		cell->node.parent = nullptr;
 		cell->node.x = x;
@@ -147,8 +146,12 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY, const FindPathParams&
 	const bool yForward = (startY < targetY);
 
 	AStarNode* n = getBestNode();
-	while (n) {
+	bool capHit = false;
+	while (n && !capHit) {
 		if (++iterations >= MAX_NODES) {
+			if (found) {
+				break;
+			}
 			return false;
 		}
 
@@ -244,7 +247,7 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY, const FindPathParams&
 				continue;
 			}
 
-			uint16_t walkCost = (nx != n->x && ny != n->y) ? 25 : 10;
+			uint16_t walkCost = (nx != n->x && ny != n->y) ? MAP_DIAGONALWALKCOST : MAP_NORMALWALKCOST;
 
 			if (cell->state != 0) {
 				// Already in open or closed set
@@ -283,13 +286,23 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY, const FindPathParams&
 				cell->tileCost = tileCost;
 
 				if (openCount >= MAX_NODES) {
+					if (found) {
+						capHit = true;
+						break;
+					}
 					return false;
 				}
 				openList[openCount++] = &cell->node;
 			}
 		}
 
-		n = getBestNode();
+		if (!capHit) {
+			n = getBestNode();
+		}
+	}
+
+	if (capHit && !found) {
+		return false;
 	}
 
 	if (!found) {

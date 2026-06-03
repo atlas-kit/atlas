@@ -733,25 +733,29 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
                           std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
                           const FindPathParams& fpp) const
 {
-	const Position startPos = creature->getPosition();
-	uint8_t z = startPos.getZ();
+	const auto& position = creature->getPosition();
+	uint8_t z = position.getZ();
 
+	// We can't walk, no need to create path.
 	if (creature->getSpeed() <= 0) {
 		return false;
 	}
 
-	if (startPos.getZ() != targetPos.getZ()) {
+	// We can't get paths up or down floors.
+	if (position.getZ() != targetPos.getZ()) {
 		return false;
 	}
 
-	int32_t distanceX = startPos.getDistanceX(targetPos);
-	int32_t distanceY = startPos.getDistanceY(targetPos);
+	const auto distanceX = position.getDistanceX(targetPos);
+	const auto distanceY = position.getDistanceY(targetPos);
+	// We are next to our target. Let dance step decide.
 	if (fpp.maxTargetDist <= 1 && distanceX <= 1 && distanceY <= 1) {
 		return true;
 	}
 
-	int32_t maxDistanceX = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportX + 1;
-	int32_t maxDistanceY = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportY + 1;
+	const auto maxDistanceX = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportX + 1;
+	const auto maxDistanceY = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportY + 1;
+	// Don't update path. The target is too far away.
 	if (distanceX > maxDistanceX || distanceY > maxDistanceY) {
 		return false;
 	}
@@ -778,6 +782,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 				if (!creature->asPlayer()) {
 					flags |= FLAG_IGNOREFIELDDAMAGE;
 				}
+
 				if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
 					return 0;
 				}
@@ -785,7 +790,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 
 			uint16_t cost = 0;
 			if (tile->getTopVisibleCreature(creature)) {
-				cost += 30;
+				cost += MAP_NORMALWALKCOST * 3;
 			}
 
 			if (const auto& field = tile->getFieldItem()) {
@@ -793,7 +798,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 				const auto& monster = creature->asMonster();
 				if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
 				    (monster && !monster->canWalkOnFieldType(combatType))) {
-					cost += 180;
+					cost += MAP_NORMALWALKCOST * 18;
 				}
 			}
 
@@ -802,9 +807,9 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 	};
 
 	MapAccessAdapter adapter(*this, z, creature);
-	bool sightClear = isSightClear(startPos, targetPos, true, true);
+	const auto sightClear = isSightClear(position, targetPos, true, true);
 
-	PathFinder finder(startPos.x, startPos.y);
+	PathFinder finder(position.x, position.y);
 	return finder.solve(targetPos.x, targetPos.y, fpp, dirList, adapter, pathCondition, sightClear);
 }
 
