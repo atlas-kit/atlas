@@ -6,8 +6,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-// ─── Basic cases ────────────────────────────────────────────────
-
 BOOST_AUTO_TEST_CASE(test_same_position)
 {
 	struct EmptyMap final : IPathMap
@@ -116,8 +114,6 @@ BOOST_AUTO_TEST_CASE(test_linear_path_three_steps)
 	BOOST_CHECK_GE(dirList.size(), 2);
 }
 
-// ─── Cost variations ────────────────────────────────────────────
-
 BOOST_AUTO_TEST_CASE(test_cost_avoidance_chooses_cheaper_path)
 {
 	struct CostMap final : IPathMap
@@ -198,8 +194,6 @@ BOOST_AUTO_TEST_CASE(test_minimal_cost_leads_to_shortest_path)
 	// Path should avoid (1,1) which is expensive diagonal
 }
 
-// ─── Search params ──────────────────────────────────────────────
-
 BOOST_AUTO_TEST_CASE(test_max_search_dist_limits_exploration)
 {
 	struct OpenMap final : IPathMap
@@ -244,8 +238,6 @@ BOOST_AUTO_TEST_CASE(test_frozen_condition_is_in_range)
 	// Position (9,3) → dist = max(4,0) = 4 → out of range
 	BOOST_CHECK(!cond.isInRange(Position(0, 0, 7), Position(9, 3, 7), fpp));
 }
-
-// ─── Interface independence ─────────────────────────────────────
 
 BOOST_AUTO_TEST_CASE(test_ipathmap_custom_costs)
 {
@@ -302,8 +294,6 @@ BOOST_AUTO_TEST_CASE(test_ipathmap_all_blocked_except_one)
 	BOOST_CHECK(ok);
 	BOOST_CHECK_EQUAL(dirList.size(), 1);
 }
-
-// ─── Node limit / edge cases ────────────────────────────────────
 
 BOOST_AUTO_TEST_CASE(test_long_path_within_limits)
 {

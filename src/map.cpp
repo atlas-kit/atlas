@@ -19,15 +19,24 @@ namespace {
 constexpr ConditionType_t DamageToConditionType(CombatType_t type)
 {
 	switch (type) {
-		case COMBAT_FIREDAMAGE: return CONDITION_FIRE;
-		case COMBAT_ENERGYDAMAGE: return CONDITION_ENERGY;
-		case COMBAT_DROWNDAMAGE: return CONDITION_DROWN;
-		case COMBAT_EARTHDAMAGE: return CONDITION_POISON;
-		case COMBAT_ICEDAMAGE: return CONDITION_FREEZING;
-		case COMBAT_HOLYDAMAGE: return CONDITION_DAZZLED;
-		case COMBAT_DEATHDAMAGE: return CONDITION_CURSED;
-		case COMBAT_PHYSICALDAMAGE: return CONDITION_BLEEDING;
-		default: return CONDITION_NONE;
+		case COMBAT_FIREDAMAGE:
+			return CONDITION_FIRE;
+		case COMBAT_ENERGYDAMAGE:
+			return CONDITION_ENERGY;
+		case COMBAT_DROWNDAMAGE:
+			return CONDITION_DROWN;
+		case COMBAT_EARTHDAMAGE:
+			return CONDITION_POISON;
+		case COMBAT_ICEDAMAGE:
+			return CONDITION_FREEZING;
+		case COMBAT_HOLYDAMAGE:
+			return CONDITION_DAZZLED;
+		case COMBAT_DEATHDAMAGE:
+			return CONDITION_CURSED;
+		case COMBAT_PHYSICALDAMAGE:
+			return CONDITION_BLEEDING;
+		default:
+			return CONDITION_NONE;
 	}
 }
 
@@ -753,8 +762,9 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 		uint8_t z;
 		const std::shared_ptr<const Creature>& creature;
 
-		MapAccessAdapter(const Map& map, uint8_t z, const std::shared_ptr<const Creature>& creature)
-		    : map(map), z(z), creature(creature) {}
+		MapAccessAdapter(const Map& map, uint8_t z, const std::shared_ptr<const Creature>& creature) :
+		    map(map), z(z), creature(creature)
+		{}
 
 		uint16_t getWalkCost(uint16_t x, uint16_t y) const override
 		{

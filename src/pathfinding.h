@@ -1,9 +1,9 @@
 #pragma once
 
+#include "position.h"
+
 #include <cstdint>
 #include <vector>
-
-#include "position.h"
 
 struct FindPathParams
 {
@@ -54,17 +54,16 @@ class PathFinder
 public:
 	PathFinder(uint16_t startX, uint16_t startY);
 
-	bool solve(uint16_t targetX, uint16_t targetY,
-	           const FindPathParams& fpp,
-	           std::vector<Direction>& dirList,
-	           const IPathMap& map,
-	           const FrozenPathingConditionCall& condition,
-	           bool sightClear);
+	bool solve(uint16_t targetX, uint16_t targetY, const FindPathParams& fpp, std::vector<Direction>& dirList,
+	           const IPathMap& map, const FrozenPathingConditionCall& condition, bool sightClear);
 
 private:
 	static constexpr int32_t GRID_W = PATHFIND_VIEWPORT_X * 2 + 1;
 	static constexpr int32_t GRID_H = PATHFIND_VIEWPORT_Y * 2 + 1;
 	static constexpr int32_t MAX_NODES = PATHFIND_VIEWPORT_X * PATHFIND_VIEWPORT_Y;
+
+	static constexpr std::pair<int8_t, int8_t> NEIGHBORS[8] = {{-1, 0},  {0, 1},  {1, 0}, {0, -1},
+	                                                           {-1, -1}, {1, -1}, {1, 1}, {-1, 1}};
 
 	struct Cell
 	{
@@ -78,12 +77,10 @@ private:
 	int32_t openCount;
 	int32_t startX, startY;
 
-	Cell* getCell(uint16_t x, uint16_t y);
+	Cell* cellAt(uint16_t x, uint16_t y);
 	AStarNode* getNodeByPosition(uint16_t x, uint16_t y) const;
-	AStarNode* createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f);
 	AStarNode* getBestNode();
 	void reconstructPath(AStarNode* node, uint16_t endX, uint16_t endY, std::vector<Direction>& dirList) const;
 
-	static uint16_t getMapWalkCost(uint16_t fromX, uint16_t fromY, uint16_t toX, uint16_t toY);
-	static uint16_t calculateHeuristic(uint16_t x, uint16_t y, uint16_t targetX, uint16_t targetY);
+	static uint16_t heuristic(uint16_t x, uint16_t y, uint16_t targetX, uint16_t targetY);
 };
