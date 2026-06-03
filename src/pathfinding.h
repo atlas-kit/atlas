@@ -1,13 +1,9 @@
 #pragma once
 
-#include <memory>
+#include <cstdint>
 #include <vector>
 
 #include "position.h"
-
-class Creature;
-class Tile;
-enum Direction : uint8_t;
 
 struct FindPathParams
 {
@@ -50,7 +46,7 @@ class IPathMap
 {
 public:
 	virtual ~IPathMap() = default;
-	virtual const Tile* getTile(const std::shared_ptr<const Creature>& creature, uint16_t x, uint16_t y) const = 0;
+	virtual uint16_t getWalkCost(uint16_t x, uint16_t y) const = 0;
 };
 
 class PathFinder
@@ -58,17 +54,12 @@ class PathFinder
 public:
 	PathFinder(uint16_t startX, uint16_t startY);
 
-	void setStartTile(const Tile* tile);
-
 	bool solve(uint16_t targetX, uint16_t targetY,
-	           const std::shared_ptr<const Creature>& creature,
 	           const FindPathParams& fpp,
 	           std::vector<Direction>& dirList,
 	           const IPathMap& map,
 	           const FrozenPathingConditionCall& condition,
 	           bool sightClear);
-
-	static uint16_t getTileWalkCost(const std::shared_ptr<const Creature>& creature, const Tile* tile);
 
 private:
 	static constexpr int32_t GRID_W = PATHFIND_VIEWPORT_X * 2 + 1;
@@ -79,7 +70,7 @@ private:
 	{
 		AStarNode node;
 		uint8_t state;
-		const Tile* tile;
+		uint16_t tileCost;
 	};
 
 	Cell grid[GRID_H][GRID_W];

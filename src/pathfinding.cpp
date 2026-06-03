@@ -5,7 +5,6 @@
 #include "combat.h"
 #include "creature.h"
 #include "game.h"
-#include "map.h"
 #include "tile.h"
 
 extern Game g_game;
@@ -100,26 +99,18 @@ bool FrozenPathingConditionCall::operator()(const Position& startPos, const Posi
 	return false;
 }
 
-void PathFinder::setStartTile(const Tile* tile)
-{
-	if (Cell* cell = getCell(static_cast<uint16_t>(startX), static_cast<uint16_t>(startY))) {
-		cell->tile = tile;
-	}
-}
-
 PathFinder::PathFinder(uint16_t x, uint16_t y) : openCount(0), startX(x), startY(y)
 {
 	for (auto& row : grid) {
 		for (auto& cell : row) {
 			cell.state = 0;
-			cell.tile = nullptr;
+			cell.tileCost = 0;
 		}
 	}
 	createNode(nullptr, x, y, 0, 0);
 }
 
 bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
-                       const std::shared_ptr<const Creature>& creature,
                        const FindPathParams& fpp,
                        std::vector<Direction>& dirList,
                        const IPathMap& map,
@@ -127,11 +118,11 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
                        bool sightClear)
 {
 	Position startPos(startX, startY, 0);
-	Position targetPos(targetX, targetY, 0);
 
 	AStarNode* found = nullptr;
 	int32_t bestMatch = 0;
 	uint16_t iterations = 0;
+	uint16_t endX = targetX, endY = targetY;
 
 	AStarNode* n = getBestNode();
 	while (n) {
@@ -142,7 +133,8 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
 		Position pos(n->x, n->y, 0);
 		if (condition(startPos, pos, fpp, bestMatch)) {
 			found = n;
-			targetPos = pos;
+			endX = n->x;
+			endY = n->y;
 			if (bestMatch == 0) {
 				break;
 			}
@@ -155,9 +147,10 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
 			int32_t nx = static_cast<int32_t>(n->x) + allNeighbors[i].first;
 			int32_t ny = static_cast<int32_t>(n->y) + allNeighbors[i].second;
 
-			int32_t dx = std::abs(nx - startX);
-			int32_t dy = std::abs(ny - startY);
-			if (dx > PATHFIND_VIEWPORT_X || dy > PATHFIND_VIEWPORT_Y) {
+			int32_t startDist = std::abs(nx - startX) + std::abs(ny - startY);
+			if (fpp.maxSearchDist != 0 && startDist > fpp.maxSearchDist) {
+				continue;
+			} else if (fpp.maxSearchDist == 0 && (startDist > PATHFIND_VIEWPORT_X + PATHFIND_VIEWPORT_Y)) {
 				continue;
 			}
 
@@ -180,47 +173,45 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
 				else if (startY < targetY && ny > targetY) { continue; }
 			}
 
-			AStarNode* neighborNode = getNodeByPosition(static_cast<uint16_t>(nx), static_cast<uint16_t>(ny));
-			if (neighborNode) {
-				uint16_t walkCost = getMapWalkCost(n->x, n->y, static_cast<uint16_t>(nx), static_cast<uint16_t>(ny));
-				uint16_t h = calculateHeuristic(static_cast<uint16_t>(nx), static_cast<uint16_t>(ny), targetX, targetY);
-				uint16_t minG = n->g + walkCost;
+			uint16_t nx16 = static_cast<uint16_t>(nx);
+			uint16_t ny16 = static_cast<uint16_t>(ny);
+			uint16_t walkCost = getMapWalkCost(n->x, n->y, nx16, ny16);
+			uint16_t h = calculateHeuristic(nx16, ny16, targetX, targetY);
+			uint16_t minG = n->g + walkCost;
 
+			AStarNode* neighborNode = getNodeByPosition(nx16, ny16);
+			if (neighborNode) {
 				if (neighborNode->f <= h + minG) {
 					continue;
 				}
 
-				Cell* cell = getCell(static_cast<uint16_t>(nx), static_cast<uint16_t>(ny));
-				if (cell && cell->tile) {
-					uint16_t fullG = minG + getTileWalkCost(creature, cell->tile);
+				Cell* cell = getCell(nx16, ny16);
+				if (cell) {
+					uint16_t fullG = minG + (cell->tileCost > 0 ? cell->tileCost : 10);
 					uint16_t newf = h + fullG;
 
-					if (neighborNode->f <= newf) {
-						continue;
+					if (neighborNode->f > newf) {
+						neighborNode->g = fullG;
+						neighborNode->f = newf;
+						neighborNode->parent = n;
 					}
-
-					neighborNode->g = fullG;
-					neighborNode->f = newf;
-					neighborNode->parent = n;
 				}
 			} else {
-				const Tile* tile = map.getTile(creature, static_cast<uint16_t>(nx), static_cast<uint16_t>(ny));
-				if (!tile) {
+				uint16_t tileCost = map.getWalkCost(nx16, ny16);
+				if (tileCost == 0) {
 					continue;
 				}
 
-				uint16_t walkCost = getMapWalkCost(n->x, n->y, static_cast<uint16_t>(nx), static_cast<uint16_t>(ny));
-				uint16_t h = calculateHeuristic(static_cast<uint16_t>(nx), static_cast<uint16_t>(ny), targetX, targetY);
-				uint16_t g = n->g + walkCost + getTileWalkCost(creature, tile);
+				uint16_t g = minG + tileCost;
 				uint16_t newf = h + g;
 
-				AStarNode* newNode = createNode(n, static_cast<uint16_t>(nx), static_cast<uint16_t>(ny), g, newf);
+				AStarNode* newNode = createNode(n, nx16, ny16, g, newf);
 				if (!newNode) {
 					return false;
 				}
 
-				if (Cell* cell = getCell(static_cast<uint16_t>(nx), static_cast<uint16_t>(ny))) {
-					cell->tile = tile;
+				if (Cell* cell = getCell(nx16, ny16)) {
+					cell->tileCost = tileCost;
 				}
 			}
 		}
@@ -232,7 +223,7 @@ bool PathFinder::solve(uint16_t targetX, uint16_t targetY,
 		return false;
 	}
 
-	reconstructPath(found, targetX, targetY, dirList);
+	reconstructPath(found, endX, endY, dirList);
 	return true;
 }
 
@@ -305,8 +296,8 @@ AStarNode* PathFinder::createNode(AStarNode* parent, uint16_t x, uint16_t y, uin
 		return nullptr;
 	}
 
-	cell->state = 1;
-	cell->node.parent = parent;
+			cell->state = 1;
+			cell->node.parent = parent;
 	cell->node.x = x;
 	cell->node.y = y;
 	cell->node.g = g;
@@ -356,24 +347,6 @@ uint16_t PathFinder::getMapWalkCost(uint16_t fromX, uint16_t fromY, uint16_t toX
 		return 25;
 	}
 	return 10;
-}
-
-uint16_t PathFinder::getTileWalkCost(const std::shared_ptr<const Creature>& creature, const Tile* tile)
-{
-	uint16_t cost = 0;
-	if (tile->getTopVisibleCreature(creature)) {
-		cost += 30;
-	}
-
-	if (const auto& field = tile->getFieldItem()) {
-		CombatType_t combatType = field->getCombatType();
-		const auto& monster = creature->asMonster();
-		if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
-		    (monster && !monster->canWalkOnFieldType(combatType))) {
-			cost += 180;
-		}
-	}
-	return cost;
 }
 
 uint16_t PathFinder::calculateHeuristic(uint16_t x, uint16_t y, uint16_t targetX, uint16_t targetY)

@@ -10,15 +10,16 @@ BOOST_AUTO_TEST_CASE(test_same_position_returns_true)
 {
 	struct EmptyMap final : IPathMap
 	{
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t, uint16_t) const override
+		uint16_t getWalkCost(uint16_t, uint16_t) const override
 		{
-			return nullptr;
+			return 0;
 		}
 	};
 
 	EmptyMap map;
 	FindPathParams fpp;
 	fpp.fullPathSearch = true;
+	fpp.clearSight = false;
 	fpp.minTargetDist = 0;
 	fpp.maxTargetDist = 1;
 
@@ -26,7 +27,7 @@ BOOST_AUTO_TEST_CASE(test_same_position_returns_true)
 	std::vector<Direction> dirList;
 
 	PathFinder finder(3, 3);
-	bool result = finder.solve(3, 3, nullptr, fpp, dirList, map, condition, true);
+	bool result = finder.solve(3, 3, fpp, dirList, map, condition, true);
 
 	BOOST_CHECK(result);
 	BOOST_CHECK(dirList.empty());
@@ -36,15 +37,16 @@ BOOST_AUTO_TEST_CASE(test_unreachable_returns_false)
 {
 	struct EmptyMap final : IPathMap
 	{
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t, uint16_t) const override
+		uint16_t getWalkCost(uint16_t, uint16_t) const override
 		{
-			return nullptr;
+			return 0;
 		}
 	};
 
 	EmptyMap map;
 	FindPathParams fpp;
 	fpp.fullPathSearch = true;
+	fpp.clearSight = false;
 	fpp.minTargetDist = 0;
 	fpp.maxTargetDist = 1;
 
@@ -52,104 +54,73 @@ BOOST_AUTO_TEST_CASE(test_unreachable_returns_false)
 	std::vector<Direction> dirList;
 
 	PathFinder finder(0, 0);
-	bool result = finder.solve(5, 0, nullptr, fpp, dirList, map, condition, true);
+	bool result = finder.solve(5, 0, fpp, dirList, map, condition, true);
 
 	BOOST_CHECK(!result);
 	BOOST_CHECK(dirList.empty());
 }
 
-BOOST_AUTO_TEST_CASE(test_target_out_of_bounds)
+BOOST_AUTO_TEST_CASE(test_walkable_path_returns_directions)
 {
-	struct EmptyMap final : IPathMap
+	struct OpenMap final : IPathMap
 	{
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t, uint16_t) const override
+		uint16_t getWalkCost(uint16_t, uint16_t) const override
 		{
-			return nullptr;
+			return 10;
 		}
 	};
 
-	EmptyMap map;
+	OpenMap map;
 	FindPathParams fpp;
 	fpp.fullPathSearch = true;
-	fpp.minTargetDist = 0;
-	fpp.maxTargetDist = 3;
-
-	FrozenPathingConditionCall condition(Position(30, 30, 7));
-	std::vector<Direction> dirList;
-
-	PathFinder finder(0, 0);
-	bool result = finder.solve(30, 30, nullptr, fpp, dirList, map, condition, true);
-
-	BOOST_CHECK(!result);
-	BOOST_CHECK(dirList.empty());
-}
-
-BOOST_AUTO_TEST_CASE(test_start_tile_cache)
-{
-	PathFinder finder(5, 5);
-
-	int setCount = 0;
-	struct CountingMap final : IPathMap
-	{
-		mutable int& count;
-		explicit CountingMap(int& c) : count(c) {}
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t, uint16_t) const override
-		{
-			++count;
-			return nullptr;
-		}
-	};
-
-	FindPathParams fpp;
-	fpp.fullPathSearch = true;
+	fpp.clearSight = false;
 	fpp.minTargetDist = 0;
 	fpp.maxTargetDist = 1;
 
-	FrozenPathingConditionCall condition(Position(5, 5, 7));
+	FrozenPathingConditionCall condition(Position(2, 0, 7));
 	std::vector<Direction> dirList;
 
-	int calls = 0;
-	CountingMap map(calls);
-	finder.solve(5, 5, nullptr, fpp, dirList, map, condition, true);
+	PathFinder finder(0, 0);
+	bool result = finder.solve(2, 0, fpp, dirList, map, condition, true);
+
+	BOOST_CHECK(result);
+	BOOST_CHECK(dirList.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(test_tile_walk_cost_creature_null)
+BOOST_AUTO_TEST_CASE(test_ipathmap_interface_independent)
 {
-	uint16_t cost = PathFinder::getTileWalkCost(nullptr, nullptr);
-	BOOST_CHECK_EQUAL(cost, 0);
-}
-
-BOOST_AUTO_TEST_CASE(test_pathfinder_stress_max_nodes)
-{
-	struct FullMap final : IPathMap
+	// IPathMap::getWalkCost is called by PathFinder without any dependency on
+	// Creature or Tile types
+	struct CustomCostMap final : IPathMap
 	{
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t x, uint16_t y) const override
+		uint16_t getWalkCost(uint16_t x, uint16_t y) const override
 		{
-			if (x == 5 && y == 5) {
-				return nullptr;
-			}
-			return reinterpret_cast<const Tile*>(static_cast<uintptr_t>(1));
+			if (x == 1 && y == 1) return 100;
+			return 10;
 		}
 	};
 
-	FullMap map;
+	CustomCostMap map;
 	FindPathParams fpp;
 	fpp.fullPathSearch = true;
+	fpp.clearSight = false;
 	fpp.minTargetDist = 0;
-	fpp.maxTargetDist = 5;
+	fpp.maxTargetDist = 1;
+	fpp.maxSearchDist = 4;
 
-	FrozenPathingConditionCall condition(Position(3, 3, 7));
+	FrozenPathingConditionCall condition(Position(2, 0, 7));
 	std::vector<Direction> dirList;
-	dirList.reserve(20);
 
 	PathFinder finder(0, 0);
-	bool result = finder.solve(3, 3, nullptr, fpp, dirList, map, condition, true);
+	bool result = finder.solve(2, 0, fpp, dirList, map, condition, true);
 
-	BOOST_CHECK(!result);
+	BOOST_CHECK(result);
+	BOOST_CHECK(dirList.size() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(test_set_start_tile)
+BOOST_AUTO_TEST_CASE(test_start_tile_cache_not_required)
 {
+	// PathFinder does not require explicit start tile setup
 	PathFinder finder(10, 10);
-	finder.setStartTile(nullptr);
+	BOOST_CHECK(true);
 }

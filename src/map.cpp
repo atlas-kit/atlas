@@ -16,6 +16,21 @@ extern Game g_game;
 
 namespace {
 
+constexpr ConditionType_t DamageToConditionType(CombatType_t type)
+{
+	switch (type) {
+		case COMBAT_FIREDAMAGE: return CONDITION_FIRE;
+		case COMBAT_ENERGYDAMAGE: return CONDITION_ENERGY;
+		case COMBAT_DROWNDAMAGE: return CONDITION_DROWN;
+		case COMBAT_EARTHDAMAGE: return CONDITION_POISON;
+		case COMBAT_ICEDAMAGE: return CONDITION_FREEZING;
+		case COMBAT_HOLYDAMAGE: return CONDITION_DAZZLED;
+		case COMBAT_DEATHDAMAGE: return CONDITION_CURSED;
+		case COMBAT_PHYSICALDAMAGE: return CONDITION_BLEEDING;
+		default: return CONDITION_NONE;
+	}
+}
+
 bool loadHousesXML(const std::filesystem::path& filename)
 {
 	pugi::xml_document doc;
@@ -741,23 +756,38 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 		MapAccessAdapter(const Map& map, uint8_t z, const std::shared_ptr<const Creature>& creature)
 		    : map(map), z(z), creature(creature) {}
 
-		const Tile* getTile(const std::shared_ptr<const Creature>&, uint16_t x, uint16_t y) const override
+		uint16_t getWalkCost(uint16_t x, uint16_t y) const override
 		{
 			auto tile = map.getTile(x, y, z);
 			if (!tile) {
-				return nullptr;
+				return 0;
 			}
-			if (creature->getTile() == tile) {
-				return tile.get();
+
+			if (creature->getTile() != tile) {
+				uint32_t flags = FLAG_PATHFINDING;
+				if (!creature->asPlayer()) {
+					flags |= FLAG_IGNOREFIELDDAMAGE;
+				}
+				if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
+					return 0;
+				}
 			}
-			uint32_t flags = FLAG_PATHFINDING;
-			if (!creature->asPlayer()) {
-				flags |= FLAG_IGNOREFIELDDAMAGE;
+
+			uint16_t cost = 0;
+			if (tile->getTopVisibleCreature(creature)) {
+				cost += 30;
 			}
-			if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
-				return nullptr;
+
+			if (const auto& field = tile->getFieldItem()) {
+				CombatType_t combatType = field->getCombatType();
+				const auto& monster = creature->asMonster();
+				if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
+				    (monster && !monster->canWalkOnFieldType(combatType))) {
+					cost += 180;
+				}
 			}
-			return tile.get();
+
+			return cost;
 		}
 	};
 
@@ -765,11 +795,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 	bool sightClear = isSightClear(startPos, targetPos, true, true);
 
 	PathFinder finder(startPos.x, startPos.y);
-	if (const auto& startTile = getTile(startPos.x, startPos.y, z)) {
-		finder.setStartTile(startTile.get());
-	}
-
-	return finder.solve(targetPos.x, targetPos.y, creature, fpp, dirList, adapter, pathCondition, sightClear);
+	return finder.solve(targetPos.x, targetPos.y, fpp, dirList, adapter, pathCondition, sightClear);
 }
 
 // QTreeNode
