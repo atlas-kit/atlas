@@ -34,6 +34,13 @@ struct PositionHash
 };
 
 struct FindPathParams;
+
+static constexpr int32_t PATHFIND_VIEWPORT_X = 11;
+static constexpr int32_t PATHFIND_VIEWPORT_Y = 11;
+static constexpr int32_t PATHFIND_GRID_W = PATHFIND_VIEWPORT_X * 2 + 1;
+static constexpr int32_t PATHFIND_GRID_H = PATHFIND_VIEWPORT_Y * 2 + 1;
+static constexpr int32_t PATHFIND_RESERVE = (PATHFIND_VIEWPORT_X * PATHFIND_VIEWPORT_Y * 3) / 2;
+
 struct AStarNode
 {
 	AStarNode* parent;
@@ -41,35 +48,37 @@ struct AStarNode
 	uint16_t g, f;
 };
 
-inline uint32_t hashCoord(uint16_t x, uint16_t y) { return (static_cast<uint32_t>(x) << 16) | y; }
-
 class AStarNodes
 {
 public:
-	AStarNodes(uint16_t x, uint16_t y);
+	AStarNodes(uint16_t startX, uint16_t startY);
 
 	AStarNode* createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f);
 	AStarNode* getBestNode();
 	AStarNode* getNodeByPosition(uint16_t x, uint16_t y);
+	const std::shared_ptr<const Tile>& getTile(uint16_t x, uint16_t y) const;
+	void setTile(uint16_t x, uint16_t y, const std::shared_ptr<const Tile>& tile);
 
-	static uint16_t getMapWalkCost(AStarNode* node, const Position& neighborPos);
+	static uint16_t getMapWalkCost(const AStarNode* node, uint16_t neighborX, uint16_t neighborY);
 	static uint16_t getTileWalkCost(const std::shared_ptr<const Creature>& creature,
 	                                const std::shared_ptr<const Tile>& tile);
 
 private:
-	std::vector<AStarNode> nodes = {};
-	std::unordered_map<uint32_t, AStarNode*> nodeMap = {};
-	std::unordered_set<uint32_t> visited = {};
+	int32_t startX;
+	int32_t startY;
+	int32_t openCount;
 
-	struct NodeCompare
+	struct Cell
 	{
-		bool operator()(AStarNode* a, AStarNode* b) const
-		{
-			return a->f > b->f; // Min-heap based on f score
-		}
+		AStarNode node;
+		uint8_t state;
+		std::shared_ptr<const Tile> tile;
 	};
 
-	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
+	Cell grid[PATHFIND_GRID_H][PATHFIND_GRID_W];
+	AStarNode* openList[PATHFIND_RESERVE];
+
+	Cell* getCell(uint16_t x, uint16_t y);
 };
 
 using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;
@@ -171,11 +180,11 @@ private:
 class Map
 {
 public:
-	static constexpr int32_t maxViewportX = 11; // min value: maxClientViewportX + 1
-	static constexpr int32_t maxViewportY = 11; // min value: maxClientViewportY + 1
+	static constexpr int32_t maxViewportX = PATHFIND_VIEWPORT_X; // min value: maxClientViewportX + 1
+	static constexpr int32_t maxViewportY = PATHFIND_VIEWPORT_Y; // min value: maxClientViewportY + 1
 	static constexpr int32_t maxClientViewportX = 8;
 	static constexpr int32_t maxClientViewportY = 6;
-	static constexpr int16_t nodeReserveSize = static_cast<int16_t>((maxViewportX * maxViewportY * 3) / 2);
+	static constexpr int16_t nodeReserveSize = static_cast<int16_t>(PATHFIND_RESERVE);
 
 	uint32_t clean() const;
 

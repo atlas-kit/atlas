@@ -750,6 +750,9 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 
 	Position endPos;
 	AStarNodes nodes(pos.x, pos.y);
+	if (const auto& startTile = getTile(pos.x, pos.y, pos.z)) {
+		nodes.setTile(pos.x, pos.y, startTile);
+	}
 
 	AStarNode* found = nullptr;
 	int32_t bestMatch = 0;
@@ -826,37 +829,43 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 				}
 			}
 
-			std::shared_ptr<const Tile> tile;
 			AStarNode* neighborNode = nodes.getNodeByPosition(pos.x, pos.y);
 			if (neighborNode) {
-				tile = getTile(pos.x, pos.y, pos.z);
-			} else {
-				tile = canWalkTo(creature, pos);
-				if (!tile) {
+				uint16_t walkCost = AStarNodes::getMapWalkCost(n, pos.x, pos.y);
+				uint16_t h = calculateHeuristic(pos, targetPos);
+				uint16_t minG = n->g + walkCost;
+
+				if (neighborNode->f <= h + minG) {
 					continue;
 				}
-			}
 
-			// The cost to walk to this neighbor
-			const uint16_t g = n->g + AStarNodes::getMapWalkCost(n, pos) + AStarNodes::getTileWalkCost(creature, tile);
-			const uint16_t h = calculateHeuristic(pos, targetPos);
-			const uint16_t newf = h + g;
+				const auto& tile = nodes.getTile(pos.x, pos.y);
+				uint16_t fullG = minG + AStarNodes::getTileWalkCost(creature, tile);
+				uint16_t newf = h + fullG;
 
-			if (neighborNode) {
 				if (neighborNode->f <= newf) {
-					// The node on the closed/open list is cheaper than this one
 					continue;
 				}
 
-				neighborNode->g = g;
+				neighborNode->g = fullG;
 				neighborNode->f = newf;
 				neighborNode->parent = n;
 			} else {
-				// Does not exist in the open/closed list, create a new node
-				if (!nodes.createNode(n, pos.x, pos.y, g, newf)) {
-					// Limit of nodes reached
+				const auto& tile = canWalkTo(creature, pos);
+				if (!tile) {
+					continue;
+				}
+
+				uint16_t walkCost = AStarNodes::getMapWalkCost(n, pos.x, pos.y);
+				uint16_t h = calculateHeuristic(pos, targetPos);
+				uint16_t g = n->g + walkCost + AStarNodes::getTileWalkCost(creature, tile);
+				uint16_t newf = h + g;
+
+				AStarNode* newNode = nodes.createNode(n, pos.x, pos.y, g, newf);
+				if (!newNode) {
 					return false;
 				}
+				nodes.setTile(pos.x, pos.y, tile);
 			}
 		}
 
@@ -906,52 +915,113 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 }
 
 // AStarNodes
-AStarNodes::AStarNodes(uint16_t x, uint16_t y)
+AStarNodes::AStarNodes(uint16_t x, uint16_t y) : startX(x), startY(y), openCount(0)
 {
-	nodes.reserve(Map::nodeReserveSize);
-	nodeMap.reserve(Map::nodeReserveSize);
-	visited.reserve(Map::nodeReserveSize);
+	for (auto& row : grid) {
+		for (auto& cell : row) {
+			cell.state = 0;
+		}
+	}
 	createNode(nullptr, x, y, 0, 0);
 }
 
 AStarNode* AStarNodes::createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f)
 {
-	if (nodes.size() == Map::nodeReserveSize) {
+	if (openCount >= PATHFIND_RESERVE) {
 		return nullptr;
 	}
 
-	uint32_t key = hashCoord(x, y);
-	nodes.emplace_back(AStarNode{parent, x, y, g, f});
-	AStarNode* node = &nodes.back();
-	nodeMap[key] = node;
-	openSet.push(node);
-	return node;
+	Cell* cell = getCell(x, y);
+	if (!cell || cell->state != 0) {
+		return nullptr;
+	}
+
+	cell->state = 1;
+	cell->node.parent = parent;
+	cell->node.x = x;
+	cell->node.y = y;
+	cell->node.g = g;
+	cell->node.f = f;
+
+	openList[openCount++] = &cell->node;
+	return &cell->node;
 }
 
 AStarNode* AStarNodes::getBestNode()
 {
-	while (!openSet.empty()) {
-		AStarNode* node = openSet.top();
-		openSet.pop();
-		uint32_t key = hashCoord(node->x, node->y);
-		if (visited.find(key) == visited.end()) {
-			visited.insert(key);
-			return node;
+	if (openCount == 0) {
+		return nullptr;
+	}
+
+	AStarNode* best = nullptr;
+	uint16_t bestF = std::numeric_limits<uint16_t>::max();
+	int32_t bestIndex = -1;
+
+	for (int32_t i = 0; i < openCount; ++i) {
+		AStarNode* node = openList[i];
+		if (node->f < bestF) {
+			bestF = node->f;
+			best = node;
+			bestIndex = i;
+		}
+	}
+
+	if (bestIndex == -1) {
+		return nullptr;
+	}
+
+	openList[bestIndex] = openList[--openCount];
+
+	if (Cell* cell = getCell(best->x, best->y)) {
+		cell->state = 2;
+	}
+
+	return best;
+}
+
+AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
+{
+	if (Cell* cell = getCell(x, y)) {
+		if (cell->state != 0) {
+			return &cell->node;
 		}
 	}
 	return nullptr;
 }
 
-AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
+	const std::shared_ptr<const Tile>& AStarNodes::getTile(uint16_t x, uint16_t y) const
 {
-	auto it = nodeMap.find(hashCoord(x, y));
-	return (it != nodeMap.end()) ? it->second : nullptr;
+	static const std::shared_ptr<const Tile> nullTile;
+	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
+	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
+	if (dx >= 0 && dx < PATHFIND_GRID_W && dy >= 0 && dy < PATHFIND_GRID_H) {
+		return grid[dy][dx].tile;
+	}
+	return nullTile;
 }
 
-uint16_t AStarNodes::getMapWalkCost(AStarNode* node, const Position& neighborPos)
+void AStarNodes::setTile(uint16_t x, uint16_t y, const std::shared_ptr<const Tile>& tile)
 {
-	if (std::abs(node->x - neighborPos.x) == std::abs(node->y - neighborPos.y)) {
-		// diagonal movement extra cost
+	if (Cell* cell = getCell(x, y)) {
+		cell->tile = tile;
+	}
+}
+
+AStarNodes::Cell* AStarNodes::getCell(uint16_t x, uint16_t y)
+{
+	int32_t dx = static_cast<int32_t>(x) - startX + PATHFIND_VIEWPORT_X;
+	int32_t dy = static_cast<int32_t>(y) - startY + PATHFIND_VIEWPORT_Y;
+	if (dx >= 0 && dx < PATHFIND_GRID_W && dy >= 0 && dy < PATHFIND_GRID_H) {
+		return &grid[dy][dx];
+	}
+	return nullptr;
+}
+
+uint16_t AStarNodes::getMapWalkCost(const AStarNode* node, uint16_t neighborX, uint16_t neighborY)
+{
+	uint16_t dx = static_cast<uint16_t>(std::abs(static_cast<int16_t>(node->x) - static_cast<int16_t>(neighborX)));
+	uint16_t dy = static_cast<uint16_t>(std::abs(static_cast<int16_t>(node->y) - static_cast<int16_t>(neighborY)));
+	if (dx == dy) {
 		return MAP_DIAGONALWALKCOST;
 	}
 	return MAP_NORMALWALKCOST;
