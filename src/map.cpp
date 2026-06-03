@@ -760,46 +760,57 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 		return false;
 	}
 
+	struct MapAccessAdapter final : IPathMap
+	{
+		const Map& map;
+		uint8_t z;
+		const std::shared_ptr<const Creature>& creature;
+
+		MapAccessAdapter(const Map& map, uint8_t z, const std::shared_ptr<const Creature>& creature) :
+		    map(map), z(z), creature(creature)
+		{}
+
+		uint16_t getWalkCost(uint16_t x, uint16_t y) const override
+		{
+			auto tile = map.getTile(x, y, z);
+			if (!tile) {
+				return 0;
+			}
+
+			if (creature->getTile() != tile) {
+				uint32_t flags = FLAG_PATHFINDING;
+				if (!creature->asPlayer()) {
+					flags |= FLAG_IGNOREFIELDDAMAGE;
+				}
+
+				if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
+					return 0;
+				}
+			}
+
+			uint16_t cost = 0;
+			if (tile->getTopVisibleCreature(creature)) {
+				cost += MAP_NORMALWALKCOST * 3;
+			}
+
+			if (const auto& field = tile->getFieldItem()) {
+				CombatType_t combatType = field->getCombatType();
+				const auto& monster = creature->asMonster();
+				if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
+				    (monster && !monster->canWalkOnFieldType(combatType))) {
+					cost += MAP_NORMALWALKCOST * 18;
+				}
+			}
+
+			return cost;
+		}
+	};
+
+	MapAccessAdapter adapter(*this, z, creature);
 	const auto sightClear = isSightClear(position, targetPos, true, true);
 
 	PathFinder finder(position.x, position.y);
-
-	auto getTileCost = [this, &creature, z](uint16_t x, uint16_t y) -> uint16_t
-	{
-		auto tile = getTile(x, y, z);
-		if (!tile) {
-			return 0;
-		}
-
-		if (creature->getTile() != tile) {
-			uint32_t flags = FLAG_PATHFINDING;
-			if (!creature->asPlayer()) {
-				flags |= FLAG_IGNOREFIELDDAMAGE;
-			}
-
-			if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
-				return 0;
-			}
-		}
-
-		uint16_t cost = 0;
-		if (tile->getTopVisibleCreature(creature)) {
-			cost += MAP_NORMALWALKCOST * 3;
-		}
-
-		if (const auto& field = tile->getFieldItem()) {
-			CombatType_t combatType = field->getCombatType();
-			const auto& monster = creature->asMonster();
-			if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
-			    (monster && !monster->canWalkOnFieldType(combatType))) {
-				cost += MAP_NORMALWALKCOST * 18;
-			}
-		}
-
-		return cost;
-	};
-
-	return finder.search(targetPos.x, targetPos.y, fpp, dirList, getTileCost, pathCondition, sightClear);
+	return finder.search(targetPos.x, targetPos.y, fpp, dirList, adapter, pathCondition, sightClear);
 }
 
 // QTreeNode
