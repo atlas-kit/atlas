@@ -16,7 +16,7 @@
 
 namespace chrono = std::chrono;
 
-using Callback = std::move_only_function<void(void)>;
+using Callback = std::move_only_function<void()>;
 
 inline constexpr auto MIN_TASK_INTERVAL = 50ms;
 
