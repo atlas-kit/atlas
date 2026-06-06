@@ -7,7 +7,6 @@
 
 // cppcheck-suppress missingIncludeSystem
 #include <boost/test/unit_test.hpp>
-
 #include <stdexcept>
 
 // Most tests use a top-level DBTransaction that is never committed, so its
@@ -160,11 +159,11 @@ BOOST_AUTO_TEST_CASE(missing_column_does_not_crash)
 
 BOOST_AUTO_TEST_CASE(next_iterates_multiple_rows)
 {
-	BOOST_TEST(db.executeQuery(
-	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES "
-	    "('iter_a', 'iter_a@example.com', SHA1('x')),"
-	    "('iter_b', 'iter_b@example.com', SHA1('x')),"
-	    "('iter_c', 'iter_c@example.com', SHA1('x'))"));
+	BOOST_TEST(
+	    db.executeQuery("INSERT INTO `accounts` (`name`, `email`, `password`) VALUES "
+	                    "('iter_a', 'iter_a@example.com', SHA1('x')),"
+	                    "('iter_b', 'iter_b@example.com', SHA1('x')),"
+	                    "('iter_c', 'iter_c@example.com', SHA1('x'))"));
 
 	auto result = db.storeQuery("SELECT `name` FROM `accounts` WHERE `name` LIKE 'iter_%' ORDER BY `name`");
 	BOOST_REQUIRE(result);
@@ -187,9 +186,9 @@ BOOST_AUTO_TEST_CASE(escape_string_quotes_and_special_chars_round_trip)
 	// Strings with characters that would break a naive concatenation.
 	const std::string payload = R"(He said "hello" and used a \backslash plus an 'apostrophe'.)";
 
-	BOOST_TEST(db.executeQuery(std::format(
-	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('escape_t', {:s}, SHA1('x'))",
-	    db.escapeString(payload))));
+	BOOST_TEST(db.executeQuery(
+	    std::format("INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('escape_t', {:s}, SHA1('x'))",
+	                db.escapeString(payload))));
 
 	auto result = db.storeQuery("SELECT `email` FROM `accounts` WHERE `name` = 'escape_t'");
 	BOOST_REQUIRE(result);
@@ -198,9 +197,9 @@ BOOST_AUTO_TEST_CASE(escape_string_quotes_and_special_chars_round_trip)
 
 BOOST_AUTO_TEST_CASE(escape_string_empty_round_trip)
 {
-	BOOST_TEST(db.executeQuery(std::format(
-	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('escape_e', {:s}, SHA1('x'))",
-	    db.escapeString(""))));
+	BOOST_TEST(db.executeQuery(
+	    std::format("INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('escape_e', {:s}, SHA1('x'))",
+	                db.escapeString(""))));
 
 	auto result = db.storeQuery("SELECT `email` FROM `accounts` WHERE `name` = 'escape_e'");
 	BOOST_REQUIRE(result);
@@ -224,13 +223,13 @@ BOOST_AUTO_TEST_CASE(escape_blob_with_null_bytes_round_trips_via_player_items)
 	const char binary[] = {0x00, 0x01, 0x02, '\'', '\\', '\n', 0x00, 'z', 0x7f};
 	const uint32_t binaryLength = sizeof(binary);
 
-	BOOST_TEST(db.executeQuery(std::format(
-	    "INSERT INTO `player_items` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`)"
-	    " VALUES ({:d}, 0, 1, 100, 1, {:s})",
-	    playerId, db.escapeBlob(binary, binaryLength))));
+	BOOST_TEST(db.executeQuery(
+	    std::format("INSERT INTO `player_items` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`)"
+	                " VALUES ({:d}, 0, 1, 100, 1, {:s})",
+	                playerId, db.escapeBlob(binary, binaryLength))));
 
-	auto result = db.storeQuery(
-	    std::format("SELECT `attributes` FROM `player_items` WHERE `player_id` = {:d}", playerId));
+	auto result =
+	    db.storeQuery(std::format("SELECT `attributes` FROM `player_items` WHERE `player_id` = {:d}", playerId));
 	BOOST_REQUIRE(result);
 
 	auto stored = result->getString("attributes");
@@ -306,14 +305,13 @@ BOOST_AUTO_TEST_CASE(transaction_commit_persists_changes)
 	{
 		DBTransaction tx;
 		BOOST_REQUIRE(tx.begin());
-		BOOST_TEST(db.executeQuery(
-		    "INSERT INTO `accounts` (`name`, `email`, `password`)"
-		    " VALUES ('__dbtest__commit', 'commit@example.com', SHA1('x'))"));
+		BOOST_TEST(
+		    db.executeQuery("INSERT INTO `accounts` (`name`, `email`, `password`)"
+		                    " VALUES ('__dbtest__commit', 'commit@example.com', SHA1('x'))"));
 		BOOST_REQUIRE(tx.commit());
 	}
 
-	auto result =
-	    db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit'");
+	auto result = db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit'");
 	BOOST_REQUIRE(result);
 	BOOST_TEST(result->getNumber<int>("n") == 1);
 }
@@ -323,14 +321,13 @@ BOOST_AUTO_TEST_CASE(transaction_destructor_rolls_back_without_commit)
 	{
 		DBTransaction tx;
 		BOOST_REQUIRE(tx.begin());
-		BOOST_TEST(db.executeQuery(
-		    "INSERT INTO `accounts` (`name`, `email`, `password`)"
-		    " VALUES ('__dbtest__rollback', 'rb@example.com', SHA1('x'))"));
+		BOOST_TEST(
+		    db.executeQuery("INSERT INTO `accounts` (`name`, `email`, `password`)"
+		                    " VALUES ('__dbtest__rollback', 'rb@example.com', SHA1('x'))"));
 		// tx goes out of scope without commit -- destructor must rollback.
 	}
 
-	auto result =
-	    db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__rollback'");
+	auto result = db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__rollback'");
 	BOOST_REQUIRE(result);
 	BOOST_TEST(result->getNumber<int>("n") == 0);
 }
@@ -344,19 +341,17 @@ BOOST_AUTO_TEST_CASE(transaction_commit_after_destruction_path_does_not_double_r
 	{
 		DBTransaction tx;
 		BOOST_REQUIRE(tx.begin());
-		BOOST_TEST(db.executeQuery(
-		    "INSERT INTO `accounts` (`name`, `email`, `password`)"
-		    " VALUES ('__dbtest__commit2', 'c2@example.com', SHA1('x'))"));
+		BOOST_TEST(
+		    db.executeQuery("INSERT INTO `accounts` (`name`, `email`, `password`)"
+		                    " VALUES ('__dbtest__commit2', 'c2@example.com', SHA1('x'))"));
 		BOOST_REQUIRE(tx.commit());
 
-		auto result =
-		    db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit2'");
+		auto result = db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit2'");
 		BOOST_REQUIRE(result);
 		BOOST_TEST(result->getNumber<int>("n") == 1);
 	}
 
-	auto result =
-	    db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit2'");
+	auto result = db.storeQuery("SELECT COUNT(*) AS `n` FROM `accounts` WHERE `name` = '__dbtest__commit2'");
 	BOOST_REQUIRE(result);
 	BOOST_TEST(result->getNumber<int>("n") == 1);
 }

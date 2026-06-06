@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(test_base64_decode)
 {
 	for (auto&& [plain, encoded] : testVectors) {
 		std::string result = tfs::base64::decode(encoded);
-	BOOST_TEST(result == plain, "expected '" << plain << "', got '" << result << "'");
+		BOOST_TEST(result == plain, "expected '" << plain << "', got '" << result << "'");
+	}
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-}

@@ -19,11 +19,13 @@ BOOST_AUTO_TEST_CASE(test_read_bytes)
 	auto bytes = OTB::readBytes(first, s.data() + s.size(), 8);
 	BOOST_TEST(bytes == "\x01\x02\x03\x04\x05\x06\x07\x08"sv,
 	           "expected '\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08', got '" << bytes << "'");
-	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2, "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2,
+	           "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
 
 	bytes = OTB::readBytes(first, s.data() + s.size(), 2);
 	BOOST_TEST(bytes == "\x09\x00"sv, "expected '\\x09\\x00', got '" << bytes << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read_bytes_escape)
@@ -35,11 +37,13 @@ BOOST_AUTO_TEST_CASE(test_read_bytes_escape)
 	auto bytes = OTB::readBytes(first, s.data() + s.size(), 8);
 	BOOST_TEST(bytes == "\x01\x02\x03\x04\x05\x06\x07\x08"sv,
 	           "expected '\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08', got '" << bytes << "'");
-	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2, "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2,
+	           "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
 
 	bytes = OTB::readBytes(first, s.data() + s.size(), 2);
 	BOOST_TEST(bytes == "\x09\x00"sv, "expected '\\x09\\x00', got '" << bytes << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read)
@@ -52,12 +56,14 @@ BOOST_AUTO_TEST_CASE(test_read)
 	static_assert(std::is_same_v<decltype(u64), uint64_t>);
 	BOOST_TEST(u64 == 0x0807060504030201,
 	           "expected '0x" << std::hex << 0x0807060504030201 << "', got '0x" << u64 << "'");
-	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2, "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(std::distance(first, s.data() + s.size()) == 2,
+	           "expected 2 bytes left, got " << std::distance(first, s.data() + s.size()));
 
 	auto u16 = OTB::read<uint16_t>(first, s.data() + s.size());
 	static_assert(std::is_same_v<decltype(u16), uint16_t>);
 	BOOST_TEST(u16 == 0x0009, "expected '0x" << std::hex << 0x0009 << "', got '0x" << u16 << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read_escape)
@@ -69,7 +75,8 @@ BOOST_AUTO_TEST_CASE(test_read_escape)
 	auto u64 = OTB::read<uint64_t>(first, s.data() + s.size());
 	BOOST_TEST(u64 == 0x0807060504030201,
 	           "expected '0x" << std::hex << 0x0807060504030201 << "', got '0x" << u64 << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read_not_enough_bytes)
@@ -102,11 +109,13 @@ BOOST_AUTO_TEST_CASE(test_read_string)
 
 	auto result = OTB::readString(first, s.data() + s.size());
 	BOOST_TEST(result == "atlas", "expected 'atlas', got '" << result << "'");
-	BOOST_TEST(std::distance(first, s.data() + s.size()) == 8, "expected 8 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(std::distance(first, s.data() + s.size()) == 8,
+	           "expected 8 bytes left, got " << std::distance(first, s.data() + s.size()));
 
 	result = OTB::readString(first, s.data() + s.size());
 	BOOST_TEST(result == "server", "expected 'server', got '" << result << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read_string_escape)
@@ -122,11 +131,13 @@ BOOST_AUTO_TEST_CASE(test_read_string_escape)
 
 	auto result = OTB::readString(first, s.data() + s.size());
 	BOOST_TEST(result == "atlas", "expected 'atlas', got '" << result << "'");
-	BOOST_TEST(std::distance(first, s.data() + s.size()) == 10, "expected 10 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(std::distance(first, s.data() + s.size()) == 10,
+	           "expected 10 bytes left, got " << std::distance(first, s.data() + s.size()));
 
 	result = OTB::readString(first, s.data() + s.size());
 	BOOST_TEST(result == "ser\xFDver", "expected 'ser\xFDver', got '" << result << "'");
-	BOOST_TEST(first == s.data() + s.size(), "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
+	BOOST_TEST(first == s.data() + s.size(),
+	           "expected 0 bytes left, got " << std::distance(first, s.data() + s.size()));
 }
 
 BOOST_AUTO_TEST_CASE(test_read_string_not_enough_bytes)
