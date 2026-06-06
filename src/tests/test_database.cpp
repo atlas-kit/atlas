@@ -357,3 +357,77 @@ BOOST_AUTO_TEST_CASE(transaction_commit_after_destruction_path_does_not_double_r
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(database_escape_edge, DatabaseFixture)
+
+BOOST_AUTO_TEST_CASE(escape_blob_zero_length)
+{
+	BOOST_TEST(db.executeQuery(
+	    std::format("INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('blob_zero', {:s}, SHA1('x'))",
+	                db.escapeBlob(nullptr, 0))));
+
+	auto result = db.storeQuery("SELECT `email` FROM `accounts` WHERE `name` = 'blob_zero'");
+	BOOST_REQUIRE(result);
+	BOOST_TEST(result->getString("email").empty());
+}
+
+BOOST_AUTO_TEST_CASE(escape_blob_single_null_byte)
+{
+	const char binary[] = {0x00};
+	BOOST_TEST(db.executeQuery(
+	    std::format("INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('blob_one', {:s}, SHA1('x'))",
+	                db.escapeBlob(binary, sizeof(binary)))));
+
+	auto result = db.storeQuery("SELECT `email` FROM `accounts` WHERE `name` = 'blob_one'");
+	BOOST_REQUIRE(result);
+	auto stored = result->getString("email");
+	BOOST_REQUIRE(stored.size() == 1);
+	BOOST_TEST(static_cast<uint8_t>(stored[0]) == 0x00);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(database_column_types, DatabaseFixture)
+
+BOOST_AUTO_TEST_CASE(get_number_float)
+{
+	auto result = db.storeQuery("SELECT CAST(3.14159 AS DECIMAL(10,5)) AS `pi`");
+	BOOST_REQUIRE(result);
+
+	auto val = result->getNumber<float>("pi");
+	BOOST_TEST(val > 3.14f);
+	BOOST_TEST(val < 3.15f);
+}
+
+BOOST_AUTO_TEST_CASE(get_number_double)
+{
+	auto result = db.storeQuery("SELECT CAST(2.718281828459045 AS DECIMAL(16,15)) AS `e`");
+	BOOST_REQUIRE(result);
+
+	auto val = result->getNumber<double>("e");
+	BOOST_TEST(val > 2.71);
+	BOOST_TEST(val < 2.72);
+}
+
+BOOST_AUTO_TEST_CASE(get_datetime_returns_string)
+{
+	auto result = db.storeQuery("SELECT NOW() AS `now`");
+	BOOST_REQUIRE(result);
+
+	auto dt = result->getString("now");
+	BOOST_TEST(!dt.empty());
+	BOOST_TEST(dt.size() >= 19);
+}
+
+BOOST_AUTO_TEST_CASE(get_number_on_null_returns_zero_for_all_types)
+{
+	auto result = db.storeQuery("SELECT NULL AS `maybe`");
+	BOOST_REQUIRE(result);
+
+	BOOST_TEST(result->getNumber<float>("maybe") == 0.0f);
+	BOOST_TEST(result->getNumber<double>("maybe") == 0.0);
+	BOOST_TEST(result->getNumber<int16_t>("maybe") == 0);
+	BOOST_TEST(result->getNumber<uint8_t>("maybe") == 0u);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -190,4 +190,276 @@ BOOST_AUTO_TEST_CASE(test_skip_escape_not_enough_bytes)
 	BOOST_CHECK_THROW(OTB::skip(first, s.data() + s.size(), 5), std::invalid_argument);
 }
 
+BOOST_AUTO_TEST_SUITE(propstream)
+
+BOOST_AUTO_TEST_CASE(test_propstream_init_and_size)
+{
+	PropStream stream;
+	BOOST_TEST(stream.size() == 0);
+
+	const char data[] = {0x01, 0x02, 0x03, 0x04};
+	stream.init(data, sizeof(data));
+	BOOST_TEST(stream.size() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_success)
+{
+	const char data[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	uint16_t val;
+	BOOST_TEST(stream.read<uint16_t>(val));
+	BOOST_TEST(val == 0x0201);
+	BOOST_TEST(stream.size() == 4);
+
+	uint32_t val2;
+	BOOST_TEST(stream.read<uint32_t>(val2));
+	BOOST_TEST(val2 == 0x06050403);
+	BOOST_TEST(stream.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_not_enough_bytes)
+{
+	const char data[] = {0x01, 0x02};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	uint32_t val;
+	BOOST_TEST(!stream.read<uint32_t>(val));
+	BOOST_TEST(stream.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_string_success)
+{
+	const char data[] = {0x05, 0x00, 'a', 't', 'l', 'a', 's'};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	auto [result, ok] = stream.readString();
+	BOOST_TEST(ok);
+	BOOST_TEST(result == "atlas");
+	BOOST_TEST(stream.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_string_empty)
+{
+	const char data[] = {0x00, 0x00};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	auto [result, ok] = stream.readString();
+	BOOST_TEST(ok);
+	BOOST_TEST(result.empty());
+	BOOST_TEST(stream.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_string_not_enough_bytes)
+{
+	const char data[] = {0x05, 0x00, 'a', 't'};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	auto [result, ok] = stream.readString();
+	BOOST_TEST(!ok);
+	BOOST_TEST(result.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_string_truncated_length)
+{
+	const char data[] = {0x01};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	auto [result, ok] = stream.readString();
+	BOOST_TEST(!ok);
+	BOOST_TEST(result.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_skip_success)
+{
+	const char data[] = {0x01, 0x02, 0x03, 0x04};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	BOOST_TEST(stream.skip(3));
+	BOOST_TEST(stream.size() == 1);
+
+	uint8_t val;
+	BOOST_TEST(stream.read<uint8_t>(val));
+	BOOST_TEST(val == 0x04);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_skip_zero)
+{
+	const char data[] = {0x01, 0x02, 0x03};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	BOOST_TEST(stream.skip(0));
+	BOOST_TEST(stream.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_skip_not_enough)
+{
+	const char data[] = {0x01, 0x02};
+	PropStream stream;
+	stream.init(data, sizeof(data));
+
+	BOOST_TEST(!stream.skip(5));
+	BOOST_TEST(stream.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_propstream_read_from_empty)
+{
+	PropStream stream;
+	stream.init(nullptr, 0);
+
+	uint8_t val;
+	BOOST_TEST(!stream.read<uint8_t>(val));
+
+	auto [result, ok] = stream.readString();
+	BOOST_TEST(!ok);
+	BOOST_TEST(result.empty());
+
+	BOOST_TEST(!stream.skip(1));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(propwritestream)
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_empty)
+{
+	PropWriteStream stream;
+	BOOST_TEST(stream.getStream().empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_uint8)
+{
+	PropWriteStream stream;
+	stream.write<uint8_t>(0x42);
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 1);
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x42);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_uint16)
+{
+	PropWriteStream stream;
+	stream.write<uint16_t>(0x0102);
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 2);
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x02);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x01);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_uint32)
+{
+	PropWriteStream stream;
+	stream.write<uint32_t>(0x01020304);
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 4);
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x04);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x03);
+	BOOST_TEST(static_cast<uint8_t>(sv[2]) == 0x02);
+	BOOST_TEST(static_cast<uint8_t>(sv[3]) == 0x01);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_multiple)
+{
+	PropWriteStream stream;
+	stream.write<uint8_t>(0x11);
+	stream.write<uint16_t>(0x3344);
+	stream.write<uint32_t>(0x778899AA);
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 7);
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x11);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x44);
+	BOOST_TEST(static_cast<uint8_t>(sv[2]) == 0x33);
+	BOOST_TEST(static_cast<uint8_t>(sv[3]) == 0xAA);
+	BOOST_TEST(static_cast<uint8_t>(sv[4]) == 0x99);
+	BOOST_TEST(static_cast<uint8_t>(sv[5]) == 0x88);
+	BOOST_TEST(static_cast<uint8_t>(sv[6]) == 0x77);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_string)
+{
+	PropWriteStream stream;
+	stream.writeString("atlas");
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 7); // 2 bytes length + 5 bytes data
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x05);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x00);
+	BOOST_TEST(std::string_view(sv.data() + 2, 5) == "atlas");
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_empty_string)
+{
+	PropWriteStream stream;
+	stream.writeString("");
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 2); // 2 bytes length only
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x00);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x00);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_write_string_truncated)
+{
+	PropWriteStream stream;
+	// String longer than UINT16_MAX should write length 0 (existing behavior)
+	std::string huge(65536, 'x');
+	stream.writeString(huge);
+
+	auto sv = stream.getStream();
+	BOOST_TEST(sv.size() == 2); // only length 0 written
+	BOOST_TEST(static_cast<uint8_t>(sv[0]) == 0x00);
+	BOOST_TEST(static_cast<uint8_t>(sv[1]) == 0x00);
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_clear)
+{
+	PropWriteStream stream;
+	stream.write<uint32_t>(0xdeadbeef);
+	BOOST_TEST(!stream.getStream().empty());
+
+	stream.clear();
+	BOOST_TEST(stream.getStream().empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_propwritestream_roundtrip_via_propstream)
+{
+	PropWriteStream writer;
+	writer.write<uint8_t>(0x42);
+	writer.write<uint16_t>(0x0102);
+	writer.writeString("hello");
+
+	auto sv = writer.getStream();
+
+	PropStream reader;
+	reader.init(sv.data(), sv.size());
+
+	uint8_t u8;
+	BOOST_REQUIRE(reader.read<uint8_t>(u8));
+	BOOST_TEST(u8 == 0x42);
+
+	uint16_t u16;
+	BOOST_REQUIRE(reader.read<uint16_t>(u16));
+	BOOST_TEST(u16 == 0x0102);
+
+	auto [str, ok] = reader.readString();
+	BOOST_REQUIRE(ok);
+	BOOST_TEST(str == "hello");
+
+	BOOST_TEST(reader.size() == 0);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE_END()

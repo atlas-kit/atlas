@@ -72,4 +72,48 @@ BOOST_AUTO_TEST_CASE(test_totp)
 	}
 }
 
+BOOST_AUTO_TEST_CASE(test_hmac_sha1_empty_key)
+{
+	auto result = hmac("SHA1", "", "Hi There");
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmac_sha1_empty_message)
+{
+	auto result = hmac("SHA1", std::string(20, '\x0b'), "");
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmac_sha1_both_empty)
+{
+	auto result = hmac("SHA1", "", "");
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmac_unknown_algorithm)
+{
+	// Non-existent algorithm digest must throw
+	BOOST_CHECK_THROW(hmac("BOGUS", "key", "message"), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_totp_counter_zero)
+{
+	auto result = generateToken("12345678901234567890", 0, 8);
+	BOOST_TEST(result.size() == 8);
+}
+
+BOOST_AUTO_TEST_CASE(test_totp_empty_key)
+{
+	auto result = generateToken("", 1, 8);
+	BOOST_TEST(result.size() == 8);
+}
+
+BOOST_AUTO_TEST_CASE(test_totp_different_lengths)
+{
+	for (size_t len : {6, 7, 8}) {
+		auto result = generateToken("12345678901234567890", 1, len);
+		BOOST_TEST(result.size() == len, "expected length " << len << ", got " << result.size());
+	}
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -65,4 +65,77 @@ BOOST_AUTO_TEST_CASE(test_scope_exit_on_exception)
 	}
 }
 
+BOOST_AUTO_TEST_CASE(test_scope_exit_no_op)
+{
+	bool ran = false;
+	{
+		tfs::scope_exit se{[] {}};
+		BOOST_TEST(!ran);
+	}
+	BOOST_TEST(!ran); // no-op lambda doesn't modify ran
+}
+
+BOOST_AUTO_TEST_CASE(test_scope_exit_multiple_reverse_order)
+{
+	std::vector<int> order;
+	{
+		tfs::scope_exit se1{[&] { order.push_back(1); }};
+		tfs::scope_exit se2{[&] { order.push_back(2); }};
+		tfs::scope_exit se3{[&] { order.push_back(3); }};
+		BOOST_TEST(order.empty());
+	}
+	// Destructors run in reverse order of construction
+	BOOST_REQUIRE(order.size() == 3);
+	BOOST_TEST(order[0] == 3);
+	BOOST_TEST(order[1] == 2);
+	BOOST_TEST(order[2] == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_scope_exit_nested)
+{
+	bool outerRan = false;
+	bool innerRan = false;
+	{
+		tfs::scope_exit outer{[&] { outerRan = true; }};
+		{
+			tfs::scope_exit inner{[&] { innerRan = true; }};
+			BOOST_TEST(!innerRan);
+			BOOST_TEST(!outerRan);
+		}
+		// inner destroyed when its scope exits
+		BOOST_TEST(innerRan);
+		BOOST_TEST(!outerRan);
+	}
+	BOOST_TEST(outerRan);
+}
+
+BOOST_AUTO_TEST_CASE(test_scope_exit_move_only_callable)
+{
+	auto ptr = std::make_unique<int>(42);
+	{
+		tfs::scope_exit se{[ptr = std::move(ptr)] {
+			// ptr is moved into the lambda and destroyed with se
+		}};
+		BOOST_TEST(!ptr); // ptr was moved
+	}
+	// se was destroyed, lambda ran
+}
+
+BOOST_AUTO_TEST_CASE(test_scope_exit_function_pointer)
+{
+	bool ran = false;
+	auto cleanup = [&] { ran = true; };
+
+	auto fp = +[](void* arg) { // function pointer
+		(*static_cast<bool*>(arg)) = true;
+	};
+
+	{
+		// Use a lambda that wraps the function pointer
+		tfs::scope_exit se{[&] { fp(&ran); }};
+		BOOST_TEST(!ran);
+	}
+	BOOST_TEST(ran);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

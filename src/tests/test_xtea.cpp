@@ -45,4 +45,121 @@ BOOST_AUTO_TEST_CASE(test_xtea_decrypt)
 	BOOST_TEST(data == expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_xtea_encrypt_empty_data)
+{
+	auto data = std::vector<uint8_t>{};
+	xtea::encrypt(data.data(), data.size(), xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef}));
+	BOOST_TEST(data.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_decrypt_empty_data)
+{
+	auto data = std::vector<uint8_t>{};
+	xtea::decrypt(data.data(), data.size(), xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef}));
+	BOOST_TEST(data.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_roundtrip_single_block)
+{
+	auto original = std::vector<uint8_t>{0xef, 0xbe, 0xad, 0xde, 0xef, 0xbe, 0xad, 0xde};
+	auto data = original;
+	auto keys = xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef});
+
+	xtea::encrypt(data.data(), data.size(), keys);
+	xtea::decrypt(data.data(), data.size(), keys);
+
+	BOOST_TEST(data == original);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_roundtrip_multi_block)
+{
+	auto original = std::vector<uint8_t>(32, 0);
+	for (size_t i = 0; i < original.size(); ++i) {
+		original[i] = static_cast<uint8_t>(i * 17 + 13);
+	}
+
+	auto data = original;
+	auto keys = xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef});
+
+	xtea::encrypt(data.data(), data.size(), keys);
+	xtea::decrypt(data.data(), data.size(), keys);
+
+	BOOST_TEST(data == original);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_roundtrip_all_zeros_key)
+{
+	auto original = std::vector<uint8_t>(24, 0);
+	for (size_t i = 0; i < original.size(); ++i) {
+		original[i] = static_cast<uint8_t>(i * 7 + 3);
+	}
+
+	auto data = original;
+	auto keys = xtea::expand_key({0, 0, 0, 0});
+
+	xtea::encrypt(data.data(), data.size(), keys);
+	xtea::decrypt(data.data(), data.size(), keys);
+
+	BOOST_TEST(data == original);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_roundtrip_all_ones_key)
+{
+	auto original = std::vector<uint8_t>(24, 0);
+	for (size_t i = 0; i < original.size(); ++i) {
+		original[i] = static_cast<uint8_t>(i * 11 + 7);
+	}
+
+	auto data = original;
+	auto keys = xtea::expand_key({0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF});
+
+	xtea::encrypt(data.data(), data.size(), keys);
+	xtea::decrypt(data.data(), data.size(), keys);
+
+	BOOST_TEST(data == original);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_expand_key_all_zeros)
+{
+	auto actual = xtea::expand_key({0, 0, 0, 0});
+
+	BOOST_TEST(actual.size() == 64);
+	BOOST_TEST(actual[0] == 0);
+	BOOST_TEST(actual[1] == 0x9e3779b9);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_encrypt_all_zeros_plaintext)
+{
+	auto data = std::vector<uint8_t>(8, 0);
+	xtea::encrypt(data.data(), data.size(), xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef}));
+
+	auto nonZero = false;
+	for (auto b : data) {
+		if (b != 0) {
+			nonZero = true;
+			break;
+		}
+	}
+	BOOST_TEST(nonZero);
+}
+
+BOOST_AUTO_TEST_CASE(test_xtea_encrypt_all_ones_plaintext)
+{
+	auto data = std::vector<uint8_t>(8, 0xFF);
+	xtea::encrypt(data.data(), data.size(), xtea::expand_key({0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef}));
+
+	auto changed = false;
+	auto allNonFF = true;
+	for (auto b : data) {
+		if (b != 0xFF) {
+			changed = true;
+		}
+		if (b == 0xFF) {
+			allNonFF = false;
+		}
+	}
+	BOOST_TEST(changed);
+	BOOST_TEST(allNonFF);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -135,4 +135,40 @@ BOOST_FIXTURE_TEST_CASE(test_rsa_decrypt, PrivateKeyFixture)
 	BOOST_TEST(encrypted == plaintext, "expected '" << plaintext << "', got '" << encrypted << "'");
 }
 
+BOOST_AUTO_TEST_CASE(test_rsa_load_pem_invalid)
+{
+	BOOST_CHECK_THROW(tfs::rsa::loadPEM("this is not a PEM"), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_rsa_load_pem_empty) { BOOST_CHECK_THROW(tfs::rsa::loadPEM(""), std::runtime_error); }
+
+BOOST_AUTO_TEST_CASE(test_rsa_load_pem_truncated)
+{
+	BOOST_CHECK_THROW(tfs::rsa::loadPEM("-----BEGIN RSA PRIVATE KEY-----\n"), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_rsa_load_pem_public_key)
+{
+	// Public key PEM (extracted from the same 1024-bit key) should fail since
+	// PEM_read_bio_PrivateKey expects a private key.
+	auto publicKey =
+	    "-----BEGIN PUBLIC KEY-----\n"
+	    "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbZGkDtFsHrJVlaNhzU71xZROd15QHA7A+bdB5\n"
+	    "OZZhtKg3qmBWHXzLlFL6AIBZSQmIKrW8pYoaGzX4sQWbcrEhJhHGFSrT27PPvuetwUKnXT11lxUJ\n"
+	    "wyHFwkpb1R/UYPAbThW+sN4ZMFKKXT8VwePL9cQB1nd+EKyqsz2+jVt/9QIDAQAB\n"
+	    "-----END PUBLIC KEY-----\n";
+	BOOST_CHECK_THROW(tfs::rsa::loadPEM(publicKey), std::runtime_error);
+}
+
+BOOST_FIXTURE_TEST_CASE(test_rsa_decrypt_wrong_size, PrivateKeyFixture)
+{
+	tfs::rsa::loadPEM(privateKey);
+
+	// Buffer smaller than 128 bytes (RSA 1024 block size) — the function
+	// delegates to OpenSSL which may pad/truncate silently. Just verify no crash.
+	std::string shortBuf(64, 'x');
+	tfs::rsa::decrypt(reinterpret_cast<uint8_t*>(shortBuf.data()), shortBuf.size());
+	BOOST_TEST(true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

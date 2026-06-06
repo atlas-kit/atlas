@@ -149,4 +149,93 @@ BOOST_AUTO_TEST_CASE(test_MatrixArea_rotate270)
 	BOOST_TEST(!m(3, 2));
 }
 
+BOOST_AUTO_TEST_CASE(test_createArea_empty)
+{
+	auto m = createArea({}, 0);
+	BOOST_TEST(m.getCols() == 0);
+	BOOST_TEST(m.getRows() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_createArea_1xN)
+{
+	auto m = createArea({1, 2, 0, 0, 1, 0}, 1);
+	BOOST_TEST(m.getCols() == 6);
+	BOOST_TEST(m.getRows() == 1);
+	BOOST_TEST(m(0, 0));
+	BOOST_TEST(m(0, 1));
+	BOOST_TEST(!m(0, 2));
+	BOOST_TEST(!m(0, 3));
+	BOOST_TEST(m(0, 4));
+	BOOST_TEST(!m(0, 5));
+}
+
+BOOST_AUTO_TEST_CASE(test_createArea_Nx1)
+{
+	// clang-format off
+	auto m = createArea({
+	    1,
+	    0,
+	    1,
+	}, 3);
+	// clang-format on
+	BOOST_TEST(m.getCols() == 1);
+	BOOST_TEST(m.getRows() == 3);
+	BOOST_TEST(m(0, 0));
+	BOOST_TEST(!m(1, 0));
+	BOOST_TEST(m(2, 0));
+}
+
+BOOST_AUTO_TEST_CASE(test_createArea_all_zeros)
+{
+	auto m = createArea({0, 0, 0, 0}, 2);
+	BOOST_TEST(m.getRows() == 2);
+	BOOST_TEST(m.getCols() == 2);
+	BOOST_TEST(!m(0, 0));
+	BOOST_TEST(!m(0, 1));
+	BOOST_TEST(!m(1, 0));
+	BOOST_TEST(!m(1, 1));
+}
+
+BOOST_AUTO_TEST_CASE(test_createArea_all_ones)
+{
+	auto m = createArea({1, 1, 1, 1}, 2);
+	BOOST_TEST(m.getRows() == 2);
+	BOOST_TEST(m.getCols() == 2);
+	BOOST_TEST(m(0, 0));
+	BOOST_TEST(m(0, 1));
+	BOOST_TEST(m(1, 0));
+	BOOST_TEST(m(1, 1));
+}
+
+BOOST_AUTO_TEST_CASE(test_createArea_no_center_marker)
+{
+	// No value 2 or 3 — center stays at (0,0)
+	auto m = createArea({1, 0, 0, 1}, 2);
+	auto&& [centerX, centerY] = m.getCenter();
+	BOOST_TEST(centerX == 0);
+	BOOST_TEST(centerY == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_rotate90_1x1)
+{
+	auto m = createArea({1}, 1).rotate90();
+	BOOST_TEST(m.getRows() == 1);
+	BOOST_TEST(m.getCols() == 1);
+	BOOST_TEST(m(0, 0));
+}
+
+BOOST_AUTO_TEST_CASE(test_rotate180_1xN)
+{
+	// clang-format off
+	auto m = createArea({
+	    1, 0, 1,
+	}, 1).rotate180();
+	// clang-format on
+	BOOST_TEST(m.getRows() == 1);
+	BOOST_TEST(m.getCols() == 3);
+	BOOST_TEST(m(0, 0));
+	BOOST_TEST(!m(0, 1));
+	BOOST_TEST(m(0, 2));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -16,7 +16,7 @@ struct SHA1Fixture
 
 // test vectors from https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing
 // up to 64 bytes in input length
-auto testVectors = std::vector<SHA1Fixture>{
+auto shortVectors = std::vector<SHA1Fixture>{
     {.input = "", .expected = "\xda\x39\xa3\xee\x5e\x6b\x4b\x0d\x32\x55\xbf\xef\x95\x60\x18\x90\xaf\xd8\x07\x09"sv},
     {.input = "\x36", .expected = "\xc1\xdf\xd9\x6e\xea\x8c\xc2\xb6\x27\x85\x27\x5b\xca\x38\xac\x26\x12\x56\xe2\x78"sv},
     {.input = "\x19\x5a",
@@ -36,10 +36,74 @@ auto testVectors = std::vector<SHA1Fixture>{
 
 };
 
-BOOST_AUTO_TEST_CASE(test_sha1)
+// FIPS 180-4 known answer tests for block-boundary coverage
+auto blockBoundaryVectors = std::vector<SHA1Fixture>{
+    // http://www.nsrl.nist.gov/testdata/ - SHA1
+    // 56 bytes (forces second block due to SHA1 padding)
+    {.input = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+     .expected = "\x84\x98\x3e\x44\x1c\x3b\xd2\x6e\xba\xae\x4a\xa1\xf9\x51\x29\xe5\xe5\x46\x70\xf1"sv},
+    // 112 bytes (multiple blocks, from FIPS 180-4)
+    {.input =
+         "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+     .expected = "\xa4\x9b\x24\x46\xa0\x2c\x64\x5b\xf4\x19\xf9\x95\xb6\x70\x91\x25\x3a\x04\xa2\x59"sv},
+};
+
+BOOST_AUTO_TEST_SUITE(sha1)
+
+BOOST_AUTO_TEST_CASE(test_sha1_short_vectors)
 {
-	for (auto&& [input, expected] : testVectors) {
+	for (auto&& [input, expected] : shortVectors) {
 		std::string result = transformToSHA1(input);
 		BOOST_TEST(result == expected, "expected '" << expected << "', got '" << result << "'");
 	}
 }
+
+BOOST_AUTO_TEST_CASE(test_sha1_block_boundary_vectors)
+{
+	for (auto&& [input, expected] : blockBoundaryVectors) {
+		std::string result = transformToSHA1(input);
+		BOOST_TEST(result == expected, "expected '" << expected << "', got '" << result << "'");
+	}
+}
+
+BOOST_AUTO_TEST_CASE(test_sha1_output_length)
+{
+	// SHA1 always produces 20-byte output regardless of input size
+	for (size_t len : {0, 1, 55, 56, 64, 65, 128, 1024}) {
+		std::string input(len, 'a');
+		std::string result = transformToSHA1(input);
+		BOOST_TEST(result.size() == 20, "expected 20 bytes for input length " << len << ", got " << result.size());
+	}
+}
+
+BOOST_AUTO_TEST_CASE(test_sha1_deterministic)
+{
+	auto a = transformToSHA1("The quick brown fox jumps over the lazy dog");
+	auto b = transformToSHA1("The quick brown fox jumps over the lazy dog");
+	BOOST_TEST(a == b);
+}
+
+BOOST_AUTO_TEST_CASE(test_sha1_binary_data_with_nulls)
+{
+	std::string input(64, '\0');
+	input[0] = 'a';
+	input[63] = 'z';
+	auto result = transformToSHA1(input);
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_sha1_all_zeros)
+{
+	std::string input(64, '\0');
+	auto result = transformToSHA1(input);
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_sha1_all_ff)
+{
+	std::string input(64, '\xFF');
+	auto result = transformToSHA1(input);
+	BOOST_TEST(result.size() == 20);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
