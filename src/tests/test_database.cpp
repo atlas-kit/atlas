@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(escape_blob_with_null_bytes_round_trips_via_player_items)
 	BOOST_REQUIRE(result);
 
 	auto stored = result->getString("attributes");
-	BOOST_REQUIRE_EQUAL(stored.size(), binaryLength);
+	BOOST_REQUIRE(stored.size() == binaryLength);
 	BOOST_TEST(stored == std::string_view(binary, binaryLength));
 }
 
