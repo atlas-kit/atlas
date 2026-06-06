@@ -6,6 +6,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(xtea)
+
 BOOST_AUTO_TEST_CASE(test_xtea_expand_key)
 {
 	auto expected = xtea::round_keys{
@@ -42,3 +44,5 @@ BOOST_AUTO_TEST_CASE(test_xtea_decrypt)
 
 	BOOST_TEST(data == expected);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

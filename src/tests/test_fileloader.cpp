@@ -8,6 +8,8 @@
 
 using namespace std::string_view_literals;
 
+BOOST_AUTO_TEST_SUITE(fileloader)
+
 BOOST_AUTO_TEST_CASE(test_read_bytes)
 {
 	auto s = "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x00"sv;
@@ -176,3 +178,5 @@ BOOST_AUTO_TEST_CASE(test_skip_escape_not_enough_bytes)
 	auto first = s.begin();
 	BOOST_CHECK_THROW(OTB::skip(first, s.end(), 5), std::invalid_argument);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

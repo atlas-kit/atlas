@@ -8,6 +8,8 @@
 #include <openssl/core_names.h>
 #include <openssl/evp.h>
 
+BOOST_AUTO_TEST_SUITE(rsa)
+
 struct PrivateKeyFixture
 {
 	// contains the private key from key.pem in the root of the repository
@@ -132,3 +134,5 @@ BOOST_FIXTURE_TEST_CASE(test_rsa_decrypt, PrivateKeyFixture)
 	tfs::rsa::decrypt(reinterpret_cast<uint8_t*>(encrypted.data()), encrypted.size());
 	BOOST_TEST(encrypted == plaintext, "expected '" << plaintext << "', got '" << encrypted << "'");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

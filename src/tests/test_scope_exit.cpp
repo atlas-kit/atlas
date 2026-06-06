@@ -8,6 +8,8 @@
 
 // Test that the scope_exit destructor executes the cleanup function
 // when the scope is exited normally.
+BOOST_AUTO_TEST_SUITE(scope_exit)
+
 BOOST_AUTO_TEST_CASE(test_scope_exit_runs_on_destruction)
 {
 	bool ran = false;
@@ -62,3 +64,5 @@ BOOST_AUTO_TEST_CASE(test_scope_exit_on_exception)
 		BOOST_TEST(std::string(e.what()) == "boom");
 	}
 }
+
+BOOST_AUTO_TEST_SUITE_END()

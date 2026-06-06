@@ -6,6 +6,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(matrixarea)
+
 BOOST_AUTO_TEST_CASE(test_createArea)
 {
 	// clang-format off
@@ -146,3 +148,5 @@ BOOST_AUTO_TEST_CASE(test_MatrixArea_rotate270)
 	BOOST_TEST(!m(3, 1));
 	BOOST_TEST(!m(3, 2));
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -13,6 +13,8 @@ struct HmacSHA1Fixture
 	std::string_view expected;
 };
 
+BOOST_AUTO_TEST_SUITE(generate_token)
+
 BOOST_AUTO_TEST_CASE(test_hmac_sha1)
 {
 	using namespace std::string_view_literals;
@@ -69,3 +71,5 @@ BOOST_AUTO_TEST_CASE(test_totp)
 		BOOST_TEST(actual == expected, "expected: " << expected << ", got: " << actual);
 	}
 }
+
+BOOST_AUTO_TEST_SUITE_END()
