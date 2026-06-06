@@ -124,7 +124,6 @@ BOOST_AUTO_TEST_CASE(test_scope_exit_move_only_callable)
 BOOST_AUTO_TEST_CASE(test_scope_exit_function_pointer)
 {
 	bool ran = false;
-	auto cleanup = [&] { ran = true; };
 
 	auto fp = +[](void* arg) { // function pointer
 		(*static_cast<bool*>(arg)) = true;
