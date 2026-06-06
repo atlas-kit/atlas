@@ -135,6 +135,16 @@
       }
     },
     {
+      "name": "linux-debug-tests",
+      "inherits": "linux-debug",
+      "displayName": "Linux - Debug (with tests)",
+      "description": "Linux Debug build with unit tests enabled",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-debug-tests"
+      }
+    },
+    {
       "name": "linux-debug-asan",
       "inherits": "linux-debug",
       "displayName": "Linux - Debug + ASAN",
@@ -194,6 +204,10 @@
       "configurePreset": "linux-release-tests"
     },
     {
+      "name": "linux-debug-tests",
+      "configurePreset": "linux-debug-tests"
+    },
+    {
       "name": "linux-debug-asan",
       "configurePreset": "linux-debug-asan"
     },
@@ -238,6 +252,11 @@
       "name": "windows-debug-asan",
       "inherits": "base",
       "configurePreset": "windows-debug-asan"
+    },
+    {
+      "name": "linux-debug-tests",
+      "inherits": "base",
+      "configurePreset": "linux-debug-tests"
     },
     {
       "name": "linux-debug-asan",
