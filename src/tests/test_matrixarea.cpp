@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_MatrixArea_rotate180)
 	BOOST_TEST(m(2, 0));
 	BOOST_TEST(m(2, 1));
 	BOOST_TEST(m(2, 2));
-	BOOST_TEST(m(2, 2));
+	BOOST_TEST(m(2, 3));
 }
 
 BOOST_AUTO_TEST_CASE(test_MatrixArea_rotate270)
