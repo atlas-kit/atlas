@@ -73,6 +73,27 @@
       }
     },
     {
+      "name": "windows-debug-tests",
+      "inherits": "windows-debug",
+      "displayName": "Windows - Debug (with tests)",
+      "description": "Windows Debug build with unit tests enabled",
+      "cacheVariables": {
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-debug-tests"
+      }
+    },
+    {
+      "name": "windows-debug-asan",
+      "inherits": "windows-debug",
+      "displayName": "Windows - Debug + ASAN",
+      "description": "Windows Debug build with Address Sanitizer",
+      "cacheVariables": {
+        "ENABLE_ASAN": "ON",
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-debug-asan"
+      }
+    },
+    {
       "name": "linux-release",
       "inherits": "base",
       "displayName": "Linux - Release",
@@ -153,6 +174,14 @@
       "configurePreset": "windows-release-asan"
     },
     {
+      "name": "windows-debug-tests",
+      "configurePreset": "windows-debug-tests"
+    },
+    {
+      "name": "windows-debug-asan",
+      "configurePreset": "windows-debug-asan"
+    },
+    {
       "name": "linux-release",
       "configurePreset": "linux-release"
     },
@@ -199,6 +228,16 @@
       "name": "linux-release-tests",
       "inherits": "base",
       "configurePreset": "linux-release-tests"
+    },
+    {
+      "name": "windows-debug-tests",
+      "inherits": "base",
+      "configurePreset": "windows-debug-tests"
+    },
+    {
+      "name": "windows-debug-asan",
+      "inherits": "base",
+      "configurePreset": "windows-debug-asan"
     },
     {
       "name": "linux-debug-asan",
