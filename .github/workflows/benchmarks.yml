@@ -1,0 +1,108 @@
+name: Benchmarks
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  deployments: write
+
+on:
+  push:
+    branches:
+      - dev
+
+    paths:
+      - .github/workflows/benchmarks.yml
+      - cmake/**
+      - src/**
+      - CMakeLists.txt
+      - CMakePresets.json
+      - vcpkg.json
+
+  pull_request:
+    branches:
+      - dev
+
+    paths:
+      - .github/workflows/benchmarks.yml
+      - cmake/**
+      - src/**
+      - CMakeLists.txt
+      - CMakePresets.json
+      - vcpkg.json
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    env:
+      CXX: g++-14
+      VCPKG_BUILD_TYPE: release
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux-benchmarks
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
+      BENCH_OUTPUT_DIR: ${{ github.workspace }}/benchmark_results
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p "${{ github.workspace }}/vcpkg_cache"
+        shell: bash
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@7bfc9baacbbdcb5e37957ad05c3546b3e222be3c # v4.3.2
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: vcpkg-benchmarks-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', '**/CMakeLists.txt', 'CMakePresets.json') }}
+          restore-keys: |
+            vcpkg-benchmarks-
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
+
+      - name: Build with CMake
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
+        with:
+          configurePreset: linux-release-benchmarks
+          buildPreset: linux-release-benchmarks
+
+      - name: Run benchmarks and export JSON
+        run: |
+          mkdir -p "${{ env.BENCH_OUTPUT_DIR }}"
+          build_dir="${{ github.workspace }}/build/linux-release-benchmarks"
+          for bench in "$build_dir"/bench_*; do
+            if [ -x "$bench" ]; then
+              name=$(basename "$bench")
+              "$bench" --benchmark_out="${{ env.BENCH_OUTPUT_DIR }}/${name}.json" \
+                       --benchmark_out_format=json \
+                       --benchmark_min_time=1s
+            fi
+          done
+          # Merge all individual JSONs into one for the benchmark action
+          jq -s '{ benchmarks: map(.benchmarks[]) }' "${{ env.BENCH_OUTPUT_DIR }}"/*.json \
+            > "${{ env.BENCH_OUTPUT_DIR }}/combined.json"
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
+        with:
+          tool: 'googlecpp'
+          output-file-path: ${{ env.BENCH_OUTPUT_DIR }}/combined.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: false
+
+      - name: Upload benchmark results as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: ${{ env.BENCH_OUTPUT_DIR }}/*.json

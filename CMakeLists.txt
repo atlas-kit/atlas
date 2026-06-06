@@ -44,6 +44,11 @@ if (BUILD_TESTING)
     list(APPEND VCPKG_MANIFEST_FEATURES "unit-tests")
 endif ()
 
+option(BUILD_BENCHMARKING "Build the benchmarking tree" OFF)
+if (BUILD_BENCHMARKING)
+    list(APPEND VCPKG_MANIFEST_FEATURES "benchmarks")
+endif ()
+
 project(tfs CXX)
 
 if (ENABLE_HTTP)
@@ -124,7 +129,7 @@ else ()
 endif ()
 set(CMAKE_UNITY_BUILD ${ENABLE_UNITY_BUILD})
 
-if (BUILD_TESTING)
+if (BUILD_TESTING OR BUILD_BENCHMARKING)
     include(CTest)
 endif ()
 
@@ -196,6 +201,10 @@ find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${BOOST_REQUIRE
 # required when the Boost.MySQL backend is selected.
 if (USE_BOOST_MYSQL)
     find_package(boost_mysql CONFIG REQUIRED)
+endif ()
+
+if (BUILD_BENCHMARKING)
+    find_package(benchmark REQUIRED)
 endif ()
 
 include_directories(${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${LUA_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${PUGIXML_INCLUDE_DIR})
