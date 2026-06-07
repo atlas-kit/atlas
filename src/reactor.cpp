@@ -7,6 +7,16 @@
 
 TaskReactor g_reactor;
 
+namespace {
+
+struct OrderedCallback
+{
+	uint64_t sequence;
+	Callback function;
+};
+
+} // namespace
+
 void TaskReactor::send(Callback&& callback)
 {
 	const auto sequence = ++nextSequence;
@@ -79,20 +89,21 @@ void TaskReactor::runLoop()
 
 void TaskReactor::runOnce()
 {
-	std::vector<Callback> sendCallbacks;
-	std::vector<Callback> readyCallbacks;
-
 	const auto now = chrono::steady_clock::now();
+
+	std::vector<OrderedCallback> sendList;
+	std::vector<OrderedCallback> heapList;
+	std::vector<Callback> callbacks;
 
 	{
 		std::lock_guard<std::mutex> lockGuard(mutex);
 
-		// Drain send inbox directly — no heap round-trip
+		// Drain send inbox — preserve submission order (sorted by sequence)
 		for (auto& task : sendInbox) {
 			if (task.deadline != chrono::steady_clock::time_point::max() && task.deadline <= now) {
 				continue;
 			}
-			sendCallbacks.push_back(std::move(task.function));
+			sendList.push_back({task.sequence, std::move(task.function)});
 		}
 		sendInbox.clear();
 
@@ -128,16 +139,37 @@ void TaskReactor::runOnce()
 					continue;
 				}
 
-				readyCallbacks.push_back(std::move(readyTask.function));
+				heapList.push_back({readyTask.sequence, std::move(readyTask.function)});
 			}
 		}
 	}
 
-	// Execute send callbacks first (network responses), then scheduled
-	for (auto& callback : sendCallbacks) {
-		callback();
+	// Merge sendList and heapList — both sorted by sequence number
+	callbacks.reserve(sendList.size() + heapList.size());
+	auto sit = sendList.begin();
+	auto hit = heapList.begin();
+	while (sit != sendList.end() && hit != heapList.end()) {
+		if (sit->sequence < hit->sequence) {
+			callbacks.push_back(std::move(sit->function));
+			++sit;
+		} else {
+			callbacks.push_back(std::move(hit->function));
+			++hit;
+		}
 	}
-	for (auto& callback : readyCallbacks) {
+
+	while (sit != sendList.end()) {
+		callbacks.push_back(std::move(sit->function));
+		++sit;
+	}
+
+	while (hit != heapList.end()) {
+		callbacks.push_back(std::move(hit->function));
+		++hit;
+	}
+
+	// Execute all callbacks in interleaved order
+	for (auto& callback : callbacks) {
 		callback();
 	}
 
