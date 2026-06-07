@@ -91,43 +91,46 @@ void TaskReactor::runOnce()
 		}
 		sendInbox.clear();
 
-		// Move schedule inbox tasks into the heap
-		for (auto& task : scheduleInbox) {
-			taskHeap.push_back(std::move(task));
-			std::push_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
-		}
-		scheduleInbox.clear();
-
 		// Process cancellation requests
 		for (auto identifier : cancelInbox) {
 			cancelled.push_back(identifier);
 		}
 		cancelInbox.clear();
 
-		// Pop expired tasks from the heap
-		while (!taskHeap.empty() && taskHeap.front().fireAt <= now) {
-			std::pop_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
-			Task readyTask = std::move(taskHeap.back());
-			taskHeap.pop_back();
+		// Only touch the heap if there is work to do
+		if (!taskHeap.empty() || !scheduleInbox.empty()) {
+			// Move schedule inbox tasks into the heap
+			for (auto& task : scheduleInbox) {
+				taskHeap.push_back(std::move(task));
+				std::push_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
+			}
+			scheduleInbox.clear();
 
-			// Check cancellation
-			if (readyTask.identifier != 0) {
-				auto it = std::find(cancelled.begin(), cancelled.end(), readyTask.identifier);
-				if (it != cancelled.end()) {
-					*it = cancelled.back();
-					cancelled.pop_back();
+			// Pop expired tasks from the heap
+			while (!taskHeap.empty() && taskHeap.front().fireAt <= now) {
+				std::pop_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
+				Task readyTask = std::move(taskHeap.back());
+				taskHeap.pop_back();
+
+				// Check cancellation
+				if (readyTask.identifier != 0) {
+					auto it = std::find(cancelled.begin(), cancelled.end(), readyTask.identifier);
+					if (it != cancelled.end()) {
+						*it = cancelled.back();
+						cancelled.pop_back();
+						continue;
+					}
+				}
+
+				// Check deadline expiration
+				const auto deadlineReached =
+				    readyTask.deadline != chrono::steady_clock::time_point::max() && readyTask.deadline <= now;
+				if (deadlineReached) {
 					continue;
 				}
-			}
 
-			// Check deadline expiration
-			const auto deadlineReached =
-			    readyTask.deadline != chrono::steady_clock::time_point::max() && readyTask.deadline <= now;
-			if (deadlineReached) {
-				continue;
+				readyCallbacks.push_back(std::move(readyTask.function));
 			}
-
-			readyCallbacks.push_back(std::move(readyTask.function));
 		}
 	}
 
