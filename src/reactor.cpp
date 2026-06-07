@@ -82,10 +82,10 @@ void TaskReactor::runOnce()
 	std::vector<Callback> sendCallbacks;
 	std::vector<Callback> readyCallbacks;
 
+	const auto now = chrono::steady_clock::now();
+
 	{
 		std::lock_guard<std::mutex> lockGuard(mutex);
-
-		const auto now = chrono::steady_clock::now();
 
 		// Drain send inbox directly — no heap round-trip
 		for (auto& task : sendInbox) {
@@ -149,7 +149,7 @@ void TaskReactor::runOnce()
 		cancelled.clear();
 	}
 
-	waitForWork();
+	waitForWork(now);
 }
 
 void TaskReactor::shutdown()
@@ -159,7 +159,7 @@ void TaskReactor::shutdown()
 	conditionVariable.notify_one();
 }
 
-void TaskReactor::waitForWork()
+void TaskReactor::waitForWork(chrono::steady_clock::time_point now)
 {
 	auto wakePredicate = [this]() {
 		return threadState.load(std::memory_order_relaxed) == THREAD_STATE_TERMINATED || !sendInbox.empty() ||
@@ -170,7 +170,6 @@ void TaskReactor::waitForWork()
 
 	auto timeout = chrono::milliseconds(100);
 	if (!taskHeap.empty()) {
-		const auto now = chrono::steady_clock::now();
 		if (taskHeap.front().fireAt > now) {
 			timeout = chrono::duration_cast<chrono::milliseconds>(taskHeap.front().fireAt - now);
 		} else {

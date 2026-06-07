@@ -50,7 +50,7 @@ private:
 		}
 	};
 
-	void waitForWork();
+	void waitForWork(chrono::steady_clock::time_point now);
 
 	// Single mutex for all producer inboxes. The reactor thread acquires it
 	// only to drain pending tasks into the task heap (microseconds), never
