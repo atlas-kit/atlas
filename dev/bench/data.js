@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780839637328,
+  "lastUpdate": 1780844949820,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -2436,6 +2436,590 @@ window.BENCHMARK_DATA = {
             "value": 158685.9964896443,
             "unit": "ns/iter",
             "extra": "iterations: 8831\ncpu: 158672.0347638999 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "committer": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "id": "b14207d07c7d0ad530828f642c36985f39ca6771",
+          "message": "perf(worker): replace the two-thread task scheduling system with a single-threaded reactor",
+          "timestamp": "2026-06-06T23:34:54Z",
+          "url": "https://github.com/atlas-kit/atlas/pull/345/commits/b14207d07c7d0ad530828f642c36985f39ca6771"
+        },
+        "date": 1780844949323,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 437.8544814282311,
+            "unit": "ns/iter",
+            "extra": "iterations: 3237305\ncpu: 437.7988651053886 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 470.4878667026115,
+            "unit": "ns/iter",
+            "extra": "iterations: 2993127\ncpu: 470.3224721169533 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 518.2624790656675,
+            "unit": "ns/iter",
+            "extra": "iterations: 2676823\ncpu: 518.2334319452574 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 855.2066971209038,
+            "unit": "ns/iter",
+            "extra": "iterations: 1633269\ncpu: 854.9047738002735 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1306.4069122014314,
+            "unit": "ns/iter",
+            "extra": "iterations: 1070860\ncpu: 1306.2300375399223 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 381.7831232674143,
+            "unit": "ns/iter",
+            "extra": "iterations: 3671943\ncpu: 381.7509612758148 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 403.4044521024724,
+            "unit": "ns/iter",
+            "extra": "iterations: 3482175\ncpu: 402.9114803247965 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 601.9236674841212,
+            "unit": "ns/iter",
+            "extra": "iterations: 2329597\ncpu: 601.8622787546509 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 1963.5087395393277,
+            "unit": "ns/iter",
+            "extra": "iterations: 712795\ncpu: 1963.3725657447076 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3530.775411924804,
+            "unit": "ns/iter",
+            "extra": "iterations: 395582\ncpu: 3530.5493702948993 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send",
+            "value": 148.95371801774903,
+            "unit": "ns/iter",
+            "extra": "iterations: 9389896\ncpu: 148.93409522320587 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule",
+            "value": 156.0736421315653,
+            "unit": "ns/iter",
+            "extra": "iterations: 9016632\ncpu: 156.0505819689658 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/1",
+            "value": 115.91620979891192,
+            "unit": "ns/iter",
+            "extra": "iterations: 12086831\ncpu: 115.90163153600814 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/2",
+            "value": 229.63061957174534,
+            "unit": "ns/iter",
+            "extra": "iterations: 6089432\ncpu: 229.61288474852836 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/4",
+            "value": 458.95886456499954,
+            "unit": "ns/iter",
+            "extra": "iterations: 3056027\ncpu: 458.90705448610254 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/8",
+            "value": 906.332091626254,
+            "unit": "ns/iter",
+            "extra": "iterations: 1538205\ncpu: 906.2291502107978 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/16",
+            "value": 1855.7379495209407,
+            "unit": "ns/iter",
+            "extra": "iterations: 753580\ncpu: 1855.6182104089805 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/32",
+            "value": 3870.8590836110225,
+            "unit": "ns/iter",
+            "extra": "iterations: 360611\ncpu: 3870.7302467201525 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/64",
+            "value": 8009.628523875489,
+            "unit": "ns/iter",
+            "extra": "iterations: 174843\ncpu: 8009.17433354496 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/128",
+            "value": 16425.50976461702,
+            "unit": "ns/iter",
+            "extra": "iterations: 85308\ncpu: 16425.536737468945 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/256",
+            "value": 33784.206091025466,
+            "unit": "ns/iter",
+            "extra": "iterations: 41438\ncpu: 33783.176408127794 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/512",
+            "value": 69550.0119858752,
+            "unit": "ns/iter",
+            "extra": "iterations: 20107\ncpu: 69546.21325906402 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/1024",
+            "value": 142391.48544879342,
+            "unit": "ns/iter",
+            "extra": "iterations: 9793\ncpu: 142374.3270703561 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/2048",
+            "value": 295394.04246100096,
+            "unit": "ns/iter",
+            "extra": "iterations: 4616\ncpu: 295364.92309358757 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/4096",
+            "value": 736428.5930048083,
+            "unit": "ns/iter",
+            "extra": "iterations: 1887\ncpu: 736344.5723370431 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_batch/8192",
+            "value": 1576893.9186441484,
+            "unit": "ns/iter",
+            "extra": "iterations: 885\ncpu: 1576778.1966101693 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/1",
+            "value": 117.3513513197736,
+            "unit": "ns/iter",
+            "extra": "iterations: 11981176\ncpu: 117.34237432118526 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/2",
+            "value": 231.04745630341168,
+            "unit": "ns/iter",
+            "extra": "iterations: 6053906\ncpu: 231.03527821542008 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/4",
+            "value": 463.94033308328375,
+            "unit": "ns/iter",
+            "extra": "iterations: 3015222\ncpu: 463.91716530325107 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/8",
+            "value": 928.1608118828873,
+            "unit": "ns/iter",
+            "extra": "iterations: 1508937\ncpu: 928.1174343262834 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/16",
+            "value": 1891.4428147865704,
+            "unit": "ns/iter",
+            "extra": "iterations: 741669\ncpu: 1891.4361581783758 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/32",
+            "value": 3892.95357667481,
+            "unit": "ns/iter",
+            "extra": "iterations: 360810\ncpu: 3892.7693744630224 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/64",
+            "value": 8249.769504545635,
+            "unit": "ns/iter",
+            "extra": "iterations: 173921\ncpu: 8248.660713772339 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/128",
+            "value": 16487.045399943534,
+            "unit": "ns/iter",
+            "extra": "iterations: 84912\ncpu: 16485.883926889 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/256",
+            "value": 33703.5142008437,
+            "unit": "ns/iter",
+            "extra": "iterations: 41406\ncpu: 33699.7986765203 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/512",
+            "value": 69700.28626770098,
+            "unit": "ns/iter",
+            "extra": "iterations: 20135\ncpu: 69696.78043208359 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/1024",
+            "value": 142845.11731672575,
+            "unit": "ns/iter",
+            "extra": "iterations: 9794\ncpu: 142827.4240351234 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/2048",
+            "value": 297589.4657794254,
+            "unit": "ns/iter",
+            "extra": "iterations: 4734\ncpu: 297546.96810308425 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/4096",
+            "value": 733156.9557661981,
+            "unit": "ns/iter",
+            "extra": "iterations: 1899\ncpu: 733033.3375460745 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_batch/8192",
+            "value": 1612358.004514663,
+            "unit": "ns/iter",
+            "extra": "iterations: 886\ncpu: 1609961.253950335 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/1",
+            "value": 118.68832567165008,
+            "unit": "ns/iter",
+            "extra": "iterations: 11811823\ncpu: 118.67611451678572 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/2",
+            "value": 234.5108950004391,
+            "unit": "ns/iter",
+            "extra": "iterations: 5945617\ncpu: 234.49753070202772 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/4",
+            "value": 486.2686798115449,
+            "unit": "ns/iter",
+            "extra": "iterations: 2888118\ncpu: 486.2463105731842 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/8",
+            "value": 988.3455320037483,
+            "unit": "ns/iter",
+            "extra": "iterations: 1417067\ncpu: 988.1899465586308 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/16",
+            "value": 2013.613506714758,
+            "unit": "ns/iter",
+            "extra": "iterations: 694884\ncpu: 2013.4236707133832 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/32",
+            "value": 4185.360640014883,
+            "unit": "ns/iter",
+            "extra": "iterations: 334680\ncpu: 4185.166541173669 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/64",
+            "value": 8775.24847366063,
+            "unit": "ns/iter",
+            "extra": "iterations: 158713\ncpu: 8774.395323634495 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/128",
+            "value": 18746.970307157528,
+            "unit": "ns/iter",
+            "extra": "iterations: 74294\ncpu: 18745.68893854157 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/256",
+            "value": 42338.90811998193,
+            "unit": "ns/iter",
+            "extra": "iterations: 32771\ncpu: 42335.69326538709 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/512",
+            "value": 93208.0572610888,
+            "unit": "ns/iter",
+            "extra": "iterations: 14984\ncpu: 93198.75507207627 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/1024",
+            "value": 196666.62899817142,
+            "unit": "ns/iter",
+            "extra": "iterations: 7097\ncpu: 196654.488657179 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/2048",
+            "value": 413255.6599118538,
+            "unit": "ns/iter",
+            "extra": "iterations: 3405\ncpu: 413224.8079295193 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/4096",
+            "value": 977867.7819443576,
+            "unit": "ns/iter",
+            "extra": "iterations: 1440\ncpu: 977747.94305556 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_mixed_send_schedule/8192",
+            "value": 2068179.5524373068,
+            "unit": "ns/iter",
+            "extra": "iterations: 677\ncpu: 2067973.6366322027 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/1",
+            "value": 366.92489230464554,
+            "unit": "ns/iter",
+            "extra": "iterations: 3929371\ncpu: 366.8840969712437 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/4",
+            "value": 798.4612653550097,
+            "unit": "ns/iter",
+            "extra": "iterations: 1755302\ncpu: 798.441515477109 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/16",
+            "value": 2579.6657599157325,
+            "unit": "ns/iter",
+            "extra": "iterations: 541126\ncpu: 2579.4653389414084 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/64",
+            "value": 9836.9206879098,
+            "unit": "ns/iter",
+            "extra": "iterations: 142286\ncpu: 9836.297970285246 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/256",
+            "value": 37061.299240315944,
+            "unit": "ns/iter",
+            "extra": "iterations: 37779\ncpu: 37059.6400381164 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/1024",
+            "value": 145553.96712442182,
+            "unit": "ns/iter",
+            "extra": "iterations: 9612\ncpu: 145528.12338743257 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_all/4096",
+            "value": 1020825.8408407583,
+            "unit": "ns/iter",
+            "extra": "iterations: 1332\ncpu: 1020648.7882882847 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/1",
+            "value": 225.07681636721932,
+            "unit": "ns/iter",
+            "extra": "iterations: 6210955\ncpu: 225.05949793550297 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/4",
+            "value": 693.8306369352655,
+            "unit": "ns/iter",
+            "extra": "iterations: 1979369\ncpu: 693.7590999960045 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/16",
+            "value": 2548.9329826849194,
+            "unit": "ns/iter",
+            "extra": "iterations: 548888\ncpu: 2548.5772398012123 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/64",
+            "value": 10736.004081352892,
+            "unit": "ns/iter",
+            "extra": "iterations: 130839\ncpu: 10735.350973333716 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/256",
+            "value": 44036.899080547955,
+            "unit": "ns/iter",
+            "extra": "iterations: 31758\ncpu: 44032.5950311733 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/1024",
+            "value": 180341.55273006312,
+            "unit": "ns/iter",
+            "extra": "iterations: 7747\ncpu: 180320.22408674247 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_cancel_half/4096",
+            "value": 903406.5713367665,
+            "unit": "ns/iter",
+            "extra": "iterations: 1556\ncpu: 903357.2557840624 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/1",
+            "value": 139.42524621872118,
+            "unit": "ns/iter",
+            "extra": "iterations: 9956493\ncpu: 139.40947018192068 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/8",
+            "value": 163.82926449106307,
+            "unit": "ns/iter",
+            "extra": "iterations: 8545797\ncpu: 163.81259056352442 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/64",
+            "value": 185.16207088153783,
+            "unit": "ns/iter",
+            "extra": "iterations: 7562364\ncpu: 185.14222867346797 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/512",
+            "value": 204.88327431921866,
+            "unit": "ns/iter",
+            "extra": "iterations: 6819836\ncpu: 204.85671502951251 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/4096",
+            "value": 227.9212951115647,
+            "unit": "ns/iter",
+            "extra": "iterations: 6123457\ncpu: 227.91020137807737 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_heap_pressure/16384",
+            "value": 252.81629071214135,
+            "unit": "ns/iter",
+            "extra": "iterations: 5303390\ncpu: 252.79301069693105 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_with_deadline",
+            "value": 152.950378854045,
+            "unit": "ns/iter",
+            "extra": "iterations: 9165931\ncpu: 152.93211938863573 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_send_expired_deadline",
+            "value": 133.39607293613452,
+            "unit": "ns/iter",
+            "extra": "iterations: 10496799\ncpu: 133.3845340851062 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/1",
+            "value": 154.85529746882148,
+            "unit": "ns/iter",
+            "extra": "iterations: 9033871\ncpu: 154.83739074866062 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/2",
+            "value": 266.68369144635767,
+            "unit": "ns/iter",
+            "extra": "iterations: 5256162\ncpu: 266.6601213965617 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/4",
+            "value": 496.0073081339889,
+            "unit": "ns/iter",
+            "extra": "iterations: 2823703\ncpu: 495.9775773160291 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/8",
+            "value": 953.8157673965774,
+            "unit": "ns/iter",
+            "extra": "iterations: 1466152\ncpu: 953.7280609377417 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/16",
+            "value": 1882.3291060323024,
+            "unit": "ns/iter",
+            "extra": "iterations: 742633\ncpu: 1882.2681135904209 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/32",
+            "value": 3702.2278653731028,
+            "unit": "ns/iter",
+            "extra": "iterations: 377429\ncpu: 3701.975579512964 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/64",
+            "value": 7355.847012337313,
+            "unit": "ns/iter",
+            "extra": "iterations: 190316\ncpu: 7355.483406544923 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/128",
+            "value": 14799.402642477444,
+            "unit": "ns/iter",
+            "extra": "iterations: 95365\ncpu: 14797.935741624286 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/256",
+            "value": 29213.755521594383,
+            "unit": "ns/iter",
+            "extra": "iterations: 47767\ncpu: 29210.49684928937 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/512",
+            "value": 58385.244934546,
+            "unit": "ns/iter",
+            "extra": "iterations: 23986\ncpu: 58376.53518719316 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_accumulate/1024",
+            "value": 120072.08449304463,
+            "unit": "ns/iter",
+            "extra": "iterations: 12072\ncpu: 120046.34642147104 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/1",
+            "value": 133.85398333798142,
+            "unit": "ns/iter",
+            "extra": "iterations: 10440151\ncpu: 133.82982976012477 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/4",
+            "value": 504.14137789649203,
+            "unit": "ns/iter",
+            "extra": "iterations: 2785202\ncpu: 504.06482402353924 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/16",
+            "value": 1987.020255555149,
+            "unit": "ns/iter",
+            "extra": "iterations: 705288\ncpu: 1986.9388561836101 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/64",
+            "value": 8042.305944547782,
+            "unit": "ns/iter",
+            "extra": "iterations: 174025\ncpu: 8041.240114925994 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/256",
+            "value": 33967.14796791034,
+            "unit": "ns/iter",
+            "extra": "iterations: 41509\ncpu: 33965.387674961676 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/1024",
+            "value": 142033.1399898208,
+            "unit": "ns/iter",
+            "extra": "iterations: 9815\ncpu: 142010.1023942965 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_reactor_schedule_expired_deadline_cleanup/4096",
+            "value": 730970.763322852,
+            "unit": "ns/iter",
+            "extra": "iterations: 1914\ncpu: 730848.6196447215 ns\nthreads: 1"
           }
         ]
       }
