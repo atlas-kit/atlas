@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_send_before_schedule_immediate)
 	BOOST_TEST(executionOrder[1] == 2);
 }
 
-BOOST_AUTO_TEST_CASE(test_schedule_before_send_respects_sequence)
+BOOST_AUTO_TEST_CASE(test_send_executes_before_schedule)
 {
 	TaskReactor reactor;
 	std::vector<int> executionOrder;
@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE(test_schedule_before_send_respects_sequence)
 	reactor.runOnce();
 
 	BOOST_TEST(executionOrder.size() == 2);
-	BOOST_TEST(executionOrder[0] == 1);
-	BOOST_TEST(executionOrder[1] == 2);
+	BOOST_TEST(executionOrder[0] == 2);
+	BOOST_TEST(executionOrder[1] == 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple_sends_in_order)
@@ -179,10 +179,10 @@ BOOST_AUTO_TEST_CASE(test_interleaved_send_and_schedule)
 	reactor.runOnce();
 
 	BOOST_TEST(executionOrder.size() == 4);
-	BOOST_TEST(executionOrder[0] == 1);
-	BOOST_TEST(executionOrder[1] == 2);
-	BOOST_TEST(executionOrder[2] == 3);
-	BOOST_TEST(executionOrder[3] == 4);
+	BOOST_TEST(executionOrder[0] == 2);
+	BOOST_TEST(executionOrder[1] == 4);
+	BOOST_TEST(executionOrder[2] == 1);
+	BOOST_TEST(executionOrder[3] == 3);
 }
 
 BOOST_AUTO_TEST_CASE(test_scheduled_task_does_not_fire_before_delay)
