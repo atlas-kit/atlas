@@ -44,7 +44,6 @@ uint32_t TaskReactor::schedule(chrono::milliseconds delay, Callback&& callback)
 		std::lock_guard<std::mutex> lockGuard(mutex);
 
 		const auto fireAt = chrono::steady_clock::now() + delay;
-		activeIdentifiers.insert(identifier);
 		scheduleInbox.push_back(
 		    Task{fireAt, chrono::steady_clock::time_point::max(), identifier, sequence, std::move(callback)});
 
@@ -63,9 +62,7 @@ void TaskReactor::cancel(uint32_t taskIdentifier)
 	{
 		std::lock_guard<std::mutex> lockGuard(mutex);
 
-		if (activeIdentifiers.find(taskIdentifier) != activeIdentifiers.end()) {
-			cancelInbox.push_back(taskIdentifier);
-		}
+		cancelInbox.push_back(taskIdentifier);
 	}
 }
 
@@ -103,9 +100,7 @@ void TaskReactor::runOnce()
 
 		// Process cancellation requests
 		for (auto identifier : cancelInbox) {
-			if (activeIdentifiers.find(identifier) != activeIdentifiers.end()) {
-				cancelled.insert(identifier);
-			}
+			cancelled.insert(identifier);
 		}
 		cancelInbox.clear();
 
@@ -115,12 +110,9 @@ void TaskReactor::runOnce()
 			Task readyTask = std::move(taskHeap.back());
 			taskHeap.pop_back();
 
-			// Remove from active identifiers and check cancellation
-			if (readyTask.identifier != 0) {
-				activeIdentifiers.erase(readyTask.identifier);
-				if (cancelled.erase(readyTask.identifier) != 0) {
-					continue;
-				}
+			// Check cancellation
+			if (readyTask.identifier != 0 && cancelled.erase(readyTask.identifier) != 0) {
+				continue;
 			}
 
 			// Check deadline expiration

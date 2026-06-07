@@ -65,7 +65,6 @@ private:
 	std::vector<uint32_t> cancelInbox;
 
 	std::unordered_set<uint32_t> cancelled;
-	std::unordered_set<uint32_t> activeIdentifiers;
 	std::vector<Task> taskHeap;
 
 	std::atomic<uint32_t> nextIdentifier{0};
