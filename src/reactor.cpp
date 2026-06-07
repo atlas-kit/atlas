@@ -136,6 +136,12 @@ void TaskReactor::runOnce()
 		return;
 	}
 
+	// Clear cancelled set when the heap is empty — prevents unbounded
+	// growth from stale cancel() calls targeting already-executed tasks.
+	if (taskHeap.empty() && !cancelled.empty()) {
+		cancelled.clear();
+	}
+
 	waitForWork();
 }
 
@@ -148,8 +154,14 @@ void TaskReactor::shutdown()
 
 void TaskReactor::waitForWork()
 {
-	auto timeout = chrono::milliseconds(100);
+	auto wakePredicate = [this]() {
+		return threadState.load(std::memory_order_relaxed) == THREAD_STATE_TERMINATED || !sendInbox.empty() ||
+		       !scheduleInbox.empty() || !cancelInbox.empty();
+	};
 
+	std::unique_lock<std::mutex> uniqueLock(mutex);
+
+	auto timeout = chrono::milliseconds(100);
 	if (!taskHeap.empty()) {
 		const auto now = chrono::steady_clock::now();
 		if (taskHeap.front().fireAt > now) {
@@ -158,13 +170,6 @@ void TaskReactor::waitForWork()
 			timeout = chrono::milliseconds::zero();
 		}
 	}
-
-	auto wakePredicate = [this]() {
-		return threadState.load(std::memory_order_relaxed) == THREAD_STATE_TERMINATED || !sendInbox.empty() ||
-		       !scheduleInbox.empty() || !cancelInbox.empty();
-	};
-
-	std::unique_lock<std::mutex> uniqueLock(mutex);
 
 	conditionVariable.wait_for(uniqueLock, timeout, wakePredicate);
 }
