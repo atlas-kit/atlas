@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780836460963,
+  "lastUpdate": 1780839637328,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -2344,6 +2344,98 @@ window.BENCHMARK_DATA = {
             "value": 5331.0519769531475,
             "unit": "ns/iter",
             "extra": "iterations: 262424\ncpu: 5330.626669054658 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "committer": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "id": "69a5044286ba52e0fdef3cf9afc32c21139c9175",
+          "message": "feat: add rsa benchmark",
+          "timestamp": "2026-06-06T23:34:54Z",
+          "url": "https://github.com/atlas-kit/atlas/pull/358/commits/69a5044286ba52e0fdef3cf9afc32c21139c9175"
+        },
+        "date": 1780839636294,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 473.3738001773149,
+            "unit": "ns/iter",
+            "extra": "iterations: 2956791\ncpu: 473.28393653795627 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 510.909752260408,
+            "unit": "ns/iter",
+            "extra": "iterations: 2759914\ncpu: 510.7834207877492 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 574.5979811142948,
+            "unit": "ns/iter",
+            "extra": "iterations: 2443328\ncpu: 574.5373359614426 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 911.5550792223016,
+            "unit": "ns/iter",
+            "extra": "iterations: 1554234\ncpu: 911.4979584798682 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1319.004943220999,
+            "unit": "ns/iter",
+            "extra": "iterations: 1065095\ncpu: 1318.794561987428 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 441.73377514898533,
+            "unit": "ns/iter",
+            "extra": "iterations: 3158180\ncpu: 441.68070344312207 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 466.6148043094203,
+            "unit": "ns/iter",
+            "extra": "iterations: 2996695\ncpu: 466.5771875349347 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 680.5048355316142,
+            "unit": "ns/iter",
+            "extra": "iterations: 2056961\ncpu: 680.4442252429675 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 2191.463107976506,
+            "unit": "ns/iter",
+            "extra": "iterations: 639149\ncpu: 2191.2384545700625 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3932.1171133927382,
+            "unit": "ns/iter",
+            "extra": "iterations: 355587\ncpu: 3931.6947469958177 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_rsa_load_pem",
+            "value": 23400.815462800336,
+            "unit": "ns/iter",
+            "extra": "iterations: 60015\ncpu: 23398.60284928768 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_rsa_decrypt/128",
+            "value": 158685.9964896443,
+            "unit": "ns/iter",
+            "extra": "iterations: 8831\ncpu: 158672.0347638999 ns\nthreads: 1"
           }
         ]
       }
