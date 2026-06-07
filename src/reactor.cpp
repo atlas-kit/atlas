@@ -63,6 +63,8 @@ void TaskReactor::cancel(uint32_t taskIdentifier)
 		std::lock_guard<std::mutex> lockGuard(mutex);
 
 		cancelInbox.push_back(taskIdentifier);
+
+		conditionVariable.notify_one();
 	}
 }
 
