@@ -51,6 +51,7 @@ public:
 
 	void addTask(uint32_t expiration, TaskFunc&& f) { addTask(std::make_unique<Task>(expiration, std::move(f))); }
 
+	void drain();
 	void shutdown();
 
 	uint64_t getDispatcherCycle() const { return dispatcherCycle; }

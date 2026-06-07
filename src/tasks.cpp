@@ -19,48 +19,49 @@ std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f)
 	return std::make_unique<Task>(expiration, std::move(f));
 }
 
-void Dispatcher::threadMain()
+void Dispatcher::drain()
 {
 	std::vector<std::unique_ptr<Task>> tmpTaskList;
+	{
+		std::lock_guard<std::mutex> lockGuard(taskLock);
+		tmpTaskList.swap(taskList);
+	}
+
+	for (auto& task : tmpTaskList) {
+		if (!task->hasExpired()) {
+			++dispatcherCycle;
+			(*task)();
+		}
+	}
+}
+
+void Dispatcher::threadMain()
+{
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	std::unique_lock<std::mutex> taskLockUnique(taskLock, std::defer_lock);
 
 	while (getState() != THREAD_STATE_TERMINATED) {
-		// check if there are tasks waiting
 		taskLockUnique.lock();
 		if (taskList.empty()) {
-			// if the list is empty wait for signal
 			taskSignal.wait(taskLockUnique);
 		}
-		tmpTaskList.swap(taskList);
 		taskLockUnique.unlock();
 
-		for (auto& task : tmpTaskList) {
-			if (!task->hasExpired()) {
-				++dispatcherCycle;
-				// execute it
-				(*task)();
-			}
-		}
-		tmpTaskList.clear();
+		drain();
 	}
 }
 
 void Dispatcher::addTask(std::unique_ptr<Task>&& task)
 {
-	bool do_signal = false;
+	bool doSignal = false;
 
-	taskLock.lock();
-
-	if (getState() == THREAD_STATE_RUNNING) {
-		do_signal = taskList.empty();
+	{
+		std::lock_guard<std::mutex> lockGuard(taskLock);
+		doSignal = taskList.empty();
 		taskList.push_back(std::move(task));
 	}
 
-	taskLock.unlock();
-
-	// send a signal if the list was empty
-	if (do_signal) {
+	if (doSignal) {
 		taskSignal.notify_one();
 	}
 }
