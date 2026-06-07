@@ -107,11 +107,14 @@ void TaskReactor::runOnce()
 		}
 		sendInbox.clear();
 
-		// Process cancellation requests
+		// Process cancellation requests and sort for binary search
 		for (auto identifier : cancelInbox) {
 			cancelled.push_back(identifier);
 		}
 		cancelInbox.clear();
+		if (!cancelled.empty()) {
+			std::sort(cancelled.begin(), cancelled.end());
+		}
 
 		// Only touch the heap if there is timer work
 		if (!taskHeap.empty() || !scheduleInbox.empty()) {
@@ -127,11 +130,13 @@ void TaskReactor::runOnce()
 				taskHeap.pop_back();
 
 				if (readyTask.identifier != 0) {
-					auto it = std::find(cancelled.begin(), cancelled.end(), readyTask.identifier);
-					if (it != cancelled.end()) {
-						*it = cancelled.back();
-						cancelled.pop_back();
-						continue;
+					if (!cancelled.empty()) {
+						auto it = std::lower_bound(cancelled.begin(), cancelled.end(), readyTask.identifier);
+						if (it != cancelled.end() && *it == readyTask.identifier) {
+							*it = cancelled.back();
+							cancelled.pop_back();
+							continue;
+						}
 					}
 				}
 
