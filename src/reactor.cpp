@@ -79,6 +79,7 @@ void TaskReactor::runLoop()
 
 void TaskReactor::runOnce()
 {
+	std::vector<Callback> sendCallbacks;
 	std::vector<Callback> readyCallbacks;
 
 	{
@@ -86,10 +87,12 @@ void TaskReactor::runOnce()
 
 		const auto now = chrono::steady_clock::now();
 
-		// Move send inbox tasks into the heap
+		// Drain send inbox directly — no heap round-trip
 		for (auto& task : sendInbox) {
-			taskHeap.push_back(std::move(task));
-			std::push_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
+			if (task.deadline != chrono::steady_clock::time_point::max() && task.deadline <= now) {
+				continue;
+			}
+			sendCallbacks.push_back(std::move(task.function));
 		}
 		sendInbox.clear();
 
@@ -99,22 +102,19 @@ void TaskReactor::runOnce()
 		}
 		cancelInbox.clear();
 
-		// Only touch the heap if there is work to do
+		// Only touch the heap if there is timer work
 		if (!taskHeap.empty() || !scheduleInbox.empty()) {
-			// Move schedule inbox tasks into the heap
 			for (auto& task : scheduleInbox) {
 				taskHeap.push_back(std::move(task));
 				std::push_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
 			}
 			scheduleInbox.clear();
 
-			// Pop expired tasks from the heap
 			while (!taskHeap.empty() && taskHeap.front().fireAt <= now) {
 				std::pop_heap(taskHeap.begin(), taskHeap.end(), std::greater<>{});
 				Task readyTask = std::move(taskHeap.back());
 				taskHeap.pop_back();
 
-				// Check cancellation
 				if (readyTask.identifier != 0) {
 					auto it = std::find(cancelled.begin(), cancelled.end(), readyTask.identifier);
 					if (it != cancelled.end()) {
@@ -124,10 +124,7 @@ void TaskReactor::runOnce()
 					}
 				}
 
-				// Check deadline expiration
-				const auto deadlineReached =
-				    readyTask.deadline != chrono::steady_clock::time_point::max() && readyTask.deadline <= now;
-				if (deadlineReached) {
+				if (readyTask.deadline != chrono::steady_clock::time_point::max() && readyTask.deadline <= now) {
 					continue;
 				}
 
@@ -136,18 +133,18 @@ void TaskReactor::runOnce()
 		}
 	}
 
-	// Execute all ready callbacks outside the lock
+	// Execute send callbacks first (network responses), then scheduled
+	for (auto& callback : sendCallbacks) {
+		callback();
+	}
 	for (auto& callback : readyCallbacks) {
 		callback();
 	}
 
-	// Stop if shutdown was requested
 	if (threadState.load(std::memory_order_relaxed) == THREAD_STATE_TERMINATED) {
 		return;
 	}
 
-	// Clear cancelled set when the heap is empty — prevents unbounded
-	// growth from stale cancel() calls targeting already-executed tasks.
 	if (taskHeap.empty() && !cancelled.empty()) {
 		cancelled.clear();
 	}
