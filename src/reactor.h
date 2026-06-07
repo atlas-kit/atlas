@@ -6,12 +6,12 @@
 
 #include "enums.h"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#include <unordered_set>
 #include <vector>
 
 namespace chrono = std::chrono;
@@ -64,7 +64,7 @@ private:
 	std::vector<Task> scheduleInbox;
 	std::vector<uint32_t> cancelInbox;
 
-	std::unordered_set<uint32_t> cancelled;
+	std::vector<uint32_t> cancelled;
 	std::vector<Task> taskHeap;
 
 	std::atomic<uint32_t> nextIdentifier{0};

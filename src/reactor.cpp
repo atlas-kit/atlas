@@ -100,7 +100,7 @@ void TaskReactor::runOnce()
 
 		// Process cancellation requests
 		for (auto identifier : cancelInbox) {
-			cancelled.insert(identifier);
+			cancelled.push_back(identifier);
 		}
 		cancelInbox.clear();
 
@@ -111,8 +111,13 @@ void TaskReactor::runOnce()
 			taskHeap.pop_back();
 
 			// Check cancellation
-			if (readyTask.identifier != 0 && cancelled.erase(readyTask.identifier) != 0) {
-				continue;
+			if (readyTask.identifier != 0) {
+				auto it = std::find(cancelled.begin(), cancelled.end(), readyTask.identifier);
+				if (it != cancelled.end()) {
+					*it = cancelled.back();
+					cancelled.pop_back();
+					continue;
+				}
 			}
 
 			// Check deadline expiration
