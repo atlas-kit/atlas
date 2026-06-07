@@ -28,11 +28,11 @@ uint32_t Scheduler::addEvent(std::unique_ptr<SchedulerTask>&& task)
 			eventIdTimerMap.erase(task->getEventId());
 
 			if (error == boost::asio::error::operation_aborted || getState() == THREAD_STATE_TERMINATED) {
-				// the timer has been manually canceled(timer->cancel()) or Scheduler::shutdown has been called
 				return;
 			}
 
-			g_dispatcher.addTask(std::move(task));
+			Dispatcher& d = dispatcher ? *dispatcher : g_dispatcher;
+			d.addTask(std::move(task));
 		});
 	});
 

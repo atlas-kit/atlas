@@ -31,14 +31,19 @@ std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds del
 class Scheduler : public ThreadHolder<Scheduler>
 {
 public:
+	Scheduler() = default;
+	explicit Scheduler(Dispatcher& dispatcher) : dispatcher(&dispatcher) {}
+
 	uint32_t addEvent(std::unique_ptr<SchedulerTask>&& task);
 	void stopEvent(uint32_t eventId);
 
+	void pollOnce() { io_context.poll(); }
 	void shutdown();
 
 	void threadMain() { io_context.run(); }
 
 private:
+	Dispatcher* dispatcher = nullptr;
 	std::atomic<uint32_t> lastEventId{0};
 	std::unordered_map<uint32_t, boost::asio::steady_timer> eventIdTimerMap;
 	boost::asio::io_context io_context;
