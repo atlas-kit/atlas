@@ -277,7 +277,7 @@ public:
 	AccountType_t getAccountType() const { return accountType; }
 	void setAccountType(AccountType_t type) { accountType = type; }
 	uint32_t getLevel() const { return level; }
-	uint8_t getLevelPercent() const { return levelPercent; }
+	uint16_t getLevelPercent() const { return levelPercent; }
 	uint32_t getMagicLevel() const { return std::max<int32_t>(0, magLevel + varStats[STAT_MAGICPOINTS]); }
 	uint32_t getSpecialMagicLevel(CombatType_t type) const
 	{
@@ -1404,7 +1404,7 @@ private:
 
 	uint8_t soul = 0;
 	std::bitset<6> blessings;
-	uint8_t levelPercent = 0;
+	uint16_t levelPercent = 0;
 	uint16_t magLevelPercent = 0;
 
 	PlayerSex_t sex = PLAYERSEX_FEMALE;
