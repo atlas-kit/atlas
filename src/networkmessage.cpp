@@ -142,7 +142,6 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x01);
