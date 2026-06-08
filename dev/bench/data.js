@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780958454315,
+  "lastUpdate": 1780960741347,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -5436,6 +5436,86 @@ window.BENCHMARK_DATA = {
             "value": 3927.5973098023264,
             "unit": "ns/iter",
             "extra": "iterations: 356182\ncpu: 3927.3476902257817 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "committer": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "id": "03f452eef854bfa60490e6d5cdb417e11384a74d",
+          "message": "fix(player): store levelPercent as basis points (0-10000) for protocol 15.24",
+          "timestamp": "2026-06-06T23:34:54Z",
+          "url": "https://github.com/atlas-kit/atlas/pull/362/commits/03f452eef854bfa60490e6d5cdb417e11384a74d"
+        },
+        "date": 1780960740299,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 472.4489828425576,
+            "unit": "ns/iter",
+            "extra": "iterations: 2956966\ncpu: 472.31897965685096 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 515.2675326802889,
+            "unit": "ns/iter",
+            "extra": "iterations: 2722359\ncpu: 515.1219971355724 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 580.6161724592338,
+            "unit": "ns/iter",
+            "extra": "iterations: 2381085\ncpu: 580.5055132429121 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 907.3965178337355,
+            "unit": "ns/iter",
+            "extra": "iterations: 1539444\ncpu: 907.184198970537 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1313.1950805521715,
+            "unit": "ns/iter",
+            "extra": "iterations: 1068128\ncpu: 1312.995778595824 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 441.8839111540625,
+            "unit": "ns/iter",
+            "extra": "iterations: 3140853\ncpu: 441.8299420571418 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 455.1088381777986,
+            "unit": "ns/iter",
+            "extra": "iterations: 3079232\ncpu: 455.04355826387894 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 668.5683109293374,
+            "unit": "ns/iter",
+            "extra": "iterations: 2099847\ncpu: 668.4915210489143 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 2180.382356970018,
+            "unit": "ns/iter",
+            "extra": "iterations: 642418\ncpu: 2180.1518294941925 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3918.7904058646745,
+            "unit": "ns/iter",
+            "extra": "iterations: 357114\ncpu: 3918.470527618627 ns\nthreads: 1"
           }
         ]
       }
