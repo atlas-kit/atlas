@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781042062395,
+  "lastUpdate": 1781042628898,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -5920,6 +5920,90 @@ window.BENCHMARK_DATA = {
             "value": 3539.080244436468,
             "unit": "ns/iter",
             "extra": "iterations: 393722\ncpu: 3538.7554187980327 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "1993083+ranisalt@users.noreply.github.com",
+            "name": "Ranieri Althoff",
+            "username": "ranisalt"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f88bae8878e8dec9a01fdce7b0a907d223faa57f",
+          "message": "fix(networkmessage): remove extra byte on add item for containers (#360)\n\n* Fix sending extra byte for containers on login\n\n* Send quiver info for id-added items\n\n* Remove invalid zero bytes",
+          "timestamp": "2026-06-09T18:54:38-03:00",
+          "tree_id": "7beec0a9c79da432260540eed1c64690b833414f",
+          "url": "https://github.com/atlas-kit/atlas/commit/f88bae8878e8dec9a01fdce7b0a907d223faa57f"
+        },
+        "date": 1781042628340,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 466.7327495699297,
+            "unit": "ns/iter",
+            "extra": "iterations: 2929840\ncpu: 466.6434310406028 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 513.5823583883537,
+            "unit": "ns/iter",
+            "extra": "iterations: 2726735\ncpu: 513.5129816428807 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 583.2211446426787,
+            "unit": "ns/iter",
+            "extra": "iterations: 2417558\ncpu: 583.1688435189557 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 905.1469469803367,
+            "unit": "ns/iter",
+            "extra": "iterations: 1548123\ncpu: 905.0697224962103 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1307.8813460192807,
+            "unit": "ns/iter",
+            "extra": "iterations: 1065215\ncpu: 1307.7906385095969 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 444.96079578479106,
+            "unit": "ns/iter",
+            "extra": "iterations: 3165680\ncpu: 444.89566001617294 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 455.52765678022973,
+            "unit": "ns/iter",
+            "extra": "iterations: 3067096\ncpu: 455.48965210087994 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 665.6739960249407,
+            "unit": "ns/iter",
+            "extra": "iterations: 2096591\ncpu: 665.6088354857952 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 2180.165417815392,
+            "unit": "ns/iter",
+            "extra": "iterations: 642724\ncpu: 2180.0167583597326 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3918.9648870389997,
+            "unit": "ns/iter",
+            "extra": "iterations: 357247\ncpu: 3918.6651784339633 ns\nthreads: 1"
           }
         ]
       }
