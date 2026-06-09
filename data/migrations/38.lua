@@ -1,5 +1,5 @@
 function onUpdateDatabase()
-    print("> Updating database to version 40 (sample players)")
+    print("> Updating database to version 39 (sample players)")
 
     db.query("INSERT INTO `accounts` (`id`, `name`, `email`, `password`, `type`) VALUES (1, 'god', '@god', '21298df8a3277357ee55b01df9530b535cf08ec1', 6)")
 
