@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780964234808,
+  "lastUpdate": 1780964545744,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -5680,6 +5680,86 @@ window.BENCHMARK_DATA = {
             "value": 3919.223370235667,
             "unit": "ns/iter",
             "extra": "iterations: 357429\ncpu: 3918.895229542094 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "committer": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "id": "8312a972fa12472a3dcf20e28e0969c27a03a452",
+          "message": "deps(actions): bump lukka/get-cmake from 4.3.2 to 4.3.3",
+          "timestamp": "2026-06-09T00:05:05Z",
+          "url": "https://github.com/atlas-kit/atlas/pull/340/commits/8312a972fa12472a3dcf20e28e0969c27a03a452"
+        },
+        "date": 1780964544747,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 399.0225110753244,
+            "unit": "ns/iter",
+            "extra": "iterations: 3174393\ncpu: 398.87737907688177 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 431.2576856568434,
+            "unit": "ns/iter",
+            "extra": "iterations: 3242501\ncpu: 431.14105253938243 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 499.59160047088454,
+            "unit": "ns/iter",
+            "extra": "iterations: 2805062\ncpu: 499.46752941646224 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 820.8189223535237,
+            "unit": "ns/iter",
+            "extra": "iterations: 1706014\ncpu: 820.7243146890938 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1236.8288795069707,
+            "unit": "ns/iter",
+            "extra": "iterations: 1130788\ncpu: 1236.6646188321772 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 359.33339131197675,
+            "unit": "ns/iter",
+            "extra": "iterations: 3892237\ncpu: 359.2931489012615 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 389.6611865922919,
+            "unit": "ns/iter",
+            "extra": "iterations: 3612968\ncpu: 389.6126594533913 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 590.7254455055632,
+            "unit": "ns/iter",
+            "extra": "iterations: 2357827\ncpu: 590.6688179412652 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 1847.5894565305525,
+            "unit": "ns/iter",
+            "extra": "iterations: 759693\ncpu: 1847.4594250572304 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3267.4435802755297,
+            "unit": "ns/iter",
+            "extra": "iterations: 428157\ncpu: 3267.2248707833774 ns\nthreads: 1"
           }
         ]
       }
