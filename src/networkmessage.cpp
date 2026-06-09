@@ -110,8 +110,12 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
-		addByte(0x00); // quiver ammo count
+		if (it.weaponType == WEAPON_QUIVER) {
+			addByte(0x01); // assigned loot container icon
+			add<uint32_t>(0); // quiver ammo count
+		} else {
+			addByte(0x00);
+		}
 	} else if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
