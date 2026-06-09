@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1780965128805,
+  "lastUpdate": 1781042062395,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -5840,6 +5840,86 @@ window.BENCHMARK_DATA = {
             "value": 3922.549795683451,
             "unit": "ns/iter",
             "extra": "iterations: 355332\ncpu: 3921.839842738625 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "committer": {
+            "name": "atlas-kit",
+            "username": "atlas-kit"
+          },
+          "id": "2855a6b22b1cb361e1f5e1e48a0c0dddc961bbfd",
+          "message": "fix(build): add /EHsc flag for MSVC exception handling support",
+          "timestamp": "2026-06-09T21:29:46Z",
+          "url": "https://github.com/atlas-kit/atlas/pull/368/commits/2855a6b22b1cb361e1f5e1e48a0c0dddc961bbfd"
+        },
+        "date": 1781042061822,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 431.6191164711889,
+            "unit": "ns/iter",
+            "extra": "iterations: 3182805\ncpu: 431.30302641852074 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 461.8375428906727,
+            "unit": "ns/iter",
+            "extra": "iterations: 3037374\ncpu: 461.69982787763377 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 516.2380307282955,
+            "unit": "ns/iter",
+            "extra": "iterations: 2716456\ncpu: 516.1663689748702 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 872.4256613841027,
+            "unit": "ns/iter",
+            "extra": "iterations: 1605081\ncpu: 872.3511978523196 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1303.674475865206,
+            "unit": "ns/iter",
+            "extra": "iterations: 1078301\ncpu: 1303.571032578103 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 391.5915191228796,
+            "unit": "ns/iter",
+            "extra": "iterations: 3558830\ncpu: 391.5640558835349 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 413.7211277446711,
+            "unit": "ns/iter",
+            "extra": "iterations: 3386192\ncpu: 413.6925953991974 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 609.5878051791493,
+            "unit": "ns/iter",
+            "extra": "iterations: 2300616\ncpu: 609.5422378180452 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 2088.5900119624685,
+            "unit": "ns/iter",
+            "extra": "iterations: 710550\ncpu: 2086.325187530786 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3539.080244436468,
+            "unit": "ns/iter",
+            "extra": "iterations: 393722\ncpu: 3538.7554187980327 ns\nthreads: 1"
           }
         ]
       }
