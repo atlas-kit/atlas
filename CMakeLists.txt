@@ -137,7 +137,7 @@ endif ()
 # Compiler Options
 # *****************************************************************************
 if (MSVC)
-    add_compile_options(/bigobj /utf-8 /MP)
+    add_compile_options(/bigobj /utf-8 /MP /EHsc)
 else ()
     add_compile_options(-Wall -Wextra -Wnon-virtual-dtor -Wno-error=old-style-cast -pedantic -Werror -pipe -fvisibility=hidden)
 endif ()

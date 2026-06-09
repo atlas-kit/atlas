@@ -245,7 +245,7 @@ public:
 			client->disconnect();
 		}
 	}
-	Connection::Address getIP() const;
+	boost::asio::ip::address getIP() const;
 
 	void addContainer(uint8_t cid, std::shared_ptr<Container> container);
 	void closeContainer(uint8_t cid) { openContainers.erase(cid); }
@@ -1345,7 +1345,7 @@ private:
 	std::chrono::steady_clock::time_point nextAction = std::chrono::steady_clock::time_point::min();
 
 	std::shared_ptr<ProtocolGame> client;
-	Connection::Address lastIP = {};
+	boost::asio::ip::address lastIP = {};
 	std::weak_ptr<Guild> guild;
 	std::weak_ptr<GuildRank> guildRank;
 	Group* group = nullptr;

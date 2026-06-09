@@ -57,19 +57,10 @@ struct TextMessage
 class ProtocolGame final : public Protocol
 {
 public:
-	// static protocol information
-	enum
-	{
-		server_sends_first = true
-	};
-	enum
-	{
-		protocol_identifier = 0
-	}; // Not required as we send first
-	enum
-	{
-		use_checksum = true
-	};
+	// Protocol traits — consumed by ServicePort for connection routing and framing.
+	static constexpr auto server_sends_first = true;
+	static constexpr uint8_t protocol_identifier = 0;
+	static constexpr auto use_checksum = true;
 	static const char* protocol_name() { return "gameworld protocol"; }
 
 	explicit ProtocolGame(std::shared_ptr<Connection> connection) : Protocol(std::move(connection)) {}

@@ -13,7 +13,7 @@
 extern Dispatcher g_dispatcher;
 extern Game g_game;
 
-std::map<Connection::Address, std::chrono::steady_clock::time_point> ipConnectMap = {};
+std::map<boost::asio::ip::address, std::chrono::steady_clock::time_point> ipConnectMap = {};
 
 enum RequestedInfo_t : uint16_t
 {
@@ -31,7 +31,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
 	const static auto acceptorAddress = boost::asio::ip::make_address(getString(ConfigManager::IP));
 
-	const auto& ip = getIP();
+	const auto& ip = getRemoteAddress();
 
 	if (!ip.is_loopback() && ip != acceptorAddress) {
 		if (auto it = ipConnectMap.find(ip);
@@ -80,7 +80,7 @@ void ProtocolStatus::sendStatusString()
 {
 	auto output = tfs::net::make_output_message();
 
-	setRawMessages(true);
+	enableRawMode();
 
 	pugi::xml_document doc;
 
@@ -111,7 +111,7 @@ void ProtocolStatus::sendStatusString()
 	uint32_t reportableOnlinePlayerCount = 0;
 	uint32_t maxPlayersPerIp = getNumber(ConfigManager::STATUS_COUNT_MAX_PLAYERS_PER_IP);
 	if (maxPlayersPerIp > 0) {
-		std::map<Connection::Address, uint32_t> playersPerIp;
+		std::map<boost::asio::ip::address, uint32_t> playersPerIp;
 		for (const auto& player : g_game.getPlayers() | tfs::views::lock_weak_ptrs) {
 			if (!player->getIP().is_unspecified()) {
 				++playersPerIp[player->getIP()];

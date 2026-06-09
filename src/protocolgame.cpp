@@ -16,6 +16,7 @@
 #include "outputmessage.h"
 #include "player.h"
 #include "podium.h"
+#include "rsa.h"
 #include "scheduler.h"
 
 extern Chat g_chat;
@@ -382,7 +383,13 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	msg.skipBytes(1); // U8 preview state
 
 	// Disconnect if RSA decrypt fails
-	if (!Protocol::RSA_decrypt(msg)) {
+	if (msg.getRemainingBufferLength() < 128) {
+		disconnect();
+		return;
+	}
+
+	tfs::rsa::decrypt(msg.getRemainingBuffer(), 128);
+	if (msg.getByte() != 0) {
 		disconnect();
 		return;
 	}
@@ -393,7 +400,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 	key[1] = msg.get<uint32_t>();
 	key[2] = msg.get<uint32_t>();
 	key[3] = msg.get<uint32_t>();
-	enableXTEAEncryption();
+	enableEncryption();
 	setXTEAKey(std::move(key));
 
 	// Web login skips the character list request so we need to check the client version again
@@ -446,7 +453,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		return;
 	}
 
-	auto ip = getIP();
+	auto ip = getRemoteAddress();
 	if (const auto& banInfo = IOBan::getIpBanInfo(ip)) {
 		disconnectClient(std::format("Your IP has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
 		                             formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
@@ -468,7 +475,7 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		return;
 	}
 
-	Connection::Address sessionIP = boost::asio::ip::make_address(result->getString("session_ip"));
+	boost::asio::ip::address sessionIP = boost::asio::ip::make_address(result->getString("session_ip"));
 	if (!sessionIP.is_loopback() && ip != sessionIP) {
 		disconnectClient("Your game session is already locked to a different IP. Please log in again.");
 		return;

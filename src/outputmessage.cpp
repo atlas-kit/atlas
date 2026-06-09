@@ -37,7 +37,7 @@ void sendAll(const std::vector<std::shared_ptr<Protocol>>& protocols)
 {
 	// dispatcher thread
 	for (auto& protocol : protocols) {
-		if (auto& msg = protocol->getCurrentBuffer()) {
+		if (auto& msg = protocol->getSendBuffer()) {
 			protocol->send(std::move(msg));
 		}
 	}

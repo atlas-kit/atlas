@@ -20,14 +20,14 @@ struct ConnectBlock
 	uint32_t count = 1;
 };
 
-bool acceptConnection(const Connection::Address& clientIP)
+bool acceptConnection(const boost::asio::ip::address& clientIP)
 {
 	static std::recursive_mutex mu;
 	std::lock_guard lock{mu};
 
 	auto currentTime = std::chrono::steady_clock::now();
 
-	static std::map<Connection::Address, ConnectBlock> ipConnectMap;
+	static std::map<boost::asio::ip::address, ConnectBlock> ipConnectMap;
 	auto it = ipConnectMap.find(clientIP);
 	if (it == ipConnectMap.end()) {
 		ipConnectMap.emplace(clientIP, ConnectBlock{.lastAttempt = currentTime});
@@ -131,7 +131,7 @@ void ServicePort::accept()
 		return;
 	}
 
-	auto connection = ConnectionManager::getInstance().createConnection(io_context, shared_from_this());
+	auto connection = connectionManager->createConnection(io_context, shared_from_this());
 	acceptor->async_accept(connection->getSocket(),
 	                       [=, thisPtr = shared_from_this()](const boost::system::error_code& error) {
 		                       thisPtr->onAccept(connection, error);
@@ -145,7 +145,7 @@ void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::
 			return;
 		}
 
-		const auto& remote_ip = connection->getIP();
+		const auto& remote_ip = connection->getRemoteAddress();
 		if (acceptConnection(remote_ip)) {
 			const auto service = services.front();
 			if (service->is_single_socket()) {
@@ -224,6 +224,8 @@ void ServicePort::open(uint16_t port)
 
 void ServicePort::close()
 {
+	connectionManager->closeAll();
+
 	if (acceptor && acceptor->is_open()) {
 		boost::system::error_code error;
 		acceptor->close(error);

@@ -1958,10 +1958,10 @@ BlockType_t Player::blockHit(const std::shared_ptr<Creature>& attacker, CombatTy
 	return blockType;
 }
 
-Connection::Address Player::getIP() const
+boost::asio::ip::address Player::getIP() const
 {
 	if (client) {
-		return client->getIP();
+		return client->getRemoteAddress();
 	}
 
 	return {};

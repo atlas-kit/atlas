@@ -60,6 +60,7 @@ private:
 	void accept();
 
 	boost::asio::io_context& io_context;
+	std::shared_ptr<ConnectionManager> connectionManager = std::make_shared<ConnectionManager>();
 	std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
 	std::vector<std::shared_ptr<ServiceBase>> services;
 

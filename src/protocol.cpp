@@ -9,44 +9,9 @@
 #include "rsa.h"
 #include "xtea.h"
 
-namespace {
-
-void XTEA_encrypt(OutputMessage& msg, const xtea::round_keys& key)
-{
-	// The message must be a multiple of 8
-	size_t paddingBytes = msg.getLength() % 8u;
-	if (paddingBytes != 0) {
-		msg.addPaddingBytes(8 - paddingBytes);
-	}
-
-	uint8_t* buffer = msg.getOutputBuffer();
-	xtea::encrypt(buffer, msg.getLength(), key);
-}
-
-bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
-{
-	if (((msg.getLength() - 6) & 7) != 0) {
-		return false;
-	}
-
-	uint8_t* buffer = msg.getRemainingBuffer();
-	xtea::decrypt(buffer, msg.getLength() - 6, key);
-
-	uint8_t paddingLength = msg.getByte();
-	uint16_t innerLength = msg.getLength() - 6 - paddingLength;
-	if (innerLength + 7 > msg.getLength()) {
-		return false;
-	}
-
-	msg.setLength(innerLength);
-	return true;
-}
-
-} // namespace
-
 Protocol::~Protocol()
 {
-	const auto zlibEndResult = deflateEnd(&zstream);
+	const auto zlibEndResult = deflateEnd(&zlibStream);
 	if (zlibEndResult == Z_DATA_ERROR) {
 		std::cout << "ZLIB discarded pending output or unprocessed input while cleaning up stream state" << std::endl;
 	} else if (zlibEndResult == Z_STREAM_ERROR) {
@@ -56,31 +21,64 @@ Protocol::~Protocol()
 
 void Protocol::onSendMessage(const std::shared_ptr<OutputMessage>& msg)
 {
-	if (!rawMessages) {
-		if (encryptionEnabled) {
-			uint32_t compressionChecksum = 0;
-			if (msg->getLength() >= 128 && deflateMessage(*msg)) {
-				compressionChecksum = 0x80000000;
-			}
-
-			msg->setSequenceId(compressionChecksum | getNextSequenceId());
-		}
-
-		if (encryptionEnabled) {
-			msg->writePaddingLength();
-			XTEA_encrypt(*msg, key);
-			msg->addCryptoHeader();
-		}
-
-		msg->writeMessageLength();
+	// Raw messages: no framing at all.
+	if (rawMode) {
+		return;
 	}
+
+	// Unencrypted: only need the block count header.
+	if (!encrypted) {
+		const auto blockCount =
+		    static_cast<uint16_t>((msg->getLength() - NetworkMessage::CHECKSUM_LENGTH) / NetworkMessage::XTEA_MULTIPLE);
+		msg->addHeader(blockCount);
+		return;
+	}
+
+	// 1. Optional zlib compression (MSB of sequenceId = 1 when compressed).
+	auto compressionFlag = 0u;
+	if (msg->getLength() >= 128 && deflateMessage(*msg)) {
+		compressionFlag = 0x80000000u;
+	}
+
+	// 2. Pad to XTEA block boundary, stash padding count as first encrypted byte.
+	const auto paddingCount =
+	    static_cast<uint8_t>(NetworkMessage::XTEA_MULTIPLE - (msg->getLength() % NetworkMessage::XTEA_MULTIPLE) - 1);
+	msg->addPaddingBytes(paddingCount);
+	msg->addHeader(paddingCount);
+
+	// 3. XTEA-encrypt in-place.
+	xtea::encrypt(msg->getOutputBuffer(), msg->getLength(), xteaKey);
+
+	// 4. Prepend sequence/checksum (u32, plaintext).
+	const auto sequenceId = compressionFlag | nextSequenceId();
+	msg->addHeader(sequenceId);
+
+	// 5. Prepend block count (u16, plaintext).
+	const auto blockCount =
+	    static_cast<uint16_t>((msg->getLength() - NetworkMessage::CHECKSUM_LENGTH) / NetworkMessage::XTEA_MULTIPLE);
+	msg->addHeader(blockCount);
 }
 
 void Protocol::onRecvMessage(NetworkMessage& msg)
 {
-	if (encryptionEnabled && !XTEA_decrypt(msg, key)) {
+	// Unencrypted: no framing to strip.
+	if (!encrypted) {
+		parsePacket(msg);
 		return;
 	}
+
+	// 1. Verify remainder after 6-byte header is whole XTEA blocks.
+	const auto encryptedLen = msg.getLength() - NetworkMessage::CRYPTO_HEADER_LENGTH;
+	if ((encryptedLen & (NetworkMessage::XTEA_MULTIPLE - 1)) != 0) {
+		return;
+	}
+
+	// 2. Decrypt in-place.
+	xtea::decrypt(msg.getRemainingBuffer(), encryptedLen, xteaKey);
+
+	// 3. Strip padding (first decrypted byte = padding count).
+	const auto paddingLength = msg.getByte();
+	msg.setLength(msg.getLength() - paddingLength);
 
 	parsePacket(msg);
 }
@@ -88,47 +86,37 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 std::shared_ptr<OutputMessage> Protocol::getOutputBuffer(int32_t size)
 {
 	// dispatcher thread
-	if (!outputBuffer) {
-		outputBuffer = tfs::net::make_output_message();
-	} else if ((outputBuffer->getLength() + size) > NetworkMessage::MAX_PROTOCOL_BODY_LENGTH) {
-		send(outputBuffer);
-		outputBuffer = tfs::net::make_output_message();
+	if (!sendBuffer) {
+		sendBuffer = tfs::net::make_output_message();
+	} else if ((sendBuffer->getLength() + size) > NetworkMessage::MAX_PROTOCOL_BODY_LENGTH) {
+		send(sendBuffer);
+		sendBuffer = tfs::net::make_output_message();
 	}
-	return outputBuffer;
-}
-
-bool Protocol::RSA_decrypt(NetworkMessage& msg)
-{
-	if (msg.getRemainingBufferLength() < RSA_BUFFER_LENGTH) {
-		return false;
-	}
-
-	tfs::rsa::decrypt(msg.getRemainingBuffer(), RSA_BUFFER_LENGTH);
-	return msg.getByte() == 0;
+	return sendBuffer;
 }
 
 bool Protocol::deflateMessage(OutputMessage& msg)
 {
 	static thread_local std::vector<uint8_t> buffer(NETWORKMESSAGE_MAXSIZE);
 
-	zstream.next_in = msg.getOutputBuffer();
-	zstream.avail_in = msg.getLength();
-	zstream.next_out = buffer.data();
-	zstream.avail_out = buffer.size();
+	zlibStream.next_in = msg.getOutputBuffer();
+	zlibStream.avail_in = msg.getLength();
+	zlibStream.next_out = buffer.data();
+	zlibStream.avail_out = buffer.size();
 
-	const auto result = deflate(&zstream, Z_FINISH);
+	const auto result = deflate(&zlibStream, Z_FINISH);
 	if (result != Z_OK && result != Z_STREAM_END) {
-		std::cout << "Error while deflating packet data error: " << (zstream.msg ? zstream.msg : "unknown")
+		std::cout << "Error while deflating packet data error: " << (zlibStream.msg ? zlibStream.msg : "unknown")
 		          << std::endl;
 		return false;
 	}
 
-	const auto size = zstream.total_out;
-	deflateReset(&zstream);
+	const auto size = zlibStream.total_out;
+	deflateReset(&zlibStream);
 
 	if (size <= 0) {
 		std::cout << "Deflated packet data had invalid size: " << size
-		          << " error: " << (zstream.msg ? zstream.msg : "unknown") << std::endl;
+		          << " error: " << (zlibStream.msg ? zlibStream.msg : "unknown") << std::endl;
 		return false;
 	}
 
@@ -138,10 +126,10 @@ bool Protocol::deflateMessage(OutputMessage& msg)
 	return true;
 }
 
-Connection::Address Protocol::getIP() const
+boost::asio::ip::address Protocol::getRemoteAddress() const
 {
 	if (auto connection = getConnection()) {
-		return connection->getIP();
+		return connection->getRemoteAddress();
 	}
 
 	return {};

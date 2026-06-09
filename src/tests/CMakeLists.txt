@@ -7,6 +7,7 @@ set(tests_SRC
     ${CMAKE_CURRENT_LIST_DIR}/test_rsa.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_sha1.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_xtea.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_connection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_scope_exit.cpp
     )
 

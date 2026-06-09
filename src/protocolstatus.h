@@ -9,19 +9,10 @@
 class ProtocolStatus final : public Protocol
 {
 public:
-	// static protocol information
-	enum
-	{
-		server_sends_first = false
-	};
-	enum
-	{
-		protocol_identifier = 0xFF
-	};
-	enum
-	{
-		use_checksum = false
-	};
+	// Protocol traits — consumed by ServicePort for connection routing and framing.
+	static constexpr auto server_sends_first = false;
+	static constexpr uint8_t protocol_identifier = 0xFF;
+	static constexpr auto use_checksum = false;
 	static const char* protocol_name() { return "status protocol"; }
 
 	explicit ProtocolStatus(std::shared_ptr<Connection> connection) : Protocol(std::move(connection)) {}
