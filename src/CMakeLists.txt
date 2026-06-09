@@ -198,3 +198,7 @@ target_precompile_headers(tfs PUBLIC otpch.h)
 if (BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+if (BUILD_BENCHMARKING)
+    add_subdirectory(benchs)
+endif()

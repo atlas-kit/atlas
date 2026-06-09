@@ -61,6 +61,17 @@
       }
     },
     {
+      "name": "windows-release-benchmarks",
+      "inherits": "windows-release",
+      "displayName": "Windows - Release (with benchmarks)",
+      "description": "Windows Release build with benchmarks enabled",
+      "cacheVariables": {
+        "BUILD_BENCHMARKING": "ON",
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-windows-static-release-benchmarks"
+      }
+    },
+    {
       "name": "windows-release-asan",
       "inherits": "windows-release",
       "displayName": "Windows - Release + ASAN",
@@ -114,6 +125,17 @@
       }
     },
     {
+      "name": "linux-release-benchmarks",
+      "inherits": "linux-release",
+      "displayName": "Linux - Release (with benchmarks)",
+      "description": "Linux Release build with benchmarks enabled",
+      "cacheVariables": {
+        "BUILD_BENCHMARKING": "ON",
+        "BUILD_TESTING": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed/x64-linux-benchmarks"
+      }
+    },
+    {
       "name": "linux-debug-asan",
       "inherits": "linux-debug",
       "displayName": "Linux - Debug + ASAN",
@@ -149,6 +171,10 @@
       "configurePreset": "windows-release-tests"
     },
     {
+      "name": "windows-release-benchmarks",
+      "configurePreset": "windows-release-benchmarks"
+    },
+    {
       "name": "windows-release-asan",
       "configurePreset": "windows-release-asan"
     },
@@ -163,6 +189,10 @@
     {
       "name": "linux-release-tests",
       "configurePreset": "linux-release-tests"
+    },
+    {
+      "name": "linux-release-benchmarks",
+      "configurePreset": "linux-release-benchmarks"
     },
     {
       "name": "linux-debug-asan",
@@ -199,6 +229,11 @@
       "name": "linux-release-tests",
       "inherits": "base",
       "configurePreset": "linux-release-tests"
+    },
+    {
+      "name": "linux-release-benchmarks",
+      "inherits": "base",
+      "configurePreset": "linux-release-benchmarks"
     },
     {
       "name": "linux-debug-asan",
