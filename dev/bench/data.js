@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781125153374,
+  "lastUpdate": 1781129416347,
   "repoUrl": "https://github.com/atlas-kit/atlas",
   "entries": {
     "Benchmark": [
@@ -6482,6 +6482,168 @@ window.BENCHMARK_DATA = {
             "value": 332428.7425249376,
             "unit": "ns/iter",
             "extra": "iterations: 4214\ncpu: 332404.43213099166 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "luanluciano93@gmail.com",
+            "name": "Luan Luciano",
+            "username": "luanluciano93"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cce37a5f541559a7ab8d5142291b36e88b371833",
+          "message": "fix(benchs): correct XTEA benchmark throughput metric and max range (#372)",
+          "timestamp": "2026-06-11T00:00:39+02:00",
+          "tree_id": "fdca87ffcc65ce5d44bdbc3131c93ea365f1d94d",
+          "url": "https://github.com/atlas-kit/atlas/commit/cce37a5f541559a7ab8d5142291b36e88b371833"
+        },
+        "date": 1781129415878,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "bench_base64_encode/1",
+            "value": 438.42405285799214,
+            "unit": "ns/iter",
+            "extra": "iterations: 3120361\ncpu: 438.26576059628997 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/8",
+            "value": 511.1872037287144,
+            "unit": "ns/iter",
+            "extra": "iterations: 2720058\ncpu: 511.06968086709907 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/64",
+            "value": 562.5771689240918,
+            "unit": "ns/iter",
+            "extra": "iterations: 2489195\ncpu: 562.4139659608828 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/512",
+            "value": 917.6634030028138,
+            "unit": "ns/iter",
+            "extra": "iterations: 1531612\ncpu: 917.116125363343 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_encode/1024",
+            "value": 1341.789315954115,
+            "unit": "ns/iter",
+            "extra": "iterations: 1043088\ncpu: 1341.6420349960883 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1",
+            "value": 430.69740510928614,
+            "unit": "ns/iter",
+            "extra": "iterations: 3259328\ncpu: 430.62830190763265 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/8",
+            "value": 447.9377167664214,
+            "unit": "ns/iter",
+            "extra": "iterations: 3127214\ncpu: 447.9016181815512 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/64",
+            "value": 647.4323794731449,
+            "unit": "ns/iter",
+            "extra": "iterations: 2170968\ncpu: 647.3898109046289 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/512",
+            "value": 2005.852831643821,
+            "unit": "ns/iter",
+            "extra": "iterations: 697616\ncpu: 2005.7107749822255 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_base64_decode/1024",
+            "value": 3597.0209892295543,
+            "unit": "ns/iter",
+            "extra": "iterations: 391820\ncpu: 3592.0605201367994 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_expand_key",
+            "value": 28.21779937078987,
+            "unit": "ns/iter",
+            "extra": "iterations: 49494817\ncpu: 28.213616811635045 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/8",
+            "value": 112.48918072351131,
+            "unit": "ns/iter",
+            "extra": "iterations: 12442283\ncpu: 112.4759215812725 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/64",
+            "value": 389.4871289277058,
+            "unit": "ns/iter",
+            "extra": "iterations: 3594650\ncpu: 389.45446455148624 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/512",
+            "value": 3025.4048746979224,
+            "unit": "ns/iter",
+            "extra": "iterations: 462921\ncpu: 3025.2447674657233 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/4096",
+            "value": 24071.13054318324,
+            "unit": "ns/iter",
+            "extra": "iterations: 58157\ncpu: 24069.940557456557 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/32768",
+            "value": 192859.6798076914,
+            "unit": "ns/iter",
+            "extra": "iterations: 7280\ncpu: 192844.58420329657 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_encrypt/65496",
+            "value": 397880.55372840224,
+            "unit": "ns/iter",
+            "extra": "iterations: 3527\ncpu: 397842.39013325796 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/8",
+            "value": 112.47112220277631,
+            "unit": "ns/iter",
+            "extra": "iterations: 12435765\ncpu: 112.46104739032943 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/64",
+            "value": 400.8050658251509,
+            "unit": "ns/iter",
+            "extra": "iterations: 3492738\ncpu: 400.75994964408983 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/512",
+            "value": 2928.315689148193,
+            "unit": "ns/iter",
+            "extra": "iterations: 478968\ncpu: 2927.876689048122 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/4096",
+            "value": 23527.126335573692,
+            "unit": "ns/iter",
+            "extra": "iterations: 59057\ncpu: 23525.624599962724 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/32768",
+            "value": 186828.7495329649,
+            "unit": "ns/iter",
+            "extra": "iterations: 7494\ncpu: 186816.14478249266 ns\nthreads: 1"
+          },
+          {
+            "name": "bench_xtea_decrypt/65496",
+            "value": 382845.0576187865,
+            "unit": "ns/iter",
+            "extra": "iterations: 3662\ncpu: 382804.4123429824 ns\nthreads: 1"
           }
         ]
       }
