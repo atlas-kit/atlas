@@ -19,6 +19,10 @@ Outfits = {
     -- Cooldown (ms) enforced for manual mount toggles (Ctrl+R). Forced zone toggles may bypass this.
     ToggleMountCooldown = 3000,
 
+    -- Show the special Gamemaster outfit (lookType 75) in outfit windows for staff members.
+    -- Disabled by default because it can crash with mount and random outfit behavior.
+    EnableGamemasterOutfit = false,
+
     -- Print outfit/mount command usage to console.
     PrintCommandsToConsole = true
 }

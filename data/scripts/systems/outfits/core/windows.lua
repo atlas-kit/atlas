@@ -15,14 +15,12 @@ local function getAvailableOutfits(player)
     local availableOutfits = {}
 
     local isAccessPlayer = player:getGroup():getAccess()
-    if isAccessPlayer then
-        -- Add GM outfit for staff members.
-        local gamemaster = {
+    if Outfits.EnableGamemasterOutfit and isAccessPlayer then
+        table.insert(availableOutfits, {
             name = "Gamemaster",
             lookType = 75,
             addons = 0
-        }
-        table.insert(availableOutfits, gamemaster)
+        })
     end
 
     local outfits = Game.getOutfits(player:getSex())
