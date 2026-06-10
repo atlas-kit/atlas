@@ -47,17 +47,17 @@
 		<voice sentence="Come kiss the cook!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="82053" countmax="40" />
-		<item id="2671" name="ham" chance="20794" />
-		<item id="1294" name="small stone" chance="10397" countmax="3" />
-		<item id="2406" name="short sword" chance="7946" />
-		<item id="10575" name="frost giant pelt" chance="4953" />
+		<item id="3031" name="gold coin" chance="82053" countmax="40" />
+		<item id="3582" name="ham" chance="20794" />
+		<item id="1781" name="small stone" chance="10397" countmax="3" />
+		<item id="3294" name="short sword" chance="7946" />
+		<item id="9658" name="frost giant pelt" chance="4953" />
 		<item id="7441" name="ice cube" chance="2093" />
-		<item id="2513" name="battle shield" chance="1532" />
-		<item id="7620" name="mana potion" chance="945" />
+		<item id="3413" name="battle shield" chance="1532" />
+		<item id="268" name="mana potion" chance="945" />
 		<item id="7460" name="norse shield" chance="287" />
-		<item id="2490" name="dark helmet" chance="172" />
+		<item id="3384" name="dark helmet" chance="172" />
 		<item id="7290" name="shard" chance="102" />
-		<item id="2209" name="club ring" chance="70" />
+		<item id="3093" name="club ring" chance="70" />
 	</loot>
 </monster>

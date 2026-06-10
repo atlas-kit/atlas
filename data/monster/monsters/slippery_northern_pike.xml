@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Slippery Northern Pike" nameDescription="a slippery northern pike" race="blood" experience="0" speed="310">
 	<health now="100" max="100" />
-	<look type="454" corpse="2669" />
+	<look type="454" corpse="3580" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />

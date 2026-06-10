@@ -24,6 +24,6 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="9114" name="bulb of garlic" chance="4959" />
+		<item id="8197" name="bulb of garlic" chance="4959" />
 	</loot>
 </monster>

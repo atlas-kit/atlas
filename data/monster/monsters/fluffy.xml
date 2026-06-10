@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fluffy" nameDescription="Fluffy" race="blood" experience="3550" speed="310">
 	<health now="4500" max="4500" />
-	<look type="240" corpse="6332" />
+	<look type="240" corpse="6331" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -42,10 +42,10 @@
 	<loot>
 		<item name="gold coin" countmax="100" chance="100000" />
 		<item name="gold coin" countmax="20" chance="100000" />
-		<item id="2230" name="bone" chance="25000" />
+		<item id="3115" name="bone" chance="25000" />
 		<item name="spike sword" chance="2500" />
 		<item name="knight axe" chance="2857" />
-		<item id="2671" name="ham" countmax="8" chance="50000" />
+		<item id="3582" name="ham" countmax="8" chance="50000" />
 		<item name="soul orb" chance="5555" />
 		<item name="demonic essence" chance="7200" />
 		<item id="6558" name="flask of demonic blood" chance="8888" />

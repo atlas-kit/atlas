@@ -38,15 +38,15 @@
 		<voice sentence="KRAK ORRRRRRK!" yell="1" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="54944" countmax="25" />
-		<item id="12433" name="orcish gear" chance="10397" />
-		<item id="2671" name="ham" chance="9754" />
-		<item id="2381" name="halberd" chance="6943" />
-		<item id="2378" name="battle axe" chance="5740" />
-		<item id="3965" name="hunting spear" chance="4968" />
-		<item id="12435" name="orc leather" chance="4144" />
-		<item id="11113" name="orc tooth" chance="2763" />
-		<item id="2464" name="chain armor" chance="982" />
-		<item id="2044" name="lamp" chance="840" />
+		<item id="3031" name="gold coin" chance="54944" countmax="25" />
+		<item id="11477" name="orcish gear" chance="10397" />
+		<item id="3582" name="ham" chance="9754" />
+		<item id="3269" name="halberd" chance="6943" />
+		<item id="3266" name="battle axe" chance="5740" />
+		<item id="3347" name="hunting spear" chance="4968" />
+		<item id="11479" name="orc leather" chance="4144" />
+		<item id="10196" name="orc tooth" chance="2763" />
+		<item id="3358" name="chain armor" chance="982" />
+		<item id="2914" name="lamp" chance="840" />
 	</loot>
 </monster>

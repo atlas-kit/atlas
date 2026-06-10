@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Weakened Frazzlemaw" nameDescription="a weakened frazzlemaw" race="blood" experience="1000" speed="300" raceId="1442">
 	<health now="1200" max="1200" />
-	<look type="594" corpse="22567" />
+	<look type="594" corpse="20233" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -57,24 +57,24 @@
 		<voice sentence="Mmmwhamwhamwhah, mwaaah!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="100" />
-		<item id="2152" name="platinum coin" chance="60501" />
-		<item id="28350" name="fairy wings" chance="15066" />
-		<item id="2229" name="skull (item)" chance="12013" />
-		<item id="22532" name="frazzle tongue" chance="11712" />
-		<item id="22533" name="frazzle skin" chance="10220" />
-		<item id="2230" name="bone" chance="9994" />
-		<item id="7590" name="great mana potion" chance="9899" countmax="3" />
-		<item id="7591" name="great health potion" chance="9876" countmax="2" />
-		<item id="2240" name="remains of a fish" chance="9830" />
-		<item id="2667" name="fish" chance="6483" countmax="3" />
-		<item id="2671" name="ham" chance="6090" />
-		<item id="2231" name="big bone" chance="5301" />
+		<item id="3031" name="gold coin" chance="100000" countmax="100" />
+		<item id="3035" name="platinum coin" chance="60501" />
+		<item id="25694" name="fairy wings" chance="15066" />
+		<item id="3114" name="skull (item)" chance="12013" />
+		<item id="20198" name="frazzle tongue" chance="11712" />
+		<item id="20199" name="frazzle skin" chance="10220" />
+		<item id="3115" name="bone" chance="9994" />
+		<item id="238" name="great mana potion" chance="9899" countmax="3" />
+		<item id="239" name="great health potion" chance="9876" countmax="2" />
+		<item id="3125" name="remains of a fish" chance="9830" />
+		<item id="3578" name="fish" chance="6483" countmax="3" />
+		<item id="3582" name="ham" chance="6090" />
+		<item id="3116" name="big bone" chance="5301" />
 		<item id="5895" name="fish fin" chance="5040" />
-		<item id="2225" name="piece of iron" chance="4902" />
+		<item id="3110" name="piece of iron" chance="4902" />
 		<item id="5880" name="iron ore" chance="2746" />
 		<item id="7418" name="nightmare blade" chance="347" />
-		<item id="11306" name="sai" chance="298" />
-		<item id="22396" name="cluster of solace" chance="190" />
+		<item id="10389" name="sai" chance="298" />
+		<item id="20062" name="cluster of solace" chance="190" />
 	</loot>
 </monster>

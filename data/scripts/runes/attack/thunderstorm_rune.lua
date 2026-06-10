@@ -21,7 +21,7 @@ end
 spell:group("attack")
 spell:id(117)
 spell:name("Thunderstorm Rune")
-spell:runeId(2315)
+spell:runeId(3202)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(28)

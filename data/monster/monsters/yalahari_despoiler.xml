@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Yalahari Despoiler" nameDescription="a yalahari despoiler" race="blood" experience="200" speed="250">
 	<health now="10000" max="10000" />
-	<look type="309" corpse="20550" />
+	<look type="309" corpse="18269" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

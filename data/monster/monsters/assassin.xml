@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Assassin" nameDescription="an assassin" race="blood" experience="105" speed="224" manacost="450" raceId="224">
 	<health now="175" max="175" />
-	<look type="152" head="95" body="95" legs="95" feet="95" addons="3" corpse="20327" />
+	<look type="152" head="95" body="95" legs="95" feet="95" addons="3" corpse="18046" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -49,7 +49,7 @@
 	</voices>
 	<loot>
 		<item name="gold coin" countmax="50" chance="83000" />
-		<item id="2050" countmax="2" chance="30000" /><!-- torch -->
+		<item id="2920" countmax="2" chance="30000" /><!-- torch -->
 		<item name="knife" chance="9800" />
 		<item name="Throwing Star" countmax="14" chance="7000" />
 		<item name="viper star" countmax="7" chance="4200" />

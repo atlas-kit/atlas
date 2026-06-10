@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Smuggler Baron Silvertoe" nameDescription="Smuggler Baron Silvertoe" race="blood" experience="170" speed="400">
 	<health now="280" max="280" />
-	<look type="134" head="38" body="0" legs="94" feet="95" addons="0" corpse="20506" />
+	<look type="134" head="38" body="0" legs="94" feet="95" addons="0" corpse="18225" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -43,16 +43,16 @@
 		<voice sentence="I expect you to die!" />
 	</voices>
 	<loot>
-		<item id="2148" countmax="30" chance="80000" />	<!-- gold coin -->
-		<item id="2050" countmax="2" chance="30200" />	<!-- torch -->
-		<item id="2649" chance="14000" />				<!-- leather legs -->
-		<item id="2671" chance="10000" />				<!-- ham -->
-		<item id="2406" chance="10000" />				<!-- short sword -->
-		<item id="2461" chance="10000" />				<!-- leather helmet -->
-		<item id="2403" chance="10000" />				<!-- knife -->
-		<item id="2376" chance="5000" />					<!-- sword -->
-		<item id="8840" countmax="5" chance="5000" />	<!-- raspberries -->
-		<item id="2404" chance="4000" />					<!-- combat knife -->
+		<item id="3031" countmax="30" chance="80000" />	<!-- gold coin -->
+		<item id="2920" countmax="2" chance="30200" />	<!-- torch -->
+		<item id="3559" chance="14000" />				<!-- leather legs -->
+		<item id="3582" chance="10000" />				<!-- ham -->
+		<item id="3294" chance="10000" />				<!-- short sword -->
+		<item id="3355" chance="10000" />				<!-- leather helmet -->
+		<item id="3291" chance="10000" />				<!-- knife -->
+		<item id="3264" chance="5000" />					<!-- sword -->
+		<item id="8012" countmax="5" chance="5000" />	<!-- raspberries -->
+		<item id="3292" chance="4000" />					<!-- combat knife -->
 		<item id="7397" chance="110" />					<!-- deer trophy -->
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="General Murius" nameDescription="General Murius" race="blood" experience="450" speed="240">
 	<health now="550" max="550" />
-	<look type="611" corpse="23462" />
+	<look type="611" corpse="21091" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -44,19 +44,19 @@
 		<voice sentence="Guards!" />
 	</voices>
 	<loot>
-		<item id="12428" name="minotaur horn" chance="100000" countmax="2" />
+		<item id="11472" name="minotaur horn" chance="100000" countmax="2" />
 		<item id="5878" name="minotaur leather" chance="100000" />
-		<item id="2148" name="gold coin" chance="93333" countmax="97" />
-		<item id="2152" name="platinum coin" chance="93333" countmax="3" />
-		<item id="2387" name="double axe" chance="80000" />
-		<item id="2465" name="brass armor" chance="66667" />
-		<item id="2513" name="battle shield" chance="33333" />
+		<item id="3031" name="gold coin" chance="93333" countmax="97" />
+		<item id="3035" name="platinum coin" chance="93333" countmax="3" />
+		<item id="3275" name="double axe" chance="80000" />
+		<item id="3359" name="brass armor" chance="66667" />
+		<item id="3413" name="battle shield" chance="33333" />
 		<item id="7363" name="piercing bolt" chance="33333" countmax="11" />
-		<item id="2666" name="meat" chance="26667" />
-		<item id="2648" name="chain legs" chance="20000" />
+		<item id="3577" name="meat" chance="26667" />
+		<item id="3558" name="chain legs" chance="20000" />
 		<item id="7401" name="minotaur trophy" chance="20000" />
-		<item id="2547" name="power bolt" chance="20000" countmax="7" />
-		<item id="2580" name="fishing rod" chance="6667" />
-		<item id="7588" name="strong health potion" chance="6667" />
+		<item id="3450" name="power bolt" chance="20000" countmax="7" />
+		<item id="3483" name="fishing rod" chance="6667" />
+		<item id="236" name="strong health potion" chance="6667" />
 	</loot>
 </monster>

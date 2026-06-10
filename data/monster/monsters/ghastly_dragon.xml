@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ghastly Dragon" nameDescription="a ghastly dragon" race="undead" experience="4600" speed="320" raceId="643">
 	<health now="7800" max="7800" />
-	<look type="351" corpse="11362" />
+	<look type="351" corpse="10445" />
 	<targetchange interval="4000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -69,7 +69,7 @@
 		<item name="terra boots" chance="9510" />
 		<item name="great spirit potion" countmax="2" chance="29460" />
 		<item name="ultimate health potion" chance="24700" />
-		<item id="9810" chance="180" /><!-- rusty armor (rare) -->
+		<item id="8896" chance="180" /><!-- rusty armor (rare) -->
 		<item name="shiny stone" chance="860" />
 		<item name="guardian boots" chance="200" />
 		<item name="Zaoan armor" chance="870" />

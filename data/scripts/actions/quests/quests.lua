@@ -1,6 +1,6 @@
 local action = Action()
 
-local annihilatorReward = {1990, 2400, 2431, 2494}
+local annihilatorReward = {2856, 3288, 3319, 3388}
 
 function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if item.uid <= 1250 or item.uid >= 30000 then
@@ -18,7 +18,7 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 		if not player:getStorageValue(PlayerStorageKeys.annihilatorReward) then
 			if playerCap >= itemWeight then
 				if item.uid == 1990 then
-					player:addItem(1990, 1):addItem(2326, 1)
+					player:addItem(2856, 1):addItem(3213, 1)
 				else
 					player:addItem(item.uid, 1)
 				end
@@ -47,5 +47,5 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	return true
 end
 
-action:id(1740, 1747, 1748, 1749)
+action:id(2472, 2480, 2481, 2482)
 action:register()

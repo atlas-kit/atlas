@@ -23,6 +23,6 @@
 	<loot>
 		<item name="meat" countmax="2" chance="85000" />
 		<item name="silky fur" chance="30000" />
-		<item id="2684" chance="10000" /><!-- carrot -->
+		<item id="3595" chance="10000" /><!-- carrot -->
 	</loot>
 </monster>

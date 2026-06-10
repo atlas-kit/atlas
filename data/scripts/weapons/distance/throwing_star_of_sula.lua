@@ -1,4 +1,4 @@
 local weapon = Weapon(WEAPON_DISTANCE)
-weapon:id(25526)
+weapon:id(22870)
 weapon:breakChance(10)
 weapon:register()

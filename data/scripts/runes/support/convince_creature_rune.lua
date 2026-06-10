@@ -40,7 +40,7 @@ end
 spell:group("support")
 spell:id(12)
 spell:name("Convince Creature Rune")
-spell:runeId(2290)
+spell:runeId(3177)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(16)

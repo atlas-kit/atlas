@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Energy Overlord" nameDescription="an Energy Overlord" race="undead" experience="2800" speed="290">
 	<health now="4000" max="4000" />
-	<look type="290" corpse="8966" />
+	<look type="290" corpse="8138" />
 	<targetchange interval="20000" chance="15" />
 	<flags>
 		<flag summonable="0" />

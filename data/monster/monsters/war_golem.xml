@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="War Golem" nameDescription="a war golem" race="energy" experience="2750" speed="240" raceId="533">
 	<health now="4300" max="4300" />
-	<look type="326" corpse="10005" />
+	<look type="326" corpse="9092" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -79,8 +79,8 @@
 		<item name="lightning boots" chance="90" />
 		<item name="nail" countmax="5" chance="5260" />
 		<item name="ultimate health potion" chance="10080" />
-		<item id="9809" chance="260" /><!-- rusty armor (semi-rare) -->
-		<item id="9978" chance="1080" /><!-- crystal pedestal -->
+		<item id="8895" chance="260" /><!-- rusty armor (semi-rare) -->
+		<item id="9065" chance="1080" /><!-- crystal pedestal -->
 		<item name="crystal of power" chance="130" />
 	</loot>
 </monster>

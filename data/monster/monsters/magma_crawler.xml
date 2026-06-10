@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Magma Crawler" nameDescription="a magma crawler" race="fire" experience="2700" speed="220" raceId="885">
 	<health now="4800" max="4800" />
-	<look type="492" corpse="17336" />
+	<look type="492" corpse="15991" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -74,7 +74,7 @@
 		<item name="magma boots" chance="1820" />
 		<item name="wand of draconia" chance="4280" />
 		<item name="fiery heart" chance="7810" />
-		<item id="13757" chance="1675" /><!-- coal -->
+		<item id="12600" chance="1675" /><!-- coal -->
 		<item name="crystalline arrow" countmax="10" chance="5950" />
 		<item name="wand of everblazing" chance="690" />
 		<item name="blue crystal shard" countmax="2" chance="3930" />

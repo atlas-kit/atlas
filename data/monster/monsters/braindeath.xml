@@ -70,17 +70,17 @@
 		<voice sentence="You will be punished!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="99448" countmax="90" />
-		<item id="2450" name="bone sword" chance="14985" />
+		<item id="3031" name="gold coin" chance="99448" countmax="90" />
+		<item id="3338" name="bone sword" chance="14985" />
 		<item id="7364" name="sniper arrow" chance="9593" countmax="4" />
-		<item id="2509" name="steel shield" chance="5899" />
-		<item id="10580" name="piece of dead brain" chance="5041" />
+		<item id="3409" name="steel shield" chance="5899" />
+		<item id="9663" name="piece of dead brain" chance="5041" />
 		<item id="5898" name="bonelord eye" chance="2967" />
-		<item id="2423" name="clerical mace" chance="1965" />
+		<item id="3311" name="clerical mace" chance="1965" />
 		<item id="7407" name="haunted blade" chance="1446" />
-		<item id="2175" name="spellbook" chance="958" />
+		<item id="3059" name="spellbook" chance="958" />
 		<item id="7452" name="spiked squelcher" chance="178" />
-		<item id="2518" name="bonelord shield" chance="102" />
-		<item id="3972" name="bonelord helmet" chance="99" />
+		<item id="3418" name="bonelord shield" chance="102" />
+		<item id="3408" name="bonelord helmet" chance="99" />
 	</loot>
 </monster>

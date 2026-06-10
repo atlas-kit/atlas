@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Count" nameDescription="The Count" race="undead" experience="450" speed="370">
 	<health now="1250" max="1250" />
-	<look type="287" corpse="8937" />
+	<look type="287" corpse="8109" />
 	<targetchange interval="5000" chance="10" />
 	<flags>
 		<flag summonable="0" />

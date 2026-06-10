@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Madareth" nameDescription="Madareth" race="fire" experience="10000" speed="330">
 	<health now="75000" max="75000" />
-	<look type="12" head="77" body="78" legs="100" feet="79" corpse="8721" />
+	<look type="12" head="77" body="78" legs="100" feet="79" corpse="7893" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -55,47 +55,47 @@
 		<voice sentence="You will all die!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="100" />
-		<item id="9813" name="slightly rusted legs" chance="59259" />
-		<item id="9810" name="slightly rusted armor" chance="40741" />
+		<item id="3031" name="gold coin" chance="100000" countmax="100" />
+		<item id="8899" name="slightly rusted legs" chance="59259" />
+		<item id="8896" name="slightly rusted armor" chance="40741" />
 		<item id="7443" name="bullseye potion" chance="37037" />
-		<item id="7591" name="great health potion" chance="29630" />
-		<item id="8472" name="great spirit potion" chance="27778" />
+		<item id="239" name="great health potion" chance="29630" />
+		<item id="7642" name="great spirit potion" chance="27778" />
 		<item id="7439" name="berserk potion" chance="25926" />
 		<item id="7440" name="mastermind potion" chance="25926" />
-		<item id="7590" name="great mana potion" chance="22222" />
-		<item id="6300" name="death ring" chance="20370" />
-		<item id="2152" name="platinum coin" chance="20370" countmax="26" />
-		<item id="8473" name="ultimate health potion" chance="20370" />
-		<item id="8912" name="springsprout rod" chance="18519" />
+		<item id="238" name="great mana potion" chance="22222" />
+		<item id="6299" name="death ring" chance="20370" />
+		<item id="3035" name="platinum coin" chance="20370" countmax="26" />
+		<item id="7643" name="ultimate health potion" chance="20370" />
+		<item id="8084" name="springsprout rod" chance="18519" />
 		<item id="7404" name="assassin dagger" chance="16667" />
-		<item id="2072" name="lute" chance="16667" />
-		<item id="2377" name="two handed sword" chance="16667" />
-		<item id="2208" name="axe ring" chance="14815" />
-		<item id="2183" name="hailstorm rod" chance="14815" />
+		<item id="2950" name="lute" chance="16667" />
+		<item id="3265" name="two handed sword" chance="16667" />
+		<item id="3092" name="axe ring" chance="14815" />
+		<item id="3067" name="hailstorm rod" chance="14815" />
 		<item id="7418" name="nightmare blade" chance="14815" />
-		<item id="8910" name="underworld rod" chance="14815" />
-		<item id="2187" name="wand of inferno" chance="14815" />
+		<item id="8082" name="underworld rod" chance="14815" />
+		<item id="3071" name="wand of inferno" chance="14815" />
 		<item id="7416" name="bloody edge" chance="12963" />
-		<item id="2209" name="club ring" chance="12963" />
+		<item id="3093" name="club ring" chance="12963" />
 		<item id="7407" name="haunted blade" chance="12963" />
-		<item id="2071" name="lyre" chance="12963" />
-		<item id="2214" name="ring of healing" chance="12963" />
-		<item id="8922" name="wand of voodoo" chance="12963" />
-		<item id="6500" name="demonic essence" chance="11111" />
-		<item id="3953" name="war drum" chance="11111" />
-		<item id="2079" name="war horn" chance="11111" />
+		<item id="2949" name="lyre" chance="12963" />
+		<item id="3098" name="ring of healing" chance="12963" />
+		<item id="8094" name="wand of voodoo" chance="12963" />
+		<item id="6499" name="demonic essence" chance="11111" />
+		<item id="2966" name="war drum" chance="11111" />
+		<item id="2958" name="war horn" chance="11111" />
 		<item id="7449" name="crystal sword" chance="9259" />
-		<item id="2168" name="life ring" chance="9259" />
-		<item id="2169" name="time ring" chance="9259" />
+		<item id="3052" name="life ring" chance="9259" />
+		<item id="3053" name="time ring" chance="9259" />
 		<item id="5954" name="demon horn" chance="7407" countmax="2" />
-		<item id="3952" name="didgeridoo" chance="7407" />
+		<item id="2965" name="didgeridoo" chance="7407" />
 		<item id="7383" name="relic sword" chance="7407" />
-		<item id="8920" name="wand of starstorm" chance="7407" />
+		<item id="8092" name="wand of starstorm" chance="7407" />
 		<item id="7386" name="mercenary sword" chance="5556" />
-		<item id="2070" name="wooden flute" chance="5556" />
-		<item id="2213" name="dwarven ring" chance="3704" />
-		<item id="2396" name="ice rapier" chance="3704" />
-		<item id="2207" name="sword ring" chance="3704" />
+		<item id="2948" name="wooden flute" chance="5556" />
+		<item id="3097" name="dwarven ring" chance="3704" />
+		<item id="3284" name="ice rapier" chance="3704" />
+		<item id="3091" name="sword ring" chance="3704" />
 	</loot>
 </monster>

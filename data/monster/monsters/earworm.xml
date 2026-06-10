@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Earworm" nameDescription="an earworm" race="blood" experience="2000" speed="155">
 	<health now="4000" max="4000" />
-	<look type="26" corpse="34318" />
+	<look type="26" corpse="31662" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -37,16 +37,16 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" />
-		<item id="18437" name="envenomed arrow" chance="56948" countmax="47" />
-		<item id="10609" name="lump of dirt" chance="10023" />
-		<item id="7887" name="terra amulet" chance="5011" />
-		<item id="7903" name="terra hood" chance="4328" />
-		<item id="7850" name="earth arrow" chance="4100" countmax="21" />
-		<item id="34012" name="green memory shard" chance="3645" />
-		<item id="34011" name="violet memory shard" chance="3645" />
-		<item id="34010" name="blue memory shard" chance="3189" />
-		<item id="10219" name="sacred tree amulet" chance="2278" />
-		<item id="3976" name="worm" chance="911" countmax="3" />
+		<item id="3035" name="platinum coin" chance="100000" />
+		<item id="16143" name="envenomed arrow" chance="56948" countmax="47" />
+		<item id="9692" name="lump of dirt" chance="10023" />
+		<item id="814" name="terra amulet" chance="5011" />
+		<item id="830" name="terra hood" chance="4328" />
+		<item id="774" name="earth arrow" chance="4100" countmax="21" />
+		<item id="31356" name="green memory shard" chance="3645" />
+		<item id="31355" name="violet memory shard" chance="3645" />
+		<item id="31354" name="blue memory shard" chance="3189" />
+		<item id="9302" name="sacred tree amulet" chance="2278" />
+		<item id="3492" name="worm" chance="911" countmax="3" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fiery Blood" nameDescription="a fiery blood" race="undead" experience="0" speed="150">
 	<health now="25000" max="25000" />
-	<look type="49" corpse="8964" />
+	<look type="49" corpse="8136" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="1" />

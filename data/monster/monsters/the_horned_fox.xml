@@ -54,17 +54,17 @@
 	</voices>
 	<loot>
 		<item id="5804" name="nose ring" chance="100000" />
-		<item id="2148" name="gold coin" chance="96875" countmax="99" />
+		<item id="3031" name="gold coin" chance="96875" countmax="99" />
 		<item id="5878" name="minotaur leather" chance="96875" />
-		<item id="12428" name="minotaur horn" chance="93750" countmax="2" />
-		<item id="12438" name="piece of warrior armor" chance="81250" />
+		<item id="11472" name="minotaur horn" chance="93750" countmax="2" />
+		<item id="11482" name="piece of warrior armor" chance="81250" />
 		<item id="7363" name="piercing bolt" chance="46875" countmax="14" />
-		<item id="2465" name="brass armor" chance="28125" />
-		<item id="2666" name="meat" chance="15625" />
-		<item id="2513" name="battle shield" chance="12500" />
-		<item id="2502" name="dwarven helmet" chance="9375" />
-		<item id="7588" name="strong health potion" chance="9375" />
-		<item id="2580" name="fishing rod" chance="6250" />
-		<item id="2387" name="double axe" chance="3125" />
+		<item id="3359" name="brass armor" chance="28125" />
+		<item id="3577" name="meat" chance="15625" />
+		<item id="3413" name="battle shield" chance="12500" />
+		<item id="3396" name="dwarven helmet" chance="9375" />
+		<item id="236" name="strong health potion" chance="9375" />
+		<item id="3483" name="fishing rod" chance="6250" />
+		<item id="3275" name="double axe" chance="3125" />
 	</loot>
 </monster>

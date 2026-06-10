@@ -51,16 +51,16 @@
 		<voice sentence="Grak brrretz gulu." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="89750" countmax="5" />
-		<item id="2686" name="corncob" chance="10877" countmax="2" />
-		<item id="12408" name="broken shamanic staff" chance="10161" />
-		<item id="2464" name="chain armor" chance="8658" />
-		<item id="12434" name="shamanic hood" chance="7513" />
-		<item id="2389" name="spear" chance="5170" />
-		<item id="12435" name="orc leather" chance="3792" />
-		<item id="26642" name="heavy old tome" chance="2397" />
-		<item id="11113" name="orc tooth" chance="2182" />
-		<item id="2188" name="wand of decay" chance="966" />
-		<item id="1958" name="book (grey)" chance="465" />
+		<item id="3031" name="gold coin" chance="89750" countmax="5" />
+		<item id="3597" name="corncob" chance="10877" countmax="2" />
+		<item id="11452" name="broken shamanic staff" chance="10161" />
+		<item id="3358" name="chain armor" chance="8658" />
+		<item id="11478" name="shamanic hood" chance="7513" />
+		<item id="3277" name="spear" chance="5170" />
+		<item id="11479" name="orc leather" chance="3792" />
+		<item id="23986" name="heavy old tome" chance="2397" />
+		<item id="10196" name="orc tooth" chance="2182" />
+		<item id="3072" name="wand of decay" chance="966" />
+		<item id="2824" name="book (grey)" chance="465" />
 	</loot>
 </monster>

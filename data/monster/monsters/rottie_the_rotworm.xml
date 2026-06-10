@@ -22,15 +22,15 @@
 	</attacks>
 	<defenses armor="8" defense="11" />
 	<loot>
-		<item id="10609" name="lump of dirt" chance="100000" />
-		<item id="2148" name="gold coin" chance="84211" countmax="18" />
-		<item id="2398" name="mace" chance="63158" />
-		<item id="3976" name="worm" chance="47368" countmax="5" />
-		<item id="2376" name="sword" chance="26316" />
-		<item id="2671" name="ham" chance="21053" />
-		<item id="2530" name="copper shield" chance="15789" />
-		<item id="2666" name="meat" chance="15789" />
-		<item id="2480" name="legion helmet" chance="10526" />
-		<item id="2412" name="katana" chance="5263" />
+		<item id="9692" name="lump of dirt" chance="100000" />
+		<item id="3031" name="gold coin" chance="84211" countmax="18" />
+		<item id="3286" name="mace" chance="63158" />
+		<item id="3492" name="worm" chance="47368" countmax="5" />
+		<item id="3264" name="sword" chance="26316" />
+		<item id="3582" name="ham" chance="21053" />
+		<item id="3430" name="copper shield" chance="15789" />
+		<item id="3577" name="meat" chance="15789" />
+		<item id="3374" name="legion helmet" chance="10526" />
+		<item id="3300" name="katana" chance="5263" />
 	</loot>
 </monster>

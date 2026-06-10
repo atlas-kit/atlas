@@ -49,8 +49,8 @@
 	<loot>
 		<item name="small pitchfork" chance="19770" />
 		<item name="blank rune" chance="11000" />
-		<item id="2419" chance="3000" /><!-- scimitar -->
-		<item id="2050" countmax="2" chance="1370" /><!-- torch -->
+		<item id="3307" chance="3000" /><!-- scimitar -->
+		<item id="2920" countmax="2" chance="1370" /><!-- torch -->
 		<item name="double axe" chance="1200" />
 		<item name="cleaver" chance="920" />
 		<item name="necrotic rod" chance="460" />

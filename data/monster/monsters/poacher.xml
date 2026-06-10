@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Poacher" nameDescription="a poacher" race="blood" experience="70" speed="198" manacost="530" raceId="376">
 	<health now="90" max="90" />
-	<look type="129" head="60" body="118" legs="118" feet="116" addons="1" corpse="20487" />
+	<look type="129" head="60" body="118" legs="118" feet="116" addons="1" corpse="18206" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -33,13 +33,13 @@
 		<voice sentence="Look what has stepped into my trap!" />
 	</voices>
 	<loot>
-		<item id="2544" name="arrow" chance="47154" countmax="18" />
-		<item id="2461" name="leather helmet" chance="30758" />
-		<item id="2649" name="leather legs" chance="27912" />
-		<item id="2456" name="bow" chance="14901" />
-		<item id="2690" name="roll" chance="11049" countmax="2" />
-		<item id="2050" name="torch" chance="5082" />
-		<item id="2545" name="poison arrow" chance="2521" countmax="3" />
-		<item id="2578" name="closed trap" chance="1006" />
+		<item id="3447" name="arrow" chance="47154" countmax="18" />
+		<item id="3355" name="leather helmet" chance="30758" />
+		<item id="3559" name="leather legs" chance="27912" />
+		<item id="3350" name="bow" chance="14901" />
+		<item id="3601" name="roll" chance="11049" countmax="2" />
+		<item id="2920" name="torch" chance="5082" />
+		<item id="3448" name="poison arrow" chance="2521" countmax="3" />
+		<item id="3481" name="closed trap" chance="1006" />
 	</loot>
 </monster>

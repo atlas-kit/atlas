@@ -41,16 +41,16 @@
 		<voice sentence="Prek tars, dekklep zurk." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="74992" countmax="13" />
-		<item id="2467" name="leather armor" chance="10048" />
-		<item id="2410" name="throwing knife" chance="7906" countmax="2" />
-		<item id="2050" name="torch" chance="5486" />
-		<item id="2545" name="poison arrow" chance="4957" countmax="3" />
-		<item id="2411" name="poison dagger" chance="1500" />
-		<item id="2229" name="skull (item)" chance="983" countmax="2" />
-		<item id="3967" name="tribal mask" chance="502" />
-		<item id="7732" name="seeds" chance="193" />
-		<item id="3983" name="bast skirt" chance="99" />
-		<item id="2172" name="bronze amulet" chance="97" />
+		<item id="3031" name="gold coin" chance="74992" countmax="13" />
+		<item id="3361" name="leather armor" chance="10048" />
+		<item id="3298" name="throwing knife" chance="7906" countmax="2" />
+		<item id="2920" name="torch" chance="5486" />
+		<item id="3448" name="poison arrow" chance="4957" countmax="3" />
+		<item id="3299" name="poison dagger" chance="1500" />
+		<item id="3114" name="skull (item)" chance="983" countmax="2" />
+		<item id="3403" name="tribal mask" chance="502" />
+		<item id="647" name="seeds" chance="193" />
+		<item id="3560" name="bast skirt" chance="99" />
+		<item id="3056" name="bronze amulet" chance="97" />
 	</loot>
 </monster>

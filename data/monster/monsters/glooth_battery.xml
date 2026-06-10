@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Glooth Battery" nameDescription="a glooth battery" race="blood" experience="3000" speed="0">
 	<health now="8000" max="8000" />
-	<look typeex="23081" corpse="24309" />
+	<look typeex="23081" corpse="21940" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag ignorespawnblock="1" />
@@ -37,16 +37,16 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="75000" countmax="5" />
-		<item id="7590" name="great mana potion" chance="13462" />
-		<item id="9930" name="flask of rust remover" chance="9615" />
-		<item id="7591" name="great health potion" chance="9615" />
-		<item id="23541" name="gearwheel chain" chance="7692" />
-		<item id="9690" name="gear wheel" chance="3846" />
-		<item id="2645" name="steel boots" chance="3846" />
-		<item id="9978" name="crystal pedestal" chance="1923" />
+		<item id="3035" name="platinum coin" chance="75000" countmax="5" />
+		<item id="238" name="great mana potion" chance="13462" />
+		<item id="9016" name="flask of rust remover" chance="9615" />
+		<item id="239" name="great health potion" chance="9615" />
+		<item id="21170" name="gearwheel chain" chance="7692" />
+		<item id="8775" name="gear wheel" chance="3846" />
+		<item id="3554" name="steel boots" chance="3846" />
+		<item id="9065" name="crystal pedestal" chance="1923" />
 		<item id="5880" name="iron ore" chance="1923" />
 		<item id="7440" name="mastermind potion" chance="1923" />
-		<item id="23540" name="metal spats" chance="1923" />
+		<item id="21169" name="metal spats" chance="1923" />
 	</loot>
 </monster>

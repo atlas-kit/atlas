@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Thawing Dragon Lord" nameDescription="a thawing dragon lord" race="blood" experience="2100" speed="230">
 	<health now="25000" max="25000" />
-	<look type="1077" corpse="31296" />
+	<look type="1077" corpse="28640" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag illusionable="1" />
@@ -34,8 +34,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="9971" name="gold ingot" chance="41905" countmax="5" />
-		<item id="15515" name="bar of gold" chance="4762" />
+		<item id="9058" name="gold ingot" chance="41905" countmax="5" />
+		<item id="14112" name="bar of gold" chance="4762" />
 		<item id="7441" name="ice cube" chance="952" />
 	</loot>
 </monster>

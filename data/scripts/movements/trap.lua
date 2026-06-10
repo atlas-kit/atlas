@@ -1,21 +1,21 @@
 local traps = {
-	[1510] = { -- strange slits
-		transformTo = 1511,
+	[2145] = { -- strange slits
+		transformTo = 2146,
 		damage = {-60, -60}
 	},
-	[1513] = { -- spikes
+	[2148] = { -- spikes
 		damage = {-60, -60}
 	},
-	[2579] = { -- trap
-		transformTo = 2578,
+	[3482] = { -- trap
+		transformTo = 3481,
 		damage = {-30, -30}
 	},
-	[4208] = { -- jungle maw
-		transformTo = 4209,
+	[3944] = { -- jungle maw
+		transformTo = 3945,
 		damage = {-30, -30},
 		type = COMBAT_EARTHDAMAGE
 	},
-	[25331] = { -- lava (walkable)
+	[22675] = { -- lava (walkable)
 		damage = {-500, -500},
 		type = COMBAT_FIREDAMAGE
 	}
@@ -41,7 +41,7 @@ do
 		return true
 	end
 
-	event:id(1510, 1513, 2579, 4208, 25331)
+	event:id(2145, 2148, 3482, 3944, 22675)
 	event:register()
 end
 
@@ -53,7 +53,7 @@ do
 		return true
 	end
 
-	event:id(1511)
+	event:id(2146)
 	event:register()
 end
 
@@ -69,6 +69,6 @@ do
 		return true
 	end
 
-	event:id(2579)
+	event:id(3482)
 	event:register()
 end

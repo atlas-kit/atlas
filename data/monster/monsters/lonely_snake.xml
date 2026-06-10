@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lonely Snake" nameDescription="a lonely snake" race="blood" experience="10" speed="120">
 	<health now="15" max="15" />
-	<look type="28" corpse="2817" />
+	<look type="28" corpse="3998" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

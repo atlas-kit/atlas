@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Handmaiden" nameDescription="The Handmaiden" race="blood" experience="7500" speed="450">
 	<health now="19500" max="19500" />
-	<look type="230" corpse="6312" />
+	<look type="230" corpse="6311" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

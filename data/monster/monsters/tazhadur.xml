@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Tazhadur" nameDescription="Tazhadur" race="blood" experience="9000" speed="350">
 	<health now="10000" max="10000" />
-	<look type="947" head="24" body="120" legs="38" feet="95" addons="3" corpse="27849" />
+	<look type="947" head="24" body="120" legs="38" feet="95" addons="3" corpse="25193" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -51,21 +51,21 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="27593" name="dragon blood" chance="100000" />
-		<item id="27594" name="dragon tongue" chance="100000" />
+		<item id="24937" name="dragon blood" chance="100000" />
+		<item id="24938" name="dragon tongue" chance="100000" />
 		<item id="5920" name="green dragon scale" chance="100000" />
-		<item id="27596" name="tooth of tazhadur" chance="100000" />
+		<item id="24940" name="tooth of tazhadur" chance="100000" />
 		<item id="5877" name="green dragon leather" chance="98598" />
-		<item id="2148" name="gold coin" chance="90654" countmax="99" />
-		<item id="2672" name="dragon ham" chance="39252" />
-		<item id="2387" name="double axe" chance="10748" />
-		<item id="2201" name="dragon necklace" chance="8879" />
-		<item id="2516" name="dragon shield" chance="4673" />
-		<item id="2434" name="dragon hammer" chance="3738" />
-		<item id="2187" name="wand of inferno" chance="2804" />
-		<item id="2492" name="dragon scale mail" chance="2336" />
-		<item id="7588" name="strong health potion" chance="1869" />
+		<item id="3031" name="gold coin" chance="90654" countmax="99" />
+		<item id="3583" name="dragon ham" chance="39252" />
+		<item id="3275" name="double axe" chance="10748" />
+		<item id="3085" name="dragon necklace" chance="8879" />
+		<item id="3416" name="dragon shield" chance="4673" />
+		<item id="3322" name="dragon hammer" chance="3738" />
+		<item id="3071" name="wand of inferno" chance="2804" />
+		<item id="3386" name="dragon scale mail" chance="2336" />
+		<item id="236" name="strong health potion" chance="1869" />
 		<item id="7430" name="dragonbone staff" chance="935" />
-		<item id="2145" name="small diamond" chance="467" />
+		<item id="3028" name="small diamond" chance="467" />
 	</loot>
 </monster>

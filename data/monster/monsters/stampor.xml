@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Stampor" nameDescription="a stampor" race="blood" experience="780" speed="240" raceId="694">
 	<health now="1200" max="1200" />
-	<look type="381" corpse="13312" />
+	<look type="381" corpse="12325" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

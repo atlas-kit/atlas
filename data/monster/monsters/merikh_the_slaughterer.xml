@@ -58,16 +58,16 @@
 	</voices>
 	<loot>
 		<item id="5910" name="green piece of cloth" chance="100000" countmax="4" />
-		<item id="12426" name="jewelled belt" chance="100000" />
-		<item id="2148" name="gold coin" chance="97222" countmax="121" />
-		<item id="12442" name="noble turban" chance="63889" />
-		<item id="11227" name="shiny stone" chance="58333" />
+		<item id="11470" name="jewelled belt" chance="100000" />
+		<item id="3031" name="gold coin" chance="97222" countmax="121" />
+		<item id="11486" name="noble turban" chance="63889" />
+		<item id="10310" name="shiny stone" chance="58333" />
 		<item id="7378" name="royal spear" chance="55556" countmax="3" />
-		<item id="2442" name="heavy machete" chance="41667" />
-		<item id="7589" name="strong mana potion" chance="41667" countmax="3" />
-		<item id="2663" name="mystic turban" chance="36111" />
-		<item id="7900" name="magma monocle" chance="8333" />
-		<item id="2155" name="green gem" chance="2778" />
-		<item id="2149" name="small emerald" chance="2778" countmax="2" />
+		<item id="3330" name="heavy machete" chance="41667" />
+		<item id="237" name="strong mana potion" chance="41667" countmax="3" />
+		<item id="3574" name="mystic turban" chance="36111" />
+		<item id="827" name="magma monocle" chance="8333" />
+		<item id="3038" name="green gem" chance="2778" />
+		<item id="3032" name="small emerald" chance="2778" countmax="2" />
 	</loot>
 </monster>

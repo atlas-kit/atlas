@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Enlightened of the Cult" nameDescription="an enlightened of the cult" race="blood" experience="500" speed="210" raceId="252">
 	<health now="700" max="700" />
-	<look type="193" corpse="20391" />
+	<look type="193" corpse="18110" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -64,7 +64,7 @@
 		<voice sentence="You will die in the name of the triangle!" />
 	</voices>
 	<loot>
-		<item id="1962" chance="910" /><!-- orange book -->
+		<item id="2828" chance="910" /><!-- orange book -->
 		<item name="piggy bank" chance="130" />
 		<item name="small sapphire" chance="550" />
 		<item name="gold coin" countmax="70" chance="64550" />

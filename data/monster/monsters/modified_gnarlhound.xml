@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Modified Gnarlhound" nameDescription="a modified gnarlhound" race="blood" experience="0" speed="450" raceId="877">
 	<health now="1500" max="1500" />
-	<look type="515" corpse="13528" />
+	<look type="515" corpse="12539" />
 	<targetchange interval="2000" chance="20" />
 	<flags>
 		<flag summonable="0" />

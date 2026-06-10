@@ -1,5 +1,5 @@
 local weapon = Weapon(WEAPON_DISTANCE)
-weapon:id(8853)
+weapon:id(8025)
 weapon:level(80)
 weapon:vocation("paladin")
 weapon:register()

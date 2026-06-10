@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="High Templar Cobrass" nameDescription="High Templar Cobrass" race="blood" experience="515" speed="174">
 	<health now="410" max="410" />
-	<look type="113" corpse="4251" />
+	<look type="113" corpse="4239" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -39,7 +39,7 @@
 		<item name="lizard scale" chance="100000" />
 		<item name="lizard leather" chance="100000" />
 		<item name="short sword" chance="10000" />
-		<item id="2376" chance="5200" /><!-- sword -->
+		<item id="3264" chance="5200" /><!-- sword -->
 		<item name="steel helmet" chance="2500" />
 		<item name="morning star" chance="2490" />
 		<item name="plate armor" chance="1500" />

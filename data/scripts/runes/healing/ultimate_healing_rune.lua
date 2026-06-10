@@ -22,7 +22,7 @@ end
 spell:group("healing")
 spell:id(5)
 spell:name("Ultimate Healing Rune")
-spell:runeId(2273)
+spell:runeId(3160)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(24)

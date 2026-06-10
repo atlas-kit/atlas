@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Pirate Cutthroat" nameDescription="a pirate cutthroat" race="blood" experience="175" speed="214" manacost="495" raceId="248">
 	<health now="325" max="325" />
-	<look type="96" corpse="20479" />
+	<look type="96" corpse="18198" />
 	<targetchange interval="4000" chance="15" />
 	<flags>
 		<flag summonable="0" />
@@ -44,18 +44,18 @@
 		<voice sentence="Plundeeeeer!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="77548" countmax="50" />
-		<item id="11219" name="compass" chance="10074" />
-		<item id="2483" name="scale armor" chance="3070" />
-		<item id="2509" name="steel shield" chance="2884" />
+		<item id="3031" name="gold coin" chance="77548" countmax="50" />
+		<item id="10302" name="compass" chance="10074" />
+		<item id="3377" name="scale armor" chance="3070" />
+		<item id="3409" name="steel shield" chance="2884" />
 		<item id="5710" name="light shovel" chance="1960" />
-		<item id="14337" name="treasure map (pirate)" chance="1092" />
+		<item id="5706" name="treasure map (pirate)" chance="1092" />
 		<item id="5918" name="pirate knee breeches" chance="1019" />
 		<item id="5927" name="pirate bag" chance="987" />
 		<item id="6097" name="hook" chance="534" />
 		<item id="6126" name="peg leg" chance="514" />
 		<item id="6098" name="eye patch" chance="468" />
 		<item id="5792" name="die" chance="93" />
-		<item id="5553" name="rum flask" chance="89" />
+		<item id="5552" name="rum flask" chance="89" />
 	</loot>
 </monster>

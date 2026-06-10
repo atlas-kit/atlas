@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fury" nameDescription="a fury" race="blood" experience="4500" speed="250" raceId="291">
 	<health now="4100" max="4100" />
-	<look type="149" head="94" body="77" legs="78" feet="79" addons="1" corpse="20399" />
+	<look type="149" head="94" body="77" legs="78" feet="79" addons="1" corpse="18118" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -70,8 +70,8 @@
 		<voice sentence="Dieee!" />
 	</voices>
 	<loot>
-		<item id="2120" countmax="3" chance="8000" /><!-- small amethyst -->
-		<item id="2124" chance="410" /><!-- crystal ring-->
+		<item id="3003" countmax="3" chance="8000" /><!-- small amethyst -->
+		<item id="3007" chance="410" /><!-- crystal ring-->
 		<item name="gold coin" countmax="100" chance="30000" />
 		<item name="gold coin" countmax="100" chance="30000" />
 		<item name="gold coin" countmax="69" chance="38000" />
@@ -84,13 +84,13 @@
 		<item name="red piece of cloth" chance="4000" />
 		<item name="soul orb" chance="21500" />
 		<item name="soul orb" chance="50" />
-		<item id="6301" chance="60" /><!-- death ring-->
+		<item id="6300" chance="60" /><!-- death ring-->
 		<item name="demonic essence" chance="22500" />
 		<item name="flask of demonic blood" countmax="3" chance="35000" />
 		<item name="assassin dagger" chance="660" />
 		<item name="noble axe" chance="2000" />
 		<item name="great health potion" chance="10500" />
 		<item name="jalapeno pepper" countmax="4" chance="29280" />
-		<item id="9813" chance="1920" /><!-- rusty legs (rare) -->
+		<item id="8899" chance="1920" /><!-- rusty legs (rare) -->
 	</loot>
 </monster>

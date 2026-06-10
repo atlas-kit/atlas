@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Burning Gladiator" nameDescription="a burning gladiator" race="blood" experience="7350" speed="290" raceId="1798">
 	<health now="10000" max="10000" />
-	<look type="541" head="95" body="113" legs="3" feet="3" addons="1" corpse="34302" />
+	<look type="541" head="95" body="113" legs="3" feet="3" addons="1" corpse="31646" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -53,21 +53,21 @@
 		<voice sentence="Praised be Fafnar, the Smiter!" />
 	</voices>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" countmax="4" />
-		<item id="34099" name="fafnar symbol" chance="10157" />
-		<item id="34089" name="secret instruction" chance="7419" />
-		<item id="2201" name="dragon necklace" chance="5951" />
-		<item id="2161" name="strange talisman" chance="4979" />
-		<item id="7889" name="lightning pendant" chance="4602" />
-		<item id="7890" name="magma amulet" chance="4463" />
-		<item id="7901" name="lightning headband" chance="4305" />
-		<item id="7891" name="magma boots" chance="4225" />
-		<item id="7895" name="lightning legs" chance="3967" />
-		<item id="33987" name="empty honey glass" chance="2579" />
-		<item id="2198" name="elven amulet" chance="2559" />
-		<item id="7893" name="lightning boots" chance="1627" />
-		<item id="11355" name="spellweaver's robe" chance="1111" />
-		<item id="33980" name="golden mask" chance="893" />
-		<item id="33979" name="sea horse figurine" chance="575" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="4" />
+		<item id="31443" name="fafnar symbol" chance="10157" />
+		<item id="31433" name="secret instruction" chance="7419" />
+		<item id="3085" name="dragon necklace" chance="5951" />
+		<item id="3045" name="strange talisman" chance="4979" />
+		<item id="816" name="lightning pendant" chance="4602" />
+		<item id="817" name="magma amulet" chance="4463" />
+		<item id="828" name="lightning headband" chance="4305" />
+		<item id="818" name="magma boots" chance="4225" />
+		<item id="822" name="lightning legs" chance="3967" />
+		<item id="31331" name="empty honey glass" chance="2579" />
+		<item id="3082" name="elven amulet" chance="2559" />
+		<item id="820" name="lightning boots" chance="1627" />
+		<item id="10438" name="spellweaver's robe" chance="1111" />
+		<item id="31324" name="golden mask" chance="893" />
+		<item id="31323" name="sea horse figurine" chance="575" />
 	</loot>
 </monster>

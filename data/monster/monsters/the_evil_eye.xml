@@ -78,7 +78,7 @@
 		<item name="steel shield" chance="50000" />
 		<item name="two handed sword" chance="34000" />
 		<item name="longsword" chance="23000" />
-		<item id="2175" chance="23000" /><!-- spellbook -->
+		<item id="3059" chance="23000" /><!-- spellbook -->
 		<item name="great mana potion" chance="15000" />
 		<item name="bonelord shield" chance="11000" />
 		<item name="terra mantle" chance="11000" />

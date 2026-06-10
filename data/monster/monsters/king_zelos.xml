@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="King Zelos" nameDescription="King Zelos" experience="75000" speed="250">
 	<health now="480000" max="480000" />
-	<look type="1224" corpse="34267" />
+	<look type="1224" corpse="31611" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -38,54 +38,54 @@
 		<voice sentence="My lich-knights will conquer this world for me!" />
 	</voices>
 	<loot>
-		<item id="2160" name="crystal coin" chance="100000" countmax="8" />
-		<item id="25172" name="silver token" chance="99725" countmax="4" />
-		<item id="25377" name="gold token" chance="73352" countmax="3" />
-		<item id="26031" name="supreme health potion" chance="57967" countmax="20" />
-		<item id="26030" name="ultimate spirit potion" chance="56044" countmax="20" />
-		<item id="26029" name="ultimate mana potion" chance="54670" countmax="20" />
-		<item id="2154" name="yellow gem" chance="27473" countmax="2" />
-		<item id="2156" name="red gem" chance="26374" countmax="2" />
-		<item id="2487" name="crown armor" chance="17582" />
+		<item id="3043" name="crystal coin" chance="100000" countmax="8" />
+		<item id="22516" name="silver token" chance="99725" countmax="4" />
+		<item id="22721" name="gold token" chance="73352" countmax="3" />
+		<item id="23375" name="supreme health potion" chance="57967" countmax="20" />
+		<item id="23374" name="ultimate spirit potion" chance="56044" countmax="20" />
+		<item id="23373" name="ultimate mana potion" chance="54670" countmax="20" />
+		<item id="3037" name="yellow gem" chance="27473" countmax="2" />
+		<item id="3039" name="red gem" chance="26374" countmax="2" />
+		<item id="3381" name="crown armor" chance="17582" />
 		<item id="7443" name="bullseye potion" chance="15934" countmax="10" />
 		<item id="7440" name="mastermind potion" chance="15934" countmax="10" />
 		<item id="7439" name="berserk potion" chance="14286" countmax="10" />
-		<item id="2155" name="green gem" chance="12912" />
-		<item id="9971" name="gold ingot" chance="12363" />
-		<item id="26199" name="collar of green plasma" chance="11538" />
-		<item id="2158" name="blue gem" chance="11264" />
-		<item id="7884" name="terra mantle" chance="10714" />
-		<item id="26187" name="ring of green plasma" chance="10440" />
-		<item id="26198" name="collar of blue plasma" chance="10165" />
-		<item id="26200" name="collar of red plasma" chance="9341" />
-		<item id="7899" name="magma coat" chance="9341" />
-		<item id="7898" name="lightning robe" chance="7967" />
-		<item id="1986" name="red tome" chance="7692" />
-		<item id="26185" name="ring of blue plasma" chance="7143" />
-		<item id="34246" name="young lich worm" chance="7143" />
-		<item id="26189" name="ring of red plasma" chance="6868" />
-		<item id="7897" name="glacier robe" chance="6593" />
-		<item id="2153" name="violet gem" chance="6044" countmax="2" />
-		<item id="34244" name="ancient liche bone" chance="5495" />
-		<item id="34245" name="rotten heart" chance="4396" />
-		<item id="32717" name="giant sapphire" chance="4121" />
+		<item id="3038" name="green gem" chance="12912" />
+		<item id="9058" name="gold ingot" chance="12363" />
+		<item id="23543" name="collar of green plasma" chance="11538" />
+		<item id="3041" name="blue gem" chance="11264" />
+		<item id="811" name="terra mantle" chance="10714" />
+		<item id="23531" name="ring of green plasma" chance="10440" />
+		<item id="23542" name="collar of blue plasma" chance="10165" />
+		<item id="23544" name="collar of red plasma" chance="9341" />
+		<item id="826" name="magma coat" chance="9341" />
+		<item id="825" name="lightning robe" chance="7967" />
+		<item id="2852" name="red tome" chance="7692" />
+		<item id="23529" name="ring of blue plasma" chance="7143" />
+		<item id="31590" name="young lich worm" chance="7143" />
+		<item id="23533" name="ring of red plasma" chance="6868" />
+		<item id="824" name="glacier robe" chance="6593" />
+		<item id="3036" name="violet gem" chance="6044" countmax="2" />
+		<item id="31588" name="ancient liche bone" chance="5495" />
+		<item id="31589" name="rotten heart" chance="4396" />
+		<item id="30061" name="giant sapphire" chance="4121" />
 		<item id="5885" name="flask of warrior's sweat" chance="3022" />
-		<item id="32716" name="giant emerald" chance="3022" />
+		<item id="30060" name="giant emerald" chance="3022" />
 		<item id="5904" name="magic sulphur" chance="3022" />
 		<item id="5909" name="white piece of cloth" chance="2198" countmax="4" />
 		<item id="5892" name="huge chunk of crude iron" chance="1923" />
 		<item id="7414" name="abyss hammer" chance="1374" />
-		<item id="2195" name="boots of haste" chance="1374" />
-		<item id="34393" name="shadow cowl" chance="1374" />
-		<item id="34237" name="bow of cataclysm" chance="1099" />
-		<item id="34238" name="galea mortis" chance="1099" />
-		<item id="32715" name="giant ruby" chance="1099" />
-		<item id="34236" name="mortal mace" chance="1099" />
-		<item id="34239" name="toga mortis" chance="1099" />
-		<item id="13532" name="golden hyaena pendant" chance="824" />
-		<item id="32712" name="ornate locket" chance="824" />
-		<item id="15515" name="bar of gold" chance="549" />
+		<item id="3079" name="boots of haste" chance="1374" />
+		<item id="31737" name="shadow cowl" chance="1374" />
+		<item id="31581" name="bow of cataclysm" chance="1099" />
+		<item id="31582" name="galea mortis" chance="1099" />
+		<item id="30059" name="giant ruby" chance="1099" />
+		<item id="31580" name="mortal mace" chance="1099" />
+		<item id="31583" name="toga mortis" chance="1099" />
+		<item id="12543" name="golden hyaena pendant" chance="824" />
+		<item id="30056" name="ornate locket" chance="824" />
+		<item id="14112" name="bar of gold" chance="549" />
 		<item id="5884" name="spirit container" chance="549" />
-		<item id="27048" name="gemmed figurine" chance="275" />
+		<item id="24392" name="gemmed figurine" chance="275" />
 	</loot>
 </monster>

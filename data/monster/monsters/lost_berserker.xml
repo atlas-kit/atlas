@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lost Berserker" nameDescription="a lost berserker" race="blood" experience="4400" speed="300" raceId="888">
 	<health now="5900" max="5900" />
-	<look type="496" corpse="17416" />
+	<look type="496" corpse="16071" />
 	<targetchange interval="4000" chance="15" />
 	<flags>
 		<flag summonable="0" />
@@ -60,31 +60,31 @@
 		<voice sentence="Death! Death! Death!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="200" />
-		<item id="2152" name="platinum coin" chance="99965" countmax="9" />
-		<item id="2789" name="brown mushroom" chance="15482" countmax="2" />
-		<item id="7590" name="great mana potion" chance="14232" />
-		<item id="7591" name="great health potion" chance="13497" />
+		<item id="3031" name="gold coin" chance="100000" countmax="200" />
+		<item id="3035" name="platinum coin" chance="99965" countmax="9" />
+		<item id="3725" name="brown mushroom" chance="15482" countmax="2" />
+		<item id="238" name="great mana potion" chance="14232" />
+		<item id="239" name="great health potion" chance="13497" />
 		<item id="5880" name="iron ore" chance="8663" />
-		<item id="9970" name="small topaz" chance="8033" countmax="2" />
-		<item id="18436" name="drill bolt" chance="7974" countmax="10" />
-		<item id="18417" name="brown crystal splinter" chance="7542" countmax="2" />
-		<item id="18421" name="green crystal fragment" chance="6667" />
-		<item id="18418" name="blue crystal splinter" chance="4752" />
-		<item id="2114" name="piggy bank" chance="3783" />
-		<item id="18414" name="violet crystal shard" chance="3596" />
-		<item id="2213" name="dwarven ring" chance="2347" />
-		<item id="2430" name="knight axe" chance="2113" />
-		<item id="13757" name="coal" chance="1880" />
-		<item id="2515" name="guardian shield" chance="1296" />
-		<item id="11339" name="clay lump" chance="992" />
-		<item id="2528" name="tower shield" chance="899" />
+		<item id="9057" name="small topaz" chance="8033" countmax="2" />
+		<item id="16142" name="drill bolt" chance="7974" countmax="10" />
+		<item id="16123" name="brown crystal splinter" chance="7542" countmax="2" />
+		<item id="16127" name="green crystal fragment" chance="6667" />
+		<item id="16124" name="blue crystal splinter" chance="4752" />
+		<item id="2995" name="piggy bank" chance="3783" />
+		<item id="16120" name="violet crystal shard" chance="3596" />
+		<item id="3097" name="dwarven ring" chance="2347" />
+		<item id="3318" name="knight axe" chance="2113" />
+		<item id="12600" name="coal" chance="1880" />
+		<item id="3415" name="guardian shield" chance="1296" />
+		<item id="10422" name="clay lump" chance="992" />
+		<item id="3428" name="tower shield" chance="899" />
 		<item id="7452" name="spiked squelcher" chance="794" />
 		<item id="5904" name="magic sulphur" chance="724" />
-		<item id="2529" name="black shield" chance="630" />
-		<item id="7886" name="terra boots" chance="619" />
+		<item id="3429" name="black shield" chance="630" />
+		<item id="813" name="terra boots" chance="619" />
 		<item id="7427" name="chaos mace" chance="479" />
-		<item id="2432" name="fire axe" chance="409" />
-		<item id="2498" name="royal helmet" chance="198" />
+		<item id="3320" name="fire axe" chance="409" />
+		<item id="3392" name="royal helmet" chance="198" />
 	</loot>
 </monster>

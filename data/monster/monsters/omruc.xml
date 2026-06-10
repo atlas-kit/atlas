@@ -67,18 +67,18 @@
 		<voice sentence="Die!" />
 	</voices>
 	<loot>
-		<item id="2352" name="crystal arrow" chance="100000" />
-		<item id="2148" name="gold coin" chance="85417" countmax="211" />
-		<item id="2674" name="red apple" chance="78125" countmax="2" />
-		<item id="2545" name="poison arrow" chance="57292" countmax="19" />
-		<item id="2546" name="burst arrow" chance="47917" countmax="15" />
+		<item id="3239" name="crystal arrow" chance="100000" />
+		<item id="3031" name="gold coin" chance="85417" countmax="211" />
+		<item id="3585" name="red apple" chance="78125" countmax="2" />
+		<item id="3448" name="poison arrow" chance="57292" countmax="19" />
+		<item id="3449" name="burst arrow" chance="47917" countmax="15" />
 		<item id="7365" name="onyx arrow" chance="33333" countmax="6" />
-		<item id="2544" name="arrow" chance="22917" countmax="25" />
-		<item id="2547" name="power bolt" chance="17708" countmax="5" />
-		<item id="7591" name="great health potion" chance="11458" />
-		<item id="2145" name="small diamond" chance="9375" countmax="3" />
-		<item id="2165" name="stealth ring" chance="3125" />
-		<item id="11207" name="mini mummy" chance="2083" />
-		<item id="2195" name="boots of haste" chance="1042" />
+		<item id="3447" name="arrow" chance="22917" countmax="25" />
+		<item id="3450" name="power bolt" chance="17708" countmax="5" />
+		<item id="239" name="great health potion" chance="11458" />
+		<item id="3028" name="small diamond" chance="9375" countmax="3" />
+		<item id="3049" name="stealth ring" chance="3125" />
+		<item id="10290" name="mini mummy" chance="2083" />
+		<item id="3079" name="boots of haste" chance="1042" />
 	</loot>
 </monster>

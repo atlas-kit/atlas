@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Novice of the Cult" nameDescription="a novice of the cult" race="blood" experience="100" speed="200" raceId="255">
 	<health now="285" max="285" />
-	<look type="133" head="114" body="114" legs="76" feet="114" corpse="20467" />
+	<look type="133" head="114" body="114" legs="76" feet="114" corpse="18186" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -50,7 +50,7 @@
 		<voice sentence="Your curiosity will be punished!" />
 	</voices>
 	<loot>
-		<item id="1962" chance="700" /><!-- orange book -->
+		<item id="2828" chance="700" /><!-- orange book -->
 		<item name="small diamond" chance="210" />
 		<item name="gold coin" countmax="40" chance="43380" />
 		<item name="wand of vortex" chance="450" />

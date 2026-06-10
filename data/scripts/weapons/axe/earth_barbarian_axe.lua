@@ -1,5 +1,5 @@
 local weapon = Weapon(WEAPON_AXE)
-weapon:id(7859)
+weapon:id(784)
 weapon:level(20)
 weapon:action("removecharge")
 weapon:register()

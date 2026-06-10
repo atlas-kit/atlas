@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Nightmare Scion" nameDescription="a nightmare scion" race="blood" experience="1350" speed="440" raceId="518">
 	<health now="1400" max="1400" />
-	<look type="321" corpse="9919" />
+	<look type="321" corpse="9005" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -53,17 +53,17 @@
 		<voice sentence="Peak a boo, I killed you!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="97006" countmax="155" />
-		<item id="2666" name="meat" chance="50392" />
-		<item id="11223" name="essence of a bad dream" chance="8074" />
-		<item id="11229" name="scythe leg" chance="4977" />
-		<item id="2152" name="platinum coin" chance="1074" countmax="3" />
-		<item id="2491" name="crown helmet" chance="728" />
+		<item id="3031" name="gold coin" chance="97006" countmax="155" />
+		<item id="3577" name="meat" chance="50392" />
+		<item id="10306" name="essence of a bad dream" chance="8074" />
+		<item id="10312" name="scythe leg" chance="4977" />
+		<item id="3035" name="platinum coin" chance="1074" countmax="3" />
+		<item id="3385" name="crown helmet" chance="728" />
 		<item id="7387" name="diamond sceptre" chance="367" />
-		<item id="8871" name="focus cape" chance="330" />
-		<item id="6300" name="death ring" chance="284" />
+		<item id="8043" name="focus cape" chance="330" />
+		<item id="6299" name="death ring" chance="284" />
 		<item id="6574" name="bar of chocolate" chance="248" />
 		<item id="7451" name="shadow sceptre" chance="248" />
-		<item id="9941" name="crystal of focus" chance="114" />
+		<item id="9027" name="crystal of focus" chance="114" />
 	</loot>
 </monster>

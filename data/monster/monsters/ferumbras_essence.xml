@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ferumbras Essence" nameDescription="a ferumbras essence" race="undead" experience="0" speed="200">
 	<health now="115" max="115" />
-	<look type="294" corpse="10508" />
+	<look type="294" corpse="9591" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />

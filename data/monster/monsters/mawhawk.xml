@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mawhawk" nameDescription="Mawhawk" race="blood" experience="14000" speed="270">
 	<health now="45000" max="45000" />
-	<look type="595" corpse="22629" />
+	<look type="595" corpse="20295" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

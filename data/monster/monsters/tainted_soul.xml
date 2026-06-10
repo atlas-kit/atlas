@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <monster name="Tainted Soul" nameDescription="a tainted soul" race="undead" experience="0" speed="170" raceId="1137">
 	<health now="250" max="250" />
-	<look type="712" corpse="24633" />
+	<look type="712" corpse="21977" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -51,6 +51,6 @@
 		<voice sentence="*Sizzle*" />
 	</voices>
 	<loot>
-		<item id="2147" name="small ruby" chance="1256" />
+		<item id="3030" name="small ruby" chance="1256" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lonely Yielothax" nameDescription="a lonely yielothax" race="venom" experience="1250" speed="300">
 	<health now="1500" max="1500" />
-	<look type="408" corpse="13752" />
+	<look type="408" corpse="12595" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

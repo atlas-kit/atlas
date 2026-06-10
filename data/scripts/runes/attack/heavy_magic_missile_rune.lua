@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(8)
 spell:name("Heavy Magic Missile Rune")
-spell:runeId(2311)
+spell:runeId(3198)
 spell:allowFarUse(true)
 spell:charges(10)
 spell:runeLevel(25)

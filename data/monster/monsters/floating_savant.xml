@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Floating Savant" nameDescription="a floating savant" race="fire" experience="8000" speed="330" raceId="1637">
 	<health now="8000" max="8000" />
-	<look type="1063" head="113" body="94" legs="78" feet="78" addons="0" corpse="31254" />
+	<look type="1063" head="113" body="94" legs="78" feet="78" addons="0" corpse="28598" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -48,15 +48,15 @@
 		<summon name="Lava Lurker Attendant" interval="2000" chance="15" />
 	</summons>
 	<loot>
-		<item id="2156" name="red gem" chance="71588" countmax="4" />
+		<item id="3039" name="red gem" chance="71588" countmax="4" />
 		<item id="5911" name="red piece of cloth" chance="30501" countmax="3" />
-		<item id="6500" name="demonic essence" chance="23692" />
-		<item id="7760" name="small enchanted ruby" chance="20613" countmax="14" />
-		<item id="11237" name="book of necromantic rituals" chance="20009" />
-		<item id="18420" name="red crystal fragment" chance="19344" countmax="8" />
+		<item id="6499" name="demonic essence" chance="23692" />
+		<item id="676" name="small enchanted ruby" chance="20613" countmax="14" />
+		<item id="10320" name="book of necromantic rituals" chance="20009" />
+		<item id="16126" name="red crystal fragment" chance="19344" countmax="8" />
 		<item id="6558" name="flask of demonic blood" chance="15460" />
-		<item id="3456" name="pick" chance="5091" />
-		<item id="9969" name="black skull (item)" chance="263" />
-		<item id="30530" name="sample of monster blood" chance="108" />
+		<item id="1545" name="pick" chance="5091" />
+		<item id="9056" name="black skull (item)" chance="263" />
+		<item id="27874" name="sample of monster blood" chance="108" />
 	</loot>
 </monster>

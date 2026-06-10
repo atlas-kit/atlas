@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gloom Wolf" nameDescription="a gloom wolf" race="blood" experience="70" speed="250" raceId="1139">
 	<health now="200" max="200" />
-	<look type="716" corpse="24639" />
+	<look type="716" corpse="21983" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -39,11 +39,11 @@
 		<element earthPercent="20" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="66035" countmax="15" />
-		<item id="2666" name="meat" chance="40928" />
-		<item id="2671" name="ham" chance="39744" />
-		<item id="24663" name="gloom wolf fur" chance="8100" />
-		<item id="2129" name="wolf tooth chain" chance="7248" />
+		<item id="3031" name="gold coin" chance="66035" countmax="15" />
+		<item id="3577" name="meat" chance="40928" />
+		<item id="3582" name="ham" chance="39744" />
+		<item id="22007" name="gloom wolf fur" chance="8100" />
+		<item id="3012" name="wolf tooth chain" chance="7248" />
 		<item id="5897" name="wolf paw" chance="3221" />
 	</loot>
 </monster>

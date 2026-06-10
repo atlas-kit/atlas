@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Furious Scorpion" nameDescription="a furious scorpion" race="undead" experience="12000" speed="250">
 	<health now="15000" max="15000" />
-	<look type="398" corpse="13501" />
+	<look type="398" corpse="12512" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -33,11 +33,11 @@
 		<element earthPercent="70" />
 	</elements>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" countmax="5" />
-		<item id="2148" name="gold coin" chance="93478" countmax="117" />
-		<item id="2439" name="daramian mace" chance="19565" />
-		<item id="3351" name="steel helmet" chance="19565" />
-		<item id="2149" name="small emerald" chance="10870" countmax="5" />
-		<item id="2529" name="black shield" chance="4348" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="5" />
+		<item id="3031" name="gold coin" chance="93478" countmax="117" />
+		<item id="3327" name="daramian mace" chance="19565" />
+		<item id="1200" name="steel helmet" chance="19565" />
+		<item id="3032" name="small emerald" chance="10870" countmax="5" />
+		<item id="3429" name="black shield" chance="4348" />
 	</loot>
 </monster>

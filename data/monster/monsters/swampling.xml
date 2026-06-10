@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Swampling" nameDescription="a swampling" race="venom" experience="45" speed="190" raceId="919">
 	<health now="80" max="80" />
-	<look type="535" corpse="19902" />
+	<look type="535" corpse="17622" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -39,7 +39,7 @@
 		<voice sentence="Crrrck!" />
 	</voices>
 	<loot>
-		<item id="2120" chance="4540" /><!-- rope -->
+		<item id="3003" chance="4540" /><!-- rope -->
 		<item name="gold coin" countmax="12" chance="60000" />
 		<item name="white mushroom" countmax="5" chance="8980" />
 		<item name="rat cheese" chance="18670" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Infected Weeper" nameDescription="an infected weeper" race="fire" experience="4800" speed="250" raceId="897">
 	<health now="6800" max="6800" />
-	<look type="489" corpse="17251" />
+	<look type="489" corpse="15906" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -56,6 +56,6 @@
 		<item name="gold coin" countmax="100" chance="50000" />
 		<item name="gold coin" countmax="98" chance="50000" />
 		<item name="platinum coin" countmax="7" chance="100000" />
-		<item id="8748" chance="1460" /><!-- coal -->
+		<item id="7920" chance="1460" /><!-- coal -->
 	</loot>
 </monster>

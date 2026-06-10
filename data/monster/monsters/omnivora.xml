@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Omnivora" nameDescription="an omnivora" race="venom" experience="750" speed="210" raceId="1141">
 	<health now="1200" max="1200" />
-	<look type="717" corpse="24651" />
+	<look type="717" corpse="21995" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -50,20 +50,20 @@
 		<element deathPercent="20" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="145" />
-		<item id="2667" name="fish" chance="10209" />
-		<item id="2787" name="white mushroom" chance="9612" countmax="3" />
-		<item id="2671" name="ham" chance="9347" />
-		<item id="2168" name="life ring" chance="1790" />
-		<item id="2185" name="necrotic rod" chance="1028" />
-		<item id="18417" name="brown crystal splinter" chance="762" />
-		<item id="18418" name="blue crystal splinter" chance="597" />
-		<item id="18416" name="green crystal splinter" chance="497" />
-		<item id="2409" name="serpent sword" chance="497" />
-		<item id="8900" name="spellbook of enlightenment" chance="431" />
-		<item id="7887" name="terra amulet" chance="365" />
-		<item id="7886" name="terra boots" chance="265" />
-		<item id="6300" name="death ring" chance="232" />
-		<item id="13298" name="carrot on a stick" chance="166" />
+		<item id="3031" name="gold coin" chance="100000" countmax="145" />
+		<item id="3578" name="fish" chance="10209" />
+		<item id="3723" name="white mushroom" chance="9612" countmax="3" />
+		<item id="3582" name="ham" chance="9347" />
+		<item id="3052" name="life ring" chance="1790" />
+		<item id="3069" name="necrotic rod" chance="1028" />
+		<item id="16123" name="brown crystal splinter" chance="762" />
+		<item id="16124" name="blue crystal splinter" chance="597" />
+		<item id="16122" name="green crystal splinter" chance="497" />
+		<item id="3297" name="serpent sword" chance="497" />
+		<item id="8072" name="spellbook of enlightenment" chance="431" />
+		<item id="814" name="terra amulet" chance="365" />
+		<item id="813" name="terra boots" chance="265" />
+		<item id="6299" name="death ring" chance="232" />
+		<item id="12311" name="carrot on a stick" chance="166" />
 	</loot>
 </monster>

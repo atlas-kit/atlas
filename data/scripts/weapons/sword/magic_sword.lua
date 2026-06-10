@@ -1,4 +1,4 @@
 local weapon = Weapon(WEAPON_SWORD)
-weapon:id(2400)
+weapon:id(3288)
 weapon:level(80)
 weapon:register()

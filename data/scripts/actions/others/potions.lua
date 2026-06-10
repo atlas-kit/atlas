@@ -1,7 +1,7 @@
 local action = Action()
 
 local potions = {
-	[7588] = { -- strong health potion
+	[236] = { -- strong health potion
 		health = {250, 350},
 		vocations = {
 			VOCATION_PALADIN,
@@ -33,7 +33,7 @@ local potions = {
 		flask = 7635,
 		description = "Only sorcerers, druids and paladins of level 80 or above may drink this fluid."
 	},
-	[7591] = { -- great health potion
+	[239] = { -- great health potion
 		health = {425, 575},
 		vocations = {
 			VOCATION_KNIGHT,
@@ -43,7 +43,7 @@ local potions = {
 		flask = 7635,
 		description = "Only knights of level 80 or above may drink this fluid."
 	},
-	[7618] = { -- health potion
+	[266] = { -- health potion
 		health = {125, 175},
 		flask = 7636
 	},
@@ -51,7 +51,7 @@ local potions = {
 		mana = {75, 125},
 		flask = 7636
 	},
-	[8472] = { -- great spirit potion
+	[7642] = { -- great spirit potion
 		health = {250, 350},
 		mana = {100, 200},
 		vocations = {
@@ -62,7 +62,7 @@ local potions = {
 		flask = 7635,
 		description = "Only paladins of level 80 or above may drink this fluid."
 	},
-	[8473] = { -- ultimate health potion
+	[7643] = { -- ultimate health potion
 		health = {650, 850},
 		vocations = {
 			VOCATION_KNIGHT,
@@ -72,11 +72,11 @@ local potions = {
 		flask = 7635,
 		description = "Only knights of level 130 or above may drink this fluid."
 	},
-	[8474] = { -- antidote potion
+	[7644] = { -- antidote potion
 		antidote = true,
 		flask = 7636
 	},
-	[8704] = { -- small health potion
+	[7876] = { -- small health potion
 		health = {60, 90},
 		flask = 7636
 	},
@@ -92,7 +92,7 @@ local potions = {
 		flask = 7635,
 		description = "Only druids and sorcerers of level 130 or above may drink this fluid."
 	},
-	[26030] = { -- ultimate spirit potion
+	[23374] = { -- ultimate spirit potion
 		health = {410, 580},
 		mana = {150, 250},
 		vocations = {
@@ -103,7 +103,7 @@ local potions = {
 		flask = 7635,
 		description = "Only paladins of level 130 or above may drink this fluid."
 	},
-	[26031] = { -- supreme health potion
+	[23375] = { -- supreme health potion
 		health = {875, 1125},
 		vocations = {
 			VOCATION_KNIGHT,

@@ -40,7 +40,7 @@ local function creatureSayCallback(cid, type, msg)
 						if item then
 							item:setStoreItem(true)
 							item:setAttribute("wrapid", 34156)
-							item:setAttribute(ITEM_ATTRIBUTE_DESCRIPTION, "Unwrap it in your own house to create a " .. ItemType(34156):getName() .. ".")
+							item:setAttribute(ITEM_ATTRIBUTE_DESCRIPTION, "Unwrap it in your own house to create a " .. ItemType(31500):getName() .. ".")
 							storeInbox:addItemEx(item)
 						end
 

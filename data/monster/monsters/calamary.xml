@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Calamary" nameDescription="a calamary" race="undead" experience="0" speed="160" raceId="780">
 	<health now="75" max="75" />
-	<look type="451" corpse="15280" />
+	<look type="451" corpse="13853" />
 	<targetchange interval="4000" chance="8" />
 	<flags>
 		<flag summonable="0" />

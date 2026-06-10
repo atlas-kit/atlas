@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Island Troll" nameDescription="an island troll" race="blood" experience="20" speed="126" manacost="290" raceId="277">
 	<health now="50" max="50" />
-	<look type="282" corpse="7930" />
+	<look type="282" corpse="865" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="1" />
@@ -32,17 +32,17 @@
 		<voice sentence="Gruntz!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="59656" countmax="10" />
+		<item id="3031" name="gold coin" chance="59656" countmax="10" />
 		<item id="5901" name="wood" chance="30727" />
-		<item id="2389" name="spear" chance="20007" />
-		<item id="2380" name="hand axe" chance="17701" />
-		<item id="2512" name="wooden shield" chance="15244" />
-		<item id="2643" name="leather boots" chance="9794" />
-		<item id="2461" name="leather helmet" chance="9670" />
-		<item id="2120" name="rope" chance="7889" />
-		<item id="2448" name="studded club" chance="5182" />
-		<item id="5097" name="mango" chance="5102" />
-		<item id="7963" name="marlin" chance="71" />
-		<item id="2170" name="silver amulet" chance="71" />
+		<item id="3277" name="spear" chance="20007" />
+		<item id="3268" name="hand axe" chance="17701" />
+		<item id="3412" name="wooden shield" chance="15244" />
+		<item id="3552" name="leather boots" chance="9794" />
+		<item id="3355" name="leather helmet" chance="9670" />
+		<item id="3003" name="rope" chance="7889" />
+		<item id="3336" name="studded club" chance="5182" />
+		<item id="5096" name="mango" chance="5102" />
+		<item id="901" name="marlin" chance="71" />
+		<item id="3054" name="silver amulet" chance="71" />
 	</loot>
 </monster>

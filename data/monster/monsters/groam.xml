@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Groam" nameDescription="Groam" race="blood" experience="180" speed="560">
 	<health now="400" max="400" />
-	<look type="413" corpse="13839" />
+	<look type="413" corpse="12684" />
 	<targetchange interval="2000" chance="50" />
 	<flags>
 		<flag summonable="0" />
@@ -45,6 +45,6 @@
 		<item name="gold coin" countmax="50" chance="100000" />
 		<item name="life ring" chance="50000" />
 		<item name="hunting spear" countmax="4" chance="25000" />
-		<item id="9808" chance="14285" /><!-- rusty armor (common) -->
+		<item id="8894" chance="14285" /><!-- rusty armor (common) -->
 	</loot>
 </monster>

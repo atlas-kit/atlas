@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lizard Templar" nameDescription="a lizard templar" race="blood" experience="155" speed="174" raceId="113">
 	<health now="410" max="410" />
-	<look type="113" corpse="4251" />
+	<look type="113" corpse="4239" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -37,7 +37,7 @@
 	<loot>
 		<item name="gold coin" countmax="60" chance="84000" />
 		<item name="short sword" chance="9500" />
-		<item id="2376" chance="4800" /><!-- sword -->
+		<item id="3264" chance="4800" /><!-- sword -->
 		<item name="steel helmet" chance="2000" />
 		<item name="morning star" chance="1990" />
 		<item name="plate armor" chance="1000" />

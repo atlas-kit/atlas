@@ -61,12 +61,12 @@
 		<item name="gold coin" countmax="100" chance="31000" />
 		<item name="gold coin" countmax="50" chance="31000" />
 		<item name="white pearl" chance="10000" />
-		<item id="2072" chance="9200" /><!-- lute -->
+		<item id="2950" chance="9200" /><!-- lute -->
 		<item name="great mana potion" chance="8000" />
 		<item name="blue robe" chance="1200" />
 		<item name="crystal mace" chance="1000" />
-		<item id="2124" chance="1000" /><!-- crystal ring -->
-		<item id="2074" chance="330" /><!-- panpipes -->
+		<item id="3007" chance="1000" /><!-- crystal ring -->
+		<item id="2953" chance="330" /><!-- panpipes -->
 		<item name="ancient tiara" chance="170" />
 		<item name="mini mummy" chance="170" />
 	</loot>

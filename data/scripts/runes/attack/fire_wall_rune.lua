@@ -13,7 +13,7 @@ end
 spell:group("attack")
 spell:id(28)
 spell:name("Fire Wall Rune")
-spell:runeId(2303)
+spell:runeId(3190)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(33)

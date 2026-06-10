@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Undead Jester" nameDescription="an undead jester" race="blood" experience="5" speed="224" raceId="388">
 	<health now="355" max="355" />
-	<look type="273" head="0" body="0" legs="114" feet="0" addons="2" corpse="20522" />
+	<look type="273" head="0" body="0" legs="114" feet="0" addons="2" corpse="18241" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -61,22 +61,22 @@
 		<voice sentence="Did I do that?" />
 	</voices>
 	<loot>
-		<item id="2667" name="fish" chance="59315" />
-		<item id="9108" name="suspicious surprise bag" chance="40147" />
-		<item id="9696" name="part of a jester doll" chance="3814" />
-		<item id="9697" name="part of a jester doll" chance="3814" />
-		<item id="9698" name="part of a jester doll" chance="3814" />
-		<item id="9699" name="part of a jester doll" chance="3814" />
+		<item id="3578" name="fish" chance="59315" />
+		<item id="8853" name="suspicious surprise bag" chance="40147" />
+		<item id="8781" name="part of a jester doll" chance="3814" />
+		<item id="8782" name="part of a jester doll" chance="3814" />
+		<item id="8783" name="part of a jester doll" chance="3814" />
+		<item id="8784" name="part of a jester doll" chance="3814" />
 		<item id="5909" name="white piece of cloth" chance="1320" />
 		<item id="5913" name="brown piece of cloth" chance="1125" />
 		<item id="5910" name="green piece of cloth" chance="1027" />
 		<item id="7158" name="rainbow trout" chance="1027" />
-		<item id="9695" name="the torso of a jester doll" chance="978" />
+		<item id="8780" name="the torso of a jester doll" chance="978" />
 		<item id="7159" name="green perch" chance="880" />
 		<item id="5912" name="blue piece of cloth" chance="831" />
 		<item id="5914" name="yellow piece of cloth" chance="782" />
 		<item id="5911" name="red piece of cloth" chance="440" />
-		<item id="9694" name="the head of a jester doll" chance="342" />
-		<item id="7963" name="marlin" chance="196" />
+		<item id="8779" name="the head of a jester doll" chance="342" />
+		<item id="901" name="marlin" chance="196" />
 	</loot>
 </monster>

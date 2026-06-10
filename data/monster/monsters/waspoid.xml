@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Waspoid" nameDescription="Waspoid" race="venom" experience="830" speed="210" raceId="792">
 	<health now="1100" max="1100" />
-	<look type="462" corpse="15396" />
+	<look type="462" corpse="13983" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

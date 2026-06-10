@@ -56,7 +56,7 @@
 	</voices>
 	<loot>
 		<item name="gold coin" countmax="55" chance="83740" />
-		<item id="3077" chance="45000" /><!-- dead snake -->
+		<item id="4259" chance="45000" /><!-- dead snake -->
 		<item name="cape" chance="8640" />
 		<item name="life crystal" chance="1430" />
 		<item name="lizard leather" chance="1320" />

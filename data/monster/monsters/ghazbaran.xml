@@ -74,7 +74,7 @@
 	<loot>
 		<item name="blue tome" chance="20000" />
 		<item name="teddy bear" chance="12500" />
-		<item id="2124" name="crystal ring" chance="8333" />
+		<item id="3007" name="crystal ring" chance="8333" />
 		<item name="white pearl" countmax="15" chance="25000" />
 		<item name="black pearl" countmax="14" chance="11111" />
 		<item name="small diamond" countmax="5" chance="25000" />
@@ -89,8 +89,8 @@
 		<item name="stealth ring" chance="12500" />
 		<item name="strange symbol" chance="11111" />
 		<item name="life crystal" chance="12500" />
-		<item id="2178" chance="20000" />
-		<item id="2178" name="mind stone" chance="20000" />
+		<item id="3062" chance="20000" />
+		<item id="3062" name="mind stone" chance="20000" />
 		<item name="gold ring" chance="20000" />
 		<item name="ring of healing" chance="20000" />
 		<item name="twin axe" chance="11111" />
@@ -99,7 +99,7 @@
 		<item name="demon shield" chance="12500" />
 		<item name="golden boots" chance="8333" />
 		<item name="demon horn" countmax="2" chance="33333" />
-		<item id="6300" name="death ring" chance="25000" />
+		<item id="6299" name="death ring" chance="25000" />
 		<item name="demonic essence" chance="100000" />
 		<item name="ruthless axe" chance="14285" />
 		<item name="assassin star" countmax="44" chance="12500" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Reflection Of Obujos" nameDescription="a reflection of Obujos" race="blood" experience="20000" speed="270">
 	<health now="35000" max="35000" />
-	<look type="445" corpse="15224" />
+	<look type="445" corpse="13797" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -46,7 +46,7 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="7632" name="giant shimmering pearl" chance="50000" />
-		<item id="15436" name="obujos' shell" chance="50000" />
+		<item id="281" name="giant shimmering pearl" chance="50000" />
+		<item id="14023" name="obujos' shell" chance="50000" />
 	</loot>
 </monster>

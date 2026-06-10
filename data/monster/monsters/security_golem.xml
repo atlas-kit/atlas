@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Security Golem" nameDescription="a security golem" race="energy" experience="2750" speed="200">
 	<health now="6500" max="6500" />
-	<look type="326" corpse="10005" />
+	<look type="326" corpse="9092" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

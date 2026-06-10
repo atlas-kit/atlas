@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Desperate White Deer" nameDescription="a desperate white deer" race="blood" experience="35" speed="225">
 	<health now="55" max="255" />
-	<look type="400" corpse="13513" />
+	<look type="400" corpse="12524" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -31,8 +31,8 @@
 		<voice sentence="*wheeze*" />
 	</voices>
 	<loot>
-		<item id="13533" name="white deer antlers" chance="21286" />
-		<item id="13534" name="white deer skin" chance="20418" />
-		<item id="2671" name="ham" chance="19595" />
+		<item id="12544" name="white deer antlers" chance="21286" />
+		<item id="12545" name="white deer skin" chance="20418" />
+		<item id="3582" name="ham" chance="19595" />
 	</loot>
 </monster>

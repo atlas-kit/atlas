@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Preceptor Lazare" nameDescription="Preceptor Lazare" race="blood" experience="9200" speed="210">
 	<health now="15000" max="15000" />
-	<look type="1078" corpse="31299" />
+	<look type="1078" corpse="28643" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -52,8 +52,8 @@
 		<voice sentence="There is nothing here for you and you will die alone." />
 	</voices>
 	<loot>
-		<item id="7762" name="small enchanted amethyst" chance="100000" />
-		<item id="31477" name="patch of fine cloth" chance="874" />
-		<item id="31376" name="falcon greaves" chance="175" />
+		<item id="678" name="small enchanted amethyst" chance="100000" />
+		<item id="28821" name="patch of fine cloth" chance="874" />
+		<item id="28720" name="falcon greaves" chance="175" />
 	</loot>
 </monster>

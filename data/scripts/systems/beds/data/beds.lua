@@ -1,386 +1,386 @@
 local beds = {
-    [1754] = {
-        partnerId = 1755,
+    [2487] = {
+        partnerId = 2488,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1762,
-            [PLAYERSEX_MALE] = 7778
+            [PLAYERSEX_FEMALE] = 2495,
+            [PLAYERSEX_MALE] = 694
         }
     },
-    [1755] = {
-        partnerId = 1754,
+    [2488] = {
+        partnerId = 2487,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1763,
-            [PLAYERSEX_MALE] = 8075
+            [PLAYERSEX_FEMALE] = 695,
+            [PLAYERSEX_MALE] = 2496
         }
     },
-    [1756] = {
-        partnerId = 1757,
+    [2489] = {
+        partnerId = 2490,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1768,
-            [PLAYERSEX_MALE] = 7783
+            [PLAYERSEX_FEMALE] = 2501,
+            [PLAYERSEX_MALE] = 700
         }
     },
-    [1757] = {
-        partnerId = 1756,
+    [2490] = {
+        partnerId = 2489,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1769,
-            [PLAYERSEX_MALE] = 7784
+            [PLAYERSEX_FEMALE] = 2502,
+            [PLAYERSEX_MALE] = 701
         }
     },
-    [1758] = {
-        partnerId = 1759,
+    [2491] = {
+        partnerId = 2492,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1766,
-            [PLAYERSEX_MALE] = 7781
+            [PLAYERSEX_FEMALE] = 2499,
+            [PLAYERSEX_MALE] = 698
         }
     },
-    [1759] = {
-        partnerId = 1758,
+    [2492] = {
+        partnerId = 2491,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1767,
-            [PLAYERSEX_MALE] = 7782
+            [PLAYERSEX_FEMALE] = 2500,
+            [PLAYERSEX_MALE] = 699
         }
     },
-    [1760] = {
-        partnerId = 1761,
+    [2493] = {
+        partnerId = 2494,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1764,
-            [PLAYERSEX_MALE] = 7779
+            [PLAYERSEX_FEMALE] = 2497,
+            [PLAYERSEX_MALE] = 696
         }
     },
-    [1761] = {
-        partnerId = 1760,
+    [2494] = {
+        partnerId = 2493,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 1765,
-            [PLAYERSEX_MALE] = 7780
+            [PLAYERSEX_FEMALE] = 115,
+            [PLAYERSEX_MALE] = 697
         }
     },
-    [3836] = {
-        partnerId = 3837,
+    [2503] = {
+        partnerId = 2504,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 3840,
-            [PLAYERSEX_MALE] = 3840
+            [PLAYERSEX_FEMALE] = 2507,
+            [PLAYERSEX_MALE] = 2507
         }
     },
-    [3837] = {
-        partnerId = 3836,
+    [2504] = {
+        partnerId = 2503,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 3841,
-            [PLAYERSEX_MALE] = 3841
+            [PLAYERSEX_FEMALE] = 703,
+            [PLAYERSEX_MALE] = 703
         }
     },
-    [3838] = {
-        partnerId = 3839,
+    [2505] = {
+        partnerId = 2506,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 3842,
-            [PLAYERSEX_MALE] = 3842
+            [PLAYERSEX_FEMALE] = 2509,
+            [PLAYERSEX_MALE] = 2509
         }
     },
-    [3839] = {
-        partnerId = 3838,
+    [2506] = {
+        partnerId = 2505,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 3843,
-            [PLAYERSEX_MALE] = 3843
+            [PLAYERSEX_FEMALE] = 705,
+            [PLAYERSEX_MALE] = 705
+        }
+    },
+    [5495] = {
+        partnerId = 5496,
+        partnerDirection = DIRECTION_SOUTH,
+        transformTo = {
+            [PLAYERSEX_FEMALE] = 5501,
+            [PLAYERSEX_MALE] = 5501
         }
     },
     [5496] = {
-        partnerId = 5497,
-        partnerDirection = DIRECTION_SOUTH,
+        partnerId = 5495,
+        partnerDirection = DIRECTION_NORTH,
         transformTo = {
             [PLAYERSEX_FEMALE] = 5502,
             [PLAYERSEX_MALE] = 5502
         }
     },
     [5497] = {
-        partnerId = 5496,
-        partnerDirection = DIRECTION_NORTH,
+        partnerId = 767,
+        partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 5503,
-            [PLAYERSEX_MALE] = 5503
+            [PLAYERSEX_FEMALE] = 5499,
+            [PLAYERSEX_MALE] = 5499
         }
     },
-    [5498] = {
-        partnerId = 5499,
-        partnerDirection = DIRECTION_EAST,
+    [767] = {
+        partnerId = 5497,
+        partnerDirection = DIRECTION_WEST,
         transformTo = {
             [PLAYERSEX_FEMALE] = 5500,
             [PLAYERSEX_MALE] = 5500
         }
     },
-    [5499] = {
-        partnerId = 5498,
-        partnerDirection = DIRECTION_WEST,
-        transformTo = {
-            [PLAYERSEX_FEMALE] = 5501,
-            [PLAYERSEX_MALE] = 5501
-        }
-    },
-    [7787] = {
-        partnerId = 7788,
+    [706] = {
+        partnerId = 707,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7811,
-            [PLAYERSEX_MALE] = 7811
+            [PLAYERSEX_FEMALE] = 734,
+            [PLAYERSEX_MALE] = 734
         }
     },
-    [7788] = {
-        partnerId = 7787,
+    [707] = {
+        partnerId = 706,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7812,
-            [PLAYERSEX_MALE] = 7812
+            [PLAYERSEX_FEMALE] = 735,
+            [PLAYERSEX_MALE] = 735
         }
     },
-    [7789] = {
-        partnerId = 7790,
+    [708] = {
+        partnerId = 709,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7813,
-            [PLAYERSEX_MALE] = 7813
+            [PLAYERSEX_FEMALE] = 736,
+            [PLAYERSEX_MALE] = 736
         }
     },
-    [7790] = {
-        partnerId = 7789,
+    [709] = {
+        partnerId = 708,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7814,
-            [PLAYERSEX_MALE] = 7814
+            [PLAYERSEX_FEMALE] = 737,
+            [PLAYERSEX_MALE] = 737
         }
     },
-    [7791] = {
-        partnerId = 7792,
+    [710] = {
+        partnerId = 711,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7815,
-            [PLAYERSEX_MALE] = 7815
+            [PLAYERSEX_FEMALE] = 738,
+            [PLAYERSEX_MALE] = 738
         }
     },
-    [7792] = {
-        partnerId = 7791,
+    [711] = {
+        partnerId = 710,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7816,
-            [PLAYERSEX_MALE] = 7816
+            [PLAYERSEX_FEMALE] = 739,
+            [PLAYERSEX_MALE] = 739
         }
     },
-    [7793] = {
-        partnerId = 7794,
+    [712] = {
+        partnerId = 713,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7817,
-            [PLAYERSEX_MALE] = 7817
+            [PLAYERSEX_FEMALE] = 740,
+            [PLAYERSEX_MALE] = 740
         }
     },
-    [7794] = {
-        partnerId = 7793,
+    [713] = {
+        partnerId = 712,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7818,
-            [PLAYERSEX_MALE] = 7818
+            [PLAYERSEX_FEMALE] = 741,
+            [PLAYERSEX_MALE] = 741
         }
     },
-    [7795] = {
-        partnerId = 7796,
+    [714] = {
+        partnerId = 715,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7819,
-            [PLAYERSEX_MALE] = 7819
+            [PLAYERSEX_FEMALE] = 742,
+            [PLAYERSEX_MALE] = 742
         }
     },
-    [7796] = {
-        partnerId = 7795,
+    [715] = {
+        partnerId = 714,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7820,
-            [PLAYERSEX_MALE] = 7820
+            [PLAYERSEX_FEMALE] = 743,
+            [PLAYERSEX_MALE] = 743
         }
     },
-    [7797] = {
-        partnerId = 7798,
+    [716] = {
+        partnerId = 717,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7821,
-            [PLAYERSEX_MALE] = 7821
+            [PLAYERSEX_FEMALE] = 744,
+            [PLAYERSEX_MALE] = 744
         }
     },
-    [7798] = {
-        partnerId = 7797,
+    [717] = {
+        partnerId = 716,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7822,
-            [PLAYERSEX_MALE] = 7822
+            [PLAYERSEX_FEMALE] = 745,
+            [PLAYERSEX_MALE] = 745
         }
     },
-    [7799] = {
-        partnerId = 7800,
+    [718] = {
+        partnerId = 719,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7811,
-            [PLAYERSEX_MALE] = 7811
+            [PLAYERSEX_FEMALE] = 734,
+            [PLAYERSEX_MALE] = 734
         }
     },
-    [7800] = {
-        partnerId = 7799,
+    [719] = {
+        partnerId = 718,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7812,
-            [PLAYERSEX_MALE] = 7812
+            [PLAYERSEX_FEMALE] = 735,
+            [PLAYERSEX_MALE] = 735
         }
     },
-    [7801] = {
-        partnerId = 7802,
+    [720] = {
+        partnerId = 721,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7813,
-            [PLAYERSEX_MALE] = 7813
+            [PLAYERSEX_FEMALE] = 736,
+            [PLAYERSEX_MALE] = 736
         }
     },
-    [7802] = {
-        partnerId = 7801,
+    [721] = {
+        partnerId = 720,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7814,
-            [PLAYERSEX_MALE] = 7814
+            [PLAYERSEX_FEMALE] = 737,
+            [PLAYERSEX_MALE] = 737
         }
     },
-    [7803] = {
-        partnerId = 7804,
+    [722] = {
+        partnerId = 723,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7815,
-            [PLAYERSEX_MALE] = 7815
+            [PLAYERSEX_FEMALE] = 738,
+            [PLAYERSEX_MALE] = 738
         }
     },
-    [7804] = {
-        partnerId = 7803,
+    [723] = {
+        partnerId = 722,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7816,
-            [PLAYERSEX_MALE] = 7816
+            [PLAYERSEX_FEMALE] = 739,
+            [PLAYERSEX_MALE] = 739
         }
     },
-    [7805] = {
-        partnerId = 7806,
+    [724] = {
+        partnerId = 725,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7817,
-            [PLAYERSEX_MALE] = 7817
+            [PLAYERSEX_FEMALE] = 740,
+            [PLAYERSEX_MALE] = 740
         }
     },
-    [7806] = {
-        partnerId = 7805,
+    [725] = {
+        partnerId = 724,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7818,
-            [PLAYERSEX_MALE] = 7818
+            [PLAYERSEX_FEMALE] = 741,
+            [PLAYERSEX_MALE] = 741
         }
     },
-    [7807] = {
-        partnerId = 7808,
+    [726] = {
+        partnerId = 731,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7819,
-            [PLAYERSEX_MALE] = 7819
+            [PLAYERSEX_FEMALE] = 742,
+            [PLAYERSEX_MALE] = 742
         }
     },
-    [7808] = {
-        partnerId = 7807,
+    [731] = {
+        partnerId = 726,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7820,
-            [PLAYERSEX_MALE] = 7820
+            [PLAYERSEX_FEMALE] = 743,
+            [PLAYERSEX_MALE] = 743
         }
     },
-    [7809] = {
-        partnerId = 7810,
+    [732] = {
+        partnerId = 733,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7821,
-            [PLAYERSEX_MALE] = 7821
+            [PLAYERSEX_FEMALE] = 744,
+            [PLAYERSEX_MALE] = 744
         }
     },
-    [7810] = {
-        partnerId = 7809,
+    [733] = {
+        partnerId = 732,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 7822,
-            [PLAYERSEX_MALE] = 7822
+            [PLAYERSEX_FEMALE] = 745,
+            [PLAYERSEX_MALE] = 745
         }
     },
-    [18027] = {
-        partnerId = 18028,
+    [15506] = {
+        partnerId = 15507,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 18031,
-            [PLAYERSEX_MALE] = 18035
+            [PLAYERSEX_FEMALE] = 15510,
+            [PLAYERSEX_MALE] = 15514
         }
     },
-    [18028] = {
-        partnerId = 18027,
+    [15507] = {
+        partnerId = 15506,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 18032,
-            [PLAYERSEX_MALE] = 18036
+            [PLAYERSEX_FEMALE] = 15511,
+            [PLAYERSEX_MALE] = 15515
         }
     },
-    [18029] = {
-        partnerId = 18030,
+    [15508] = {
+        partnerId = 15509,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 18033,
-            [PLAYERSEX_MALE] = 18037
+            [PLAYERSEX_FEMALE] = 15512,
+            [PLAYERSEX_MALE] = 15516
         }
     },
-    [18030] = {
-        partnerId = 18029,
+    [15509] = {
+        partnerId = 15508,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 18034,
-            [PLAYERSEX_MALE] = 18038
+            [PLAYERSEX_FEMALE] = 15513,
+            [PLAYERSEX_MALE] = 15517
         }
     },
-    [20197] = {
-        partnerId = 20198,
+    [17917] = {
+        partnerId = 17918,
         partnerDirection = DIRECTION_SOUTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 20201,
-            [PLAYERSEX_MALE] = 20205
+            [PLAYERSEX_FEMALE] = 17921,
+            [PLAYERSEX_MALE] = 17925
         }
     },
-    [20198] = {
-        partnerId = 20197,
+    [17918] = {
+        partnerId = 17917,
         partnerDirection = DIRECTION_NORTH,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 20202,
-            [PLAYERSEX_MALE] = 20206
+            [PLAYERSEX_FEMALE] = 17922,
+            [PLAYERSEX_MALE] = 17926
         }
     },
-    [20199] = {
-        partnerId = 20200,
+    [17919] = {
+        partnerId = 17920,
         partnerDirection = DIRECTION_EAST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 20203,
-            [PLAYERSEX_MALE] = 20207
+            [PLAYERSEX_FEMALE] = 17923,
+            [PLAYERSEX_MALE] = 17927
         }
     },
-    [20200] = {
-        partnerId = 20199,
+    [17920] = {
+        partnerId = 17919,
         partnerDirection = DIRECTION_WEST,
         transformTo = {
-            [PLAYERSEX_FEMALE] = 20204,
-            [PLAYERSEX_MALE] = 20208
+            [PLAYERSEX_FEMALE] = 17924,
+            [PLAYERSEX_MALE] = 17928
         }
     }
 }

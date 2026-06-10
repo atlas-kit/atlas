@@ -1,5 +1,5 @@
 local weapon = Weapon(WEAPON_SWORD)
-weapon:id(6528)
+weapon:id(6527)
 weapon:level(75)
 weapon:vocation("knight")
 weapon:register()

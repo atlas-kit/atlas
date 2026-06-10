@@ -15,5 +15,5 @@ function event.onStepIn(creature, item, position, fromPosition)
 	return true
 end
 
-event:id(1387)
+event:id(1949)
 event:register()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gnomevil" nameDescription="Gnomevil" race="blood" experience="45000" speed="470">
 	<health now="250000" max="250000" />
-	<look type="504" corpse="18443" />
+	<look type="504" corpse="16149" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

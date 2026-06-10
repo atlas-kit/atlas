@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Monk" nameDescription="a monk" race="blood" experience="200" speed="240" manacost="600" raceId="57">
 	<health now="240" max="240" />
-	<look type="57" corpse="20371" />
+	<look type="57" corpse="18090" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="1" />
@@ -50,13 +50,13 @@
 		<item name="book of prayers" chance="4930" />
 		<item name="rope belt" chance="3150" />
 		<item name="ankh" chance="2240" />
-		<item id="1949" chance="1700" /><!-- scroll -->
+		<item id="2815" chance="1700" /><!-- scroll -->
 		<item name="life crystal" chance="1002" />
 		<item name="safety pin" chance="1001" />
 		<item name="brown flask" chance="890" />
-		<item id="2044" chance="840" /><!-- lamp -->
+		<item id="2914" chance="840" /><!-- lamp -->
 		<item name="sandals" chance="660" />
-		<item id="2401" chance="440" /><!-- staff -->
+		<item id="3289" chance="440" /><!-- staff -->
 		<item name="power ring" chance="100" />
 	</loot>
 </monster>

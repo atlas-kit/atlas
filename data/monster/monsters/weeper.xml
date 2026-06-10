@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Weeper" nameDescription="a weeper" race="fire" experience="4800" speed="260" raceId="882">
 	<health now="6800" max="6800" />
-	<look type="489" corpse="17252" />
+	<look type="489" corpse="15907" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -63,7 +63,7 @@
 		<item name="magma coat" chance="790" />
 		<item name="ultimate health potion" countmax="2" chance="15440" />
 		<item name="fiery heart" chance="13570" />
-		<item id="13757" chance="1320" /><!-- coal -->
+		<item id="12600" chance="1320" /><!-- coal -->
 		<item name="wand of everblazing" chance="1480" />
 		<item name="violet crystal shard" chance="5430" />
 		<item name="brown crystal splinter" countmax="2" chance="12100" />

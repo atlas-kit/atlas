@@ -107,10 +107,10 @@
 		<item name="havoc blade" chance="16000" />
 		<item name="shadow sceptre" chance="16000" />
 		<item name="small emerald" countmax="100" chance="16000" />
-		<item id="7632" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
-		<item id="7633" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
+		<item id="281" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
+		<item id="282" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
 		<item name="magic plate armor" chance="14000" />
-		<item id="2514" name="mastermind shield" chance="14000" />
+		<item id="3414" name="mastermind shield" chance="14000" />
 		<item name="runed sword" chance="14000" />
 		<item name="spellscroll of prophecies" chance="14000" />
 		<item name="chaos mace" chance="12000" />

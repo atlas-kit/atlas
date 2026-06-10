@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Squirrel" nameDescription="a squirrel" race="blood" experience="0" speed="480" manacost="220" raceId="384">
 	<health now="20" max="20" />
-	<look type="274" corpse="7628" />
+	<look type="274" corpse="276" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="1" />
@@ -24,8 +24,8 @@
 		<voice sentence="Chchch" />
 	</voices>
 	<loot>
-		<item id="11213" name="acorn" chance="36613" />
-		<item id="7910" name="peanut" chance="652" />
-		<item id="7909" name="walnut" chance="516" />
+		<item id="10296" name="acorn" chance="36613" />
+		<item id="841" name="peanut" chance="652" />
+		<item id="836" name="walnut" chance="516" />
 	</loot>
 </monster>

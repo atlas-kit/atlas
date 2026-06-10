@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lord Azaram" nameDescription="Lord Azaram" race="venom" experience="55000" speed="250">
 	<health now="1000" max="1000" />
-	<look type="1223" head="0" body="38" legs="94" feet="82" addons="3" corpse="34255" />
+	<look type="1223" head="0" body="38" legs="94" feet="82" addons="3" corpse="31599" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -46,38 +46,38 @@
 		<summon name="Condensed Sins" interval="2000" chance="50" />
 	</summons>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" countmax="5" />
-		<item id="25172" name="silver token" chance="100000" countmax="2" />
-		<item id="26030" name="ultimate spirit potion" chance="65455" countmax="20" />
-		<item id="26029" name="ultimate mana potion" chance="58182" countmax="20" />
-		<item id="26031" name="supreme health potion" chance="45455" countmax="20" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="5" />
+		<item id="22516" name="silver token" chance="100000" countmax="2" />
+		<item id="23374" name="ultimate spirit potion" chance="65455" countmax="20" />
+		<item id="23373" name="ultimate mana potion" chance="58182" countmax="20" />
+		<item id="23375" name="supreme health potion" chance="45455" countmax="20" />
 		<item id="7443" name="bullseye potion" chance="34545" countmax="10" />
-		<item id="2156" name="red gem" chance="29091" />
-		<item id="2154" name="yellow gem" chance="27273" countmax="2" />
-		<item id="2155" name="green gem" chance="25455" countmax="2" />
+		<item id="3039" name="red gem" chance="29091" />
+		<item id="3037" name="yellow gem" chance="27273" countmax="2" />
+		<item id="3038" name="green gem" chance="25455" countmax="2" />
 		<item id="5888" name="piece of hell steel" chance="25455" countmax="4" />
-		<item id="2158" name="blue gem" chance="23636" />
-		<item id="2476" name="knight armor" chance="23636" />
-		<item id="2160" name="crystal coin" chance="20000" countmax="3" />
+		<item id="3041" name="blue gem" chance="23636" />
+		<item id="3370" name="knight armor" chance="23636" />
+		<item id="3043" name="crystal coin" chance="20000" countmax="3" />
 		<item id="7439" name="berserk potion" chance="18182" countmax="10" />
-		<item id="7901" name="lightning headband" chance="18182" />
-		<item id="26200" name="collar of red plasma" chance="14545" />
+		<item id="828" name="lightning headband" chance="18182" />
+		<item id="23544" name="collar of red plasma" chance="14545" />
 		<item id="7440" name="mastermind potion" chance="14545" countmax="10" />
-		<item id="26199" name="collar of green plasma" chance="12727" />
-		<item id="9971" name="gold ingot" chance="12727" />
+		<item id="23543" name="collar of green plasma" chance="12727" />
+		<item id="9058" name="gold ingot" chance="12727" />
 		<item id="7407" name="haunted blade" chance="12727" />
-		<item id="26189" name="ring of red plasma" chance="12727" />
-		<item id="2153" name="violet gem" chance="10909" countmax="2" />
+		<item id="23533" name="ring of red plasma" chance="12727" />
+		<item id="3036" name="violet gem" chance="10909" countmax="2" />
 		<item id="5892" name="huge chunk of crude iron" chance="7273" />
-		<item id="34244" name="ancient liche bone" chance="5455" />
-		<item id="26187" name="ring of green plasma" chance="5455" />
-		<item id="26198" name="collar of blue plasma" chance="3636" />
-		<item id="32717" name="giant sapphire" chance="3636" />
-		<item id="26185" name="ring of blue plasma" chance="3636" />
-		<item id="34246" name="young lich worm" chance="3636" />
-		<item id="34234" name="bear skin" chance="1818" />
-		<item id="32716" name="giant emerald" chance="1818" />
-		<item id="32715" name="giant ruby" chance="1818" />
-		<item id="34245" name="rotten heart" chance="1818" />
+		<item id="31588" name="ancient liche bone" chance="5455" />
+		<item id="23531" name="ring of green plasma" chance="5455" />
+		<item id="23542" name="collar of blue plasma" chance="3636" />
+		<item id="30061" name="giant sapphire" chance="3636" />
+		<item id="23529" name="ring of blue plasma" chance="3636" />
+		<item id="31590" name="young lich worm" chance="3636" />
+		<item id="31578" name="bear skin" chance="1818" />
+		<item id="30060" name="giant emerald" chance="1818" />
+		<item id="30059" name="giant ruby" chance="1818" />
+		<item id="31589" name="rotten heart" chance="1818" />
 	</loot>
 </monster>

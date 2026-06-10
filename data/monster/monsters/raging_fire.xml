@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Raging Fire" nameDescription="a raging fire" race="fire" experience="1500" speed="200" raceId="1121">
 	<health now="1800" max="1800" />
-	<look type="242" corpse="24184" />
+	<look type="242" corpse="21815" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

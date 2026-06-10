@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Dryad" nameDescription="a dryad" race="blood" experience="190" speed="230" raceId="383">
 	<health now="310" max="310" />
-	<look type="137" head="99" body="41" legs="5" feet="102" addons="3" corpse="20387" />
+	<look type="137" head="99" body="41" legs="5" feet="102" addons="3" corpse="18106" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -54,15 +54,15 @@
 		<voice sentence="Defiler of nature!" />
 	</voices>
 	<loot>
-		<item id="2787" countmax="2" chance="55000" />	<!-- white mushroom -->
-		<item id="2148" countmax="30" chance="40000" />	<!-- gold coin -->
-		<item id="7732" countmax="3" chance="11000" />	<!-- seeds -->
-		<item id="9928" chance="1280" />				<!-- leaf legs -->
-		<item id="9931" chance="1200" />				<!-- coconut shoes -->
-		<item id="9929" chance="1100" />				<!-- flower dress -->
-		<item id="9927" chance="970" />					<!-- flower wreath -->
-		<item id="2790" countmax="2" chance="780" />	<!-- orange mushrooms -->
-		<item id="13298" chance="210" />				<!-- carrot on a stick -->
-		<item id="2150" chance="130" />					<!-- small amethyst -->
+		<item id="3723" countmax="2" chance="55000" />	<!-- white mushroom -->
+		<item id="3031" countmax="30" chance="40000" />	<!-- gold coin -->
+		<item id="647" countmax="3" chance="11000" />	<!-- seeds -->
+		<item id="9014" chance="1280" />				<!-- leaf legs -->
+		<item id="9017" chance="1200" />				<!-- coconut shoes -->
+		<item id="9015" chance="1100" />				<!-- flower dress -->
+		<item id="9013" chance="970" />					<!-- flower wreath -->
+		<item id="3726" countmax="2" chance="780" />	<!-- orange mushrooms -->
+		<item id="12311" chance="210" />				<!-- carrot on a stick -->
+		<item id="3033" chance="130" />					<!-- small amethyst -->
 	</loot>
 </monster>

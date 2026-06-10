@@ -40,15 +40,15 @@
 		<voice sentence="Prek tars, dekklep zurk." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="74874" countmax="13" />
-		<item id="2467" name="leather armor" chance="10817" />
-		<item id="2568" name="cleaver" chance="8991" />
-		<item id="2050" name="torch" chance="5553" />
-		<item id="2229" name="skull (item)" chance="3027" countmax="3" />
-		<item id="2411" name="poison dagger" chance="2061" />
-		<item id="3965" name="hunting spear" chance="1950" />
-		<item id="2541" name="bone shield" chance="1035" />
-		<item id="3967" name="tribal mask" chance="480" />
-		<item id="3964" name="ripper lance" chance="97" />
+		<item id="3031" name="gold coin" chance="74874" countmax="13" />
+		<item id="3361" name="leather armor" chance="10817" />
+		<item id="3471" name="cleaver" chance="8991" />
+		<item id="2920" name="torch" chance="5553" />
+		<item id="3114" name="skull (item)" chance="3027" countmax="3" />
+		<item id="3299" name="poison dagger" chance="2061" />
+		<item id="3347" name="hunting spear" chance="1950" />
+		<item id="3441" name="bone shield" chance="1035" />
+		<item id="3403" name="tribal mask" chance="480" />
+		<item id="3346" name="ripper lance" chance="97" />
 	</loot>
 </monster>

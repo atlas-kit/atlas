@@ -62,16 +62,16 @@
 		<voice sentence="Blup." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="90418" countmax="110" />
-		<item id="12444" name="quara eye" chance="15606" />
-		<item id="2143" name="white pearl" chance="5083" />
-		<item id="2149" name="small emerald" chance="4960" countmax="2" />
-		<item id="2670" name="shrimp" chance="4716" />
-		<item id="2144" name="black pearl" chance="3125" />
-		<item id="7590" name="great mana potion" chance="2861" />
+		<item id="3031" name="gold coin" chance="90418" countmax="110" />
+		<item id="11488" name="quara eye" chance="15606" />
+		<item id="3026" name="white pearl" chance="5083" />
+		<item id="3032" name="small emerald" chance="4960" countmax="2" />
+		<item id="3581" name="shrimp" chance="4716" />
+		<item id="3027" name="black pearl" chance="3125" />
+		<item id="238" name="great mana potion" chance="2861" />
 		<item id="5895" name="fish fin" chance="1459" />
-		<item id="2214" name="ring of healing" chance="1233" />
-		<item id="2189" name="wand of cosmic energy" chance="979" />
-		<item id="2476" name="knight armor" chance="226" />
+		<item id="3098" name="ring of healing" chance="1233" />
+		<item id="3073" name="wand of cosmic energy" chance="979" />
+		<item id="3370" name="knight armor" chance="226" />
 	</loot>
 </monster>

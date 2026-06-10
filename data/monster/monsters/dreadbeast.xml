@@ -45,10 +45,10 @@
 	</immunities>
 	<loot>
 		<item name="gold coin" countmax="88" chance="11690" />
-		<item id="2230" chance="8230" /><!-- bone -->
+		<item id="3115" chance="8230" /><!-- bone -->
 		<item name="plate armor" chance="2810" />
-		<item id="2229" chance="2810" /><!-- skull -->
-		<item id="2231" chance="1950" /><!-- big bone -->
+		<item id="3114" chance="2810" /><!-- skull -->
+		<item id="3116" chance="1950" /><!-- big bone -->
 		<item name="bone club" chance="1520" />
 		<item name="bone shield" chance="1520" />
 		<item name="health potion" chance="870" />

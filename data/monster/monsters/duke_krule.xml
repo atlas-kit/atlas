@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Duke Krule" nameDescription="Duke Krule" race="venom" experience="55000" speed="250">
 	<health now="290000" max="290000" />
-	<look type="1221" head="19" addons="3" corpse="34255" />
+	<look type="1221" head="19" addons="3" corpse="31599" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -49,12 +49,12 @@
 		<summon name="Soul Scourge" interval="2000" chance="20" />
 	</summons>
 	<loot>
-		<item id="2158" name="blue gem" chance="100000" countmax="2" />
+		<item id="3041" name="blue gem" chance="100000" countmax="2" />
 		<item id="7443" name="bullseye potion" chance="100000" countmax="11" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="8" />
-		<item id="26189" name="ring of red plasma" chance="100000" />
-		<item id="25172" name="silver token" chance="100000" countmax="3" />
-		<item id="26031" name="supreme health potion" chance="100000" countmax="2" />
-		<item id="26030" name="ultimate spirit potion" chance="100000" countmax="4" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="8" />
+		<item id="23533" name="ring of red plasma" chance="100000" />
+		<item id="22516" name="silver token" chance="100000" countmax="3" />
+		<item id="23375" name="supreme health potion" chance="100000" countmax="2" />
+		<item id="23374" name="ultimate spirit potion" chance="100000" countmax="4" />
 	</loot>
 </monster>

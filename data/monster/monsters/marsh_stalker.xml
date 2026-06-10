@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Marsh Stalker" nameDescription="a marsh stalker" race="blood" experience="50" speed="210" raceId="914">
 	<health now="100" max="100" />
-	<look type="530" corpse="19708" />
+	<look type="530" corpse="17428" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -36,14 +36,14 @@
 		<voice sentence="Rrrawk! Rrrrawk!" />
 	</voices>
 	<loot>
-		<item id="2120" chance="4530" /><!-- rope -->
+		<item id="3003" chance="4530" /><!-- rope -->
 		<item name="gold coin" countmax="23" chance="65000" />
 		<item name="longsword" chance="7180" />
 		<item name="meat" countmax="2" chance="20360" />
-		<item id="2667" countmax="2" chance="20290" /><!-- Fish -->
+		<item id="3578" countmax="2" chance="20290" /><!-- Fish -->
 		<item name="worm" countmax="2" chance="15000" />
 		<item name="seeds" chance="120" />
-		<item id="19741" chance="7180" /><!-- Marsh Stalker Beak -->
+		<item id="17461" chance="7180" /><!-- Marsh Stalker Beak -->
 		<item name="marsh stalker beak" chance="9300" />
 	</loot>
 </monster>

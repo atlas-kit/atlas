@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Spidris Elite" nameDescription="Spidris Elite" race="venom" experience="4000" speed="260" raceId="797">
 	<health now="5000" max="5000" />
-	<look type="457" corpse="15296" />
+	<look type="457" corpse="13870" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -33,10 +33,10 @@
 		<item name="gold coin" countmax="100" chance="50000" />
 		<item name="platinum coin" countmax="6" chance="45000" />
 		<item name="violet gem" chance="1120" />
-		<item id="6300" chance="4480" /><!-- death ring -->
+		<item id="6299" chance="4480" /><!-- death ring -->
 		<item name="titan axe" chance="1440" />
 		<item name="great mana potion" countmax="2" chance="20400" />
-		<item id="7632" chance="3040" /><!-- giant shimmering pearl -->
+		<item id="281" chance="3040" /><!-- giant shimmering pearl -->
 		<item name="ultimate health potion" countmax="2" chance="9250" />
 		<item name="spidris mandible" chance="27440" />
 		<item name="compound eye" chance="13210" />

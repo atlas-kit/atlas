@@ -42,16 +42,16 @@
 		<voice sentence="Kiyosa sipaju!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="78354" countmax="20" />
-		<item id="2667" name="fish" chance="25021" countmax="2" />
-		<item id="2398" name="mace" chance="5209" />
-		<item id="3456" name="pick" chance="1016" />
-		<item id="2541" name="bone shield" chance="874" />
-		<item id="22727" name="fireproof horn" chance="461" />
+		<item id="3031" name="gold coin" chance="78354" countmax="20" />
+		<item id="3578" name="fish" chance="25021" countmax="2" />
+		<item id="3286" name="mace" chance="5209" />
+		<item id="1545" name="pick" chance="1016" />
+		<item id="3441" name="bone shield" chance="874" />
+		<item id="20356" name="fireproof horn" chance="461" />
 		<item id="7441" name="ice cube" chance="404" />
 		<item id="7381" name="mammoth whopper" chance="179" />
 		<item id="7158" name="rainbow trout" chance="122" />
 		<item id="7159" name="green perch" chance="75" />
-		<item id="2669" name="northern pike" chance="66" />
+		<item id="3580" name="northern pike" chance="66" />
 	</loot>
 </monster>

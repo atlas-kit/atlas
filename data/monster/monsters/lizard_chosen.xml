@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lizard Chosen" nameDescription="a lizard chosen" race="blood" experience="2200" speed="272" raceId="620">
 	<health now="3050" max="3050" />
-	<look type="344" corpse="11288" />
+	<look type="344" corpse="10371" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -51,20 +51,20 @@
 		<voice sentence="Kzzzzzz!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="97523" countmax="236" />
-		<item id="11325" name="spiked iron ball" chance="10048" />
-		<item id="7591" name="great health potion" chance="6895" countmax="3" />
-		<item id="11327" name="cursed shoulder spikes" chance="5939" />
-		<item id="2152" name="platinum coin" chance="2997" countmax="5" />
-		<item id="12629" name="scale of corruption" chance="2995" />
-		<item id="11326" name="corrupted flag" chance="2971" />
-		<item id="2145" name="small diamond" chance="2537" countmax="5" />
+		<item id="3031" name="gold coin" chance="97523" countmax="236" />
+		<item id="10408" name="spiked iron ball" chance="10048" />
+		<item id="239" name="great health potion" chance="6895" countmax="3" />
+		<item id="10410" name="cursed shoulder spikes" chance="5939" />
+		<item id="3035" name="platinum coin" chance="2997" countmax="5" />
+		<item id="11673" name="scale of corruption" chance="2995" />
+		<item id="10409" name="corrupted flag" chance="2971" />
+		<item id="3028" name="small diamond" chance="2537" countmax="5" />
 		<item id="5876" name="lizard leather" chance="2003" />
-		<item id="2528" name="tower shield" chance="1118" />
+		<item id="3428" name="tower shield" chance="1118" />
 		<item id="5881" name="lizard scale" chance="1035" />
-		<item id="11301" name="zaoan armor" chance="992" />
-		<item id="11304" name="zaoan legs" chance="889" />
-		<item id="11303" name="zaoan shoes" chance="809" />
-		<item id="11302" name="zaoan helmet" chance="130" />
+		<item id="10384" name="zaoan armor" chance="992" />
+		<item id="10387" name="zaoan legs" chance="889" />
+		<item id="10386" name="zaoan shoes" chance="809" />
+		<item id="10385" name="zaoan helmet" chance="130" />
 	</loot>
 </monster>

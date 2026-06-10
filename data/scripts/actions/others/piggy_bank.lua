@@ -4,7 +4,7 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if math.random(6) == 1 then
 		item:getPosition():sendMagicEffect(CONST_ME_POFF)
 		player:addItem(ITEM_GOLD_COIN, 1)
-		item:transform(2115)
+		item:transform(2996)
 		player:addAchievementProgress("Allowance Collector", 50)
 	else
 		item:getPosition():sendMagicEffect(CONST_ME_SOUND_YELLOW)
@@ -13,5 +13,5 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	return true
 end
 
-action:id(2114)
+action:id(2995)
 action:register()

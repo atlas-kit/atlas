@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Medusa" nameDescription="a medusa" race="blood" experience="4050" speed="280" raceId="570">
 	<health now="4500" max="4500" />
-	<look type="330" corpse="10524" />
+	<look type="330" corpse="9607" />
 	<targetchange interval="4000" chance="20" />
 	<flags>
 		<flag summonable="0" />
@@ -85,7 +85,7 @@
 		<item name="terra legs" chance="420" />
 		<item name="terra amulet" chance="4060" />
 		<item name="ultimate health potion" countmax="2" chance="9290" />
-		<item id="9810" chance="500" /><!-- rusty armor (rare) -->
+		<item id="8896" chance="500" /><!-- rusty armor (rare) -->
 		<item name="sacred tree amulet" chance="850" />
 		<item name="strand of medusa hair" chance="9900" />
 	</loot>

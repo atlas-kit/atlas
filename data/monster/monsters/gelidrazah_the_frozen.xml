@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gelidrazah The Frozen" nameDescription="Gelidrazah The Frozen" race="blood" experience="9000" speed="350">
 	<health now="10000" max="10000" />
-	<look type="947" head="57" body="11" legs="38" feet="38" addons="3" corpse="27721" />
+	<look type="947" head="57" body="11" legs="38" feet="38" addons="3" corpse="25065" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -38,24 +38,24 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="27593" name="dragon blood" chance="100000" />
-		<item id="27594" name="dragon tongue" chance="100000" />
-		<item id="27595" name="scale of gelidrazah" chance="100000" />
-		<item id="2148" name="gold coin" chance="87243" countmax="138" />
-		<item id="2672" name="dragon ham" chance="81481" />
-		<item id="2152" name="platinum coin" chance="66667" countmax="3" />
+		<item id="24937" name="dragon blood" chance="100000" />
+		<item id="24938" name="dragon tongue" chance="100000" />
+		<item id="24939" name="scale of gelidrazah" chance="100000" />
+		<item id="3031" name="gold coin" chance="87243" countmax="138" />
+		<item id="3583" name="dragon ham" chance="81481" />
+		<item id="3035" name="platinum coin" chance="66667" countmax="3" />
 		<item id="7290" name="shard" chance="30453" />
-		<item id="7888" name="glacier amulet" chance="26337" />
-		<item id="2146" name="small sapphire" chance="11523" />
-		<item id="7902" name="glacier mask" chance="10700" />
-		<item id="21696" name="icicle bow" chance="9465" />
-		<item id="21697" name="runic ice shield" chance="6173" />
-		<item id="2167" name="energy ring" chance="5761" />
+		<item id="815" name="glacier amulet" chance="26337" />
+		<item id="3029" name="small sapphire" chance="11523" />
+		<item id="829" name="glacier mask" chance="10700" />
+		<item id="19362" name="icicle bow" chance="9465" />
+		<item id="19363" name="runic ice shield" chance="6173" />
+		<item id="3051" name="energy ring" chance="5761" />
 		<item id="7441" name="ice cube" chance="5350" />
-		<item id="18412" name="glacial rod" chance="3704" />
-		<item id="2033" name="golden mug" chance="3292" />
-		<item id="8887" name="frozen plate" chance="1646" />
+		<item id="16118" name="glacial rod" chance="3704" />
+		<item id="2903" name="golden mug" chance="3292" />
+		<item id="8059" name="frozen plate" chance="1646" />
 		<item id="7409" name="northern star" chance="823" />
-		<item id="2177" name="life crystal" chance="412" />
+		<item id="3061" name="life crystal" chance="412" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Stone Devourer" nameDescription="a stone devourer" race="undead" experience="2900" speed="250" raceId="879">
 	<health now="4200" max="4200" />
-	<look type="486" corpse="18375" />
+	<look type="486" corpse="15865" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -62,7 +62,7 @@
 		<item name="great mana potion" countmax="2" chance="15610" />
 		<item name="mana potion" countmax="2" chance="15050" />
 		<item name="ultimate health potion" chance="14410" />
-		<item id="8748" chance="11360" /><!-- coal -->
+		<item id="7920" chance="11360" /><!-- coal -->
 		<item name="ancient stone" chance="12850" />
 		<item name="crystalline arrow" countmax="10" chance="9940" />
 		<item name="green crystal splinter" chance="6960" />

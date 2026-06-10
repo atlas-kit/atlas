@@ -65,10 +65,10 @@
 		<item name="gold coin" countmax="12" chance="80000" />
 		<item name="stealth ring" chance="888" />
 		<item name="platinum amulet" chance="1666" />
-		<item id="2175" chance="10000" /><!-- spellbook -->
+		<item id="3059" chance="10000" /><!-- spellbook -->
 		<item name="gold ring" chance="900" />
-		<item id="2237" chance="10000" /><!-- dirty cape -->
-		<item id="2401" chance="10000" /><!-- staff -->
+		<item id="3122" chance="10000" /><!-- dirty cape -->
+		<item id="3289" chance="10000" /><!-- staff -->
 		<item name="castle shield" chance="588" />
 		<item name="blue robe" chance="709" />
 		<item name="lich staff" chance="1000" />

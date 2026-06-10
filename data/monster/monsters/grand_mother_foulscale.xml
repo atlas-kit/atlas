@@ -52,16 +52,16 @@
 	<loot>
 		<item id="5877" name="green dragon leather" chance="100000" />
 		<item id="5920" name="green dragon scale" chance="100000" />
-		<item id="2148" name="gold coin" chance="86486" countmax="97" />
-		<item id="2672" name="dragon ham" chance="32432" />
-		<item id="2387" name="double axe" chance="16216" />
-		<item id="2647" name="plate legs" chance="16216" />
-		<item id="2434" name="dragon hammer" chance="13514" />
-		<item id="2455" name="crossbow" chance="8108" />
-		<item id="2546" name="burst arrow" chance="5405" countmax="7" />
-		<item id="2516" name="dragon shield" chance="5405" />
-		<item id="3351" name="steel helmet" chance="5405" />
-		<item id="2413" name="broadsword" chance="2703" />
+		<item id="3031" name="gold coin" chance="86486" countmax="97" />
+		<item id="3583" name="dragon ham" chance="32432" />
+		<item id="3275" name="double axe" chance="16216" />
+		<item id="3557" name="plate legs" chance="16216" />
+		<item id="3322" name="dragon hammer" chance="13514" />
+		<item id="3349" name="crossbow" chance="8108" />
+		<item id="3449" name="burst arrow" chance="5405" countmax="7" />
+		<item id="3416" name="dragon shield" chance="5405" />
+		<item id="1200" name="steel helmet" chance="5405" />
+		<item id="3301" name="broadsword" chance="2703" />
 		<item id="7430" name="dragonbone staff" chance="2703" />
 	</loot>
 </monster>

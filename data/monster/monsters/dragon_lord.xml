@@ -51,24 +51,24 @@
 		<voice sentence="YOU WILL BURN!" yell="1" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="95258" countmax="246" />
-		<item id="2672" name="dragon ham" chance="79757" />
-		<item id="2796" name="green mushroom" chance="12120" />
+		<item id="3031" name="gold coin" chance="95258" countmax="246" />
+		<item id="3583" name="dragon ham" chance="79757" />
+		<item id="3732" name="green mushroom" chance="12120" />
 		<item id="7378" name="royal spear" chance="9139" countmax="3" />
-		<item id="1976" name="book (gemmed)" chance="9090" />
-		<item id="2547" name="power bolt" chance="6565" countmax="7" />
-		<item id="2167" name="energy ring" chance="5072" />
-		<item id="2146" name="small sapphire" chance="4968" />
-		<item id="2033" name="golden mug" chance="3072" />
+		<item id="2842" name="book (gemmed)" chance="9090" />
+		<item id="3450" name="power bolt" chance="6565" countmax="7" />
+		<item id="3051" name="energy ring" chance="5072" />
+		<item id="3029" name="small sapphire" chance="4968" />
+		<item id="2903" name="golden mug" chance="3072" />
 		<item id="5882" name="red dragon scale" chance="1963" />
 		<item id="5948" name="red dragon leather" chance="1022" />
-		<item id="7588" name="strong health potion" chance="971" />
-		<item id="2177" name="life crystal" chance="629" />
-		<item id="2479" name="strange helmet" chance="382" />
-		<item id="2392" name="fire sword" chance="286" />
-		<item id="2528" name="tower shield" chance="268" />
-		<item id="2498" name="royal helmet" chance="233" />
-		<item id="2492" name="dragon scale mail" chance="142" />
+		<item id="236" name="strong health potion" chance="971" />
+		<item id="3061" name="life crystal" chance="629" />
+		<item id="3373" name="strange helmet" chance="382" />
+		<item id="3280" name="fire sword" chance="286" />
+		<item id="3428" name="tower shield" chance="268" />
+		<item id="3392" name="royal helmet" chance="233" />
+		<item id="3386" name="dragon scale mail" chance="142" />
 		<item id="7402" name="dragon slayer" chance="109" />
 		<item id="7399" name="dragon lord trophy" chance="93" />
 	</loot>

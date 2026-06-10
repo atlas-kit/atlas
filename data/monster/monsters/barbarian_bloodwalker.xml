@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Barbarian Bloodwalker" nameDescription="a barbarian bloodwalker" race="blood" experience="195" speed="236" manacost="590" raceId="323">
 	<health now="305" max="305" />
-	<look type="255" head="114" body="113" legs="132" feet="94" corpse="20335" />
+	<look type="255" head="114" body="113" legs="132" feet="94" corpse="18054" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -42,16 +42,16 @@
 		<voice sentence="You can run but you can't hide" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="55130" countmax="12" />
-		<item id="2458" name="chain helmet" chance="10639" />
-		<item id="2464" name="chain armor" chance="10270" />
-		<item id="2044" name="lamp" chance="8135" />
-		<item id="2381" name="halberd" chance="7013" />
-		<item id="2378" name="battle axe" chance="5934" />
-		<item id="2671" name="ham" chance="4955" />
-		<item id="7618" name="health potion" chance="950" />
+		<item id="3031" name="gold coin" chance="55130" countmax="12" />
+		<item id="3352" name="chain helmet" chance="10639" />
+		<item id="3358" name="chain armor" chance="10270" />
+		<item id="2914" name="lamp" chance="8135" />
+		<item id="3269" name="halberd" chance="7013" />
+		<item id="3266" name="battle axe" chance="5934" />
+		<item id="3582" name="ham" chance="4955" />
+		<item id="266" name="health potion" chance="950" />
 		<item id="5911" name="red piece of cloth" chance="504" />
-		<item id="3962" name="beastslayer axe" chance="350" />
+		<item id="3344" name="beastslayer axe" chance="350" />
 		<item id="7290" name="shard" chance="317" />
 		<item id="7457" name="fur boots" chance="86" />
 	</loot>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Battlemaster Zunzu" nameDescription="Battlemaster Zunzu" race="blood" experience="2500" speed="420">
 	<health now="4000" max="4000" />
-	<look type="343" corpse="11281" />
+	<look type="343" corpse="10364" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

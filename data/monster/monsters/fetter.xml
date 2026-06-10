@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fetter" nameDescription="a fetter" race="undead" experience="0" speed="280">
 	<health now="5500" max="5500" />
-	<look type="235" corpse="6348" />
+	<look type="235" corpse="6347" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />

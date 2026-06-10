@@ -29,6 +29,6 @@
 		<item name="chicken feather" chance="20000" />
 		<item name="worm" chance="10000" />
 		<item name="meat" countmax="2" chance="2120" />
-		<item id="2695" chance="1000" /><!-- egg -->
+		<item id="3606" chance="1000" /><!-- egg -->
 	</loot>
 </monster>

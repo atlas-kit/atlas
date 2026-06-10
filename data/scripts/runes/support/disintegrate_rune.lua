@@ -1,4 +1,4 @@
-local corpseIds = {3058, 3059, 3060, 3061, 3064, 3065, 3066}
+local corpseIds = {4240, 4241, 4242, 4243, 4246, 4247, 4248}
 local removalLimit = 500
 
 local spell = Spell(SPELL_RUNE)
@@ -32,7 +32,7 @@ end
 spell:group("support")
 spell:id(78)
 spell:name("Disintegrate Rune")
-spell:runeId(2310)
+spell:runeId(3197)
 spell:charges(3)
 spell:runeLevel(21)
 spell:runeMagicLevel(4)

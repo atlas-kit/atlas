@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Diabolic Imp" nameDescription="a diabolic imp" race="fire" experience="2900" speed="220" raceId="288">
 	<health now="1950" max="1950" />
-	<look type="237" corpse="6364" />
+	<look type="237" corpse="6363" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -58,22 +58,22 @@
 		<voice sentence="He he he." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="99347" countmax="200" />
-		<item id="2548" name="pitchfork" chance="50468" />
+		<item id="3031" name="gold coin" chance="99347" countmax="200" />
+		<item id="3451" name="pitchfork" chance="50468" />
 		<item id="6558" name="flask of demonic blood" chance="24610" />
-		<item id="2260" name="blank rune" chance="14973" countmax="2" />
-		<item id="2568" name="cleaver" chance="8828" />
-		<item id="2515" name="guardian shield" chance="8274" />
-		<item id="6500" name="demonic essence" chance="7777" />
+		<item id="3147" name="blank rune" chance="14973" countmax="2" />
+		<item id="3471" name="cleaver" chance="8828" />
+		<item id="3415" name="guardian shield" chance="8274" />
+		<item id="6499" name="demonic essence" chance="7777" />
 		<item id="5944" name="soul orb" chance="6912" />
-		<item id="2419" name="scimitar" chance="5351" />
-		<item id="2152" name="platinum coin" chance="3364" countmax="7" />
-		<item id="2165" name="stealth ring" chance="2739" />
-		<item id="2150" name="small amethyst" chance="2583" countmax="3" />
-		<item id="2387" name="double axe" chance="1746" />
-		<item id="2185" name="necrotic rod" chance="781" />
-		<item id="7900" name="magma monocle" chance="525" />
-		<item id="7899" name="magma coat" chance="355" />
-		<item id="6300" name="death ring" chance="99" />
+		<item id="3307" name="scimitar" chance="5351" />
+		<item id="3035" name="platinum coin" chance="3364" countmax="7" />
+		<item id="3049" name="stealth ring" chance="2739" />
+		<item id="3033" name="small amethyst" chance="2583" countmax="3" />
+		<item id="3275" name="double axe" chance="1746" />
+		<item id="3069" name="necrotic rod" chance="781" />
+		<item id="827" name="magma monocle" chance="525" />
+		<item id="826" name="magma coat" chance="355" />
+		<item id="6299" name="death ring" chance="99" />
 	</loot>
 </monster>

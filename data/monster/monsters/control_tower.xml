@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Control Tower" nameDescription="a control tower" race="energy" experience="3000" speed="0">
 	<health now="7500" max="7500" />
-	<look typeex="23265" corpse="24309" />
+	<look typeex="23265" corpse="21940" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag ignorespawnblock="1" />
@@ -27,17 +27,17 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="68000" countmax="5" />
-		<item id="7591" name="great health potion" chance="8000" />
-		<item id="7590" name="great mana potion" chance="5333" />
-		<item id="9930" name="flask of rust remover" chance="4000" />
-		<item id="9690" name="gear wheel" chance="2667" />
-		<item id="23541" name="gearwheel chain" chance="2667" />
-		<item id="23538" name="heat core" chance="2667" />
-		<item id="23539" name="alloy legs" chance="1333" />
+		<item id="3035" name="platinum coin" chance="68000" countmax="5" />
+		<item id="239" name="great health potion" chance="8000" />
+		<item id="238" name="great mana potion" chance="5333" />
+		<item id="9016" name="flask of rust remover" chance="4000" />
+		<item id="8775" name="gear wheel" chance="2667" />
+		<item id="21170" name="gearwheel chain" chance="2667" />
+		<item id="21167" name="heat core" chance="2667" />
+		<item id="21168" name="alloy legs" chance="1333" />
 		<item name="crystal pedestal" chance="1333" />
 		<item id="5880" name="iron ore" chance="1333" />
-		<item id="2645" name="steel boots" chance="1333" />
-		<item id="10571" name="war crystal" chance="1333" />
+		<item id="3554" name="steel boots" chance="1333" />
+		<item id="9654" name="war crystal" chance="1333" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Wilting Leaf Golem" nameDescription="a wilting leaf golem" race="blood" experience="145" speed="145" manacost="390" raceId="982">
 	<health now="380" max="380" />
-	<look type="573" corpse="21434" />
+	<look type="573" corpse="19117" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

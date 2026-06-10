@@ -65,19 +65,19 @@
 		<element holyPercent="35" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="98" />
-		<item id="2152" name="platinum coin" chance="90909" countmax="2" />
-		<item id="7618" name="health potion" chance="52273" countmax="3" />
-		<item id="7620" name="mana potion" chance="47727" countmax="3" />
-		<item id="2144" name="black pearl" chance="13636" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="98" />
+		<item id="3035" name="platinum coin" chance="90909" countmax="2" />
+		<item id="266" name="health potion" chance="52273" countmax="3" />
+		<item id="268" name="mana potion" chance="47727" countmax="3" />
+		<item id="3027" name="black pearl" chance="13636" countmax="2" />
 		<item id="5910" name="green piece of cloth" chance="11364" />
-		<item id="2174" name="strange symbol" chance="6818" />
-		<item id="2467" name="leather armor" chance="4545" />
-		<item id="2411" name="poison dagger" chance="4545" />
-		<item id="2181" name="terra rod" chance="4545" />
-		<item id="2231" name="big bone" chance="2273" />
-		<item id="2230" name="bone" chance="2273" />
+		<item id="3058" name="strange symbol" chance="6818" />
+		<item id="3361" name="leather armor" chance="4545" />
+		<item id="3299" name="poison dagger" chance="4545" />
+		<item id="3065" name="terra rod" chance="4545" />
+		<item id="3116" name="big bone" chance="2273" />
+		<item id="3115" name="bone" chance="2273" />
 		<item id="7440" name="mastermind potion" chance="2273" />
-		<item id="3967" name="tribal mask" chance="2273" />
+		<item id="3403" name="tribal mask" chance="2273" />
 	</loot>
 </monster>

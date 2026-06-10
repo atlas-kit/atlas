@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Primitive" nameDescription="Primitive" race="blood" experience="45" speed="300">
 	<health now="200" max="200" />
-	<look type="143" head="1" body="1" legs="1" feet="1" corpse="6080" />
+	<look type="143" head="1" body="1" legs="1" feet="1" corpse="111" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -57,8 +57,8 @@
 		<item name="sabre" chance="10250" />
 		<item name="axe" chance="12250" />
 		<item name="studded helmet" chance="9500" />
-		<item id="2484" name="studded armor" chance="7000" />
-		<item id="2526" name="studded shield" chance="1200" />
+		<item id="3378" name="studded armor" chance="7000" />
+		<item id="3426" name="studded shield" chance="1200" />
 		<item id="6570" name="blue surprise bag" chance="500" />
 		<item id="6571" name="red surprise bag" chance="500" />
 	</loot>

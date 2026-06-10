@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Enraged Crystal Golem" nameDescription="enraged crystal golem" race="energy" experience="550" speed="200" raceId="873">
 	<health now="700" max="700" />
-	<look type="508" corpse="18466" />
+	<look type="508" corpse="16176" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

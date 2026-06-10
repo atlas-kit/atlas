@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Misguided Shadow" nameDescription="a misguided shadow" race="blood" experience="1500" speed="240">
 	<health now="3000" max="3000" />
-	<look type="985" corpse="28781" />
+	<look type="985" corpse="26125" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -35,9 +35,9 @@
 		<voice sentence="Yooooouuuuu..." />
 	</voices>
 	<loot>
-		<item id="7589" name="strong mana potion" chance="6522" />
-		<item id="24849" name="onyx chip" chance="4348" />
-		<item id="2156" name="red gem" chance="2174" />
-		<item id="7588" name="strong health potion" chance="2174" />
+		<item id="237" name="strong mana potion" chance="6522" />
+		<item id="22193" name="onyx chip" chance="4348" />
+		<item id="3039" name="red gem" chance="2174" />
+		<item id="236" name="strong health potion" chance="2174" />
 	</loot>
 </monster>

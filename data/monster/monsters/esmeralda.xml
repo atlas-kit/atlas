@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Esmeralda" nameDescription="Esmeralda" race="blood" experience="600" speed="245">
 	<health now="800" max="800" />
-	<look type="305" corpse="9871" />
+	<look type="305" corpse="8957" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -49,16 +49,16 @@
 		<voice sentence="Fcccccchhhhhh" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="170" />
-		<item id="10585" name="mutated rat tail" chance="100000" />
-		<item id="2214" name="ring of healing" chance="100000" />
-		<item id="2152" name="platinum coin" chance="94872" countmax="4" />
-		<item id="2147" name="small ruby" chance="71795" countmax="3" />
-		<item id="2476" name="knight armor" chance="52564" />
-		<item id="2528" name="tower shield" chance="43590" />
-		<item id="2381" name="halberd" chance="28205" />
-		<item id="2438" name="epee" chance="25641" />
-		<item id="7884" name="terra mantle" chance="10256" />
-		<item id="2799" name="stone herb" chance="5128" />
+		<item id="3031" name="gold coin" chance="100000" countmax="170" />
+		<item id="9668" name="mutated rat tail" chance="100000" />
+		<item id="3098" name="ring of healing" chance="100000" />
+		<item id="3035" name="platinum coin" chance="94872" countmax="4" />
+		<item id="3030" name="small ruby" chance="71795" countmax="3" />
+		<item id="3370" name="knight armor" chance="52564" />
+		<item id="3428" name="tower shield" chance="43590" />
+		<item id="3269" name="halberd" chance="28205" />
+		<item id="3326" name="epee" chance="25641" />
+		<item id="811" name="terra mantle" chance="10256" />
+		<item id="3735" name="stone herb" chance="5128" />
 	</loot>
 </monster>

@@ -47,13 +47,13 @@
 		<voice sentence="YOU WILL TREMBLE! YOU WILL BREAK! YOU WILL SHATTER INTO PIECES!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="109" />
-		<item id="7590" name="great mana potion" chance="100000" countmax="11" />
-		<item id="8472" name="great spirit potion" chance="100000" countmax="8" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="17" />
-		<item id="2145" name="small diamond" chance="100000" countmax="6" />
-		<item id="2147" name="small ruby" chance="100000" countmax="13" />
-		<item id="8473" name="ultimate health potion" chance="100000" countmax="10" />
-		<item id="2444" name="hammer of wrath" chance="50000" />
+		<item id="3031" name="gold coin" chance="100000" countmax="109" />
+		<item id="238" name="great mana potion" chance="100000" countmax="11" />
+		<item id="7642" name="great spirit potion" chance="100000" countmax="8" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="17" />
+		<item id="3028" name="small diamond" chance="100000" countmax="6" />
+		<item id="3030" name="small ruby" chance="100000" countmax="13" />
+		<item id="7643" name="ultimate health potion" chance="100000" countmax="10" />
+		<item id="3332" name="hammer of wrath" chance="50000" />
 	</loot>
 </monster>

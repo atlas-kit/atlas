@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Guard Captain Quaid" nameDescription="Guard Captain Quaid" race="blood" experience="28000" speed="185">
 	<health now="55000" max="55000" />
-	<look type="1217" head="38" body="57" legs="21" feet="2" addons="2" corpse="34310" />
+	<look type="1217" head="38" body="57" legs="21" feet="2" addons="2" corpse="31654" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -54,6 +54,6 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2146" name="small sapphire" chance="100000" />
+		<item id="3029" name="small sapphire" chance="100000" />
 	</loot>
 </monster>

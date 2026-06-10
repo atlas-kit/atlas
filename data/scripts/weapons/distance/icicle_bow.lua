@@ -1,3 +1,3 @@
 local weapon = Weapon(WEAPON_DISTANCE)
-weapon:id(21696)
+weapon:id(19362)
 weapon:register()

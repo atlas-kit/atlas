@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Twisted Shaper" nameDescription="a twisted shaper" race="blood" experience="1750" speed="280" raceId="1322">
 	<health now="2500" max="2500" />
-	<look type="932" head="105" body="0" legs="0" feet="94" corpse="27724" />
+	<look type="932" head="105" body="0" legs="0" feet="94" corpse="25068" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -56,25 +56,25 @@
 		<voice sentence="Ti Jezz Kur Tar!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="175" />
-		<item id="2152" name="platinum coin" chance="75010" countmax="2" />
-		<item id="27039" name="cave turnip" chance="20014" countmax="2" />
-		<item id="27040" name="ancient belt buckle" chance="18933" />
-		<item id="27041" name="cracked alabaster vase" chance="17574" />
-		<item id="27043" name="tarnished rhino figurine" chance="14608" />
-		<item id="2666" name="meat" chance="10256" />
-		<item id="2167" name="energy ring" chance="7651" />
-		<item id="7591" name="great health potion" chance="7124" />
-		<item id="27046" name="ancient coin" chance="5502" />
-		<item id="2147" name="small ruby" chance="5461" />
-		<item id="2789" name="brown mushroom" chance="5184" countmax="3" />
-		<item id="5022" name="orichalcum pearl" chance="5128" countmax="5" />
-		<item id="15649" name="vortex bolt" chance="5031" countmax="4" />
-		<item id="24849" name="onyx chip" chance="4990" />
-		<item id="2189" name="wand of cosmic energy" chance="3617" />
-		<item id="27048" name="gemmed figurine" chance="970" />
-		<item id="2171" name="platinum amulet" chance="402" />
-		<item id="2114" name="piggy bank" chance="180" />
-		<item id="11343" name="piece of marble rock" chance="55" />
+		<item id="3031" name="gold coin" chance="100000" countmax="175" />
+		<item id="3035" name="platinum coin" chance="75010" countmax="2" />
+		<item id="24383" name="cave turnip" chance="20014" countmax="2" />
+		<item id="24384" name="ancient belt buckle" chance="18933" />
+		<item id="24385" name="cracked alabaster vase" chance="17574" />
+		<item id="24387" name="tarnished rhino figurine" chance="14608" />
+		<item id="3577" name="meat" chance="10256" />
+		<item id="3051" name="energy ring" chance="7651" />
+		<item id="239" name="great health potion" chance="7124" />
+		<item id="24390" name="ancient coin" chance="5502" />
+		<item id="3030" name="small ruby" chance="5461" />
+		<item id="3725" name="brown mushroom" chance="5184" countmax="3" />
+		<item id="5021" name="orichalcum pearl" chance="5128" countmax="5" />
+		<item id="14252" name="vortex bolt" chance="5031" countmax="4" />
+		<item id="22193" name="onyx chip" chance="4990" />
+		<item id="3073" name="wand of cosmic energy" chance="3617" />
+		<item id="24392" name="gemmed figurine" chance="970" />
+		<item id="3055" name="platinum amulet" chance="402" />
+		<item id="2995" name="piggy bank" chance="180" />
+		<item id="10426" name="piece of marble rock" chance="55" />
 	</loot>
 </monster>

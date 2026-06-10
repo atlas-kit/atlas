@@ -39,5 +39,5 @@ function clayLump.onUse(player, item, fromPosition, target, toPosition, isHotkey
 	return true
 end
 
-clayLump:id(11339)
+clayLump:id(10422)
 clayLump:register()

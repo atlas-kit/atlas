@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Minishabaal" nameDescription="Minishabaal" race="blood" experience="4000" speed="700">
 	<health now="6000" max="6000" />
-	<look type="237" corpse="6364" />
+	<look type="237" corpse="6363" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag attackable="1" />
@@ -66,12 +66,12 @@
 		<voice sentence="Muahaha!" />
 	</voices>
 	<loot>
-		<item id="2136" name="demonbone amulet" chance="909" />
+		<item id="3019" name="demonbone amulet" chance="909" />
 		<item name="gold coin" countmax="40" chance="100000" />
 		<item name="small amethyst" countmax="2" chance="1428" />
 		<item name="fire axe" chance="666" />
 		<item name="golden legs" chance="180" />
-		<item id="2488" name="crown legs" chance="800" />
+		<item id="3382" name="crown legs" chance="800" />
 		<item name="guardian shield" chance="1333" />
 		<item name="demon shield" chance="200" />
 		<item name="tempest shield" chance="100" />

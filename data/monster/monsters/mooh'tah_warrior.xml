@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mooh'Tah Warrior" nameDescription="a mooh'tah warrior" race="blood" experience="900" speed="220" raceId="1051">
 	<health now="1200" max="1200" />
-	<look type="611" corpse="23462" />
+	<look type="611" corpse="21091" />
 	<targetchange interval="2000" chance="4" />
 	<flags>
 		<flag summonable="0" />
@@ -58,25 +58,25 @@
 		<voice sentence="You will not disrupt my inner balance!" />
 	</voices>
 	<loot>
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2148" countmax="20" chance="60000" /><!-- gold coin -->
-		<item id="2152" countmax="3" chance="39860" /><!-- platinum coin -->
-		<item id="23573" chance="15030" /><!-- mooh'tah shell -->
-		<item id="7589" chance="7110" /><!-- strong mana potion -->
-		<item id="7588" chance="6390" /><!-- strong health potion -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3031" countmax="20" chance="60000" /><!-- gold coin -->
+		<item id="3035" countmax="3" chance="39860" /><!-- platinum coin -->
+		<item id="21202" chance="15030" /><!-- mooh'tah shell -->
+		<item id="237" chance="7110" /><!-- strong mana potion -->
+		<item id="236" chance="6390" /><!-- strong health potion -->
 		<item id="5878" chance="5530" /><!-- minotaur leather -->
-		<item id="2147" chance="5470" /><!-- small ruby -->
-		<item id="2149" chance="5280" /><!-- small emerald -->
-		<item id="2150" chance="5200" /><!-- small amethyst -->
-		<item id="9970" chance="4760" /><!-- small topaz -->
-		<item id="12428" countmax="2" chance="4710" /><!-- minotaur horn -->
-		<item id="23548" chance="1380" /><!-- cowtana -->
-		<item id="2207" chance="1110" /><!-- sword ring -->
-		<item id="23537" chance="1090" /><!-- mooh'tah plate -->
-		<item id="2515" chance="1020" /><!-- guardian shield -->
-		<item id="2477" chance="710" /><!-- knight legs -->
+		<item id="3030" chance="5470" /><!-- small ruby -->
+		<item id="3032" chance="5280" /><!-- small emerald -->
+		<item id="3033" chance="5200" /><!-- small amethyst -->
+		<item id="9057" chance="4760" /><!-- small topaz -->
+		<item id="11472" countmax="2" chance="4710" /><!-- minotaur horn -->
+		<item id="21177" chance="1380" /><!-- cowtana -->
+		<item id="3091" chance="1110" /><!-- sword ring -->
+		<item id="21166" chance="1090" /><!-- mooh'tah plate -->
+		<item id="3415" chance="1020" /><!-- guardian shield -->
+		<item id="3371" chance="710" /><!-- knight legs -->
 		<item id="5911" chance="650" /><!-- red piece of cloth -->
-		<item id="2476" chance="490" /><!-- knight armor -->
+		<item id="3370" chance="490" /><!-- knight armor -->
 		<item id="7401" chance="150" /><!-- minotaur trophy -->
 	</loot>
 </monster>

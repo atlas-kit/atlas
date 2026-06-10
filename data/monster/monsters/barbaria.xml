@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Barbaria" nameDescription="Barbaria" race="blood" experience="355" speed="280">
 	<health now="345" max="345" />
-	<look type="264" head="78" body="97" legs="95" feet="120" corpse="20339" />
+	<look type="264" head="78" body="97" legs="95" feet="120" corpse="18058" />
 	<targetchange interval="60000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -52,8 +52,8 @@
 		<voice sentence="My instincts tell me about your cowardice." />
 	</voices>
 	<loot>
-		<item id="1958" chance="15000" /><!-- grey book -->
-		<item id="2050" chance="25000" /><!-- torch -->
+		<item id="2824" chance="15000" /><!-- grey book -->
+		<item id="2920" chance="25000" /><!-- torch -->
 		<item name="gold coin" countmax="35" chance="48000" />
 		<item name="chain armor" chance="11000" />
 		<item name="hunting spear" chance="12500" />

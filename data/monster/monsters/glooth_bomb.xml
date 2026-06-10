@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Glooth Bomb" nameDescription="a glooth bomb" race="blood" experience="0" speed="80">
 	<health now="250000" max="250000" />
-	<look type="680" corpse="24256" />
+	<look type="680" corpse="21887" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="0" />
@@ -52,10 +52,10 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="7591" name="great health potion" chance="100000" countmax="20" />
-		<item id="7590" name="great mana potion" chance="100000" countmax="13" />
-		<item id="8472" name="great spirit potion" chance="100000" countmax="5" />
-		<item id="23571" name="moohtant horn" chance="100000" countmax="2" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="24" />
+		<item id="239" name="great health potion" chance="100000" countmax="20" />
+		<item id="238" name="great mana potion" chance="100000" countmax="13" />
+		<item id="7642" name="great spirit potion" chance="100000" countmax="5" />
+		<item id="21200" name="moohtant horn" chance="100000" countmax="2" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="24" />
 	</loot>
 </monster>

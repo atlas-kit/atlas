@@ -44,12 +44,12 @@
 		<immunity invisible="1" />
 	</immunities>
 	<loot>
-		<item id="2804" name="shadow herb" chance="10954" />
-		<item id="2148" name="gold coin" chance="10703" countmax="5" />
-		<item id="12432" name="nettle spit" chance="9840" />
-		<item id="2802" name="sling herb" chance="5556" countmax="2" />
-		<item id="2747" name="grave flower" chance="989" />
-		<item id="11231" name="nettle blossom" chance="910" />
-		<item id="7732" name="seeds" chance="361" />
+		<item id="3740" name="shadow herb" chance="10954" />
+		<item id="3031" name="gold coin" chance="10703" countmax="5" />
+		<item id="11476" name="nettle spit" chance="9840" />
+		<item id="3738" name="sling herb" chance="5556" countmax="2" />
+		<item id="3661" name="grave flower" chance="989" />
+		<item id="10314" name="nettle blossom" chance="910" />
+		<item id="647" name="seeds" chance="361" />
 	</loot>
 </monster>

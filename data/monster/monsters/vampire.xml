@@ -61,12 +61,12 @@
 		<item name="gold coin" countmax="60" chance="90230" />
 		<item name="vampire teeth" chance="7600" />
 		<item name="blood preservation" chance="5100" />
-		<item id="2747" chance="1910" /><!-- grave flower -->
+		<item id="3661" chance="1910" /><!-- grave flower -->
 		<item name="black pearl" chance="1800" />
 		<item name="strong health potion" chance="1500" />
 		<item name="katana" chance="1560" />
 		<item name="spike sword" chance="1000" />
-		<item id="2229" chance="1000" /><!-- skull -->
+		<item id="3114" chance="1000" /><!-- skull -->
 		<item name="ice rapier" chance="470" />
 		<item name="strange helmet" chance="420" />
 		<item name="bronze amulet" chance="230" />

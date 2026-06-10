@@ -1,16 +1,16 @@
 local event = MoveEvent()
 
 function event.onAddItem(moveitem, tileitem, position)
-	if moveitem:getId() == 2693 then
-		moveitem:transform(2689)
+	if moveitem:getId() == 3604 then
+		moveitem:transform(3600)
 		position:sendMagicEffect(CONST_ME_HITBYFIRE)
-	elseif moveitem:getId() == 6277 then
-		moveitem:transform(2687, 12)
+	elseif moveitem:getId() == 6276 then
+		moveitem:transform(3598, 12)
 		position:sendMagicEffect(CONST_ME_HITBYFIRE)
 	end
 	return true
 end
 
-event:id(1786, 1788, 1790, 1792)
+event:id(2535, 2537, 2539, 2541)
 event:tileItem(true)
 event:register()

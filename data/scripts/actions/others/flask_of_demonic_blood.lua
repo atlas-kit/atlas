@@ -1,6 +1,6 @@
 local action = Action()
 
-local transform = {7588, 7589}
+local transform = {236, 237}
 
 function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
     local reward = transform[math.random(#transform)]

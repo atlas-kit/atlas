@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Crustacea Gigantica" nameDescription="a crustacea gigantica" race="blood" experience="1800" speed="290" raceId="697">
 	<health now="1600" max="1600" />
-	<look type="383" corpse="13331" />
+	<look type="383" corpse="12344" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

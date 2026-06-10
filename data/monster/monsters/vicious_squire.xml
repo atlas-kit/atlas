@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Vicious Squire" nameDescription="a vicious squire" race="blood" experience="900" speed="210" raceId="1145">
 	<health now="1000" max="1000" />
-	<look type="131" head="97" body="24" legs="73" feet="116" addons="1" corpse="20418" />
+	<look type="131" head="97" body="24" legs="73" feet="116" addons="1" corpse="18137" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -47,20 +47,20 @@
 		<voice sentence="You are as good as dead!" />
 	</voices>
 	<loot>
-		<item id="2455" chance="12763" /><!-- crossbow -->
-		<item id="2148" countmax="70" chance="100000" /><!-- gold coin -->
-		<item id="2661" chance="743" /><!-- scarf -->
-		<item id="2543" countmax="10" chance="21685" /><!-- bolt -->
-		<item id="2666" chance="11771" /><!-- meat -->
-		<item id="2145" chance="2602" /><!-- small diamond -->
-		<item id="2149" chance="3097" /><!-- small emerald -->
-		<item id="2150" chance="2973" /><!-- small amethyst -->
-		<item id="2391" chance="991" /><!-- war hammer -->
-		<item id="2381" chance="2230" /><!-- halberd -->
-		<item id="2477" chance="619" /><!-- knight legs -->
-		<item id="2515" chance="247" /><!-- guardian shield -->
-		<item id="2475" chance="123" /><!-- warrior helmet -->
-		<item id="7591" chance="5576" /><!-- great health potion -->
-		<item id="2164" chance="247" /><!-- might ring -->
+		<item id="3349" chance="12763" /><!-- crossbow -->
+		<item id="3031" countmax="70" chance="100000" /><!-- gold coin -->
+		<item id="3572" chance="743" /><!-- scarf -->
+		<item id="3446" countmax="10" chance="21685" /><!-- bolt -->
+		<item id="3577" chance="11771" /><!-- meat -->
+		<item id="3028" chance="2602" /><!-- small diamond -->
+		<item id="3032" chance="3097" /><!-- small emerald -->
+		<item id="3033" chance="2973" /><!-- small amethyst -->
+		<item id="3279" chance="991" /><!-- war hammer -->
+		<item id="3269" chance="2230" /><!-- halberd -->
+		<item id="3371" chance="619" /><!-- knight legs -->
+		<item id="3415" chance="247" /><!-- guardian shield -->
+		<item id="3369" chance="123" /><!-- warrior helmet -->
+		<item id="239" chance="5576" /><!-- great health potion -->
+		<item id="3048" chance="247" /><!-- might ring -->
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Golden Servant" nameDescription="a golden servant" race="energy" experience="450" speed="210" raceId="701">
 	<health now="550" max="550" />
-	<look type="396" corpse="13489" />
+	<look type="396" corpse="12500" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -49,17 +49,17 @@
 		<voice sentence="Remain. Obedient." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="84992" countmax="140" />
-		<item id="7618" name="health potion" chance="4962" />
-		<item id="7620" name="mana potion" chance="4960" />
-		<item id="2381" name="halberd" chance="3030" />
-		<item id="2796" name="green mushroom" chance="1510" />
-		<item id="9690" name="gear wheel" chance="943" />
-		<item id="8900" name="spellbook of enlightenment" chance="524" />
-		<item id="2165" name="stealth ring" chance="478" />
-		<item id="13758" name="slime mould" chance="356" />
-		<item id="13938" name="golden can of oil" chance="36" />
-		<item id="2466" name="golden armor" chance="22" />
-		<item id="2179" name="gold ring" chance="8" />
+		<item id="3031" name="gold coin" chance="84992" countmax="140" />
+		<item id="266" name="health potion" chance="4962" />
+		<item id="268" name="mana potion" chance="4960" />
+		<item id="3269" name="halberd" chance="3030" />
+		<item id="3732" name="green mushroom" chance="1510" />
+		<item id="8775" name="gear wheel" chance="943" />
+		<item id="8072" name="spellbook of enlightenment" chance="524" />
+		<item id="3049" name="stealth ring" chance="478" />
+		<item id="12601" name="slime mould" chance="356" />
+		<item id="12801" name="golden can of oil" chance="36" />
+		<item id="3360" name="golden armor" chance="22" />
+		<item id="3063" name="gold ring" chance="8" />
 	</loot>
 </monster>

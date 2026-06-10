@@ -11,7 +11,7 @@ end
 spell:group("attack")
 spell:id(86)
 spell:name("Magic Wall Rune")
-spell:runeId(2293)
+spell:runeId(3180)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(32)

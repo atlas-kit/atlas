@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Old Whopper" nameDescription="The Old Whopper" race="blood" experience="750" speed="420">
 	<health now="785" max="785" />
-	<look type="277" corpse="7740" />
+	<look type="277" corpse="656" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -49,7 +49,7 @@
 		<item name="double axe" chance="880" />
 		<item name="battle hammer" chance="5200" />
 		<item name="heavy machete" chance="2000" />
-		<item id="2490" name="dark helmet" chance="200" />
+		<item id="3384" name="dark helmet" chance="200" />
 		<item name="plate shield" chance="2000" />
 		<item name="battle shield" chance="6190" />
 		<item name="meat" chance="49950" />

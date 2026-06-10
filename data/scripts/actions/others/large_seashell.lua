@@ -15,7 +15,7 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 			msg = "Nothing is inside."
 		end
 		player:say(msg, TALKTYPE_MONSTER_SAY, false, player, item:getPosition())
-		item:transform(7553)
+		item:transform(198)
 		item:decay()
 		player:setStorageValue(PlayerStorageKeys.delayLargeSeaShell, os.time() + 20 * 60 * 60)
 		item:getPosition():sendMagicEffect(CONST_ME_BUBBLES)
@@ -25,5 +25,5 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	return true
 end
 
-action:id(7552)
+action:id(197)
 action:register()

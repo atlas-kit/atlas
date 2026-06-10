@@ -68,7 +68,7 @@
 		<item name="poison dagger" chance="21000" />
 		<item name="small emerald" countmax="3" chance="9000" />
 		<item name="great health potion" chance="8200" />
-		<item id="2169" chance="5200" /><!-- time ring -->
+		<item id="3053" chance="5200" /><!-- time ring -->
 		<item name="serpent sword" chance="2700" />
 		<item name="djinn blade" chance="1000" />
 		<item name="green gem" chance="100" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Stonerefiner" nameDescription="a stonerefiner" race="blood" experience="500" speed="220" raceId="1525">
 	<health now="800" max="800" />
-	<look type="1032" corpse="30192" />
+	<look type="1032" corpse="27536" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -36,12 +36,12 @@
 		<voice sentence="nomnomnom" />
 	</voices>
 	<loot>
-		<item id="2152" name="platinum coin" chance="50816" countmax="4" />
-		<item id="29957" name="rare earth" chance="39833" />
-		<item id="13757" name="coal" chance="29841" />
-		<item id="9967" name="glob of acid slime" chance="24966" />
-		<item id="30262" name="stonerefiner's skull" chance="20111" />
-		<item id="10557" name="poisonous slime" chance="19460" />
-		<item id="20101" name="rat cheese" chance="10410" />
+		<item id="3035" name="platinum coin" chance="50816" countmax="4" />
+		<item id="27301" name="rare earth" chance="39833" />
+		<item id="12600" name="coal" chance="29841" />
+		<item id="9054" name="glob of acid slime" chance="24966" />
+		<item id="27606" name="stonerefiner's skull" chance="20111" />
+		<item id="9640" name="poisonous slime" chance="19460" />
+		<item id="17821" name="rat cheese" chance="10410" />
 	</loot>
 </monster>

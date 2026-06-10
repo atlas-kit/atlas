@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mole" nameDescription="a mole" race="blood" experience="100" speed="160" raceId="1570">
 	<health now="200" max="200" />
-	<look type="1048" corpse="30302" />
+	<look type="1048" corpse="27646" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -32,6 +32,6 @@
 		<element deathPercent="40" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="80142" countmax="75" />
+		<item id="3031" name="gold coin" chance="80142" countmax="75" />
 	</loot>
 </monster>

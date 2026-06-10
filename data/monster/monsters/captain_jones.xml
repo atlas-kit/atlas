@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Captain Jones" nameDescription="Captain Jones" race="undead" experience="620" speed="200">
 	<health now="555" max="555" />
-	<look type="196" corpse="5566" />
+	<look type="196" corpse="5565" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -44,7 +44,7 @@
 		<item name="gold coin" countmax="100" chance="50000" />
 		<item name="gold coin" countmax="50" chance="50000" />
 		<item name="stealth ring" chance="20000" />
-		<item id="2488" name="crown legs" chance="5000" />
+		<item id="3382" name="crown legs" chance="5000" />
 		<item name="focus cape" chance="5000" />
 		<item name="red robe" chance="5000" />
 		<item name="spike sword" chance="5000" />

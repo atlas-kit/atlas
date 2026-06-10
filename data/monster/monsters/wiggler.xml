@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Wiggler" namedescription="a wiggler" race="venom" experience="900" speed="220" raceId="899">
 	<health now="1200" max="1200" />
-	<look type="510" corpse="18483" />
+	<look type="510" corpse="16193" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

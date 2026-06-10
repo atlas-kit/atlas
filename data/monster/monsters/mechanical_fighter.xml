@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mechanical Fighter" nameDescription="a mechanical fighter" race="undead" experience="255" speed="200">
 	<health now="420" max="420" />
-	<look type="102" corpse="2253" />
+	<look type="102" corpse="3138" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Tormented Ghost" nameDescription="a tormented ghost" race="undead" experience="5" speed="160">
 	<health now="210" max="210" />
-	<look type="48" corpse="9741" />
+	<look type="48" corpse="8826" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

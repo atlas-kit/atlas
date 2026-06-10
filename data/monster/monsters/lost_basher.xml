@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lost Basher" nameDescription="a lost basher" race="blood" experience="1800" speed="250" raceId="925">
 	<health now="2600" max="2600" />
-	<look type="538" corpse="19963" />
+	<look type="538" corpse="17683" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -70,7 +70,7 @@
 		<item name="terra boots" chance="780" />
 		<item name="ultimate health potion" chance="10250" />
 		<item name="small topaz" chance="10200" />
-		<item id="13757" chance="21130" /><!-- Coal -->
+		<item id="12600" chance="21130" /><!-- Coal -->
 		<item name="blue crystal shard" chance="840" />
 		<item name="lost basher's spike" chance="17260" />
 		<item name="lost basher's spike" chance="14380" />

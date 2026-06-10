@@ -1,5 +1,5 @@
 local weapon = Weapon(WEAPON_AMMO)
-weapon:id(2547)
+weapon:id(3450)
 weapon:action("removecount")
 weapon:level(55)
 weapon:register()

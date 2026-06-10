@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mutated Human" nameDescription="a mutated human" race="blood" experience="150" speed="154" raceId="521">
 	<health now="240" max="240" />
-	<look type="323" corpse="9107" />
+	<look type="323" corpse="5798" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -58,17 +58,17 @@
 		<voice sentence="Oh by the gods! What is this... aaaaaargh!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="88222" countmax="130" />
-		<item id="11225" name="mutated flesh" chance="19936" />
-		<item id="2226" name="fishbone" chance="10064" />
-		<item id="3607" name="cheese" chance="8076" />
-		<item id="2483" name="scale armor" chance="7833" />
-		<item id="3976" name="worm" chance="7081" countmax="2" />
-		<item id="2376" name="sword" chance="5069" />
-		<item id="2161" name="strange talisman" chance="4946" />
-		<item id="9808" name="heavily rusted armor" chance="2007" />
-		<item id="7910" name="peanut" chance="534" />
-		<item id="2801" name="fern" chance="421" />
-		<item id="2170" name="silver amulet" chance="102" />
+		<item id="3031" name="gold coin" chance="88222" countmax="130" />
+		<item id="10308" name="mutated flesh" chance="19936" />
+		<item id="3111" name="fishbone" chance="10064" />
+		<item id="1851" name="cheese" chance="8076" />
+		<item id="3377" name="scale armor" chance="7833" />
+		<item id="3492" name="worm" chance="7081" countmax="2" />
+		<item id="3264" name="sword" chance="5069" />
+		<item id="3045" name="strange talisman" chance="4946" />
+		<item id="8894" name="heavily rusted armor" chance="2007" />
+		<item id="841" name="peanut" chance="534" />
+		<item id="3737" name="fern" chance="421" />
+		<item id="3054" name="silver amulet" chance="102" />
 	</loot>
 </monster>

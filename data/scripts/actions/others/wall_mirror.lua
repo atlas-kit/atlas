@@ -25,5 +25,5 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	return true
 end
 
-action:id(1816, 1817, 1843, 1844, 1846, 1847, 1849, 1850)
+action:id(2603, 2604, 2630, 2631, 2633, 2634, 2636, 2637)
 action:register()

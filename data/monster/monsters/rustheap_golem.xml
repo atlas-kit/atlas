@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Rustheap Golem" nameDescription="a rustheap golem" race="energy" experience="2300" speed="250" raceId="1041">
 	<health now="2800" max="2800" />
-	<look type="603" corpse="23355" />
+	<look type="603" corpse="20984" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -49,24 +49,24 @@
 		<voice sentence="*frzzp*" />
 	</voices>
 	<loot>
-		<item id="8309" chance="1950" /><!-- nail -->
-		<item id="9930" chance="5860" /><!-- flask of rust remover -->
-		<item id="23567" chance="14980" /><!-- necromantic rust -->
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2148" countmax="100" chance="80000" /><!-- gold coin -->
-		<item id="2148" countmax="90" chance="60000" /><!-- gold coin -->
+		<item id="953" chance="1950" /><!-- nail -->
+		<item id="9016" chance="5860" /><!-- flask of rust remover -->
+		<item id="21196" chance="14980" /><!-- necromantic rust -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3031" countmax="100" chance="80000" /><!-- gold coin -->
+		<item id="3031" countmax="90" chance="60000" /><!-- gold coin -->
 		<item id="5880" chance="330" /><!-- iron ore -->
-		<item id="24124" chance="1950" /><!-- bronze gear wheel -->
-		<item id="2152" countmax="3" chance="58310" /><!-- platinum coin -->
-		<item id="2143" chance="1300" /><!-- white pearl -->
-		<item id="2144" chance="1630" /><!-- black pearl -->
-		<item id="7588" countmax="2" chance="10100" /><!-- strong health potion -->
-		<item id="7589" countmax="2" chance="7170" /><!-- strong mana potion -->
-		<item id="2391" chance="3580" /><!-- war hammer -->
+		<item id="21755" chance="1950" /><!-- bronze gear wheel -->
+		<item id="3035" countmax="3" chance="58310" /><!-- platinum coin -->
+		<item id="3026" chance="1300" /><!-- white pearl -->
+		<item id="3027" chance="1630" /><!-- black pearl -->
+		<item id="236" countmax="2" chance="10100" /><!-- strong health potion -->
+		<item id="237" countmax="2" chance="7170" /><!-- strong mana potion -->
+		<item id="3279" chance="3580" /><!-- war hammer -->
 		<item id="7452" chance="330" /><!-- spiked squelcher -->
-		<item id="23542" chance="330" /><!-- metal bat -->
-		<item id="23541" chance="2930" /><!-- gearwheel chain -->
-		<item id="9810" chance="5860" /><!-- rusty armor(rare) -->
-		<item id="9813" chance="4230" /><!-- rusty legs(rare) -->
+		<item id="21171" chance="330" /><!-- metal bat -->
+		<item id="21170" chance="2930" /><!-- gearwheel chain -->
+		<item id="8896" chance="5860" /><!-- rusty armor(rare) -->
+		<item id="8899" chance="4230" /><!-- rusty legs(rare) -->
 	</loot>
 </monster>

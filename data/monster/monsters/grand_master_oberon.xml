@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Grand Master Oberon" nameDescription="Grand Master Oberon" race="blood" experience="20000" speed="230">
 	<health now="30000" max="30000" />
-	<look type="1072" head="57" body="75" legs="38" feet="86" addons="1" corpse="31282" />
+	<look type="1072" head="57" body="75" legs="38" feet="86" addons="1" corpse="28626" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -43,7 +43,7 @@
 		<element deathPercent="50" />
 	</elements>
 	<loot>
-		<item id="31509" name="the spatial warp almanac" chance="100000" />
-		<item id="31480" name="grant of arms" chance="690" />
+		<item id="28853" name="the spatial warp almanac" chance="100000" />
+		<item id="28824" name="grant of arms" chance="690" />
 	</loot>
 </monster>

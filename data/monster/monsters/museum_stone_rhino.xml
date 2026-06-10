@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Museum Stone Rhino" nameDescription="a museum stone rhino" experience="1800" speed="290">
 	<health now="3000" max="3000" />
-	<look type="936" corpse="27738" />
+	<look type="936" corpse="25082" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -25,8 +25,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="24842" name="raw meat" chance="13793" />
+		<item id="22186" name="raw meat" chance="13793" />
 		<item id="5925" name="hardened bone" chance="6897" />
-		<item id="27044" name="rhino hide" chance="3448" />
+		<item id="24388" name="rhino hide" chance="3448" />
 	</loot>
 </monster>

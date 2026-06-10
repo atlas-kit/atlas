@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Werefox" nameDescription="a werefox" race="blood" experience="1600" speed="280" raceId="1549">
 	<health now="1500" max="1500" />
-	<look type="1030" corpse="30177" />
+	<look type="1030" corpse="27521" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -52,22 +52,22 @@
 		<voice sentence="Yelp!" />
 	</voices>
 	<loot>
-		<item id="2152" name="platinum coin" chance="89860" countmax="4" />
-		<item id="2148" name="gold coin" chance="84024" countmax="85" />
-		<item id="30118" name="fox paw" chance="15170" />
-		<item id="30119" name="werefox tail" chance="13284" />
-		<item id="2805" name="troll green" chance="5127" />
-		<item id="7620" name="mana potion" chance="5030" />
-		<item id="7589" name="strong mana potion" chance="4353" />
+		<item id="3035" name="platinum coin" chance="89860" countmax="4" />
+		<item id="3031" name="gold coin" chance="84024" countmax="85" />
+		<item id="27462" name="fox paw" chance="15170" />
+		<item id="27463" name="werefox tail" chance="13284" />
+		<item id="3741" name="troll green" chance="5127" />
+		<item id="268" name="mana potion" chance="5030" />
+		<item id="237" name="strong mana potion" chance="4353" />
 		<item id="7368" name="assassin star" chance="3192" countmax="5" />
-		<item id="2127" name="emerald bangle" chance="2950" />
-		<item id="2186" name="moonlight rod" chance="2015" />
-		<item id="7590" name="great mana potion" chance="1902" />
-		<item id="7761" name="small enchanted emerald" chance="1435" countmax="2" />
-		<item id="2214" name="ring of healing" chance="1080" />
-		<item id="24739" name="moonlight crystals" chance="887" />
-		<item id="24716" name="werewolf amulet" chance="871" />
-		<item id="2171" name="platinum amulet" chance="468" />
-		<item id="30362" name="werefox trophy" chance="129" />
+		<item id="3010" name="emerald bangle" chance="2950" />
+		<item id="3070" name="moonlight rod" chance="2015" />
+		<item id="238" name="great mana potion" chance="1902" />
+		<item id="677" name="small enchanted emerald" chance="1435" countmax="2" />
+		<item id="3098" name="ring of healing" chance="1080" />
+		<item id="22083" name="moonlight crystals" chance="887" />
+		<item id="22060" name="werewolf amulet" chance="871" />
+		<item id="3055" name="platinum amulet" chance="468" />
+		<item id="27706" name="werefox trophy" chance="129" />
 	</loot>
 </monster>

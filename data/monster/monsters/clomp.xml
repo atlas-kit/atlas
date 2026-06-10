@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Clomp" nameDescription="a clomp" race="blood" experience="475" speed="430" raceId="1174">
 	<health now="900" max="900" />
-	<look type="860" corpse="25398" />
+	<look type="860" corpse="22742" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -29,10 +29,10 @@
 		<voice sentence="Snarl!" />
 	</voices>
 	<loot>
-		<item id="24842" name="raw meat" chance="18061" />
+		<item id="22186" name="raw meat" chance="18061" />
 		<item id="5925" name="hardened bone" chance="7211" />
-		<item id="11224" name="thick fur" chance="6923" />
-		<item id="3973" name="tusk shield" chance="555" />
+		<item id="10307" name="thick fur" chance="6923" />
+		<item id="3443" name="tusk shield" chance="555" />
 		<item id="7432" name="furry club" chance="444" />
 	</loot>
 </monster>

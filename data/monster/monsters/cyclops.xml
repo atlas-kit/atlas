@@ -37,19 +37,19 @@
 		<voice sentence="Let da mashing begin!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="82276" countmax="47" />
-		<item id="2666" name="meat" chance="29087" />
-		<item id="2406" name="short sword" chance="7795" />
-		<item id="10574" name="cyclops toe" chance="5265" />
-		<item id="2510" name="plate shield" chance="2442" />
-		<item id="26642" name="heavy old tome" chance="2062" />
-		<item id="2513" name="battle shield" chance="1462" />
-		<item id="2381" name="halberd" chance="892" />
-		<item id="27071" name="old rag" chance="322" />
-		<item id="2129" name="wolf tooth chain" chance="322" />
-		<item id="2490" name="dark helmet" chance="234" />
-		<item id="7618" name="health potion" chance="146" />
+		<item id="3031" name="gold coin" chance="82276" countmax="47" />
+		<item id="3577" name="meat" chance="29087" />
+		<item id="3294" name="short sword" chance="7795" />
+		<item id="9657" name="cyclops toe" chance="5265" />
+		<item id="3410" name="plate shield" chance="2442" />
+		<item id="23986" name="heavy old tome" chance="2062" />
+		<item id="3413" name="battle shield" chance="1462" />
+		<item id="3269" name="halberd" chance="892" />
+		<item id="24415" name="old rag" chance="322" />
+		<item id="3012" name="wolf tooth chain" chance="322" />
+		<item id="3384" name="dark helmet" chance="234" />
+		<item id="266" name="health potion" chance="146" />
 		<item id="7398" name="cyclops trophy" chance="117" />
-		<item id="2209" name="club ring" chance="44" />
+		<item id="3093" name="club ring" chance="44" />
 	</loot>
 </monster>

@@ -21,7 +21,7 @@ end
 spell:group("attack")
 spell:id(115)
 spell:name("Avalanche Rune")
-spell:runeId(2274)
+spell:runeId(3161)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(30)

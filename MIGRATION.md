@@ -14,9 +14,13 @@ generated from `data/items/items.otb` by `tools/otb_extractor.py`
 | Target | Tool | Verification |
 |---|---|---|
 | `tools/server_to_client_map.json` | `otb_extractor.py` | gold/platinum/crystal coins spot-checked |
-| `data/items/items.xml` (18080 ids) | `convert_items_xml.py` | line count preserved; coins/fluids spot-checked |
+| `data/items/items.xml` (33468 ids) | `migrate_datapack_ids.py` | re-converted from the original with `fromid`/`toid` ranges split into mapping-contiguous sub-ranges (116 ranges; endpoint-only conversion corrupted them); names cross-checked per id against Canary's `items.xml` |
 | `src/const.h` (65 `ITEM_*` constants) | inline script | all 65 mapped, 0 unmapped, comments preserved |
 | `data/world/forgotten.otbm` (428993 items) | [Atlas Editor](https://github.com/atlas-kit/atlas-editor) — Map Converter | lossless node-tree round-trip; every id remapped per the `items.otb` mapping |
+| monster loot + corpses (850 files, 7585 loot + 1135 corpse ids) | `migrate_datapack_ids.py` | every loot entry validated by its `name` attribute against the converted `items.xml` (0 mismatches) |
+| `data/movements/movements.xml` (605 ids) | `migrate_datapack_ids.py` | ranges checked for mapping contiguity; converted ids must exist in `items.xml` |
+| NPC XML shops (`shop_buyable`/`shop_sellable`) | `migrate_datapack_ids.py` | entry names validated against `items.xml` |
+| Lua scripts (447 files, ~10k ids) | `migrate_datapack_ids.py` | see below |
 
 Map (`.otbm`) conversion is handled by the **Map Converter** tool of the
 [Atlas Editor](https://github.com/atlas-kit/atlas-editor) — the
@@ -61,19 +65,45 @@ correct until they are:
      mirroring `loadItem`/`saveItem`, run against your dump. This is unwritten
      because it must be validated against real data.
 
-2. **Lua scripts — manual review.** `tools/convert_lua_scripts.py` is
-   heuristic (`100 ≤ n ≤ 50000`) and **was intentionally not run**: Lua has no
-   structural signal to tell an item id from a storage key, count, level or
-   price, so a blanket pass introduces silent gameplay bugs. Convert
-   case-by-case.
+2. **Lua scripts — converted, review custom additions.** The datapack Lua was
+   converted by `tools/migrate_datapack_ids.py` in a single span-based pass:
+   - syntactically unambiguous positions are always converted (`Action`/
+     `MoveEvent`/`Weapon` `:id()` lists, `Spell:runeId()`, `ItemType()`,
+     `Game.createItem()`, `:addItem/:removeItem/:getItemCount/:getItemById/
+     :transform`, `doPlayerAddItem`, `itemid =`, `itemid ==`/`:getId() ==`,
+     `transformTo =`, `newItem =`, `table.contains({...})`, `for i = a, b`
+     loops with mapping-contiguity check, NPC `addBuyableItem`/
+     `addSellableItem`/`addBuyableItemContainer` item arguments);
+   - numbers in plain table constructors are converted only for files
+     classified file-by-file as item-id tables (whitelist in the script:
+     `all` / `keys` / `none`); everything else requires confirmation against
+     the equivalent script in the Canary reference datapack, otherwise it is
+     left untouched and reported.
+   Storage values, looktypes, mount ids, achievement ids, prices, chances and
+   durations were verified to remain untouched. If you add custom scripts,
+   classify them in `LUA_FILE_MODES` before re-running. The old
+   `tools/convert_lua_scripts.py` blanket heuristic is superseded by this and
+   should not be used on the datapack.
 
 ## Reproduce
 
 ```sh
 python tools/otb_extractor.py data/items/items.otb -o tools/server_to_client_map.json -f mapping
 python tools/otb_extractor.py data/items/items.otb -o tools/client_to_server_map.json -f reverse
-python tools/convert_items_xml.py -m tools/server_to_client_map.json -i data/items/items.xml -o data/items/items.xml
+
+# items.xml + monstros + movements + NPC shops + Lua, com validacao:
+git show <commit-pre-migracao>:data/items/items.xml > /tmp/items_original.xml
+python tools/migrate_datapack_ids.py \
+    --orig-items /tmp/items_original.xml \
+    --canary-items <canary>/data/items/items.xml \
+    --canary-root <canary> \
+    --apply
 ```
+
+The run must end with `0 erros`; the remaining warnings are the 14 custom ids
+absent from `items.otb` (listed above) and the reported "errors" for non-item
+numbers (prices, condition ticks) deliberately left untouched in whitelisted
+files are expected to be absent from the mapping.
 
 Map: use the [Atlas Editor](https://github.com/atlas-kit/atlas-editor)
 (GUI, Windows/macOS/Linux):

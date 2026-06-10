@@ -1,29 +1,29 @@
 local config = {
-	[26194] = { -- vibrant egg
+	[23538] = { -- vibrant egg
 		name = "vortexion",
 		mountId = 94,
 		tameMessage = "You receive the permission to ride a sparkion.",
 		achievementProgress = { name = "Vortex Tamer", progress = 3 }
 	},
-	[26340] = { -- crackling egg
+	[23684] = { -- crackling egg
 		name = "neon sparkid",
 		mountId = 98,
 		tameMessage = "You receive the permission to ride a neon sparkid.",
 		achievementProgress = { name = "Vortex Tamer", progress = 3 }
 	},
-	[26341] = { -- menacing egg
+	[23685] = { -- menacing egg
 		name = "vortexion",
 		mountId = 99,
 		tameMessage = "You receive the permission to ride a vortexion.",
 		achievementProgress = { name = "Vortex Tamer", progress = 3 }
 	},
-	[25521] = { -- mysterious scroll
+	[22865] = { -- mysterious scroll
 		name = "rift runner",
 		mountId = 87,
 		achievement = "Running the Rift",
 		tameMessage = "You receive the permission to ride a rift runner."
 	},
-	[35285] = { -- spectral scrap of cloth
+	[32629] = { -- spectral scrap of cloth
 		name = "haze",
 		mountId = 162,
 		achievement = "Nothing but Hot Air",

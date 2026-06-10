@@ -47,15 +47,15 @@
 		<voice sentence="Come to mummy!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="62513" countmax="64" />
-		<item id="28358" name="little bowl of myrrh" chance="13863" />
-		<item id="28353" name="green bandage" chance="10859" />
-		<item id="28357" name="single human eye" chance="9883" />
-		<item id="2024" name="broken flask" chance="9730" />
-		<item id="2159" name="scarab coin" chance="8891" countmax="3" />
-		<item id="13472" name="pharaoh banner" chance="2196" />
-		<item id="2155" name="green gem" chance="1845" />
-		<item id="2144" name="black pearl" chance="1052" />
-		<item id="2411" name="poison dagger" chance="580" />
+		<item id="3031" name="gold coin" chance="62513" countmax="64" />
+		<item id="25702" name="little bowl of myrrh" chance="13863" />
+		<item id="25697" name="green bandage" chance="10859" />
+		<item id="25701" name="single human eye" chance="9883" />
+		<item id="2894" name="broken flask" chance="9730" />
+		<item id="3042" name="scarab coin" chance="8891" countmax="3" />
+		<item id="12483" name="pharaoh banner" chance="2196" />
+		<item id="3038" name="green gem" chance="1845" />
+		<item id="3027" name="black pearl" chance="1052" />
+		<item id="3299" name="poison dagger" chance="580" />
 	</loot>
 </monster>

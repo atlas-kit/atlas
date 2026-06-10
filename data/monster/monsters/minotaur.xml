@@ -40,12 +40,12 @@
 		<item name="mace" chance="12840" />
 		<item name="chain armor" chance="10000" />
 		<item name="brass helmet" chance="7700" />
-		<item id="2376" chance="5000" /><!-- sword -->
+		<item id="3264" chance="5000" /><!-- sword -->
 		<item name="meat" chance="5000" />
 		<item name="axe" chance="4000" />
 		<item name="minotaur horn" countmax="2" chance="2090" />
 		<item name="minotaur leather" chance="990" />
-		<item id="2554" chance="310" /><!-- shovel -->
+		<item id="3457" chance="310" /><!-- shovel -->
 		<item name="bronze amulet" chance="110" />
 	</loot>
 </monster>

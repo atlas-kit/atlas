@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Pirate Ghost" nameDescription="a pirate ghost" race="undead" experience="250" speed="170" raceId="257">
 	<health now="275" max="275" />
-	<look type="196" corpse="5566" />
+	<look type="196" corpse="5565" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -51,7 +51,7 @@
 		<voice sentence="You will not get my treasure!" />
 	</voices>
 	<loot>
-		<item id="1951" chance="910" /><!-- parchment -->
+		<item id="2817" chance="910" /><!-- parchment -->
 		<item name="gold coin" countmax="67" chance="48000" />
 		<item name="stealth ring" chance="650" />
 		<item name="spike sword" chance="130" />

@@ -44,7 +44,7 @@
 		<item name="gold coin" countmax="55" chance="58000" />
 		<item name="worm" countmax="10" chance="9000" />
 		<item name="half-digested piece of meat" chance="5000" />
-		<item id="2230" chance="5000" /><!-- bone -->
+		<item id="3115" chance="5000" /><!-- bone -->
 		<item name="iron helmet" chance="2000" />
 		<item name="rotten meat" chance="1950" />
 		<item name="two handed sword" chance="1950" />

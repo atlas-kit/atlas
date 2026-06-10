@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Massive Water Elemental" nameDescription="a massive water elemental" race="undead" experience="1100" speed="280" raceId="279">
 	<health now="1250" max="1250" />
-	<look type="11" corpse="10499" />
+	<look type="11" corpse="9582" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -57,7 +57,7 @@
 		<item name="platinum coin" countmax="2" chance="20000" />
 		<item name="energy ring" chance="910" />
 		<item name="life ring" chance="1000" />
-		<item id="2667" countmax="2" chance="40000" /><!-- fish -->
+		<item id="3578" countmax="2" chance="40000" /><!-- fish -->
 		<item name="rainbow trout" chance="1340" />
 		<item name="green perch" chance="1590" />
 		<item name="great mana potion" chance="10400" />

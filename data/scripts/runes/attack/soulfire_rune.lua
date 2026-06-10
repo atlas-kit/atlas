@@ -18,7 +18,7 @@ end
 spell:group("attack")
 spell:id(50)
 spell:name("Soulfire Rune")
-spell:runeId(2308)
+spell:runeId(3195)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(27)

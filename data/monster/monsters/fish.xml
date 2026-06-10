@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fish" nameDescription="a fish" race="undead" experience="0" speed="180" raceId="784">
 	<health now="25" max="25" />
-	<look type="455" corpse="2667" />
+	<look type="455" corpse="3578" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />

@@ -2,7 +2,7 @@
 <monster name="Herald of Gloom" nameDescription="a herald of gloom" experience="450" speed="260" race="undead" raceId="586">
 	<health now="350" max="350" />
 	<targetchange speed="0" chance="8" />
-	<look type="320" corpse="9915" />
+	<look type="320" corpse="9001" />
 	<flags>
 		<flag summonable="0" />
 		<flag attackable="1" />

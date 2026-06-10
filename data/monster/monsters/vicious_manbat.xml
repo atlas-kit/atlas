@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Vicious Manbat" nameDescription="a vicious manbat" race="blood" experience="1200" speed="220" raceId="959">
 	<health now="1700" max="1700" />
-	<look type="554" corpse="21266" />
+	<look type="554" corpse="18949" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

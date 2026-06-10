@@ -13,7 +13,7 @@ end
 spell:group("attack")
 spell:id(91)
 spell:name("Poison Bomb Rune")
-spell:runeId(2286)
+spell:runeId(3173)
 spell:allowFarUse(true)
 spell:charges(2)
 spell:runeLevel(25)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gravedigger" nameDescription="a gravedigger" race="blood" experience="950" speed="230" raceId="975">
 	<health now="1500" max="1500" />
-	<look type="558" corpse="21279" />
+	<look type="558" corpse="18962" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -69,7 +69,7 @@
 		<item name="skull staff" chance="130" />
 		<item name="mysterious voodoo skull" chance="100" />
 		<item name="hardened bone" chance="50" />
-		<item id="6300" chance="800" /><!-- death ring -->
+		<item id="6299" chance="800" /><!-- death ring -->
 		<item name="strong health potion" countmax="2" chance="2260" />
 		<item name="strong mana potion" countmax="2" chance="3600" />
 		<item name="lump of dirt" chance="100" />

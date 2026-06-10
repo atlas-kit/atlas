@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Draken Warmaster" nameDescription="a draken warmaster" race="blood" experience="2400" speed="324" raceId="617">
 	<health now="4150" max="4150" />
-	<look type="334" corpse="11107" />
+	<look type="334" corpse="10190" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -45,20 +45,20 @@
 		<voice sentence="Hizzzzz!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="97355" countmax="200" />
-		<item id="2152" name="platinum coin" chance="50252" countmax="5" />
-		<item id="2666" name="meat" chance="30158" />
-		<item id="11321" name="bone shoulderplate" chance="12048" />
-		<item id="11323" name="zaoan halberd" chance="8001" />
-		<item id="11322" name="warmaster's wristguards" chance="6993" />
-		<item id="7591" name="great health potion" chance="5049" countmax="3" />
-		<item id="8473" name="ultimate health potion" chance="3981" />
-		<item id="11303" name="zaoan shoes" chance="2026" />
-		<item id="2528" name="tower shield" chance="1991" />
-		<item id="2147" name="small ruby" chance="1573" countmax="5" />
-		<item id="11304" name="zaoan legs" chance="943" />
-		<item id="11305" name="drakinata" chance="827" />
-		<item id="11301" name="zaoan armor" chance="791" />
-		<item id="2123" name="ring of the sky" chance="208" />
+		<item id="3031" name="gold coin" chance="97355" countmax="200" />
+		<item id="3035" name="platinum coin" chance="50252" countmax="5" />
+		<item id="3577" name="meat" chance="30158" />
+		<item id="10404" name="bone shoulderplate" chance="12048" />
+		<item id="10406" name="zaoan halberd" chance="8001" />
+		<item id="10405" name="warmaster's wristguards" chance="6993" />
+		<item id="239" name="great health potion" chance="5049" countmax="3" />
+		<item id="7643" name="ultimate health potion" chance="3981" />
+		<item id="10386" name="zaoan shoes" chance="2026" />
+		<item id="3428" name="tower shield" chance="1991" />
+		<item id="3030" name="small ruby" chance="1573" countmax="5" />
+		<item id="10387" name="zaoan legs" chance="943" />
+		<item id="10388" name="drakinata" chance="827" />
+		<item id="10384" name="zaoan armor" chance="791" />
+		<item id="3006" name="ring of the sky" chance="208" />
 	</loot>
 </monster>

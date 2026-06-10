@@ -1,6 +1,6 @@
 local action = Action()
 
-local upFloorIds = {1386, 3678, 5543, 22845, 22846}
+local upFloorIds = {1948, 1968, 5542, 20474, 20475}
 
 function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	if table.contains(upFloorIds, item.itemid) then

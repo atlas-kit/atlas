@@ -13,7 +13,7 @@ end
 spell:group("attack")
 spell:id(27)
 spell:name("Energy Field Rune")
-spell:runeId(2277)
+spell:runeId(3164)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(18)

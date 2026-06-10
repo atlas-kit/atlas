@@ -52,16 +52,16 @@
 		<voice sentence="Gimme gimme!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="50077" countmax="9" />
-		<item id="1294" name="small stone" chance="24937" countmax="2" />
-		<item id="2379" name="dagger" chance="18190" />
-		<item id="2667" name="fish" chance="12982" />
-		<item id="2230" name="bone" chance="12643" />
-		<item id="2461" name="leather helmet" chance="9855" />
-		<item id="2559" name="small axe" chance="9448" />
-		<item id="2406" name="short sword" chance="8993" />
-		<item id="2467" name="leather armor" chance="7696" />
-		<item id="2235" name="mouldy cheese" chance="7018" />
-		<item id="2449" name="bone club" chance="5044" />
+		<item id="3031" name="gold coin" chance="50077" countmax="9" />
+		<item id="1781" name="small stone" chance="24937" countmax="2" />
+		<item id="3267" name="dagger" chance="18190" />
+		<item id="3578" name="fish" chance="12982" />
+		<item id="3115" name="bone" chance="12643" />
+		<item id="3355" name="leather helmet" chance="9855" />
+		<item id="3462" name="small axe" chance="9448" />
+		<item id="3294" name="short sword" chance="8993" />
+		<item id="3361" name="leather armor" chance="7696" />
+		<item id="3120" name="mouldy cheese" chance="7018" />
+		<item id="3337" name="bone club" chance="5044" />
 	</loot>
 </monster>

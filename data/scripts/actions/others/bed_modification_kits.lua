@@ -1,11 +1,11 @@
 local action = Action()
 
 local beds = {
-	[7904] = {{7811, 7812}, {7813, 7814}}, -- green kit
-	[7905] = {{7819, 7820}, {7821, 7822}}, -- yellow kit
-	[7906] = {{7815, 7816}, {7817, 7818}}, -- red kit
-	[7907] = {{1754, 1755}, {1760, 1761}}, -- removal kit
-	[20252] = {{20197, 20198}, {20199, 20200}} -- canopy kit
+	[831] = {{734, 735}, {736, 737}}, -- green kit
+	[832] = {{742, 743}, {744, 745}}, -- yellow kit
+	[833] = {{738, 739}, {740, 741}}, -- red kit
+	[834] = {{2487, 2488}, {2493, 2494}}, -- removal kit
+	[17972] = {{17917, 17918}, {17919, 17920}} -- canopy kit
 }
 
 local function internalBedTransform(item, targetItem, toPosition, itemArray)
@@ -36,12 +36,12 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 	end
 
 	for _, bed in pairs(beds) do
-		if bed[1][1] == targetItemId or table.contains({1758, 5502, 18027}, targetItemId) then
+		if bed[1][1] == targetItemId or table.contains({2491, 5501, 15506}, targetItemId) then
 			toPosition:sendMagicEffect(CONST_ME_POFF)
 			toPosition.y = toPosition.y + 1
 			internalBedTransform(item, target, toPosition, newBed[1])
 			break
-		elseif bed[2][1] == targetItemId or table.contains({1756, 5500, 18029}, targetItemId) then
+		elseif bed[2][1] == targetItemId or table.contains({2489, 5499, 15508}, targetItemId) then
 			toPosition:sendMagicEffect(CONST_ME_POFF)
 			toPosition.x = toPosition.x + 1
 			internalBedTransform(item, target, toPosition, newBed[2])

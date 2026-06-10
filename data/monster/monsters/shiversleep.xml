@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Shiversleep" nameDescription="Shiversleep" race="blood" experience="1900" speed="270">
 	<health now="4600" max="4600" />
-	<look type="592" corpse="22497" />
+	<look type="592" corpse="20163" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -48,7 +48,7 @@
 		<item name="platinum coin" countmax="10" chance="33333" />
 		<item name="giant sword" chance="422" />
 		<item name="knight legs" chance="444" />
-		<item id="2487" name="crown armor" chance="632" />
+		<item id="3381" name="crown armor" chance="632" />
 		<item name="iron ore" countmax="2" chance="2195" />
 		<item name="magic sulphur" chance="632" />
 		<item name="great mana potion" countmax="4" chance="3100" />

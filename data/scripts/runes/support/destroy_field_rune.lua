@@ -18,7 +18,7 @@ end
 spell:group("support")
 spell:id(30)
 spell:name("Destroy Field Rune")
-spell:runeId(2261)
+spell:runeId(3148)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(17)
