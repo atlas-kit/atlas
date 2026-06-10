@@ -23,9 +23,11 @@ static void bench_xtea_encrypt(benchmark::State& state)
 	for (auto&& _ : state) {
 		xtea::encrypt(data.data(), data.size(), roundKeys);
 		benchmark::DoNotOptimize(data);
+
+		state.SetBytesProcessed(state.range(0) * state.iterations());
 	}
 }
-BENCHMARK(bench_xtea_encrypt)->Range(8, 1024);
+BENCHMARK(bench_xtea_decrypt)->Range(8, 65500);
 
 static void bench_xtea_decrypt(benchmark::State& state)
 {
@@ -37,8 +39,10 @@ static void bench_xtea_decrypt(benchmark::State& state)
 	for (auto&& _ : state) {
 		xtea::decrypt(data.data(), data.size(), roundKeys);
 		benchmark::DoNotOptimize(data);
+
+		state.SetBytesProcessed(state.range(0) * state.iterations());
 	}
 }
-BENCHMARK(bench_xtea_decrypt)->Range(8, 1024);
+BENCHMARK(bench_xtea_decrypt)->Range(8, 65500);
 
 BENCHMARK_MAIN();
