@@ -16,10 +16,10 @@ generated from `data/items/items.otb` by `tools/otb_extractor.py`
 | `tools/server_to_client_map.json` | `otb_extractor.py` | gold/platinum/crystal coins spot-checked |
 | `data/items/items.xml` (18080 ids) | `convert_items_xml.py` | line count preserved; coins/fluids spot-checked |
 | `src/const.h` (65 `ITEM_*` constants) | inline script | all 65 mapped, 0 unmapped, comments preserved |
-| `data/world/forgotten.otbm` (428993 items) | [Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor) — Map Converter | lossless node-tree round-trip; every id remapped per the `items.otb` mapping |
+| `data/world/forgotten.otbm` (428993 items) | [Atlas Editor](https://github.com/atlas-kit/atlas-editor) — Map Converter | lossless node-tree round-trip; every id remapped per the `items.otb` mapping |
 
 Map (`.otbm`) conversion is handled by the **Map Converter** tool of the
-[Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor) — the
+[Atlas Editor](https://github.com/atlas-kit/atlas-editor) — the
 official atlas-kit asset tooling — not by a script in this repo. It parses the
 OTBM node tree losslessly (`ESCAPE/START/END`-aware, matching
 `src/fileloader.cpp`), rewrites only the byte spans that hold item ids (the
@@ -75,7 +75,7 @@ python tools/otb_extractor.py data/items/items.otb -o tools/client_to_server_map
 python tools/convert_items_xml.py -m tools/server_to_client_map.json -i data/items/items.xml -o data/items/items.xml
 ```
 
-Map: use the [Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor)
+Map: use the [Atlas Editor](https://github.com/atlas-kit/atlas-editor)
 (GUI, Windows/macOS/Linux):
 
 1. Open the **Map Converter** tool from the launcher.
