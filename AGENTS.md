@@ -66,7 +66,7 @@ Run from project root:
 ./build/linux-release/tfs
 ```
 
-Ports (defaults in `config.lua`): 7171 (status), 7172 (game protocol), 8080 (HTTP).
+Ports (defaults in config.lua): 7171 (status), 7172 (game protocol). Note: HTTP (8080) is optional.
 
 ## Code Formatting
 
@@ -141,7 +141,7 @@ Server config: `config.lua` (runtime settings). Env vars: `.env.example` (DB hos
 
 ### Docker
 
-Caches system packages (no vcpkg). Installs Boost.MariaDB from Ubuntu repos.
+Caches system packages (no vcpkg). Installs libmariadb packages.
 
 ```bash
 docker build -t atlas-server .
