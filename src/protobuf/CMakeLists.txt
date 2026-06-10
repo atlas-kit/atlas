@@ -1,10 +1,17 @@
 # CMakeLists.txt for protobuf-generated files and appearances loader
 
 # Prefer vcpkg's protobuf CMake config; fall back to the FindProtobuf module
-# (Debian's libprotobuf-dev ships only the latter).
+# (Debian's libprotobuf-dev ships only the latter). protobuf_MODULE_COMPATIBLE
+# makes CONFIG-mode packages also provide protobuf_generate_cpp().
+set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG QUIET)
 if (NOT Protobuf_FOUND)
 	find_package(Protobuf REQUIRED)
+endif ()
+
+if (NOT COMMAND protobuf_generate_cpp)
+	message(FATAL_ERROR "protobuf_generate_cpp() is not provided by the found Protobuf package; "
+	                    "install protobuf with CMake module compatibility (vcpkg or libprotobuf-dev).")
 endif ()
 
 # Generate C++ files from proto

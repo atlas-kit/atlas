@@ -41,6 +41,17 @@ bool Appearances::loadFromFile(const std::string& filename)
 	effects.clear();
 	missiles.clear();
 
+	// Reset special-meaning IDs so a reload with a file that omits any of
+	// them does not keep stale values from the previous load
+	goldCoinId = 0;
+	platinumCoinId = 0;
+	crystalCoinId = 0;
+	tibiaCoinId = 0;
+	stampedLetterId = 0;
+	supplyStashId = 0;
+	standardRewardChestId = 0;
+	blankImbuementScrollId = 0;
+
 	size_t skippedObjects = 0;
 
 	// Load objects (items)

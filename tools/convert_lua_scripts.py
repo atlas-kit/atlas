@@ -382,10 +382,14 @@ def main():
             if not args.dry_run and not args.replace:
                 output_dir.mkdir(parents=True, exist_ok=True)
 
+            backup_suffix = datetime.now().strftime('%Y%m%d_%H%M%S')
+
             for lua_file in lua_files:
                 rel_path = lua_file.relative_to(input_path)
 
                 if args.replace:
+                    if not args.dry_run:
+                        shutil.copy2(lua_file, f"{lua_file}.backup.{backup_suffix}")
                     out_file = lua_file
                 else:
                     out_file = output_dir / rel_path

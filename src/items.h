@@ -448,10 +448,10 @@ public:
 	bool isCorpse = false;
 	bool isPodiumAppearance = false; // appearance show_off_socket; type==ITEM_TYPE_PODIUM is the authoritative check
 	bool wearOut = false;            // u32 charges + u8 brand-new
-	bool clockExpire = false;        // u32 decayTime + u8 brand-new (any of expire/expireStop/clockExpire writes the block)
+	bool clockExpire = false; // u32 decayTime + u8 brand-new (any of expire/expireStop/clockExpire writes the block)
 	bool expire = false;
 	bool expireStop = false;
-	bool isWrapKit = false;          // appearance.decoItemKit -> u16 unWrapId on wire
+	bool isWrapKit = false; // appearance.decoItemKit -> u16 unWrapId on wire
 };
 
 class Items

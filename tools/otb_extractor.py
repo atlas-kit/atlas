@@ -262,23 +262,33 @@ def parse_otb(filepath: str) -> tuple:
 
                 attr_len = reader.read_u16()
 
-                if attr == ITEM_ATTR_SERVERID:
+                # Honor attr_len: parse the known payload and skip any extra
+                # bytes so a size mismatch never desyncs the parser. If the
+                # payload is shorter than expected, skip it entirely.
+                if attr == ITEM_ATTR_SERVERID and attr_len >= 2:
                     server_id = reader.read_u16()
-                elif attr == ITEM_ATTR_CLIENTID:
+                    reader.skip(attr_len - 2)
+                elif attr == ITEM_ATTR_CLIENTID and attr_len >= 2:
                     client_id = reader.read_u16()
-                elif attr == ITEM_ATTR_SPEED:
+                    reader.skip(attr_len - 2)
+                elif attr == ITEM_ATTR_SPEED and attr_len >= 2:
                     speed = reader.read_u16()
-                elif attr == ITEM_ATTR_LIGHT2:
+                    reader.skip(attr_len - 2)
+                elif attr == ITEM_ATTR_LIGHT2 and attr_len >= 4:
                     light_level = reader.read_u16()
                     light_color = reader.read_u16()
-                elif attr == ITEM_ATTR_TOPORDER:
-                    top_order = reader.read_byte()
-                elif attr == ITEM_ATTR_WAREID:
+                    reader.skip(attr_len - 4)
+                elif attr == ITEM_ATTR_TOPORDER and attr_len >= 1:
+                    top_order = reader.read_escaped_byte()
+                    reader.skip(attr_len - 1)
+                elif attr == ITEM_ATTR_WAREID and attr_len >= 2:
                     ware_id = reader.read_u16()
-                elif attr == ITEM_ATTR_CLASSIFICATION:
-                    classification = reader.read_byte()
+                    reader.skip(attr_len - 2)
+                elif attr == ITEM_ATTR_CLASSIFICATION and attr_len >= 1:
+                    classification = reader.read_escaped_byte()
+                    reader.skip(attr_len - 1)
                 else:
-                    # Skip unknown attribute
+                    # Skip unknown (or undersized) attribute
                     reader.skip(attr_len)
 
             if server_id > 0:
@@ -384,8 +394,12 @@ def print_stats(items: List[ItemData]):
     server_ids = [item.server_id for item in items]
     client_ids = [item.client_id for item in items if item.client_id > 0]
 
-    print(f"\nServer IDs: {min(server_ids)} - {max(server_ids)}")
-    print(f"Client IDs: {min(client_ids)} - {max(client_ids)}")
+    if server_ids:
+        print(f"\nServer IDs: {min(server_ids)} - {max(server_ids)}")
+    if client_ids:
+        print(f"Client IDs: {min(client_ids)} - {max(client_ids)}")
+    else:
+        print("Client IDs: nenhum (> 0)")
 
     # Items where server_id != client_id
     different = [item for item in items if item.server_id != item.client_id]

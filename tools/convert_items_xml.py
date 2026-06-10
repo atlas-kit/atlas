@@ -117,12 +117,19 @@ def convert_lua_scripts(input_dir: str, output_dir: str, mapping: Dict[int, int]
 
     # Padrões comuns de uso de item IDs em Lua
     patterns = [
-        # Item(id), doCreateItem(id), etc
-        r'\b(Item|doCreateItem|doPlayerAddItem|doCreateItemEx|getTileItemById|getItemById)\s*\(\s*(\d+)',
+        # Item(id), doCreateItem(id), etc - o ID é o primeiro argumento
+        r'\b(Item|doCreateItem|doCreateItemEx|getItemById)\s*\(\s*(\d+)',
         # itemid = X, ItemId = X
         r'([iI]tem[iI]d)\s*=\s*(\d+)',
         # ITEM_XXX = X (constantes)
         r'(ITEM_\w+)\s*=\s*(\d+)',
+    ]
+
+    # Funções onde o item ID é o segundo argumento: doPlayerAddItem(cid, itemId, ...),
+    # getTileItemById(pos, itemId)
+    second_arg_patterns = [
+        r'\b(doPlayerAddItem\s*\([^,()]+,\s*)(\d+)',
+        r'\b(getTileItemById\s*\([^,()]+,\s*)(\d+)',
     ]
 
     unmapped: Set[int] = set()
@@ -149,6 +156,19 @@ def convert_lua_scripts(input_dir: str, output_dir: str, mapping: Dict[int, int]
 
         for pattern in patterns:
             content = re.sub(pattern, replace_lua_id, content)
+
+        def replace_second_arg(match):
+            prefix = match.group(1)
+            old_id = int(match.group(2))
+            new_id = convert_id(old_id, mapping, unmapped)
+
+            if old_id != new_id:
+                stats['ids_changed'] += 1
+
+            return f'{prefix}{new_id}'
+
+        for pattern in second_arg_patterns:
+            content = re.sub(pattern, replace_second_arg, content)
 
         with open(out_file, 'w', encoding='utf-8') as f:
             f.write(content)
