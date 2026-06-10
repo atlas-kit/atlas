@@ -16,14 +16,16 @@ generated from `data/items/items.otb` by `tools/otb_extractor.py`
 | `tools/server_to_client_map.json` | `otb_extractor.py` | gold/platinum/crystal coins spot-checked |
 | `data/items/items.xml` (18080 ids) | `convert_items_xml.py` | line count preserved; coins/fluids spot-checked |
 | `src/const.h` (65 `ITEM_*` constants) | inline script | all 65 mapped, 0 unmapped, comments preserved |
-| `data/world/forgotten.otbm` (428993 items) | `convert_otbm.py` | re-parse pass: node tree identical, every id remapped per mapping |
+| `data/world/forgotten.otbm` (428993 items) | [Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor) — Map Converter | lossless node-tree round-trip; every id remapped per the `items.otb` mapping |
 
-`convert_otbm.py` was rewritten as a structural OTBM node-tree parser
-(`ESCAPE/START/END`-aware, matching `src/fileloader.cpp`). It only rewrites the
-two byte spans that hold item ids (the `OTBM_ITEM` node header u16 and the
-`OTBM_ATTR_ITEM` u16 in tile prop streams) and runs a `--verify` pass that
-re-parses the output. The previous naive 0x09 byte-scan version would corrupt
-maps and must not be used.
+Map (`.otbm`) conversion is handled by the **Map Converter** tool of the
+[Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor) — the
+official atlas-kit asset tooling — not by a script in this repo. It parses the
+OTBM node tree losslessly (`ESCAPE/START/END`-aware, matching
+`src/fileloader.cpp`), rewrites only the byte spans that hold item ids (the
+`OTBM_ITEM` node header u16 and the `OTBM_ATTR_ITEM` u16 in tile prop streams),
+and converts in either direction (server ↔ client) using your `items.otb` as
+the exact mapping. Do not use naive byte-scan scripts: they corrupt maps.
 
 14 item ids `>= 100` referenced in `items.xml` are not present in `items.otb`
 (custom/newer items, kept unchanged): 27543, 27587, 27840, 28411, 29888,
@@ -71,5 +73,13 @@ correct until they are:
 python tools/otb_extractor.py data/items/items.otb -o tools/server_to_client_map.json -f mapping
 python tools/otb_extractor.py data/items/items.otb -o tools/client_to_server_map.json -f reverse
 python tools/convert_items_xml.py -m tools/server_to_client_map.json -i data/items/items.xml -o data/items/items.xml
-python tools/convert_otbm.py data/world/forgotten.otbm -m tools/server_to_client_map.json -r   # --verify by default
 ```
+
+Map: use the [Atlas Assets Editor](https://github.com/atlas-kit/atlas-assets-editor)
+(GUI, Windows/macOS/Linux):
+
+1. Open the **Map Converter** tool from the launcher.
+2. Load `data/items/items.otb` so the conversion uses your exact
+   server↔client mapping (without it the built-in community table is used).
+3. Select `data/world/forgotten.otbm`, direction **server → client**, and
+   convert.
