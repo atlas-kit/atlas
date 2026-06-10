@@ -99,19 +99,11 @@ void NetworkMessage::addPosition(const Position& pos)
 	addByte(pos.z);
 }
 
-// Wire layout for items in protocol 15.x (verified against the
-// Tibia 15.24 client parser in TibiaTrace/src/protocol/parsers/ServerPackets.hpp
-// `getItem` and Canary winter-update-2025 `ProtocolGame::AddItem`).
+// Wire layout for items in protocol 15.x. Every check below is independent —
+// the client reads each optional section in order based on the flags in its
+// own appearances.dat, so a single item can carry several sections.
 //
-// Every check below is INDEPENDENT — the client reads each optional section
-// in order based on the flags it loaded from its own appearances.dat, so a
-// single item can legitimately carry several sections (e.g. a sword with
-// upgradeClassification > 0 AND clockExpire writes both `tier` and
-// `decay+brandNew`). The previous `else if` cascade collapsed multiple flags
-// into a single branch and made the client read garbage on items that
-// matched more than one condition.
-//
-// Order matters and must match the client's read sequence:
+// Order must match the client's read sequence:
 //   1. clientId               u16
 //   2. stackable              u8 count
 //   3. fluid/splash           u8 fluidType
@@ -137,10 +129,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}
 
 	if (it.isContainer()) {
-		// ContainerSpecial_t::None — no extra payload. Quiver / loot
-		// categories require an actual Item* to enumerate ammo; the
-		// id-only overload always emits a plain container.
-		addByte(0x00);
+		addByte(0x00); // ContainerSpecial_t::None
 	}
 
 	if (it.isPodium()) {
@@ -166,7 +155,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}
 
 	if (it.isWrapKit) {
-		add<uint16_t>(0x00); // unWrapId — no wrapped item baked into a fresh kit
+		add<uint16_t>(0x00); // unWrapId
 	}
 }
 
@@ -185,11 +174,6 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	}
 
 	if (it.isContainer()) {
-		// Mirror Canary's `enumToValue(ContainerSpecial_t)`: 0 = None (no
-		// extra bytes), 2 = ContentCounter (Quiver shows ammo total). We
-		// only support the two categories actually emitted by Atlas; the
-		// rest of the enum (Manager, QuiverLoot, etc.) belongs to UI
-		// features the server doesn't drive yet.
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x02); // ContainerSpecial_t::ContentCounter
@@ -238,7 +222,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	}
 
 	if (it.classification > 0) {
-		addByte(0x00); // item tier (0-10) — Atlas does not persist tier yet
+		addByte(0x00); // item tier (0-10) — not persisted yet
 	}
 
 	if (it.clockExpire || it.expire || it.expireStop) {
@@ -252,7 +236,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	}
 
 	if (it.isWrapKit) {
-		add<uint16_t>(0x00); // unWrapId — Atlas does not yet persist the wrapped item id
+		add<uint16_t>(0x00); // unWrapId — not persisted yet
 	}
 }
 

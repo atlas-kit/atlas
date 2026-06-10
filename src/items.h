@@ -442,9 +442,7 @@ public:
 	bool dualWielding = false;
 
 	// 15.x appearance-derived flags used by NetworkMessage::addItem to decide
-	// which optional sections to write after the itemId. Mirror the parser
-	// expectations on the 15.24 client side (see TibiaTrace/getItem and
-	// Canary winter-update-2025 ProtocolGame::AddItem).
+	// which optional sections to write after the itemId
 	bool isCorpse = false;
 	bool isPodiumAppearance = false; // appearance show_off_socket; type==ITEM_TYPE_PODIUM is the authoritative check
 	bool wearOut = false;            // u32 charges + u8 brand-new

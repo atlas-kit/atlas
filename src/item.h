@@ -820,10 +820,6 @@ public:
 	bool hasProperty(ITEMPROPERTY prop) const;
 	bool isBlocking() const { return items[id].blockSolid; }
 	bool isStackable() const { return items[id].stackable; }
-	// In 15.x the appearance `clip` (ground border, order 1), `bottom` (order 2)
-	// and `top` (order 3) flags all classify an item as always-on-top for stack
-	// ordering. Use `alwaysOnTopOrder != 0` to match the client / Canary
-	// `items[id].alwaysOnTopOrder != 0` check (winter-update-2025 item.hpp:497).
 	bool isAlwaysOnTop() const { return items[id].alwaysOnTopOrder != 0; }
 	bool isGroundTile() const { return items[id].isGroundTile(); }
 	bool isMagicField() const { return items[id].isMagicField(); }

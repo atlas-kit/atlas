@@ -41,8 +41,7 @@ bool Appearances::loadFromFile(const std::string& filename)
 	effects.clear();
 	missiles.clear();
 
-	// Reset special-meaning IDs so a reload with a file that omits any of
-	// them does not keep stale values from the previous load
+	// Reset so a reload cannot keep stale values
 	goldCoinId = 0;
 	platinumCoinId = 0;
 	crystalCoinId = 0;

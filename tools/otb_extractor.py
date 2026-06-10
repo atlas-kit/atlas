@@ -262,9 +262,8 @@ def parse_otb(filepath: str) -> tuple:
 
                 attr_len = reader.read_u16()
 
-                # Honor attr_len: parse the known payload and skip any extra
-                # bytes so a size mismatch never desyncs the parser. If the
-                # payload is shorter than expected, skip it entirely.
+                # Honor attr_len: skip extra payload bytes so a size mismatch
+                # never desyncs the parser
                 if attr == ITEM_ATTR_SERVERID and attr_len >= 2:
                     server_id = reader.read_u16()
                     reader.skip(attr_len - 2)

@@ -1570,7 +1570,6 @@ const ItemType& Items::getItemType(size_t id) const
 
 const ItemType& Items::getItemIdByClientId(uint16_t spriteId) const
 {
-	// Now that we always use clientId as primary index, this is simple
 	if (spriteId >= 100 && spriteId < items.size() && items[spriteId].id != 0) {
 		return getItemType(spriteId);
 	}
@@ -1589,33 +1588,9 @@ uint16_t Items::getItemIdByName(const std::string& name)
 	return result->second;
 }
 
-// The appearances.dat (protobuf) only contains client-side visual/behavioral flags.
-// Server-side gameplay data (armor, attack, defense, weight, decay, charges, abilities,
-// ammo/shoot types, corpse type, floor change, etc.) must still come from items.xml.
-//
-// Proto fields mapped to ItemType:
-//   weaponType → WeaponType_t (proto→server enum conversion)
-//   minimumLevel → minReqLevel + WIELDINFO_LEVEL
-//   restrictToVocation → wieldInfo WIELDINFO_VOCREQ (details come from items.xml)
-//   expireStop → stopTime
-//   imbueableSlotCount → imbuementSlots
-//   dualWielding → dualWielding
-//   gemQualityId/gemVocationId → gemQualityId/gemVocationId
-//   proficiencyId → proficiencyId
-//   cyclopediaType → cyclopediaType
-//
-// Proto fields parsed into AppearanceInfo but NOT mapped to ItemType (no matching field):
-//   automapColor, isLyingObject, isDontHide, isTopEffect, defaultAction, elevation (value), lensHelp,
-//   noMovementAnimation, reverseAddons(E/W/S/N), wearout, clockExpire, expire, decoItemKit,
-//   formerObjectTypeId, npcSaleData (still accessible via g_appearances.getObjectAppearance(id))
-//
-// Proto fields NOT mapped because proto data is insufficient:
-//   isCorpse/isPlayerCorpse — proto is bool, but corpseType needs a RaceType_t enum (blood/fire/etc)
-//   isAmmo — proto is bool, but ammoType needs the specific Ammo_t enum
-//
-// Proto fields that COULD be mapped but are left to items.xml for consistency:
-//   show_off_socket → ITEM_TYPE_PODIUM (proto marks podiums, but XML already handles type assignment)
-//   fullbank → walkStack (fullground = not walkable on top, but reference implementations use XML for this)
+// appearances.dat only provides client-side visual/behavioral flags.
+// Server-side gameplay data (armor, attack, decay, corpse type, ammo type,
+// type assignment, ...) still comes from items.xml.
 bool Items::loadFromAppearances(const std::string& file)
 {
 	if (!g_appearances.loadFromFile(file)) {
@@ -1628,22 +1603,18 @@ bool Items::loadFromAppearances(const std::string& file)
 			continue;
 		}
 
-		// Resize items vector if needed
 		if (id >= items.size()) {
 			items.resize(id + 1);
 		}
 
 		ItemType& iType = items[id];
 
-		// Set IDs - with appearances, id == clientId (no serverId separation)
 		iType.id = id;
 		iType.clientId = id;
 
-		// Name/description are intentionally NOT taken from appearances:
-		// items.xml is the authoritative source for them, and a non-empty
-		// name here would make Items::parseItemNode() treat the item as a
-		// duplicate and skip all server-side attributes (attack, armor,
-		// decayTo, ...).
+		// Name/description come from items.xml: a non-empty name here would
+		// make parseItemNode() treat the item as a duplicate and skip its
+		// server-side attributes.
 
 		// Map appearance flags to ItemType properties
 		if (appearance.isGround) {
@@ -1673,8 +1644,6 @@ bool Items::loadFromAppearances(const std::string& file)
 		iType.pickupable = appearance.isPickupable;
 		iType.moveable = !appearance.isUnmovable;
 		iType.stackable = appearance.isStackable;
-		// iType.alwaysOnTop is derived from alwaysOnTopOrder below (clip/bottom/top),
-		// not just the `top` flag — see the AlwaysOnTop order block further down.
 		iType.isVertical = (appearance.hookDirection == 1);
 		iType.isHorizontal = (appearance.hookDirection == 2);
 		iType.isHangable = appearance.isHangable;
@@ -1698,10 +1667,8 @@ bool Items::loadFromAppearances(const std::string& file)
 			iType.maxTextLen = appearance.maxTextLength;
 		}
 
-		// Cloth/Equipment slot. OR the slot bit into the default
-		// (SLOTP_HAND) like Canary (slotPosition |= 1 << (slot - 1)) and
-		// items.xml do; overwriting would drop the hand bits and make
-		// equipment impossible to hold in a hand slot.
+		// Cloth/Equipment slot. OR into the default so the SLOTP_HAND bits
+		// are kept and equipment can still be held in a hand slot.
 		if (appearance.isCloth) {
 			switch (appearance.clothSlot) {
 				case 1:
@@ -1757,23 +1724,14 @@ bool Items::loadFromAppearances(const std::string& file)
 			iType.alwaysOnTopOrder = 3;
 		}
 
-		// Keep the alwaysOnTop flag consistent with the order. Tile stacking
-		// (Tile::addThing / Tile::internalAddThing) classifies an item as a top
-		// item via this flag, while the client-stackpos calculation
-		// (Tile::getClientIndexOfCreature -> Item::isAlwaysOnTop) uses the order.
-		// They must agree: clip (1) and bottom (2) borders are top items too,
-		// not only the `top` flag (3). A mismatch puts creatures at the wrong
-		// stackpos and crashes 15.x clients with
-		// "No creature found at coordinate(...)/position(N)".
+		// Tile stacking uses the flag while the client-stackpos calculation
+		// uses the order; they must agree (clip/bottom count as top items too).
 		iType.alwaysOnTop = iType.alwaysOnTopOrder != 0;
 
 		// Expiration flags
 		iType.stopTime = appearance.expireStop;
 
-		// 15.x wire-format flags consumed by NetworkMessage::addItem.
-		// Mirror Canary winter-update-2025 (items/items.cpp:228-255), which
-		// reads these straight off the proto and uses them to decide what
-		// optional sections to write after the itemId on the network.
+		// Wire-format flags consumed by NetworkMessage::addItem
 		iType.isCorpse = appearance.isCorpse || appearance.isPlayerCorpse;
 		iType.isPodiumAppearance = appearance.isShowOffSocket;
 		iType.wearOut = appearance.wearout;
