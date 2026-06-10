@@ -1698,42 +1698,44 @@ bool Items::loadFromAppearances(const std::string& file)
 			iType.maxTextLen = appearance.maxTextLength;
 		}
 
-		// Cloth/Equipment slot
+		// Cloth/Equipment slot. OR the slot bit into the default
+		// (SLOTP_HAND) like Canary (slotPosition |= 1 << (slot - 1)) and
+		// items.xml do; overwriting would drop the hand bits and make
+		// equipment impossible to hold in a hand slot.
 		if (appearance.isCloth) {
-			// Map cloth slot from appearances to slotPosition
 			switch (appearance.clothSlot) {
 				case 1:
-					iType.slotPosition = SLOTP_HEAD;
+					iType.slotPosition |= SLOTP_HEAD;
 					break;
 				case 2:
-					iType.slotPosition = SLOTP_NECKLACE;
+					iType.slotPosition |= SLOTP_NECKLACE;
 					break;
 				case 3:
-					iType.slotPosition = SLOTP_BACKPACK;
+					iType.slotPosition |= SLOTP_BACKPACK;
 					break;
 				case 4:
-					iType.slotPosition = SLOTP_ARMOR;
+					iType.slotPosition |= SLOTP_ARMOR;
 					break;
 				case 5:
-					iType.slotPosition = SLOTP_RIGHT;
+					iType.slotPosition |= SLOTP_RIGHT;
 					break;
 				case 6:
-					iType.slotPosition = SLOTP_LEFT;
+					iType.slotPosition |= SLOTP_LEFT;
 					break;
 				case 7:
-					iType.slotPosition = SLOTP_LEGS;
+					iType.slotPosition |= SLOTP_LEGS;
 					break;
 				case 8:
-					iType.slotPosition = SLOTP_FEET;
+					iType.slotPosition |= SLOTP_FEET;
 					break;
 				case 9:
-					iType.slotPosition = SLOTP_RING;
+					iType.slotPosition |= SLOTP_RING;
 					break;
 				case 10:
-					iType.slotPosition = SLOTP_AMMO;
+					iType.slotPosition |= SLOTP_AMMO;
 					break;
 				default:
-					iType.slotPosition = SLOTP_HAND;
+					iType.slotPosition |= SLOTP_HAND;
 					break;
 			}
 		}
