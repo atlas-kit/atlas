@@ -3232,7 +3232,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage& msg)
 	msg.add<uint64_t>(player->getExperience());
 
 	msg.add<uint16_t>(player->getLevel());
-	msg.add<uint16_t>(static_cast<uint16_t>(player->getLevelPercent() * 100)); // 15.24: u16 (percent * 100), was u8
+	msg.add<uint16_t>(player->getLevelPercent());
 
 	msg.add<uint16_t>(player->getClientExpDisplay());
 	msg.add<uint16_t>(player->getClientLowLevelBonusDisplay());

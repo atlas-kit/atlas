@@ -111,7 +111,6 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 		addByte(fluidMap[count & 7]);
 	} else if (it.isContainer()) {
 		addByte(0x00); // assigned loot container icon
-		addByte(0x00); // quiver ammo count
 	} else if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
@@ -142,7 +141,6 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
 	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
 			addByte(0x01);

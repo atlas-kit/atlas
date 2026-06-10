@@ -50,9 +50,38 @@ void skip(OTB::iterator& first, const OTB::iterator last, const size_t len);
 template <class T>
 [[nodiscard]] T read(OTB::iterator& first, const OTB::iterator last)
 {
+	static_assert(std::is_trivially_copyable_v<T>, "OTB::read requires a trivially copyable type");
+
 	T out;
-	auto buf = readBytes(first, last, sizeof(T));
-	std::memcpy(reinterpret_cast<char*>(&out), buf.data(), buf.size());
+	char* dst = reinterpret_cast<char*>(&out);
+
+	// Fast path: when none of the next sizeof(T) raw bytes is an escape marker we can copy the value
+	// straight out of the memory-mapped file in one shot, avoiding the per-read std::string allocation
+	// that readBytes() performs. Escape markers (0xFD) are rare in practice, so this is the common case
+	// for the millions of small reads issued while loading a map. The bounds check below guarantees the
+	// source range holds at least sizeof(T) bytes, and dst is exactly sizeof(T) bytes wide.
+	if (last - first >= static_cast<std::ptrdiff_t>(sizeof(T))) {
+		if (std::find(first, first + sizeof(T), Node::ESCAPE) == first + sizeof(T)) {
+			std::copy_n(first, sizeof(T), dst);
+			first += sizeof(T);
+			return out;
+		}
+	}
+
+	// Slow path: an escape marker is present (or we are near the end of the buffer). Unescape byte by
+	// byte directly into the output, still without allocating an intermediate buffer.
+	for (size_t i = 0; i < sizeof(T); ++i) {
+		if (first == last) [[unlikely]] {
+			throw std::invalid_argument("Not enough bytes to read.");
+		}
+
+		if (*first == Node::ESCAPE && ++first == last) [[unlikely]] {
+			throw std::invalid_argument("Not enough bytes to read.");
+		}
+
+		dst[i] = *first++;
+	}
+
 	return out;
 }
 
