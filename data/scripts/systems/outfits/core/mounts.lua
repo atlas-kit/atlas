@@ -173,6 +173,10 @@ function Player.setRandomizeMount(self, randomize)
 end
 
 -- Returns whether the player can ride the given mount lookType.
+function Game.isMountableOutfit(lookType)
+    return type(lookType) == "number" and lookType > 0 and Game.getOutfitByLookType(lookType) ~= nil
+end
+
 function Player.canRideMount(self, mountId)
     if self:getGroup():getAccess() then
         return type(mountId) == "number" and mountId > 0 and Game.getMountByLookType(mountId) ~= nil
@@ -298,6 +302,10 @@ function Player.toggleMount(self, mounted, keepWasMounted)
 
         if self:hasCondition(CONDITION_OUTFIT) then
             self:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
+            return false
+        end
+
+        if not Game.isMountableOutfit(self:getOutfit().lookType) then
             return false
         end
 

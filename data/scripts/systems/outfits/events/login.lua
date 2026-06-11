@@ -6,7 +6,7 @@ function event.onPlayerLogin(player)
         local outfit = player:getDefaultOutfit()
         local lookMount = outfit.lookMount
 
-        if player:canRideMount(lookMount) then
+        if Game.isMountableOutfit(outfit.lookType) and player:canRideMount(lookMount) then
             if not player:getCurrentMount() then
                 player:setCurrentMount(lookMount)
             end
@@ -14,6 +14,7 @@ function event.onPlayerLogin(player)
             player:setWasMounted(true)
         else
             outfit.lookMount = 0
+            player:setCurrentMount(nil)
             player:setDefaultOutfit(outfit)
             player:setCurrentOutfit(outfit)
             player:setWasMounted(false)

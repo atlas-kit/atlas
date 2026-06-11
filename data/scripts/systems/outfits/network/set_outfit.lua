@@ -60,12 +60,14 @@ function handler.onReceive(player, msg)
         end
 
         if lookMount ~= 0 then
-            if not player:canRideMount(lookMount) then
+            if not Game.isMountableOutfit(outfit.lookType) then
+                outfit.lookMount = 0
+            elseif not player:canRideMount(lookMount) then
                 player:setCurrentMount(nil)
                 return
+            else
+                player:setCurrentMount(lookMount)
             end
-
-            player:setCurrentMount(lookMount)
         end
 
         if player:setOutfitWithMountSpeed(outfit) then
