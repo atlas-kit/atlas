@@ -129,7 +129,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}
 
 	if (it.isContainer()) {
-		addByte(0x00); // ContainerSpecial_t::None
+		addByte(std::to_underlying(ContainerSpecial_t::None));
 	}
 
 	if (it.isPodium()) {
@@ -176,10 +176,10 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	if (it.isContainer()) {
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
-			addByte(0x02); // ContainerSpecial_t::ContentCounter
+			addByte(std::to_underlying(ContainerSpecial_t::ContentCounter));
 			add<uint32_t>(container->getAmmoCount());
 		} else {
-			addByte(0x00); // ContainerSpecial_t::None
+			addByte(std::to_underlying(ContainerSpecial_t::None));
 		}
 	}
 

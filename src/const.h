@@ -317,28 +317,41 @@ enum MessageClasses : uint8_t
 enum FluidTypes_t : uint8_t
 {
 	FLUID_NONE = 0,
-	FLUID_WATER = 1,       /* blue */
-	FLUID_WINE = 2,        /* purple */
-	FLUID_BEER = 3,        /* orange */
-	FLUID_MUD = 4,         /* orange */
-	FLUID_BLOOD = 5,       /* red */
-	FLUID_SLIME = 6,       /* green */
-	FLUID_OIL = 7,         /* orange */
-	FLUID_URINE = 8,       /* yellow */
-	FLUID_MILK = 9,        /* white */
-	FLUID_MANA = 10,       /* purple */
-	FLUID_LIFE = 11,       /* red */
-	FLUID_LEMONADE = 12,   /* yellow */
-	FLUID_RUM = 13,        /* orange */
-	FLUID_FRUITJUICE = 14, /* yellow */
+	FLUID_WATER = 1,        /* blue */
+	FLUID_WINE = 2,         /* purple */
+	FLUID_BEER = 3,         /* orange */
+	FLUID_MUD = 4,          /* orange */
+	FLUID_BLOOD = 5,        /* red */
+	FLUID_SLIME = 6,        /* green */
+	FLUID_OIL = 7,          /* orange */
+	FLUID_URINE = 8,        /* yellow */
+	FLUID_MILK = 9,         /* white */
+	FLUID_MANA = 10,        /* purple */
+	FLUID_LIFE = 11,        /* red */
+	FLUID_LEMONADE = 12,    /* yellow */
+	FLUID_RUM = 13,         /* orange */
+	FLUID_FRUITJUICE = 14,  /* yellow */
 	FLUID_COCONUTMILK = 15, /* white */
-	FLUID_MEAD = 16,       /* orange */
-	FLUID_TEA = 17,        /* orange */
-	FLUID_INK = 18,        /* black */
-	FLUID_CANDY = 19,      /* red with white pieces */
-	FLUID_CHOCOLATE = 20,  /* brown */
+	FLUID_MEAD = 16,        /* orange */
+	FLUID_TEA = 17,         /* orange */
+	FLUID_INK = 18,         /* black */
+	FLUID_CANDY = 19,       /* red with white pieces */
+	FLUID_CHOCOLATE = 20,   /* brown */
 
 	FLUID_LAST = FLUID_CHOCOLATE,
+};
+
+// Container category written after the itemId for containers in protocol
+// 15.x (NetworkMessage::addItem); values follow the client/Canary enum
+enum class ContainerSpecial_t : uint8_t
+{
+	None = 0,
+	LootContainer = 1,
+	ContentCounter = 2,
+	LootHighlight = 4,
+	Obtain = 8,
+	Manager = 9,
+	QuiverLoot = 11,
 };
 
 enum SquareColor_t : uint8_t
