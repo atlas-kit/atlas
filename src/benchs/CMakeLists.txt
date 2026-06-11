@@ -1,5 +1,6 @@
 set(benchs_SRC
     ${CMAKE_CURRENT_LIST_DIR}/bench_base64.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/bench_rsa.cpp
     ${CMAKE_CURRENT_LIST_DIR}/bench_xtea.cpp
     )
 
