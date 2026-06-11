@@ -8,5 +8,9 @@ std::pair<beast::http::status, json::value> tfs::http::make_error_response(detai
 	body["errorCode"] = params.code;
 	body["errorMessage"] = params.message;
 
+	for (const auto& [key, value] : params.additional_fields) {
+		body[key] = value;
+	}
+
 	return std::make_pair(beast::http::status::ok, body);
 }

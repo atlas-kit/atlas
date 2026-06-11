@@ -1,5 +1,6 @@
 set(tests_SRC
     ${CMAKE_CURRENT_LIST_DIR}/test_cacheinfo.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_check_email.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_login.cpp
     )
 

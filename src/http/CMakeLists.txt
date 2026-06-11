@@ -1,5 +1,6 @@
 set(http_SRC
 	${CMAKE_CURRENT_LIST_DIR}/cacheinfo.cpp
+	${CMAKE_CURRENT_LIST_DIR}/check_email.cpp
 	${CMAKE_CURRENT_LIST_DIR}/error.cpp
 	${CMAKE_CURRENT_LIST_DIR}/http.cpp
 	${CMAKE_CURRENT_LIST_DIR}/listener.cpp
@@ -11,6 +12,7 @@ set(http_SRC
 
 set(http_HDR
 	${CMAKE_CURRENT_LIST_DIR}/cacheinfo.h
+	${CMAKE_CURRENT_LIST_DIR}/check_email.h
 	${CMAKE_CURRENT_LIST_DIR}/error.h
 	${CMAKE_CURRENT_LIST_DIR}/http.h
 	${CMAKE_CURRENT_LIST_DIR}/listener.h

@@ -3,6 +3,7 @@
 #include "router.h"
 
 #include "cacheinfo.h"
+#include "check_email.h"
 #include "error.h"
 #include "login.h"
 #include "serverinfo.h"
@@ -19,6 +20,9 @@ auto router(std::string_view type, const json::object& body, std::string_view ip
 
 	if (type == "cacheinfo") {
 		return handle_cacheinfo(body, ip);
+	}
+	if (type == "CheckEMail") {
+		return handle_check_email(body, ip);
 	}
 	if (type == "login") {
 		return handle_login(body, ip);
