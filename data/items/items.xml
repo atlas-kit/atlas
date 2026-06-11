@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <items>
+	<!-- Fluid subtypes: ids 1-20 mirror FluidTypes_t (sent raw to 13.40+/15.x clients) -->
 	<item id="1" name="water" />
-	<item id="2" name="blood" />
+	<item id="2" name="wine" />
 	<item id="3" name="beer" />
-	<item id="4" name="slime" />
-	<item id="5" name="lemonade" />
-	<item id="6" name="milk" />
-	<item id="7" name="manafluid" />
-	<item id="8" name="ink" />
-	<item id="10" name="lifefluid" />
-	<item id="11" name="oil" />
-	<item id="13" name="urine" />
-	<item id="14" name="coconut milk" />
-	<item id="15" name="wine" />
-	<item id="19" name="mud" />
-	<item id="21" name="fruit juice" />
-	<item id="26" name="lava" />
-	<item id="27" name="rum" />
-	<item id="28" name="swamp" />
-	<item id="35" name="tea" />
-	<item id="43" name="mead" />
+	<item id="4" name="mud" />
+	<item id="5" name="blood" />
+	<item id="6" name="slime" />
+	<item id="7" name="oil" />
+	<item id="8" name="urine" />
+	<item id="9" name="milk" />
+	<item id="10" name="manafluid" />
+	<item id="11" name="lifefluid" />
+	<item id="12" name="lemonade" />
+	<item id="13" name="rum" />
+	<item id="14" name="fruit juice" />
+	<item id="15" name="coconut milk" />
+	<item id="16" name="mead" />
+	<item id="17" name="tea" />
+	<item id="18" name="ink" />
+	<item id="19" name="candyfluid" />
+	<item id="20" name="chocolate" />
 
 	<item id="100" name="void" />
 	<item id="101" name="earth" />
@@ -97,7 +98,6 @@
 	</item>
 	<item id="391" article="a" name="lava hole">
 		<attribute key="description" value="It emits heat and light." />
-		<attribute key="fluidSource" value="lava" />
 	</item>
 	<item fromid="392" toid="393" name="stalagmites" />
 	<item id="394" article="a" name="hole">

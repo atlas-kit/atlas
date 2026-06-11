@@ -241,12 +241,12 @@ const std::unordered_map<std::string, FluidTypes_t> FluidTypesMap = {
     {"wine", FLUID_WINE},
     {"mud", FLUID_MUD},
     {"fruitjuice", FLUID_FRUITJUICE},
-    {"lava", FLUID_LAVA},
     {"rum", FLUID_RUM},
-    {"swamp", FLUID_SWAMP},
     {"tea", FLUID_TEA},
     {"mead", FLUID_MEAD},
     {"ink", FLUID_INK},
+    {"candyfluid", FLUID_CANDY},
+    {"chocolate", FLUID_CHOCOLATE},
 };
 
 } // namespace

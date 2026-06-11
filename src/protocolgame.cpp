@@ -3481,7 +3481,7 @@ void ProtocolGame::AddShopItem(NetworkMessage& msg, const ShopInfo& item)
 	msg.add<uint16_t>(it.clientId);
 
 	if (it.isSplash() || it.isFluidContainer()) {
-		msg.addByte(serverFluidToClient(item.subType));
+		msg.addByte(static_cast<uint8_t>(item.subType));
 	} else {
 		msg.addByte(0x00);
 	}

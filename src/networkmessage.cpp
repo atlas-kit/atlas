@@ -125,7 +125,7 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 	}
 
 	if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[count & 7]);
+		addByte(count);
 	}
 
 	if (it.isContainer()) {
@@ -170,7 +170,7 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 	}
 
 	if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[item->getFluidType() & 7]);
+		addByte(static_cast<uint8_t>(item->getFluidType()));
 	}
 
 	if (it.isContainer()) {

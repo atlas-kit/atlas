@@ -312,78 +312,33 @@ enum MessageClasses : uint8_t
 	MESSAGE_TRANSACTION = 51,      // White, console only
 };
 
-enum FluidColors_t : uint8_t
-{
-	FLUID_EMPTY,
-	FLUID_BLUE,
-	FLUID_RED,
-	FLUID_BROWN,
-	FLUID_GREEN,
-	FLUID_YELLOW,
-	FLUID_WHITE,
-	FLUID_PURPLE,
-	FLUID_BLACK,
-};
-
+// Fluid subtypes are sent to the client as-is; ids match data/items/items.xml (1-20).
+// 13.40+: last fluid is 20, values 21+ wrap around client-side.
 enum FluidTypes_t : uint8_t
 {
-	FLUID_NONE = FLUID_EMPTY,
-	FLUID_WATER = FLUID_BLUE,
-	FLUID_BLOOD = FLUID_RED,
-	FLUID_BEER = FLUID_BROWN,
-	FLUID_SLIME = FLUID_GREEN,
-	FLUID_LEMONADE = FLUID_YELLOW,
-	FLUID_MILK = FLUID_WHITE,
-	FLUID_MANA = FLUID_PURPLE,
-	FLUID_INK = FLUID_BLACK,
+	FLUID_NONE = 0,
+	FLUID_WATER = 1,       /* blue */
+	FLUID_WINE = 2,        /* purple */
+	FLUID_BEER = 3,        /* orange */
+	FLUID_MUD = 4,         /* orange */
+	FLUID_BLOOD = 5,       /* red */
+	FLUID_SLIME = 6,       /* green */
+	FLUID_OIL = 7,         /* orange */
+	FLUID_URINE = 8,       /* yellow */
+	FLUID_MILK = 9,        /* white */
+	FLUID_MANA = 10,       /* purple */
+	FLUID_LIFE = 11,       /* red */
+	FLUID_LEMONADE = 12,   /* yellow */
+	FLUID_RUM = 13,        /* orange */
+	FLUID_FRUITJUICE = 14, /* yellow */
+	FLUID_COCONUTMILK = 15, /* white */
+	FLUID_MEAD = 16,       /* orange */
+	FLUID_TEA = 17,        /* orange */
+	FLUID_INK = 18,        /* black */
+	FLUID_CANDY = 19,      /* red with white pieces */
+	FLUID_CHOCOLATE = 20,  /* brown */
 
-	FLUID_LIFE = FLUID_RED + 8,
-	FLUID_OIL = FLUID_BROWN + 8,
-	FLUID_URINE = FLUID_YELLOW + 8,
-	FLUID_COCONUTMILK = FLUID_WHITE + 8,
-	FLUID_WINE = FLUID_PURPLE + 8,
-
-	FLUID_MUD = FLUID_BROWN + 16,
-	FLUID_FRUITJUICE = FLUID_YELLOW + 16,
-
-	FLUID_LAVA = FLUID_RED + 24,
-	FLUID_RUM = FLUID_BROWN + 24,
-	FLUID_SWAMP = FLUID_GREEN + 24,
-
-	FLUID_TEA = FLUID_BROWN + 32,
-
-	FLUID_MEAD = FLUID_BROWN + 40,
-};
-
-const uint8_t reverseFluidMap[] = {
-    FLUID_EMPTY, FLUID_WATER, FLUID_MANA,     FLUID_BEER, FLUID_EMPTY, FLUID_BLOOD,
-    FLUID_SLIME, FLUID_EMPTY, FLUID_LEMONADE, FLUID_MILK, FLUID_INK,
-};
-
-const uint8_t clientToServerFluidMap[] = {
-    FLUID_EMPTY,      FLUID_WATER,       FLUID_MANA, FLUID_BEER, FLUID_MUD,  FLUID_BLOOD, FLUID_SLIME,
-    FLUID_RUM,        FLUID_LEMONADE,    FLUID_MILK, FLUID_WINE, FLUID_LIFE, FLUID_URINE, FLUID_OIL,
-    FLUID_FRUITJUICE, FLUID_COCONUTMILK, FLUID_TEA,  FLUID_MEAD, FLUID_INK,
-};
-
-enum ClientFluidTypes_t : uint8_t
-{
-	CLIENTFLUID_EMPTY = 0,
-	CLIENTFLUID_BLUE = 1,
-	CLIENTFLUID_PURPLE = 2,
-	CLIENTFLUID_BROWN_1 = 3,
-	CLIENTFLUID_BROWN_2 = 4,
-	CLIENTFLUID_RED = 5,
-	CLIENTFLUID_GREEN = 6,
-	CLIENTFLUID_BROWN = 7,
-	CLIENTFLUID_YELLOW = 8,
-	CLIENTFLUID_WHITE = 9,
-	CLIENTFLUID_BLACK = 18,
-};
-
-const uint8_t fluidMap[] = {
-    CLIENTFLUID_EMPTY,  CLIENTFLUID_BLUE,  CLIENTFLUID_RED,    CLIENTFLUID_BROWN_1, CLIENTFLUID_GREEN,
-    CLIENTFLUID_YELLOW, CLIENTFLUID_WHITE, CLIENTFLUID_PURPLE, CLIENTFLUID_BLACK,
+	FLUID_LAST = FLUID_CHOCOLATE,
 };
 
 enum SquareColor_t : uint8_t
