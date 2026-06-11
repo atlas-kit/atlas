@@ -1025,10 +1025,11 @@ void ProtocolGame::parseOpenPrivateChannel(NetworkMessage& msg)
 void ProtocolGame::parseAutoWalk(NetworkMessage& msg)
 {
 	uint8_t numdirs = msg.getByte();
-	// The directions must fill exactly the rest of the message
-	// (INITIAL_BUFFER_POSITION + length).
+	// The directions must fill exactly the rest of the message. length
+	// includes the XTEA padding-size byte that precedes the payload, so the
+	// payload ends at length + (INITIAL_BUFFER_POSITION - 1).
 	if (numdirs == 0 ||
-	    (msg.getBufferPosition() + numdirs) != (msg.getLength() + NetworkMessage::INITIAL_BUFFER_POSITION)) {
+	    (msg.getBufferPosition() + numdirs) != (msg.getLength() + NetworkMessage::INITIAL_BUFFER_POSITION - 1)) {
 		return;
 	}
 
