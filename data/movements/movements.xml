@@ -31,8 +31,6 @@
 	<movevent event="AddItem" itemid="2121" function="onAddField" />
 	<movevent event="StepIn" itemid="2129" function="onStepInField" />
 	<movevent event="AddItem" itemid="2129" function="onAddField" />
-	<movevent event="StepIn" itemid="2129" function="onStepInField" />
-	<movevent event="AddItem" itemid="2129" function="onAddField" />
 	<movevent event="StepIn" itemid="2130" function="onStepInField" />
 	<movevent event="AddItem" itemid="2130" function="onAddField" />
 	<movevent event="StepIn" itemid="21465" function="onStepInField" />
@@ -306,8 +304,6 @@
 	<movevent event="Equip" itemid="9392" slot="ring" level="100" function="onEquipItem" />
 	<movevent event="DeEquip" itemid="9392" slot="ring" function="onDeEquipItem" />
 	<movevent event="DeEquip" itemid="9393" slot="ring" function="onDeEquipItem" />
-	<movevent event="Equip" itemid="9394" slot="ring" level="100" function="onEquipItem" />
-	<movevent event="DeEquip" itemid="9394" slot="ring" function="onDeEquipItem" />
 	<movevent event="Equip" itemid="9394" slot="ring" level="100" function="onEquipItem" />
 	<movevent event="DeEquip" itemid="9394" slot="ring" function="onDeEquipItem" />
 	<movevent event="Equip" itemid="9397" slot="ring" level="100" function="onEquipItem" />
