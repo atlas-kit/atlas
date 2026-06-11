@@ -1598,13 +1598,20 @@ bool Items::loadFromAppearances(const std::string& file)
 	}
 
 	const auto& objects = g_appearances.getObjects();
+
+	// Resize once: the map iterates in arbitrary order, growing per id
+	// would reallocate repeatedly
+	uint16_t maxId = 0;
+	for (const auto& [id, appearance] : objects) {
+		maxId = std::max(maxId, id);
+	}
+	if (maxId >= items.size()) {
+		items.resize(maxId + 1);
+	}
+
 	for (const auto& [id, appearance] : objects) {
 		if (id == 0) {
 			continue;
-		}
-
-		if (id >= items.size()) {
-			items.resize(id + 1);
 		}
 
 		ItemType& iType = items[id];

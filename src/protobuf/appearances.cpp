@@ -9,6 +9,18 @@
 
 #include <fstream>
 #include <iostream>
+#include <limits>
+
+namespace {
+
+// Garante que um id vindo do protobuf (uint32) cabe no espaco uint16 usado
+// como indice de item; ids fora do intervalo viram 0 (invalido)
+uint16_t toItemId(uint32_t value)
+{
+	return value <= std::numeric_limits<uint16_t>::max() ? static_cast<uint16_t>(value) : 0;
+}
+
+} // namespace
 
 Appearances g_appearances;
 
@@ -35,6 +47,14 @@ bool Appearances::loadFromFile(const std::string& filename)
 		return false;
 	}
 
+	// A truncated or wrong file can still parse as a valid (near-empty)
+	// protobuf; refuse to continue without object appearances
+	if (proto.object_size() == 0) {
+		std::cout << "[Error - Appearances::loadFromFile] No object appearances in: " << filename
+		          << " (wrong or truncated file?)" << std::endl;
+		return false;
+	}
+
 	// Clear existing data
 	objects.clear();
 	outfits.clear();
@@ -55,7 +75,7 @@ bool Appearances::loadFromFile(const std::string& filename)
 
 	// Load objects (items)
 	for (const auto& appearance : proto.object()) {
-		if (!appearance.has_id()) {
+		if (!appearance.has_id() || appearance.id() > std::numeric_limits<uint16_t>::max()) {
 			++skippedObjects;
 			continue;
 		}
@@ -66,7 +86,7 @@ bool Appearances::loadFromFile(const std::string& filename)
 
 	// Load outfits
 	for (const auto& appearance : proto.outfit()) {
-		if (!appearance.has_id()) {
+		if (!appearance.has_id() || appearance.id() > std::numeric_limits<uint16_t>::max()) {
 			++skippedObjects;
 			continue;
 		}
@@ -77,7 +97,7 @@ bool Appearances::loadFromFile(const std::string& filename)
 
 	// Load effects
 	for (const auto& appearance : proto.effect()) {
-		if (!appearance.has_id()) {
+		if (!appearance.has_id() || appearance.id() > std::numeric_limits<uint16_t>::max()) {
 			++skippedObjects;
 			continue;
 		}
@@ -88,7 +108,7 @@ bool Appearances::loadFromFile(const std::string& filename)
 
 	// Load missiles
 	for (const auto& appearance : proto.missile()) {
-		if (!appearance.has_id()) {
+		if (!appearance.has_id() || appearance.id() > std::numeric_limits<uint16_t>::max()) {
 			++skippedObjects;
 			continue;
 		}
@@ -101,42 +121,40 @@ bool Appearances::loadFromFile(const std::string& filename)
 	if (proto.has_special_meaning_appearance_ids()) {
 		const auto& special = proto.special_meaning_appearance_ids();
 		if (special.has_gold_coin_id()) {
-			goldCoinId = static_cast<uint16_t>(special.gold_coin_id());
+			goldCoinId = toItemId(special.gold_coin_id());
 		}
 		if (special.has_platinum_coin_id()) {
-			platinumCoinId = static_cast<uint16_t>(special.platinum_coin_id());
+			platinumCoinId = toItemId(special.platinum_coin_id());
 		}
 		if (special.has_crystal_coin_id()) {
-			crystalCoinId = static_cast<uint16_t>(special.crystal_coin_id());
+			crystalCoinId = toItemId(special.crystal_coin_id());
 		}
 		if (special.has_tibia_coin_id()) {
-			tibiaCoinId = static_cast<uint16_t>(special.tibia_coin_id());
+			tibiaCoinId = toItemId(special.tibia_coin_id());
 		}
 		if (special.has_stamped_letter_id()) {
-			stampedLetterId = static_cast<uint16_t>(special.stamped_letter_id());
+			stampedLetterId = toItemId(special.stamped_letter_id());
 		}
 		if (special.has_supply_stash_id()) {
-			supplyStashId = static_cast<uint16_t>(special.supply_stash_id());
+			supplyStashId = toItemId(special.supply_stash_id());
 		}
 		if (special.has_standard_reward_chest_id()) {
-			standardRewardChestId = static_cast<uint16_t>(special.standard_reward_chest_id());
+			standardRewardChestId = toItemId(special.standard_reward_chest_id());
 		}
 		if (special.has_blank_imbuement_scroll_id()) {
-			blankImbuementScrollId = static_cast<uint16_t>(special.blank_imbuement_scroll_id());
+			blankImbuementScrollId = toItemId(special.blank_imbuement_scroll_id());
 		}
 	}
 
 	// Log loading statistics
-	std::cout << ">> Loaded appearances from: " << filename
-	          << " (" << fileSize << " bytes)" << std::endl;
+	std::cout << ">> Loaded appearances from: " << filename << " (" << fileSize << " bytes)" << std::endl;
 	std::cout << ">> Loaded " << objects.size() << " object appearances" << std::endl;
 	std::cout << ">> Loaded " << outfits.size() << " outfit appearances" << std::endl;
 	std::cout << ">> Loaded " << effects.size() << " effect appearances" << std::endl;
 	std::cout << ">> Loaded " << missiles.size() << " missile appearances" << std::endl;
 
 	if (skippedObjects > 0) {
-		std::cout << ">> Warning: skipped " << skippedObjects
-		          << " appearances without ID" << std::endl;
+		std::cout << ">> Warning: skipped " << skippedObjects << " appearances without ID" << std::endl;
 	}
 
 	// Log extended field statistics
@@ -150,20 +168,16 @@ bool Appearances::loadFromFile(const std::string& filename)
 		if (info.wearout || info.clockExpire || info.expire) ++expireCount;
 		if (!info.npcSaleData.empty()) ++npcSaleCount;
 	}
-	std::cout << ">> Appearance flags: "
-	          << weaponCount << " weapons, "
-	          << levelReqCount << " level-restricted, "
-	          << vocationReqCount << " vocation-restricted, "
-	          << imbueableCount << " imbueable, "
-	          << expireCount << " expirable, "
-	          << npcSaleCount << " with NPC data" << std::endl;
+	std::cout << ">> Appearance flags: " << weaponCount << " weapons, " << levelReqCount << " level-restricted, "
+	          << vocationReqCount << " vocation-restricted, " << imbueableCount << " imbueable, " << expireCount
+	          << " expirable, " << npcSaleCount << " with NPC data" << std::endl;
 
 	return true;
 }
 
 void Appearances::parseAppearance(const atlas::protobuf::appearances::Appearance& proto, AppearanceInfo& info)
 {
-	info.id = static_cast<uint16_t>(proto.id());
+	info.id = toItemId(proto.id());
 
 	if (proto.has_name()) {
 		info.name = proto.name();
@@ -309,10 +323,10 @@ void Appearances::parseFlags(const atlas::protobuf::appearances::AppearanceFlags
 			info.marketCategory = static_cast<uint16_t>(market.category());
 		}
 		if (market.has_trade_as_object_id()) {
-			info.marketTradeAs = static_cast<uint16_t>(market.trade_as_object_id());
+			info.marketTradeAs = toItemId(market.trade_as_object_id());
 		}
 		if (market.has_show_as_object_id()) {
-			info.marketShowAs = static_cast<uint16_t>(market.show_as_object_id());
+			info.marketShowAs = toItemId(market.show_as_object_id());
 		}
 	}
 
