@@ -780,7 +780,6 @@ end
 
 function Player.sendTrackedBestiary(self, isBoss)
 	if isBoss == nil then
-		print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Calling Player.sendTrackedBestiary without isBoss argument is deprecated and will be removed in the future.")
 		self:sendTrackedBestiary(false)
 		self:sendTrackedBestiary(true)
 		return true
