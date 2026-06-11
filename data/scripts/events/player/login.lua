@@ -29,8 +29,7 @@ event.onPlayerJoin = function(self)
 	self:sendHotkeyPreset()
 	self:disableLoginMusic()
 	self:sendBlessings()
-	self:sendTrackedBestiary(false)
-	self:sendTrackedBestiary(true)
+	self:sendTrackedBestiary()
 
 	-- achievements points for highscores
 	if not self:getStorageValue(PlayerStorageKeys.achievementsTotal) then
