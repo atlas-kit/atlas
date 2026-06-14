@@ -8,7 +8,7 @@ namespace json = boost::json;
 
 json::value tfs::http::routes::handle_check_character_name(const json::object& body, std::string_view)
 {
-	auto characterNameField = body.if_contains("CharacterName");
+	const auto characterNameField = body.if_contains("CharacterName");
 	if (!characterNameField || !characterNameField->is_string()) {
 		return make_error_response({
 		    .code = 6,
@@ -17,7 +17,7 @@ json::value tfs::http::routes::handle_check_character_name(const json::object& b
 		});
 	}
 
-	std::string characterName{characterNameField->get_string()};
+	const auto characterName = characterNameField->get_string();
 	if (auto msg = is_valid_character_name(characterName)) {
 		return make_error_response({
 		    .code = 99,

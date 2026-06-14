@@ -8,33 +8,13 @@
 #include "validation.h"
 
 #include <chrono>
-#include <regex>
 #include <utility>
 
 namespace json = boost::json;
 
-namespace {
-
-std::regex emailRegex{R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"};
-
-bool is_valid_email(std::string_view email)
-{
-	// 191 is the maximum length of the email field in the database (767 bytes for utf8mb4, which allows up to 4 bytes
-	// per character)
-	if (email.empty() || email.length() > 191) {
-		return false;
-	}
-
-	return std::regex_match(email.begin(), email.end(), emailRegex);
-}
-
-bool is_valid_password(std::string_view password) { return !password.empty(); }
-
-} // namespace
-
 json::value tfs::http::routes::handle_create_account(const json::object& body, std::string_view ip)
 {
-	auto passwordField = body.if_contains("Password");
+	const auto passwordField = body.if_contains("Password");
 	if (!passwordField || !passwordField->is_string()) {
 		return make_error_response({
 		    .code = 87,
@@ -43,8 +23,8 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	std::string password(passwordField->get_string());
-	if (!is_valid_password(password)) {
+	const auto password = passwordField->get_string();
+	if (auto requirements = check_password_strength(password); !requirements.is_valid()) {
 		return make_error_response({
 		    .code = 87,
 		    .message = "Your password does not meet the requirements",
@@ -52,7 +32,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	auto emailField = body.if_contains("EMail");
+	const auto emailField = body.if_contains("EMail");
 	if (!emailField || !emailField->is_string()) {
 		return make_error_response({
 		    .code = 57,
@@ -61,7 +41,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	std::string email(emailField->get_string());
+	const auto email = emailField->get_string();
 	if (email.empty()) {
 		return make_error_response({
 		    .code = 57,
@@ -87,7 +67,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	std::string characterName(characterNameField->get_string());
+	const auto characterName = characterNameField->get_string();
 	if (characterName.empty()) {
 		return make_error_response({
 		    .code = 6,
@@ -96,7 +76,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	if (auto msg = is_valid_character_name(characterName)) {
+	if (const auto msg = is_valid_character_name(characterName)) {
 		return make_error_response({
 		    .code = 99,
 		    .message = msg.value(),
@@ -104,14 +84,14 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	auto sexField = body.if_contains("CharacterSex");
+	const auto sexField = body.if_contains("CharacterSex");
 	if (!sexField || !sexField->is_string()) {
 		// TODO: figure out response code and message
 		return make_error_response();
 	}
 
 	PlayerSex_t sex;
-	std::string sexValue(sexField->get_string());
+	const auto sexValue = sexField->get_string();
 	if (sexValue == "female") {
 		sex = PLAYERSEX_FEMALE;
 	} else if (sexValue == "male") {
@@ -136,7 +116,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		    {.code = 54, .message = "This character name is already used. Please select another one!"});
 	}
 
-	std::string passwordHash = transformToSHA1(password);
+	const std::string passwordHash = transformToSHA1(password);
 
 	if (!db.executeQuery(
 	        std::format("INSERT INTO `accounts` (`email`, `name`, `password`) VALUES ({:s}, {:s}, HEX({:s}))",
@@ -144,7 +124,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		return make_error_response();
 	}
 
-	auto accountId = db.getLastInsertId();
+	const auto accountId = db.getLastInsertId();
 	if (accountId == 0) {
 		return make_error_response();
 	}

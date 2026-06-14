@@ -1,5 +1,22 @@
 #include "enums.h"
 
+std::string_view tfs::http::detail::getPasswordStrengthColor(int strength)
+{
+	switch (strength) {
+		case 0:
+		case 1:
+			return "#EC644B";
+		case 2:
+			return "#EB8005";
+		case 3:
+			return "#B0B300";
+		case 4:
+			return "#20A000";
+	}
+
+	std::unreachable();
+}
+
 int tfs::http::detail::getPvpTypeIndex(WorldType_t worldType)
 {
 	switch (worldType) {

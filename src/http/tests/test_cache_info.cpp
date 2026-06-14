@@ -10,6 +10,8 @@
 
 using namespace std::chrono;
 
+namespace routes = tfs::http::routes;
+
 struct CacheInfoFixture
 {
 	CacheInfoFixture()
@@ -57,7 +59,7 @@ BOOST_FIXTURE_TEST_CASE(test_cacheinfo_players_online, CacheInfoFixture)
 	BOOST_TEST(db.executeQuery(std::format(
 	    "INSERT INTO `players_online` (`player_id`) SELECT `id` FROM `players` WHERE `account_id` = {:d}", id)));
 
-	auto&& body = tfs::http::routes::handle_cache_info({{"type", "cacheinfo"}}, ip);
+	auto&& body = routes::handle_cache_info({{"type", "cacheinfo"}}, ip);
 
 	BOOST_TEST(body.at("playersonline").as_uint64() == 3);
 }

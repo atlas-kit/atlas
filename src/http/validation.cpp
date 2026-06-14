@@ -3,10 +3,15 @@
 #include "validation.h"
 
 #include <ranges>
+#include <regex>
+
+static const std::regex email_regex{R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"};
 
 static constexpr std::string_view vowels = "aeiouyAEIOUY";
 
-std::optional<std::string_view> tfs::http::is_valid_character_name(std::string_view name)
+namespace tfs::http {
+
+std::optional<std::string_view> is_valid_character_name(std::string_view name)
 {
 	if (name.length() < 2 || name.length() > 29) {
 		return "A name must have at least 2 but no more than 29 letters.";
@@ -59,3 +64,29 @@ std::optional<std::string_view> tfs::http::is_valid_character_name(std::string_v
 
 	return std::nullopt;
 }
+
+bool is_valid_email(std::string_view email)
+{
+	// 191 is the maximum length of the email field in the database (767 bytes for utf8mb4, which allows up to 4 bytes
+	// per character)
+	if (email.length() > 191) {
+		return false;
+	}
+
+	return std::regex_match(email.begin(), email.end(), email_regex);
+}
+
+detail::PasswordRequirements check_password_strength(std::string_view password)
+{
+	return {
+	    // CipSoft requires >=10 and <=29 characters, we allow a wider range for better security and user choice
+	    .length = password.length() >= 8 && password.length() <= 64,
+	    .uppercase = std::ranges::any_of(password, [](char c) { return std::isupper(c); }),
+	    .lowercase = std::ranges::any_of(password, [](char c) { return std::islower(c); }),
+	    .digit = std::ranges::any_of(password, [](char c) { return std::isdigit(c); }),
+	    // CipSoft does not disclose the exact requirements for valid characters
+	    .validChars = std::all_of(password.begin(), password.end(), [](char c) { return std::isprint(c); }),
+	};
+}
+
+} // namespace tfs::http

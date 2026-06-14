@@ -11,6 +11,8 @@
 
 using namespace std::chrono;
 
+namespace routes = tfs::http::routes;
+
 struct CreateAccountFixture
 {
 	CreateAccountFixture()
@@ -31,6 +33,7 @@ struct CreateAccountFixture
 	DBTransaction transaction;
 
 	std::string_view ip = "74.125.224.72";
+
 	seconds now = duration_cast<seconds>(system_clock::now().time_since_epoch());
 };
 
@@ -52,7 +55,7 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_missing_character_name, CreateAccoun
 
 BOOST_FIXTURE_TEST_CASE(test_create_account_empty_character_name, CreateAccountFixture)
 {
-	auto&& body = tfs::http::routes::handle_create_account(
+	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
 	        {"EMail", "test@example.com"},
@@ -76,7 +79,7 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_invalid_email_formats, CreateAccount
 	};
 
 	for (const auto& email : invalid_emails) {
-		auto&& body = tfs::http::routes::handle_create_account(
+		auto&& body = routes::handle_create_account(
 		    {
 		        {"type", "CreateAccountAndCharacter"},
 		        {"EMail", email},
@@ -93,7 +96,7 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_invalid_email_formats, CreateAccount
 
 BOOST_FIXTURE_TEST_CASE(test_create_account_missing_email, CreateAccountFixture)
 {
-	auto&& body = tfs::http::routes::handle_create_account(
+	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
 	        {"Password", "password"},
@@ -107,7 +110,7 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_missing_email, CreateAccountFixture)
 
 BOOST_FIXTURE_TEST_CASE(test_create_account_empty_password, CreateAccountFixture)
 {
-	auto&& body = tfs::http::routes::handle_create_account(
+	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
 	        {"EMail", "test@example.com"},
@@ -122,7 +125,7 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_empty_password, CreateAccountFixture
 
 BOOST_FIXTURE_TEST_CASE(test_create_account_success, CreateAccountFixture)
 {
-	auto&& body = tfs::http::routes::handle_create_account(
+	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
 	        {"EMail", "newuser@example.com"},

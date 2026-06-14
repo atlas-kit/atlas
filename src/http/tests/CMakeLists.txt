@@ -3,7 +3,9 @@ set(utils_SRC
     )
 
 set(tests_SRC
-    ${CMAKE_CURRENT_LIST_DIR}/test_cacheinfo.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_cache_info.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_check_email.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_check_password.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_create_account.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_login.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_validation.cpp
