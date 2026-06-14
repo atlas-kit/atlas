@@ -1,23 +1,17 @@
 set(http_SRC
-	${CMAKE_CURRENT_LIST_DIR}/cacheinfo.cpp
+	${CMAKE_CURRENT_LIST_DIR}/cache_info.cpp
+	${CMAKE_CURRENT_LIST_DIR}/characters.cpp
+	${CMAKE_CURRENT_LIST_DIR}/check_character_name.cpp
+	${CMAKE_CURRENT_LIST_DIR}/create_account.cpp
+	${CMAKE_CURRENT_LIST_DIR}/enums.cpp
 	${CMAKE_CURRENT_LIST_DIR}/error.cpp
 	${CMAKE_CURRENT_LIST_DIR}/http.cpp
 	${CMAKE_CURRENT_LIST_DIR}/listener.cpp
 	${CMAKE_CURRENT_LIST_DIR}/login.cpp
 	${CMAKE_CURRENT_LIST_DIR}/router.cpp
-	${CMAKE_CURRENT_LIST_DIR}/serverinfo.cpp
+	${CMAKE_CURRENT_LIST_DIR}/server_info.cpp
 	${CMAKE_CURRENT_LIST_DIR}/session.cpp
-	)
-
-set(http_HDR
-	${CMAKE_CURRENT_LIST_DIR}/cacheinfo.h
-	${CMAKE_CURRENT_LIST_DIR}/error.h
-	${CMAKE_CURRENT_LIST_DIR}/http.h
-	${CMAKE_CURRENT_LIST_DIR}/listener.h
-	${CMAKE_CURRENT_LIST_DIR}/login.h
-	${CMAKE_CURRENT_LIST_DIR}/router.h
-	${CMAKE_CURRENT_LIST_DIR}/serverinfo.h
-	${CMAKE_CURRENT_LIST_DIR}/session.h
+	${CMAKE_CURRENT_LIST_DIR}/validation.cpp
 	)
 
 add_library(http OBJECT ${http_SRC})

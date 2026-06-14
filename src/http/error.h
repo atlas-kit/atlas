@@ -2,9 +2,7 @@
 
 #include <boost/beast/http/status.hpp>
 #include <boost/json/value.hpp>
-
-namespace beast = boost::beast;
-namespace json = boost::json;
+#include <exception>
 
 namespace tfs::http {
 
@@ -15,11 +13,23 @@ struct ErrorResponseParams
 	int code = 2;
 	std::string_view message =
 	    "Internal error. Please try again later or contact customer support if the problem persists.";
-	beast::http::status status = beast::http::status::bad_request;
+	boost::beast::http::status status = boost::beast::http::status::bad_request;
+	boost::json::object additional_fields = {};
 };
 
 } // namespace detail
 
-std::pair<beast::http::status, json::value> make_error_response(detail::ErrorResponseParams params = {});
+class ErrorResponse : public std::exception
+{
+public:
+	ErrorResponse(boost::json::object obj) : obj{std::move(obj)} {}
+
+	auto to_json() const { return obj; }
+
+private:
+	boost::json::object obj = {};
+};
+
+boost::json::value make_error_response(detail::ErrorResponseParams params = {});
 
 } // namespace tfs::http

@@ -4,12 +4,19 @@
 #include <boost/beast/http/string_body.hpp>
 #include <boost/json.hpp>
 
-namespace beast = boost::beast;
-namespace json = boost::json;
-
 namespace tfs::http {
 
-beast::http::message_generator handle_request(const beast::http::request<beast::http::string_body>& req,
-                                              std::string_view ip);
+namespace routes {
+
+boost::json::value handle_cache_info(const boost::json::object& body, std::string_view ip);
+boost::json::value handle_check_character_name(const boost::json::object& body, std::string_view ip);
+boost::json::value handle_create_account(const boost::json::object& body, std::string_view ip);
+boost::json::value handle_login(const boost::json::object& body, std::string_view ip);
+boost::json::value handle_server_info(const boost::json::object& body, std::string_view ip);
+
+} // namespace routes
+
+boost::beast::http::message_generator handle_request(
+    const boost::beast::http::request<boost::beast::http::string_body>& req, std::string_view ip);
 
 } // namespace tfs::http
