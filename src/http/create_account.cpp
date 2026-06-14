@@ -14,7 +14,7 @@ namespace json = boost::json;
 
 json::value tfs::http::routes::handle_create_account(const json::object& body, std::string_view ip)
 {
-	const auto passwordField = body.if_contains("Password");
+	const auto passwordField = body.if_contains("password");
 	if (!passwordField || !passwordField->is_string()) {
 		return make_error_response({
 		    .code = 87,
@@ -32,7 +32,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	const auto emailField = body.if_contains("EMail");
+	const auto emailField = body.if_contains("email");
 	if (!emailField || !emailField->is_string()) {
 		return make_error_response({
 		    .code = 57,
@@ -58,7 +58,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	auto characterNameField = body.if_contains("CharacterName");
+	auto characterNameField = body.if_contains("charactername");
 	if (!characterNameField || !characterNameField->is_string()) {
 		return make_error_response({
 		    .code = 6,
@@ -84,7 +84,7 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		});
 	}
 
-	const auto sexField = body.if_contains("CharacterSex");
+	const auto sexField = body.if_contains("charactersex");
 	if (!sexField || !sexField->is_string()) {
 		// TODO: figure out response code and message
 		return make_error_response();

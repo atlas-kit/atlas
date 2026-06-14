@@ -19,36 +19,51 @@ namespace {
 thread_local json::monotonic_resource mr;
 
 const auto handlers =
-    std::flat_map<std::string_view, std::function<json::value(const json::object&, std::string_view)>>{
-        {{"cacheinfo", routes::handle_cache_info},
-         {"checkcharactername", routes::handle_check_character_name},
-         {"createaccountandcharacter", routes::handle_create_account},
-         {"login", routes::handle_login},
-         {"serverinfo", routes::handle_server_info}}};
+    std::flat_map<std::string_view, std::function<json::value(const json::object&, std::string_view)>>{{
+        {"cacheinfo", routes::handle_cache_info},
+        {"checkcharactername", routes::handle_check_character_name},
+        {"createaccountandcharacter", routes::handle_create_account},
+        {"createcharacter", routes::handle_create_character},
+        {"getaccountcreationstatus", routes::handle_worlds_info},
+        {"login", routes::handle_login},
+        {"serverinfo", routes::handle_server_info},
+    }};
+
+auto normalize_keys(const json::object& obj)
+{
+	json::object normalized;
+	for (auto&& [key, value] : obj) {
+		auto lower = boost::algorithm::to_lower_copy(std::string{key});
+		normalized[lower] = value;
+	}
+	return normalized;
+}
 
 auto router(const beast::http::request<beast::http::string_body>& req, std::string_view ip)
 {
-	using namespace tfs::http;
+	using tfs::http::make_error_response;
 
 	boost::system::error_code ec;
-	auto requestBody = json::parse(req.body(), ec, &mr);
-	if (ec || !requestBody.is_object()) {
+	auto parsed_body = json::parse(req.body(), ec, &mr);
+	if (ec || !parsed_body.is_object()) {
+		spdlog::trace("Received request with invalid JSON body: {:s}", req.body());
 		return make_error_response({.code = 2, .message = "Invalid request body."});
 	}
 
-	const auto& body = requestBody.get_object();
-	auto typeField = body.if_contains("type");
+	const auto body = normalize_keys(parsed_body.get_object());
+	const auto typeField = body.if_contains("type");
 	if (!typeField || !typeField->is_string()) {
+		spdlog::trace("Received request with missing or invalid type field: {:s}", json::serialize(body));
 		return make_error_response({.code = 2, .message = "Invalid request type."});
 	}
 
 	auto type = boost::algorithm::to_lower_copy(typeField->get_string());
-
 	if (auto handler = handlers.find(type); handler != handlers.end()) {
 		return handler->second(body, ip);
 	}
 
-	return make_error_response();
+	spdlog::debug("Received request with unknown type: {:s}", type.subview());
+	return make_error_response({.code = 2, .message = "Invalid request type."});
 }
 
 } // namespace

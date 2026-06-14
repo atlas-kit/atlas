@@ -5,6 +5,7 @@ set(http_SRC
 	${CMAKE_CURRENT_LIST_DIR}/check_email.cpp
 	${CMAKE_CURRENT_LIST_DIR}/check_password.cpp
 	${CMAKE_CURRENT_LIST_DIR}/create_account.cpp
+	${CMAKE_CURRENT_LIST_DIR}/create_character.cpp
 	${CMAKE_CURRENT_LIST_DIR}/enums.cpp
 	${CMAKE_CURRENT_LIST_DIR}/error.cpp
 	${CMAKE_CURRENT_LIST_DIR}/http.cpp
@@ -14,6 +15,7 @@ set(http_SRC
 	${CMAKE_CURRENT_LIST_DIR}/server_info.cpp
 	${CMAKE_CURRENT_LIST_DIR}/session.cpp
 	${CMAKE_CURRENT_LIST_DIR}/validation.cpp
+	${CMAKE_CURRENT_LIST_DIR}/worlds_info.cpp
 	)
 
 add_library(http OBJECT ${http_SRC})

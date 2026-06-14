@@ -9,7 +9,7 @@ namespace json = boost::json;
 
 json::value tfs::http::routes::handle_check_password(const json::object& body, std::string_view)
 {
-	const auto passwordField = body.if_contains("Password1");
+	const auto passwordField = body.if_contains("password1");
 	if (!passwordField) {
 		return make_error_response(
 		    {.code = 11, .message = "Please enter a password.", .additional_fields = {{"Password1", nullptr}}});
