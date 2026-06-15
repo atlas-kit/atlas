@@ -59,19 +59,24 @@ function handler.onReceive(player, msg)
             return
         end
 
+        local sanitizedMount = lookMount
+
         if lookMount ~= 0 then
             if not Game.isMountableOutfit(outfit.lookType) then
                 outfit.lookMount = 0
+                sanitizedMount = 0
             elseif not player:canRideMount(lookMount) then
                 player:setCurrentMount(nil)
                 return
-            else
-                player:setCurrentMount(lookMount)
             end
         end
 
+        if sanitizedMount ~= 0 then
+            player:setCurrentMount(sanitizedMount)
+        end
+
         if player:setOutfitWithMountSpeed(outfit) then
-            player:setWasMounted(lookMount ~= 0)
+            player:setWasMounted(sanitizedMount ~= 0)
         end
         player:setRandomizeMount(randomizeMount)
     elseif outfitType == 1 then -- try outfit from store window
