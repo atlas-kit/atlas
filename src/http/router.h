@@ -14,6 +14,7 @@ boost::json::value handle_check_email(const boost::json::object& body, std::stri
 boost::json::value handle_check_password(const boost::json::object& body, std::string_view ip);
 boost::json::value handle_create_account(const boost::json::object& body, std::string_view ip);
 boost::json::value handle_create_character(const boost::json::object& body, std::string_view ip);
+boost::json::value handle_generate_character_name(const boost::json::object& body, std::string_view ip);
 boost::json::value handle_login(const boost::json::object& body, std::string_view ip);
 boost::json::value handle_server_info(const boost::json::object& body, std::string_view ip);
 boost::json::value handle_worlds_info(const boost::json::object& body, std::string_view ip);

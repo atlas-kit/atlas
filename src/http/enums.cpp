@@ -1,3 +1,5 @@
+#include "../otpch.h"
+
 #include "enums.h"
 
 std::string_view tfs::http::detail::getPasswordStrengthColor(int strength)

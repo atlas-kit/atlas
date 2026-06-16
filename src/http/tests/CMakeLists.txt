@@ -7,6 +7,7 @@ set(tests_SRC
     ${CMAKE_CURRENT_LIST_DIR}/test_check_email.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_check_password.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_create_account.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_generate_character_name.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_login.cpp
     ${CMAKE_CURRENT_LIST_DIR}/test_validation.cpp
     )

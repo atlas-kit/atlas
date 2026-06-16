@@ -24,6 +24,7 @@ const auto handlers =
         {"checkcharactername", routes::handle_check_character_name},
         {"createaccountandcharacter", routes::handle_create_account},
         {"createcharacter", routes::handle_create_character},
+        {"generatecharactername", routes::handle_generate_character_name},
         {"getaccountcreationstatus", routes::handle_worlds_info},
         {"login", routes::handle_login},
         {"serverinfo", routes::handle_server_info},
