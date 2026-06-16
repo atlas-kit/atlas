@@ -20,6 +20,8 @@ const auto handlers =
     boost::container::flat_map<std::string_view, std::function<json::value(const json::object&, std::string_view)>>{{
         {"cacheinfo", routes::handle_cache_info},
         {"checkcharactername", routes::handle_check_character_name},
+        {"checkemail", routes::handle_check_email},
+        {"checkpassword", routes::handle_check_password},
         {"createaccountandcharacter", routes::handle_create_account},
         {"createcharacter", routes::handle_create_character},
         {"generatecharactername", routes::handle_generate_character_name},
