@@ -29,7 +29,7 @@ std::optional<std::string_view> is_valid_character_name(std::string_view name)
 		return "The first letter of a name must be an uppercase letter.";
 	}
 
-	if (!std::all_of(name.begin(), name.end(), [](char c) { return std::isalpha(c) || c == ' '; })) {
+	if (!std::all_of(name.begin(), name.end(), [](unsigned char c) { return std::isalpha(c) || c == ' '; })) {
 		return "This name contains invalid letters. Please use only A-Z, a-z and space!";
 	}
 
@@ -51,7 +51,7 @@ std::optional<std::string_view> is_valid_character_name(std::string_view name)
 			return "This name contains a word without vowels. Please choose another name.";
 		}
 
-		if (std::ranges::any_of(word | std::views::drop(1), [](char c) { return std::isupper(c); })) {
+		if (std::ranges::any_of(word | std::views::drop(1), [](unsigned char c) { return std::isupper(c); })) {
 			return "In names capital letters are only allowed at the beginning of a word.";
 		}
 
@@ -81,11 +81,11 @@ detail::PasswordRequirements check_password_strength(std::string_view password)
 	return {
 	    // CipSoft requires >=10 and <=29 characters, we allow a wider range for better security and user choice
 	    .length = password.length() >= 8 && password.length() <= 64,
-	    .uppercase = std::ranges::any_of(password, [](char c) { return std::isupper(c); }),
-	    .lowercase = std::ranges::any_of(password, [](char c) { return std::islower(c); }),
-	    .digit = std::ranges::any_of(password, [](char c) { return std::isdigit(c); }),
+	    .uppercase = std::ranges::any_of(password, [](unsigned char c) { return std::isupper(c); }),
+	    .lowercase = std::ranges::any_of(password, [](unsigned char c) { return std::islower(c); }),
+	    .digit = std::ranges::any_of(password, [](unsigned char c) { return std::isdigit(c); }),
 	    // CipSoft does not disclose the exact requirements for valid characters
-	    .validChars = std::all_of(password.begin(), password.end(), [](char c) { return std::isprint(c); }),
+	    .validChars = std::all_of(password.begin(), password.end(), [](unsigned char c) { return std::isprint(c); }),
 	};
 }
 

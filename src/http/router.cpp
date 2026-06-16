@@ -66,7 +66,7 @@ auto router(const beast::http::request<beast::http::string_body>& req, std::stri
 		return handler->second(body, ip);
 	}
 
-	spdlog::debug("Received request with unknown type: {:s}", type.subview());
+	spdlog::debug("Received request with unknown type: {:s}", std::string_view{type});
 	return make_error_response({.code = 2, .message = "Invalid request type."});
 }
 
