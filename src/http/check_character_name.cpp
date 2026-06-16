@@ -37,5 +37,5 @@ json::value tfs::http::routes::handle_check_character_name(const json::object& b
 		});
 	}
 
-	return {{{"CharacterName", characterName}, {"IsAvailable", true}}};
+	return {{"CharacterName", characterName}, {"IsAvailable", true}};
 }

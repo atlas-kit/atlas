@@ -24,7 +24,7 @@ json::value tfs::http::routes::handle_check_password(const json::object& body, s
 	const auto password = passwordField->get_string();
 	if (password.empty()) {
 		return make_error_response(
-		    {.code = 11, .message = "Please enter your password address!", .additional_fields = {{"Password1", ""}}});
+		    {.code = 11, .message = "Please enter a password.", .additional_fields = {{"Password1", ""}}});
 	}
 
 	const auto requirements = check_password_strength(password);

@@ -44,9 +44,9 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_missing_character_name, CreateAccoun
 	auto&& body = tfs::http::routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
-	        {"EMail", "test@example.com"},
-	        {"Password", "password"},
-	        {"CharacterSex", "female"},
+	        {"email", "test@example.com"},
+	        {"password", "password"},
+	        {"charactersex", "female"},
 	    },
 	    ip);
 
@@ -58,10 +58,10 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_empty_character_name, CreateAccountF
 	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
-	        {"EMail", "test@example.com"},
-	        {"Password", "password"},
-	        {"CharacterName", ""},
-	        {"CharacterSex", "female"},
+	        {"email", "test@example.com"},
+	        {"password", "password"},
+	        {"charactername", ""},
+	        {"charactersex", "female"},
 	    },
 	    ip);
 
@@ -82,10 +82,10 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_invalid_email_formats, CreateAccount
 		auto&& body = routes::handle_create_account(
 		    {
 		        {"type", "CreateAccountAndCharacter"},
-		        {"EMail", email},
-		        {"Password", "password"},
-		        {"CharacterName", "New Char"},
-		        {"CharacterSex", "female"},
+		        {"email", email},
+		        {"password", "password"},
+		        {"charactername", "New Char"},
+		        {"charactersex", "female"},
 		    },
 		    ip);
 
@@ -98,9 +98,9 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_missing_email, CreateAccountFixture)
 	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
-	        {"Password", "password"},
-	        {"CharacterName", "New Char"},
-	        {"CharacterSex", "female"},
+	        {"password", "password"},
+	        {"charactername", "New Char"},
+	        {"charactersex", "female"},
 	    },
 	    ip);
 
@@ -112,10 +112,10 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_empty_password, CreateAccountFixture
 	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
-	        {"EMail", "test@example.com"},
-	        {"Password", ""},
-	        {"CharacterName", "New Char"},
-	        {"CharacterSex", "female"},
+	        {"email", "test@example.com"},
+	        {"password", ""},
+	        {"charactername", "New Char"},
+	        {"charactersex", "female"},
 	    },
 	    ip);
 
@@ -127,10 +127,10 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_success, CreateAccountFixture)
 	auto&& body = routes::handle_create_account(
 	    {
 	        {"type", "CreateAccountAndCharacter"},
-	        {"EMail", "newuser@example.com"},
-	        {"Password", "StrongPass123!"},
-	        {"CharacterName", "New Char"},
-	        {"CharacterSex", "female"},
+	        {"email", "newuser@example.com"},
+	        {"password", "StrongPass123!"},
+	        {"charactername", "New Char"},
+	        {"charactersex", "female"},
 	    },
 	    ip);
 
