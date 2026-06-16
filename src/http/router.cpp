@@ -2,13 +2,13 @@
 
 #include "router.h"
 
+#include "../tools.h"
 #include "boost/algorithm/string/case_conv.hpp"
 #include "error.h"
 
 #include <boost/json/monotonic_resource.hpp>
 #include <boost/json/parse.hpp>
 #include <boost/json/serialize.hpp>
-#include <flat_map>
 
 namespace beast = boost::beast;
 namespace json = boost::json;
@@ -16,10 +16,8 @@ namespace routes = tfs::http::routes;
 
 namespace {
 
-thread_local json::monotonic_resource mr;
-
 const auto handlers =
-    std::flat_map<std::string_view, std::function<json::value(const json::object&, std::string_view)>>{{
+    boost::container::flat_map<std::string_view, std::function<json::value(const json::object&, std::string_view)>>{{
         {"cacheinfo", routes::handle_cache_info},
         {"checkcharactername", routes::handle_check_character_name},
         {"createaccountandcharacter", routes::handle_create_account},
@@ -43,6 +41,9 @@ auto normalize_keys(const json::object& obj)
 auto router(const beast::http::request<beast::http::string_body>& req, std::string_view ip)
 {
 	using tfs::http::make_error_response;
+
+	thread_local json::monotonic_resource mr;
+	tfs::scope_exit clear_mr{[] { mr.release(); }};
 
 	boost::system::error_code ec;
 	auto parsed_body = json::parse(req.body(), ec, &mr);

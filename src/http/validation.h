@@ -9,11 +9,11 @@ namespace detail {
 
 struct PasswordRequirements
 {
-	bool length;
-	bool uppercase;
-	bool lowercase;
-	bool digit;
-	bool validChars;
+	bool length = false;
+	bool uppercase = false;
+	bool lowercase = false;
+	bool digit = false;
+	bool validChars = false;
 
 	bool is_valid() const { return length && validChars; }
 

@@ -89,7 +89,6 @@ BOOST_FIXTURE_TEST_CASE(test_create_account_invalid_email_formats, CreateAccount
 		    },
 		    ip);
 
-		std::cout << "Testing invalid email: " << email << std::endl;
 		BOOST_TEST(body.at("errorCode").as_int64() == 59);
 	}
 }

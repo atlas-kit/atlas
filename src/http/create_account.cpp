@@ -91,11 +91,15 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 	}
 
 	PlayerSex_t sex;
+	uint16_t lookType;
+
 	const auto sexValue = sexField->get_string();
 	if (sexValue == "female") {
 		sex = PLAYERSEX_FEMALE;
+		lookType = 128;
 	} else if (sexValue == "male") {
 		sex = PLAYERSEX_MALE;
+		lookType = 136;
 	} else {
 		// TODO: figure out response code and message
 		return make_error_response();
@@ -104,14 +108,17 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 	thread_local auto& db = Database::getInstance();
 
 	DBTransaction tx;
-	tx.begin();
 
-	if (db.storeQuery(std::format("SELECT `id` FROM `accounts` WHERE `email` = {:s}", db.escapeString(email)))) {
+	if (!tx.begin()) {
+		return make_error_response();
+	}
+
+	if (db.storeQuery(std::format("SELECT 1 FROM `accounts` WHERE `email` = {:s}", db.escapeString(email)))) {
 		// TODO: figure out response code and message
 		return make_error_response({.code = 1, .message = "This e-mail address is already in use."});
 	}
 
-	if (db.storeQuery(std::format("SELECT `id` FROM `players` WHERE `name` = {:s}", db.escapeString(characterName)))) {
+	if (db.storeQuery(std::format("SELECT 1 FROM `players` WHERE `name` = {:s}", db.escapeString(characterName)))) {
 		return make_error_response(
 		    {.code = 54, .message = "This character name is already used. Please select another one!"});
 	}
@@ -129,12 +136,15 @@ json::value tfs::http::routes::handle_create_account(const json::object& body, s
 		return make_error_response();
 	}
 
-	if (!db.executeQuery(std::format("INSERT INTO `players` (`account_id`, `name`, `sex`) VALUES ({:d}, {:s}, {:d})",
-	                                 accountId, db.escapeString(characterName), std::to_underlying(sex)))) {
+	if (!db.executeQuery(std::format(
+	        "INSERT INTO `players` (`account_id`, `name`, `sex`, `looktype`) VALUES ({:d}, {:s}, {:d}, {:d})",
+	        accountId, db.escapeString(characterName), std::to_underlying(sex), lookType))) {
 		return make_error_response();
 	}
 
-	tx.commit();
+	if (!tx.commit()) {
+		return make_error_response();
+	}
 
 	return load_characters(
 	    db, ip, accountId, 0,

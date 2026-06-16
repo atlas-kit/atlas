@@ -1,5 +1,6 @@
 #include "../otpch.h"
 
+#include "../database.h"
 #include "error.h"
 #include "router.h"
 #include "validation.h"
@@ -22,6 +23,16 @@ json::value tfs::http::routes::handle_check_character_name(const json::object& b
 		return make_error_response({
 		    .code = 99,
 		    .message = msg.value(),
+		    .additional_fields = {{"CharacterName", characterName}, {"IsAvailable", false}},
+		});
+	}
+
+	thread_local auto& db = Database::getInstance();
+
+	if (db.storeQuery(std::format("SELECT 1 FROM `players` WHERE `name` = {:s}", db.escapeString(characterName)))) {
+		return make_error_response({
+		    .code = 54,
+		    .message = "This character name is already used. Please select another one!",
 		    .additional_fields = {{"CharacterName", characterName}, {"IsAvailable", false}},
 		});
 	}

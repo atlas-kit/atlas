@@ -2,11 +2,10 @@
 
 #include "../database.h"
 #include "../game.h"
-#include "../iologindata.h"
 #include "characters.h"
-#include "enums.h"
 #include "error.h"
 #include "router.h"
+#include "validation.h"
 
 namespace json = boost::json;
 
@@ -23,14 +22,51 @@ json::value tfs::http::routes::handle_create_character(const json::object& body,
 		return make_error_response({.code = 1, .message = "Invalid session."});
 	}
 
-	auto nameField = body.if_contains("charactername");
-	if (!nameField || !nameField->is_string()) {
-		return make_error_response({.code = 1, .message = "Invalid character name."});
+	auto characterNameField = body.if_contains("charactername");
+	if (!characterNameField || !characterNameField->is_string()) {
+		return make_error_response({
+		    .code = 6,
+		    .message = "Please enter a name for your character!",
+		    .additional_fields = {{"CharacterName", ""}, {"Success", false}},
+		});
 	}
 
-	auto sexField = body.if_contains("charactersex");
+	const auto characterName = characterNameField->get_string();
+	if (characterName.empty()) {
+		return make_error_response({
+		    .code = 6,
+		    .message = "Please enter a name for your character!",
+		    .additional_fields = {{"CharacterName", ""}, {"Success", false}},
+		});
+	}
+
+	if (const auto msg = is_valid_character_name(characterName)) {
+		return make_error_response({
+		    .code = 99,
+		    .message = msg.value(),
+		    .additional_fields = {{"CharacterName", characterName}, {"Success", false}},
+		});
+	}
+
+	const auto sexField = body.if_contains("charactersex");
 	if (!sexField || !sexField->is_string()) {
-		return make_error_response({.code = 1, .message = "Invalid character sex."});
+		// TODO: figure out response code and message
+		return make_error_response();
+	}
+
+	PlayerSex_t sex;
+	uint16_t lookType;
+
+	const auto sexValue = sexField->get_string();
+	if (sexValue == "female") {
+		sex = PLAYERSEX_FEMALE;
+		lookType = 128;
+	} else if (sexValue == "male") {
+		sex = PLAYERSEX_MALE;
+		lookType = 136;
+	} else {
+		// TODO: figure out response code and message
+		return make_error_response();
 	}
 
 	const auto now = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
@@ -46,14 +82,9 @@ json::value tfs::http::routes::handle_create_character(const json::object& body,
 	const uint32_t accountId = sessionResult->getNumber<uint32_t>("account_id");
 	const int64_t premiumEndsAt = sessionResult->getNumber<int64_t>("premium_ends_at");
 
-	const std::string characterName(nameField->get_string());
-
-	if (characterName.empty()) {
-		return make_error_response({.code = 1, .message = "Invalid character name."});
-	}
-
-	if (IOLoginData::getGuidByName(characterName) != 0) {
-		return make_error_response({.code = 1, .message = "Character name already exists."});
+	if (db.storeQuery(std::format("SELECT 1 FROM `players` WHERE `name` = {:s}", db.escapeString(characterName)))) {
+		return make_error_response(
+		    {.code = 54, .message = "This character name is already used. Please select another one!"});
 	}
 
 	if (const auto& result = db.storeQuery(
@@ -63,71 +94,11 @@ json::value tfs::http::routes::handle_create_character(const json::object& body,
 		}
 	}
 
-	PlayerSex_t sex;
-	uint16_t lookType;
-
-	if (sexField->get_string() == "male") {
-		sex = PLAYERSEX_MALE;
-		lookType = 128;
-	} else if (sexField->get_string() == "female") {
-		sex = PLAYERSEX_FEMALE;
-		lookType = 136;
-	} else {
-		return make_error_response({.code = 1, .message = "Invalid character sex."});
-	}
-
 	if (!db.executeQuery(std::format(
 	        "INSERT INTO `players` (`name`, `account_id`, `sex`, `looktype`) VALUES ({:s}, {:d}, {:d}, {:d})",
 	        db.escapeString(characterName), accountId, static_cast<uint32_t>(sex), lookType))) {
 		return make_error_response();
 	}
-
-	json::array characters;
-	if (const auto& playersRes = db.storeQuery(std::format(
-	        "SELECT `id`, `name`, `level`, `vocation`, `lastlogin`, `sex`, `looktype`, `lookhead`, `lookbody`, `looklegs`, `lookfeet`, `lookaddons` FROM `players` WHERE `account_id` = {:d}",
-	        accountId))) {
-		uint32_t lastLogin = 0;
-		do {
-			auto vocation = g_vocations.getVocation(playersRes->getNumber<uint32_t>("vocation"));
-			assert(vocation);
-
-			characters.push_back({
-			    {"worldid", 0}, // not implemented
-			    {"name", playersRes->getString("name")},
-			    {"level", playersRes->getNumber<uint32_t>("level")},
-			    {"vocation", vocation->getVocName()},
-			    {"lastlogin", playersRes->getNumber<uint64_t>("lastlogin")},
-			    {"ismale", playersRes->getNumber<uint16_t>("sex") == PLAYERSEX_MALE},
-			    {"ishidden", false},        // not implemented
-			    {"ismaincharacter", false}, // not implemented
-			    {"tutorial", false},        // not implemented
-			    {"outfitid", playersRes->getNumber<uint32_t>("looktype")},
-			    {"headcolor", playersRes->getNumber<uint32_t>("lookhead")},
-			    {"torsocolor", playersRes->getNumber<uint32_t>("lookbody")},
-			    {"legscolor", playersRes->getNumber<uint32_t>("looklegs")},
-			    {"detailcolor", playersRes->getNumber<uint32_t>("lookfeet")},
-			    {"addonsflags", playersRes->getNumber<uint32_t>("lookaddons")},
-			    {"dailyrewardstate", 0}, // not implemented
-			});
-
-			lastLogin = std::max(lastLogin, playersRes->getNumber<uint32_t>("lastlogin"));
-		} while (playersRes->next());
-	}
-
-	json::array worlds{
-	    {
-	        {"id", 0}, // not implemented
-	        {"name", getString(ConfigManager::SERVER_NAME)},
-	        {"externaladdressprotected", getString(ConfigManager::IP)},
-	        {"externalportprotected", getNumber(ConfigManager::GAME_PORT)},
-	        {"externaladdressunprotected", getString(ConfigManager::IP)},
-	        {"externalportunprotected", getNumber(ConfigManager::GAME_PORT)},
-	        {"previewstate", 0}, // not implemented
-	        {"location", getString(ConfigManager::LOCATION)},
-	        {"anticheatprotection", false}, // not implemented
-	        {"pvptype", detail::getPvpTypeIndex(g_game.getWorldType())},
-	    },
-	};
 
 	return load_characters(db, ip, accountId, premiumEndsAt, now);
 }

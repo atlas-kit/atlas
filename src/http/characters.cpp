@@ -31,7 +31,9 @@ json::value tfs::http::load_characters(Database& db, std::string_view ip, uint32
 	        accountId))) {
 		do {
 			auto vocation = g_vocations.getVocation(playersRes->getNumber<uint32_t>("vocation"));
-			assert(vocation);
+			if (!vocation) [[unlikely]] {
+				return make_error_response();
+			}
 
 			characters.push_back({
 			    {"worldid", 0}, // not implemented
