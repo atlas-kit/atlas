@@ -18,8 +18,7 @@ function onUseRope(player, item, fromPosition, target, toPosition, isHotkey)
             return true
         end
 
-        player:teleportTo(toPosition, false)
-        return true
+        return player:teleportTo(toPosition, false)
     end
 
     if table.contains(Tools.ropeHoleIds, target.itemid) then
