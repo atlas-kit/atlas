@@ -69,6 +69,7 @@ public:
 
 	void send(const std::shared_ptr<OutputMessage>& msg);
 
+	const Address& initializeIP();
 	const Address& getIP() const { return remoteAddress; };
 
 private:
