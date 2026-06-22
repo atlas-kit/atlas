@@ -96,22 +96,6 @@ void mainLoader(ServiceManager* services)
 
 	printServerVersion();
 
-	// check if config.lua or config.lua.dist exist
-	const std::string& configFile = getString(ConfigManager::CONFIG_FILE);
-	std::ifstream c_test("./" + configFile);
-	if (!c_test.is_open()) {
-		std::ifstream config_lua_dist("./config.lua.dist");
-		if (config_lua_dist.is_open()) {
-			std::cout << ">> copying config.lua.dist to " << configFile << std::endl;
-			std::ofstream config_lua(configFile);
-			config_lua << config_lua_dist.rdbuf();
-			config_lua.close();
-			config_lua_dist.close();
-		}
-	} else {
-		c_test.close();
-	}
-
 	// read global config
 	std::cout << ">> Loading config" << std::endl;
 	if (!ConfigManager::load()) {
