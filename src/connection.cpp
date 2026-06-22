@@ -114,11 +114,6 @@ void Connection::accept()
 
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 
-	boost::system::error_code error;
-	if (auto endpoint = socket.remote_endpoint(error); !error) {
-		remoteAddress = endpoint.address();
-	}
-
 	try {
 		readTimer.expires_after(std::chrono::seconds(CONNECTION_READ_TIMEOUT));
 		readTimer.async_wait(
@@ -349,4 +344,16 @@ void Connection::handleTimeout(std::weak_ptr<Connection> connectionWeak, const b
 	if (auto connection = connectionWeak.lock()) {
 		connection->close(FORCE_CLOSE);
 	}
+}
+
+const Connection::Address& Connection::initializeIP()
+{
+	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
+	boost::system::error_code error;
+	if (auto endpoint = socket.remote_endpoint(error); !error) {
+		remoteAddress = endpoint.address();
+	} else {
+		std::cout << "[Network error - Connection::initializeIP] " << error.message() << std::endl;
+	}
+	return remoteAddress;
 }

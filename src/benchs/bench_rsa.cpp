@@ -32,11 +32,13 @@ static void bench_rsa_decrypt(benchmark::State& state)
 {
 	tfs::rsa::loadPEM(privateKey);
 
+	// RSA decrypts a single block whose size must match the key modulus (128 bytes for a 1024-bit key).
 	std::vector<uint8_t> data(state.range(0), 0x42);
 	for (auto&& _ : state) {
 		tfs::rsa::decrypt(data.data(), data.size());
 		benchmark::DoNotOptimize(data);
 	}
+	state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(bench_rsa_decrypt)->Arg(128);
 
