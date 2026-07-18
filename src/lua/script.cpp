@@ -917,6 +917,14 @@ bool LuaEnvironment::initState()
 	luaL_openlibs(L);
 	registerFunctions();
 
+	// Pre-create the weak userdata cache table
+	lua_newtable(L);
+	lua_newtable(L);
+	lua_pushstring(L, "v");
+	lua_setfield(L, -2, "__mode");
+	lua_setmetatable(L, -2);
+	lua_setfield(L, LUA_REGISTRYINDEX, tfs::lua::detail::kUserdataCacheKey);
+
 	runningEventId = EVENT_ID_USER;
 	return true;
 }

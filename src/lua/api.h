@@ -137,10 +137,60 @@ std::shared_ptr<T>* getRawSharedPtr(lua_State* L, int32_t arg)
 	return static_cast<std::shared_ptr<T>*>(lua_touserdata(L, arg));
 }
 
-template <class T>
-void pushSharedPtr(lua_State* L, std::shared_ptr<T> value)
+namespace detail {
+
+inline constexpr const char* kUserdataCacheKey = "tfs::lua::userdata_cache";
+
+inline void ensureUserdataCache(lua_State* L)
 {
-	new (lua_newuserdata(L, sizeof(std::shared_ptr<T>))) std::shared_ptr<T>(std::move(value));
+	lua_pushstring(L, kUserdataCacheKey);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	if (lua_isnil(L, -1)) {
+		lua_pop(L, 1);
+
+		lua_newtable(L);
+		lua_newtable(L);
+		lua_pushstring(L, "v");
+		lua_setfield(L, -2, "__mode");
+		lua_setmetatable(L, -2);
+
+		lua_pushstring(L, kUserdataCacheKey);
+		lua_pushvalue(L, -2);
+		lua_rawset(L, LUA_REGISTRYINDEX);
+	}
+}
+
+} // namespace detail
+
+template <class T>
+void pushSharedPtr(lua_State* L, const std::shared_ptr<T>& value)
+{
+	if (!value) {
+		lua_pushnil(L);
+		return;
+	}
+
+	detail::ensureUserdataCache(L);
+
+	using RawT = std::remove_const_t<T>;
+	auto* key = const_cast<RawT*>(value.get());
+
+	lua_pushlightuserdata(L, key);
+	lua_rawget(L, -2);
+	if (!lua_isnil(L, -1)) {
+		lua_remove(L, -2);
+		return;
+	}
+	lua_pop(L, 1);
+
+	auto* ud = static_cast<std::shared_ptr<T>*>(lua_newuserdata(L, sizeof(std::shared_ptr<T>)));
+	std::construct_at(ud, value);
+
+	lua_pushlightuserdata(L, key);
+	lua_pushvalue(L, -2);
+	lua_rawset(L, -4);
+
+	lua_remove(L, -2);
 }
 
 // High-level converters (Lua -> C++)
