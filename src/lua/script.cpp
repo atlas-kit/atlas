@@ -917,13 +917,13 @@ bool LuaEnvironment::initState()
 	luaL_openlibs(L);
 	registerFunctions();
 
-	// Pre-create the weak userdata cache table
+	// shared_ptr userdata cache: a weak table keyed by pointer address
 	lua_newtable(L);
 	lua_newtable(L);
 	lua_pushstring(L, "v");
 	lua_setfield(L, -2, "__mode");
 	lua_setmetatable(L, -2);
-	lua_setfield(L, LUA_REGISTRYINDEX, tfs::lua::detail::kUserdataCacheKey);
+	lua_setfield(L, LUA_REGISTRYINDEX, tfs::lua::SHARED_PTR_CACHE_KEY);
 
 	runningEventId = EVENT_ID_USER;
 	return true;

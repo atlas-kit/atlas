@@ -19,6 +19,29 @@ extern Spells* g_spells;
 
 namespace tfs::lua {
 
+const char* SHARED_PTR_CACHE_KEY = "tfs::lua::shared_ptr_cache";
+
+void requireSharedPtrCache(lua_State* L)
+{
+	// look up the cache table in the registry
+	lua_pushstring(L, SHARED_PTR_CACHE_KEY);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	if (!lua_isnil(L, -1)) {
+		return;
+	}
+
+	// not found, create a new weak table for it
+	lua_pop(L, 1);
+	lua_newtable(L);
+	lua_newtable(L);
+	lua_pushstring(L, "v");
+	lua_setfield(L, -2, "__mode");
+	lua_setmetatable(L, -2);
+	lua_pushstring(L, SHARED_PTR_CACHE_KEY);
+	lua_pushvalue(L, -2);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+}
+
 bool isNumber(lua_State* L, int32_t arg) { return lua_type(L, arg) == LUA_TNUMBER; }
 
 int luaUserdataCompare(lua_State* L)

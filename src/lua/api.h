@@ -137,31 +137,14 @@ std::shared_ptr<T>* getRawSharedPtr(lua_State* L, int32_t arg)
 	return static_cast<std::shared_ptr<T>*>(lua_touserdata(L, arg));
 }
 
-namespace detail {
+// Registry key for the weak-table cache that deduplicates shared_ptr userdata
+extern const char* SHARED_PTR_CACHE_KEY;
 
-inline constexpr const char* kUserdataCacheKey = "tfs::lua::userdata_cache";
+// Pushes the weak cache table onto the stack, creating it if absent
+void requireSharedPtrCache(lua_State* L);
 
-inline void ensureUserdataCache(lua_State* L)
-{
-	lua_pushstring(L, kUserdataCacheKey);
-	lua_rawget(L, LUA_REGISTRYINDEX);
-	if (lua_isnil(L, -1)) {
-		lua_pop(L, 1);
-
-		lua_newtable(L);
-		lua_newtable(L);
-		lua_pushstring(L, "v");
-		lua_setfield(L, -2, "__mode");
-		lua_setmetatable(L, -2);
-
-		lua_pushstring(L, kUserdataCacheKey);
-		lua_pushvalue(L, -2);
-		lua_rawset(L, LUA_REGISTRYINDEX);
-	}
-}
-
-} // namespace detail
-
+// Push a shared_ptr as a single userdata, reusing any existing one via weak cache
+// Keyed by raw pointer address, avoids use_count inflation from duplicates
 template <class T>
 void pushSharedPtr(lua_State* L, const std::shared_ptr<T>& value)
 {
@@ -170,11 +153,14 @@ void pushSharedPtr(lua_State* L, const std::shared_ptr<T>& value)
 		return;
 	}
 
-	detail::ensureUserdataCache(L);
+	// ensure the weak cache table is on the stack
+	requireSharedPtrCache(L);
 
+	// use the raw address as the cache key
 	using RawT = std::remove_const_t<T>;
 	auto* key = const_cast<RawT*>(value.get());
 
+	// look up the existing userdata
 	lua_pushlightuserdata(L, key);
 	lua_rawget(L, -2);
 	if (!lua_isnil(L, -1)) {
@@ -183,9 +169,11 @@ void pushSharedPtr(lua_State* L, const std::shared_ptr<T>& value)
 	}
 	lua_pop(L, 1);
 
+	// create a new userdata and copy the shared_ptr into it
 	auto* ud = static_cast<std::shared_ptr<T>*>(lua_newuserdata(L, sizeof(std::shared_ptr<T>)));
 	std::construct_at(ud, value);
 
+	// store in cache so future pushes reuse it
 	lua_pushlightuserdata(L, key);
 	lua_pushvalue(L, -2);
 	lua_rawset(L, -4);
