@@ -137,9 +137,6 @@ std::shared_ptr<T>* getRawSharedPtr(lua_State* L, int32_t arg)
 	return static_cast<std::shared_ptr<T>*>(lua_touserdata(L, arg));
 }
 
-// Registry key for the weak-table cache that deduplicates shared_ptr userdata
-extern const char* SHARED_PTR_CACHE_KEY;
-
 // Pushes the weak cache table onto the stack, creating it if absent
 void requireSharedPtrCache(lua_State* L);
 

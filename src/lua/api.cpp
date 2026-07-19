@@ -19,12 +19,10 @@ extern Spells* g_spells;
 
 namespace tfs::lua {
 
-const char* SHARED_PTR_CACHE_KEY = "tfs::lua::shared_ptr_cache";
-
 void requireSharedPtrCache(lua_State* L)
 {
-	// look up the cache table in the registry
-	lua_pushstring(L, SHARED_PTR_CACHE_KEY);
+	// use the function's own address as the registry key (unique, stable, zero-overhead)
+	lua_pushlightuserdata(L, reinterpret_cast<void*>(&requireSharedPtrCache));
 	lua_rawget(L, LUA_REGISTRYINDEX);
 	if (!lua_isnil(L, -1)) {
 		return;
@@ -37,7 +35,7 @@ void requireSharedPtrCache(lua_State* L)
 	lua_pushstring(L, "v");
 	lua_setfield(L, -2, "__mode");
 	lua_setmetatable(L, -2);
-	lua_pushstring(L, SHARED_PTR_CACHE_KEY);
+	lua_pushlightuserdata(L, reinterpret_cast<void*>(&requireSharedPtrCache));
 	lua_pushvalue(L, -2);
 	lua_rawset(L, LUA_REGISTRYINDEX);
 }
