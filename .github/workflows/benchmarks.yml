@@ -55,7 +55,7 @@ jobs:
         shell: bash
 
       - name: Get latest CMake
-        uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
+        uses: lukka/get-cmake@4a7d025fc60f00db0c7b44ebf783d19b52444830 # v4.4.1
 
       - name: Cache vcpkg binary packages
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
