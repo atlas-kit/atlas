@@ -2757,7 +2757,8 @@ void ProtocolGame::sendMoveCreature(const std::shared_ptr<const Creature>& creat
                                     int32_t newStackPos, const Position& oldPos, int32_t oldStackPos, bool teleport)
 {
 	if (creature == player) {
-		if (teleport) {
+		const int32_t zDiff = std::abs(newPos.z - oldPos.z);
+		if (teleport || zDiff > 1) {
 			sendRemoveTileCreature(creature, oldPos, oldStackPos);
 			sendMapDescription(newPos);
 		} else {
