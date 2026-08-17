@@ -1708,7 +1708,7 @@ void Player::addExperience(const std::shared_ptr<Creature>& source, uint64_t exp
 	}
 
 	if (nextLevelExp > currLevelExp) {
-		levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp) / 100;
+		levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp);
 	} else {
 		levelPercent = 0;
 	}
@@ -1792,7 +1792,7 @@ void Player::removeExperience(uint64_t exp, bool sendText /* = false*/)
 
 	uint64_t nextLevelExp = Player::getExpForLevel(level + 1);
 	if (nextLevelExp > currLevelExp) {
-		levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp) / 100;
+		levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp);
 	} else {
 		levelPercent = 0;
 	}
@@ -2039,7 +2039,7 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 			uint64_t currLevelExp = Player::getExpForLevel(level);
 			uint64_t nextLevelExp = Player::getExpForLevel(level + 1);
 			if (nextLevelExp > currLevelExp) {
-				levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp) / 100;
+				levelPercent = Player::getBasisPointLevel(experience - currLevelExp, nextLevelExp - currLevelExp);
 			} else {
 				levelPercent = 0;
 			}
@@ -3766,7 +3766,7 @@ double Player::getLossPercent() const
 
 	double lossPercent;
 	if (level >= 25) {
-		double tmpLevel = level + (levelPercent / 100.);
+		double tmpLevel = level + (levelPercent / 10000.);
 		lossPercent =
 		    static_cast<double>((tmpLevel + 50) * 50 * ((tmpLevel * tmpLevel) - (5 * tmpLevel) + 8)) / experience;
 	} else {

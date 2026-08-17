@@ -177,8 +177,8 @@ bool IOLoginData::loadPlayer(const std::shared_ptr<Player>& player, std::shared_
 	player->experience = experience;
 
 	if (currExpCount < nextExpCount) {
-		player->levelPercent = static_cast<uint8_t>(
-		    Player::getBasisPointLevel(player->experience - currExpCount, nextExpCount - currExpCount) / 100);
+		player->levelPercent =
+		    Player::getBasisPointLevel(player->experience - currExpCount, nextExpCount - currExpCount);
 	} else {
 		player->levelPercent = 0;
 	}

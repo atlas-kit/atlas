@@ -90,7 +90,7 @@ local clientSkillsId = {
 local function sendGeneralStats(self, msg)
 	msg:addU64(self:getExperience())
 	msg:addU16(self:getLevel())
-	msg:addByte(self:getLevelPercent())
+	msg:addU16(self:getLevelPercent())
 
 	msg:addU16(self:getClientExpDisplay())
 	msg:addU16(self:getClientLowLevelBonusDisplay())

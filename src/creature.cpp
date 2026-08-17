@@ -83,7 +83,7 @@ std::chrono::milliseconds Creature::getTimeSinceLastMove() const
 	if (lastStep != std::chrono::steady_clock::time_point{}) {
 		return duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - lastStep);
 	}
-	return std::numeric_limits<std::chrono::milliseconds>::max();
+	return std::chrono::milliseconds::max();
 }
 
 std::chrono::milliseconds Creature::getWalkDelay(Direction dir) const
