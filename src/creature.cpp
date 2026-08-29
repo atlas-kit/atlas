@@ -551,10 +551,8 @@ bool Creature::dropCorpse(const std::shared_ptr<Creature>& lastHitCreature,
                           bool mostDamageUnjustified)
 {
 	if (!lootDrop && asMonster()) {
-		if (!master.expired()) {
-			tfs::events::creature::onDeath(asCreature(), nullptr, lastHitCreature, mostDamageCreature,
-			                               lastHitUnjustified, mostDamageUnjustified);
-		}
+		tfs::events::creature::onDeath(asCreature(), nullptr, lastHitCreature, mostDamageCreature, lastHitUnjustified,
+		                               mostDamageUnjustified);
 
 		g_game.addMagicEffect(getPosition(), CONST_ME_POFF);
 	} else {

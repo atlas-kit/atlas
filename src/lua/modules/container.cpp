@@ -265,6 +265,20 @@ int luaContainerGetCorpseOwner(lua_State* L)
 	return 1;
 }
 
+int luaContainerSetCorpseOwner(lua_State* L)
+{
+	// container:setCorpseOwner(owner)
+	const auto& container = tfs::lua::getSharedPtr<Container>(L, 1);
+	if (!container) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	container->setCorpseOwner(tfs::lua::getNumber<uint32_t>(L, 2));
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
 int luaContainerGetItemCountById(lua_State* L)
 {
 	// container:getItemCountById(itemId[, subType = -1])
@@ -348,4 +362,5 @@ void tfs::lua::registerContainer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Container", "addItem", luaContainerAddItem);
 	lsi.registerMethod("Container", "addItemEx", luaContainerAddItemEx);
 	lsi.registerMethod("Container", "getCorpseOwner", luaContainerGetCorpseOwner);
+	lsi.registerMethod("Container", "setCorpseOwner", luaContainerSetCorpseOwner);
 }

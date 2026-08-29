@@ -1801,41 +1801,6 @@ bool Monster::canWalkTo(Position pos, Direction direction) const
 	return false;
 }
 
-void Monster::death(const std::shared_ptr<Creature>&)
-{
-	setAttackedCreature(nullptr);
-
-	for (const auto& summon : getSummons() | tfs::views::lock_weak_ptrs) {
-		summon->changeHealth(-summon->getHealth());
-		summon->removeMaster();
-	}
-	clearSummons();
-
-	clearTargetList();
-	clearFriendList();
-}
-
-std::shared_ptr<Item> Monster::getCorpse(const std::shared_ptr<Creature>& lastHitCreature,
-                                         const std::shared_ptr<Creature>& mostDamageCreature)
-{
-	const auto& corpse = Creature::getCorpse(lastHitCreature, mostDamageCreature);
-	if (!corpse) {
-		return nullptr;
-	}
-
-	if (mostDamageCreature) {
-		if (mostDamageCreature->asPlayer()) {
-			corpse->setCorpseOwner(mostDamageCreature->getID());
-		} else {
-			const auto& mostDamageCreatureMaster = mostDamageCreature->getMaster();
-			if (mostDamageCreatureMaster && mostDamageCreatureMaster->asPlayer()) {
-				corpse->setCorpseOwner(mostDamageCreatureMaster->getID());
-			}
-		}
-	}
-	return corpse;
-}
-
 bool Monster::isInSpawnRange(const Position& pos) const
 {
 	if (!spawn) {

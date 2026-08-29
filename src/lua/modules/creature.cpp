@@ -501,6 +501,48 @@ int luaCreatureAddHealth(lua_State* L)
 	return 1;
 }
 
+int luaCreatureChangeHealth(lua_State* L)
+{
+	// creature:changeHealth(healthChange[, sendHealthChange = true])
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->changeHealth(tfs::lua::getNumber<int32_t>(L, 2), tfs::lua::getBoolean(L, 3, true));
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaCreatureRemoveMaster(lua_State* L)
+{
+	// creature:removeMaster()
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->removeMaster();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaCreatureClearSummons(lua_State* L)
+{
+	// creature:clearSummons()
+	const auto& creature = tfs::lua::getSharedPtr<Creature>(L, 1);
+	if (!creature) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	creature->clearSummons();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
 int luaCreatureGetMaxHealth(lua_State* L)
 {
 	// creature:getMaxHealth()
@@ -1149,6 +1191,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 
 	lsi.registerMethod("Creature", "getMaster", luaCreatureGetMaster);
 	lsi.registerMethod("Creature", "setMaster", luaCreatureSetMaster);
+	lsi.registerMethod("Creature", "removeMaster", luaCreatureRemoveMaster);
 
 	lsi.registerMethod("Creature", "getLight", luaCreatureGetLight);
 	lsi.registerMethod("Creature", "setLight", luaCreatureSetLight);
@@ -1168,6 +1211,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "getHealth", luaCreatureGetHealth);
 	lsi.registerMethod("Creature", "setHealth", luaCreatureSetHealth);
 	lsi.registerMethod("Creature", "addHealth", luaCreatureAddHealth);
+	lsi.registerMethod("Creature", "changeHealth", luaCreatureChangeHealth);
 	lsi.registerMethod("Creature", "getMaxHealth", luaCreatureGetMaxHealth);
 	lsi.registerMethod("Creature", "setMaxHealth", luaCreatureSetMaxHealth);
 	lsi.registerMethod("Creature", "setHiddenHealth", luaCreatureSetHiddenHealth);
@@ -1191,6 +1235,7 @@ void tfs::lua::registerCreature(LuaScriptInterface& lsi)
 	lsi.registerMethod("Creature", "getDamageMap", luaCreatureGetDamageMap);
 
 	lsi.registerMethod("Creature", "getSummons", luaCreatureGetSummons);
+	lsi.registerMethod("Creature", "clearSummons", luaCreatureClearSummons);
 
 	lsi.registerMethod("Creature", "getDescription", luaCreatureGetDescription);
 

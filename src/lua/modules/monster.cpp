@@ -142,6 +142,34 @@ int luaMonsterSetIdle(lua_State* L)
 	return 1;
 }
 
+int luaMonsterClearTargetList(lua_State* L)
+{
+	// monster:clearTargetList()
+	const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1);
+	if (!monster) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	monster->clearTargetList();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
+int luaMonsterClearFriendList(lua_State* L)
+{
+	// monster:clearFriendList()
+	const auto& monster = tfs::lua::getSharedPtr<Monster>(L, 1);
+	if (!monster) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	monster->clearFriendList();
+	tfs::lua::pushBoolean(L, true);
+	return 1;
+}
+
 int luaMonsterIsTarget(lua_State* L)
 {
 	// monster:isTarget(creature)
@@ -505,11 +533,13 @@ void tfs::lua::registerMonster(LuaScriptInterface& lsi)
 	lsi.registerMethod("Monster", "removeFriend", luaMonsterRemoveFriend);
 	lsi.registerMethod("Monster", "getFriendList", luaMonsterGetFriendList);
 	lsi.registerMethod("Monster", "getFriendCount", luaMonsterGetFriendCount);
+	lsi.registerMethod("Monster", "clearFriendList", luaMonsterClearFriendList);
 
 	lsi.registerMethod("Monster", "addTarget", luaMonsterAddTarget);
 	lsi.registerMethod("Monster", "removeTarget", luaMonsterRemoveTarget);
 	lsi.registerMethod("Monster", "getTargetList", luaMonsterGetTargetList);
 	lsi.registerMethod("Monster", "getTargetCount", luaMonsterGetTargetCount);
+	lsi.registerMethod("Monster", "clearTargetList", luaMonsterClearTargetList);
 
 	lsi.registerMethod("Monster", "selectTarget", luaMonsterSelectTarget);
 	lsi.registerMethod("Monster", "searchTarget", luaMonsterSearchTarget);

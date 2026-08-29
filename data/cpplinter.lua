@@ -247,6 +247,7 @@ Item = {}
 ---@field addItem fun(self: Container, itemId: number, count: number): Item
 ---@field addItemEx fun(self: Container, item: Item): boolean
 ---@field getCorpseOwner fun(self: Container): number
+---@field setCorpseOwner fun(self: Container, owner: number)
 Container = {}
 
 ---@class Teleport : Item
@@ -286,6 +287,7 @@ Podium = {}
 ---@field setFollowCreature fun(self: Creature, creature: Creature)
 ---@field getMaster fun(self: Creature): Creature
 ---@field setMaster fun(self: Creature, master: Creature)
+---@field removeMaster fun(self: Creature)
 ---@field getLight fun(self: Creature): table
 ---@field setLight fun(self: Creature, lightInfo: table)
 ---@field getSpeed fun(self: Creature): number
@@ -300,6 +302,7 @@ Podium = {}
 ---@field getHealth fun(self: Creature): number
 ---@field setHealth fun(self: Creature, health: number)
 ---@field addHealth fun(self: Creature, healthDelta: number)
+---@field changeHealth fun(self: Creature, healthDelta: number, sendHealthChange?: boolean)
 ---@field getMaxHealth fun(self: Creature): number
 ---@field setMaxHealth fun(self: Creature, maxHealth: number)
 ---@field setHiddenHealth fun(self: Creature, hidden: boolean)
@@ -317,6 +320,7 @@ Podium = {}
 ---@field say fun(self: Creature, text: string, type?: number, ghost?: boolean, receiver?: Creature, channelId?: number)
 ---@field getDamageMap fun(self: Creature): table
 ---@field getSummons fun(self: Creature): table
+---@field clearSummons fun(self: Creature)
 ---@field getDescription fun(self: Creature): string
 ---@field getPathTo fun(self: Creature, position: Position): table
 ---@field move fun(self: Creature, direction: number)
@@ -499,10 +503,12 @@ Player = {}
 ---@field removeFriend fun(self: Monster, creature: Creature)
 ---@field getFriendList fun(self: Monster): table
 ---@field getFriendCount fun(self: Monster): number
+---@field clearFriendList fun(self: Monster)
 ---@field addTarget fun(self: Monster, creature: Creature)
 ---@field removeTarget fun(self: Monster, creature: Creature)
 ---@field getTargetList fun(self: Monster): table
 ---@field getTargetCount fun(self: Monster): number
+---@field clearTargetList fun(self: Monster)
 ---@field selectTarget fun(self: Monster, creature: Creature): boolean
 ---@field searchTarget fun(self: Monster): boolean
 ---@field isWalkingToSpawn fun(self: Monster): boolean
