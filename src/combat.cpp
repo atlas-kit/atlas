@@ -120,11 +120,11 @@ static bool isProtected(const std::shared_ptr<const Player>& attacker, const std
 
 bool Combat::isPlayerCombat(const std::shared_ptr<const Creature>& target)
 {
-	if (target->asPlayer()) {
+	if (target->isPlayer()) {
 		return true;
 	}
 
-	if (target->isSummon() && target->getMaster()->asPlayer()) {
+	if (target->isSummon() && target->getMaster()->isPlayer()) {
 		return true;
 	}
 
@@ -160,13 +160,13 @@ ReturnValue Combat::canTargetCreature(const std::shared_ptr<Player>& attacker, c
 	}
 
 	if (attacker->hasFlag(PlayerFlag_CannotUseCombat) || !target->isAttackable()) {
-		if (target->asPlayer()) {
+		if (target->isPlayer()) {
 			return RETURNVALUE_YOUMAYNOTATTACKTHISPLAYER;
 		}
 		return RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE;
 	}
 
-	if (target->asPlayer()) {
+	if (target->isPlayer()) {
 		if (isProtected(attacker, target->asPlayer())) {
 			return RETURNVALUE_YOUMAYNOTATTACKTHISPLAYER;
 		}
@@ -269,22 +269,22 @@ ReturnValue Combat::canDoCombat(const std::shared_ptr<Creature>& attacker, const
 				}
 			}
 		}
-	} else if (target->asMonster()) {
+	} else if (target->isMonster()) {
 		if (const auto& attackerPlayer = attacker->asPlayer()) {
 			if (attackerPlayer->hasFlag(PlayerFlag_CannotAttackMonster)) {
 				return RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE;
 			}
 
-			if (target->isSummon() && target->getMaster()->asPlayer() && target->getZone() == ZONE_NOPVP) {
+			if (target->isSummon() && target->getMaster()->isPlayer() && target->getZone() == ZONE_NOPVP) {
 				return RETURNVALUE_ACTIONNOTPERMITTEDINANOPVPZONE;
 			}
-		} else if (attacker->asMonster()) {
+		} else if (attacker->isMonster()) {
 			const auto& targetMaster = target->getMaster();
 
-			if (!targetMaster || !targetMaster->asPlayer()) {
+			if (!targetMaster || !targetMaster->isPlayer()) {
 				const auto& attackerMaster = attacker->getMaster();
 
-				if (!attackerMaster || !attackerMaster->asPlayer()) {
+				if (!attackerMaster || !attackerMaster->isPlayer()) {
 					return RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE;
 				}
 			}
@@ -292,14 +292,14 @@ ReturnValue Combat::canDoCombat(const std::shared_ptr<Creature>& attacker, const
 	}
 
 	if (g_game.getWorldType() == WORLD_TYPE_NO_PVP) {
-		if (attacker->asPlayer() || (attacker->isSummon() && attacker->getMaster()->asPlayer())) {
-			if (target->asPlayer()) {
+		if (attacker->isPlayer() || (attacker->isSummon() && attacker->getMaster()->isPlayer())) {
+			if (target->isPlayer()) {
 				if (!isInPvpZone(attacker, target)) {
 					return RETURNVALUE_YOUMAYNOTATTACKTHISPLAYER;
 				}
 			}
 
-			if (target->isSummon() && target->getMaster()->asPlayer()) {
+			if (target->isSummon() && target->getMaster()->isPlayer()) {
 				if (!isInPvpZone(attacker, target)) {
 					return RETURNVALUE_YOUMAYNOTATTACKTHISCREATURE;
 				}
@@ -1324,7 +1324,7 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 	}
 
 	// no-pvp fields must not damage players
-	if (!isLoadedFromMap() && creature->asPlayer() &&
+	if (!isLoadedFromMap() && creature->isPlayer() &&
 	    (id == ITEM_FIREFIELD_NOPVP || id == ITEM_FIREFIELD_NOPVP_MEDIUM || id == ITEM_POISONFIELD_NOPVP ||
 	     id == ITEM_ENERGYFIELD_NOPVP)) {
 		if (!creature->isInGhostMode()) {
@@ -1341,7 +1341,7 @@ void MagicField::onStepInField(const std::shared_ptr<Creature>& creature)
 
 			if (g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE)) {
 				if (const auto& owner = g_game.getCreatureByID(ownerId)) {
-					if (owner->asPlayer() || (owner->isSummon() && owner->getMaster()->asPlayer())) {
+					if (owner->isPlayer() || (owner->isSummon() && owner->getMaster()->isPlayer())) {
 						harmfulField = false;
 					}
 				}

@@ -105,6 +105,10 @@ public:
 	virtual std::shared_ptr<Monster> asMonster() { return nullptr; }
 	virtual std::shared_ptr<const Monster> asMonster() const { return nullptr; }
 
+	virtual bool isPlayer() const { return false; }
+	virtual bool isNpc() const { return false; }
+	virtual bool isMonster() const { return false; }
+
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
 	virtual std::string getDescription(int32_t lookDistance) const = 0;

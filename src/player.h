@@ -110,6 +110,8 @@ public:
 		return std::static_pointer_cast<const Player>(shared_from_this());
 	}
 
+	bool isPlayer() const final { return true; }
+
 	void setID() final;
 
 	static MuteCountMap muteCountMap;

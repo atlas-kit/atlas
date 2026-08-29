@@ -468,7 +468,7 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 
 						const auto& creatureMonster = tileCreature->asMonster();
 						if (!creatureMonster || !tileCreature->isPushable() ||
-						    (creatureMonster->isSummon() && creatureMonster->getMaster()->asPlayer())) {
+						    (creatureMonster->isSummon() && creatureMonster->getMaster()->isPlayer())) {
 							return RETURNVALUE_NOTPOSSIBLE;
 						}
 					}
@@ -798,7 +798,7 @@ void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 {
 	if (const auto& creature = thing->asCreature()) {
 		g_game.map.clearSpectatorCache();
-		if (creature->asPlayer()) {
+		if (creature->isPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
 		}
 
@@ -993,7 +993,7 @@ void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 			auto it = std::find(creatures->begin(), creatures->end(), thing);
 			if (it != creatures->end()) {
 				g_game.map.clearSpectatorCache();
-				if (creature->asPlayer()) {
+				if (creature->isPlayer()) {
 					g_game.map.clearPlayersSpectatorCache();
 				}
 
@@ -1270,7 +1270,7 @@ void Tile::postAddNotification(const std::shared_ptr<Thing>& thing, const std::s
 	SpectatorVec spectators;
 	g_game.map.getSpectators(spectators, getPosition(), true, true);
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 		std::static_pointer_cast<Player>(spectator)->postAddNotification(thing, oldParent, index, LINK_NEAR);
 	}
 
@@ -1301,7 +1301,7 @@ void Tile::postRemoveNotification(const std::shared_ptr<Thing>& thing, const std
 	g_game.map.getSpectators(spectators, tilePos, true, true);
 
 	for (const auto& spectator : spectators) {
-		assert(spectator->asPlayer() != nullptr);
+		assert(spectator->isPlayer());
 
 		if (thingCount > TILE_UPDATE_THRESHOLD) {
 			// If the tile contains more than the defined threshold of things,
@@ -1326,7 +1326,7 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 
 	if (const auto& creature = thing->asCreature()) {
 		g_game.map.clearSpectatorCache();
-		if (creature->asPlayer()) {
+		if (creature->isPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
 		}
 
