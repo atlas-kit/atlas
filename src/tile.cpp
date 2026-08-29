@@ -334,7 +334,7 @@ void Tile::onAddTileItem(const std::shared_ptr<Item>& item)
 	setTileFlags(item);
 
 	SpectatorVec spectators;
-	g_game.map.getSpectators(spectators, tilePos, true);
+	g_game.map.getSpectators(spectators, tilePos, true, true);
 
 	// send to client
 	for (const auto& spectator : spectators) {
@@ -373,7 +373,7 @@ void Tile::onUpdateTileItem(const std::shared_ptr<Item>& oldItem, const ItemType
 	}
 
 	SpectatorVec spectators;
-	g_game.map.getSpectators(spectators, tilePos, true);
+	g_game.map.getSpectators(spectators, tilePos, true, true);
 
 	// send to client
 	for (const auto& spectator : spectators) {
@@ -1018,7 +1018,7 @@ void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 		ground = nullptr;
 
 		SpectatorVec spectators;
-		g_game.map.getSpectators(spectators, getPosition(), true);
+		g_game.map.getSpectators(spectators, getPosition(), true, true);
 		onRemoveTileItem(spectators, std::vector<int32_t>(spectators.size(), 0), item);
 		return;
 	}
@@ -1036,7 +1036,7 @@ void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 		}
 
 		SpectatorVec spectators;
-		g_game.map.getSpectators(spectators, getPosition(), true);
+		g_game.map.getSpectators(spectators, getPosition(), true, true);
 
 		std::vector<int32_t> oldStackPosVector;
 		oldStackPosVector.reserve(spectators.size());
@@ -1058,7 +1058,7 @@ void Tile::removeThing(const std::shared_ptr<Thing>& thing, uint32_t count)
 			onUpdateTileItem(item, itemType, item, itemType);
 		} else {
 			SpectatorVec spectators;
-			g_game.map.getSpectators(spectators, getPosition(), true);
+			g_game.map.getSpectators(spectators, getPosition(), true, true);
 
 			std::vector<int32_t> oldStackPosVector;
 			oldStackPosVector.reserve(spectators.size());
