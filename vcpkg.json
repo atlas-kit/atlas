@@ -9,6 +9,7 @@
     "boost-lockfree",
     "boost-stacktrace",
     "boost-system",
+    "boost-unordered",
     "lua",
     "openssl",
     "pugixml",

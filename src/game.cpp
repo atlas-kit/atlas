@@ -4478,10 +4478,9 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 
 void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
-	SpectatorVec spectators, toPosSpectators;
+	SpectatorVec spectators;
 	map.getSpectators(spectators, fromPos, true, true);
-	map.getSpectators(toPosSpectators, toPos, true, true);
-	spectators.insert(toPosSpectators.begin(), toPosSpectators.end());
+	map.getSpectators(spectators, toPos, true, true);
 
 	addDistanceEffect(spectators, fromPos, toPos, effect);
 }

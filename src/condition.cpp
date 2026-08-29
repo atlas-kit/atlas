@@ -935,7 +935,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 
 				SpectatorVec spectators;
 				g_game.map.getSpectators(spectators, player->getPosition(), false, true);
-				spectators.erase(player);
+				std::erase(spectators, player);
 				if (!spectators.empty()) {
 					message.type = MESSAGE_HEALED_OTHERS;
 					message.text = player->getName() + " was healed for " + healString;
@@ -967,7 +967,7 @@ bool ConditionRegeneration::executeCondition(const std::shared_ptr<Creature>& cr
 
 				SpectatorVec spectators;
 				g_game.map.getSpectators(spectators, player->getPosition(), false, true);
-				spectators.erase(player);
+				std::erase(spectators, player);
 				if (!spectators.empty()) {
 					message.type = MESSAGE_HEALED_OTHERS;
 					message.text = player->getName() + " gained " + manaGainString + " mana.";
