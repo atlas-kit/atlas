@@ -905,9 +905,9 @@ int luaMonsterTypeAddAttack(lua_State* L)
 	if (monsterType) {
 		MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 2);
 		if (spell) {
-			spellBlock_t sb;
-			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
-				monsterType->info.attackSpells.push_back(std::move(sb));
+			spellBlock_t spellBlock;
+			if (g_monsters.deserializeSpell(spell, spellBlock, monsterType->name)) {
+				monsterType->info.attackSpells.push_back(std::move(spellBlock));
 			} else {
 				std::cout << monsterType->name << '\n';
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << spell->name << '\n';
@@ -958,9 +958,9 @@ int luaMonsterTypeAddDefense(lua_State* L)
 	if (monsterType) {
 		MonsterSpell* spell = tfs::lua::getUserdata<MonsterSpell>(L, 2);
 		if (spell) {
-			spellBlock_t sb;
-			if (g_monsters.deserializeSpell(spell, sb, monsterType->name)) {
-				monsterType->info.defenseSpells.push_back(std::move(sb));
+			spellBlock_t spellBlock;
+			if (g_monsters.deserializeSpell(spell, spellBlock, monsterType->name)) {
+				monsterType->info.defenseSpells.push_back(std::move(spellBlock));
 			} else {
 				std::cout << monsterType->name << '\n';
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << spell->name << '\n';

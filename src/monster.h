@@ -206,7 +206,7 @@ private:
 	void onEndCondition(ConditionType_t type) override;
 
 	bool canUseAttack(const Position& pos, const std::shared_ptr<const Creature>& target) const;
-	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
+	bool canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& spellBlock,
 	                 std::chrono::milliseconds interval, bool& inRange, bool& resetTicks);
 	bool getRandomStep(const Position& creaturePos, Direction& direction) const;
 	bool getDanceStep(const Position& creaturePos, Direction& direction, bool keepAttack = true,

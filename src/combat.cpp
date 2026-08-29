@@ -412,7 +412,7 @@ int32_t Combat::getParam(CombatParam_t param)
 	}
 }
 
-void Combat::setArea(AreaCombat* area) { this->area.reset(area); }
+void Combat::setArea(std::unique_ptr<AreaCombat> area) { this->area = std::move(area); }
 
 bool Combat::setCallback(CallBackParam_t key)
 {

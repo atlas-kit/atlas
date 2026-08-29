@@ -826,33 +826,34 @@ bool Monster::canUseAttack(const Position& pos, const std::shared_ptr<const Crea
 	return true;
 }
 
-bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& sb,
+bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const spellBlock_t& spellBlock,
                           std::chrono::milliseconds interval, bool& inRange, bool& resetTicks)
 {
 	inRange = true;
 
-	if (sb.isMelee) {
+	if (spellBlock.isMelee) {
 		if (isFleeing()) {
 			return false;
 		}
 
 		if (lastMeleeAttack != std::chrono::steady_clock::time_point::min() &&
-		    std::chrono::steady_clock::now() - lastMeleeAttack < sb.speed) {
+		    std::chrono::steady_clock::now() - lastMeleeAttack < spellBlock.speed) {
 			return false;
 		}
 	} else {
-		if (sb.speed > attackTicks) {
+		if (spellBlock.speed > attackTicks) {
 			resetTicks = false;
 			return false;
 		}
 
-		if (attackTicks % sb.speed >= interval) {
+		if (attackTicks % spellBlock.speed >= interval) {
 			// already used this spell for this round
 			return false;
 		}
 	}
 
-	if (sb.range != 0 && std::max<uint32_t>(pos.getDistanceX(targetPos), pos.getDistanceY(targetPos)) > sb.range) {
+	if (spellBlock.range != 0 &&
+	    std::max<uint32_t>(pos.getDistanceX(targetPos), pos.getDistanceY(targetPos)) > spellBlock.range) {
 		inRange = false;
 		return false;
 	}

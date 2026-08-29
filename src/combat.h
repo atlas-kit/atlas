@@ -116,7 +116,7 @@ public:
 	bool setParam(CombatParam_t param, uint32_t value);
 	int32_t getParam(CombatParam_t param);
 
-	void setArea(AreaCombat* area);
+	void setArea(std::unique_ptr<AreaCombat> area);
 	bool hasArea() const { return area != nullptr; }
 	void addCondition(std::unique_ptr<Condition> condition) { params.conditionList.emplace_back(std::move(condition)); }
 	void clearConditions() { params.conditionList.clear(); }

@@ -18,12 +18,10 @@ extern Spells* g_spells;
 
 Monsters g_monsters;
 
-spellBlock_t::~spellBlock_t()
-{
-	if (combatSpell) {
-		delete spell;
-	}
-}
+spellBlock_t::spellBlock_t() = default;
+spellBlock_t::~spellBlock_t() = default;
+spellBlock_t::spellBlock_t(spellBlock_t&&) noexcept = default;
+spellBlock_t& spellBlock_t::operator=(spellBlock_t&&) noexcept = default;
 
 void MonsterType::loadLoot(MonsterType* monsterType, LootBlock lootBlock)
 {
@@ -109,7 +107,7 @@ static int32_t getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
 	return static_cast<int32_t>(std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
 }
 
-bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, const std::string& description)
+bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& spellBlock, const std::string& description)
 {
 	std::string name;
 	std::string scriptName;
@@ -127,7 +125,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 	}
 
 	if ((attr = node.attribute("speed")) || (attr = node.attribute("interval"))) {
-		sb.speed = std::chrono::milliseconds{std::max<int32_t>(1, pugi::cast<int32_t>(attr.value()))};
+		spellBlock.speed = std::chrono::milliseconds{std::max<int32_t>(1, pugi::cast<int32_t>(attr.value()))};
 	}
 
 	if ((attr = node.attribute("chance"))) {
@@ -137,7 +135,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			std::cout << "[Warning - Monsters::deserializeSpell] " << description
 			          << " - Chance value out of bounds for spell: " << name << std::endl;
 		}
-		sb.chance = chance;
+		spellBlock.chance = chance;
 	} else if (boost::algorithm::to_lower_copy(name) != "melee") {
 		std::cout << "[Warning - Monsters::deserializeSpell] " << description
 		          << " - Missing chance value on non-melee spell: " << name << std::endl;
@@ -148,30 +146,30 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		if (range > (Map::maxViewportX * 2)) {
 			range = Map::maxViewportX * 2;
 		}
-		sb.range = range;
+		spellBlock.range = range;
 	}
 
 	if ((attr = node.attribute("min"))) {
-		sb.minCombatValue = pugi::cast<int32_t>(attr.value());
+		spellBlock.minCombatValue = pugi::cast<int32_t>(attr.value());
 	}
 
 	if ((attr = node.attribute("max"))) {
-		sb.maxCombatValue = pugi::cast<int32_t>(attr.value());
+		spellBlock.maxCombatValue = pugi::cast<int32_t>(attr.value());
 
 		// normalize values
-		if (std::abs(sb.minCombatValue) > std::abs(sb.maxCombatValue)) {
-			int32_t value = sb.maxCombatValue;
-			sb.maxCombatValue = sb.minCombatValue;
-			sb.minCombatValue = value;
+		if (std::abs(spellBlock.minCombatValue) > std::abs(spellBlock.maxCombatValue)) {
+			int32_t value = spellBlock.maxCombatValue;
+			spellBlock.maxCombatValue = spellBlock.minCombatValue;
+			spellBlock.minCombatValue = value;
 		}
 	}
 
 	if (auto spell = g_spells->getSpellByName(name)) {
-		sb.spell = spell;
+		spellBlock.spell = spell;
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::unique_ptr<CombatSpell> combatSpell;
 	bool needTarget = false;
 	bool needDirection = false;
 
@@ -184,19 +182,17 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			needTarget = attr.as_bool();
 		}
 
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, needTarget, needDirection));
-		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
-		                                scriptName)) {
+		combatSpell = std::make_unique<CombatSpell>(nullptr, needTarget, needDirection);
+		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" + scriptName)) {
 			return false;
 		}
 
-		if (!combatSpellPtr->loadScriptCombat()) {
+		if (!combatSpell->loadScriptCombat()) {
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
-		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
-		                                                0);
+		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0,
+		                                                spellBlock.maxCombatValue, 0);
 	} else {
 		const auto combat = std::make_shared<Combat>();
 		if ((attr = node.attribute("length"))) {
@@ -209,9 +205,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 					spread = std::max<int32_t>(0, pugi::cast<int32_t>(attr.value()));
 				}
 
-				AreaCombat* area = new AreaCombat();
+				auto area = std::make_unique<AreaCombat>();
 				area->setupArea(length, spread);
-				combat->setArea(area);
+				combat->setArea(std::move(area));
 
 				needDirection = true;
 			}
@@ -225,9 +221,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				needTarget = attr.as_bool();
 			}
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(radius);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if ((attr = node.attribute("ring"))) {
@@ -238,21 +234,21 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				needTarget = attr.as_bool();
 			}
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupAreaRing(ring);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		std::string tmpName = boost::algorithm::to_lower_copy(name);
 
 		if (tmpName == "melee") {
-			sb.isMelee = true;
+			spellBlock.isMelee = true;
 
 			pugi::xml_attribute attackAttribute, skillAttribute;
 			if ((attackAttribute = node.attribute("attack")) && (skillAttribute = node.attribute("skill"))) {
-				sb.minCombatValue = 0;
-				sb.maxCombatValue = -getMaxMeleeDamage(pugi::cast<int32_t>(skillAttribute.value()),
-				                                       pugi::cast<int32_t>(attackAttribute.value()));
+				spellBlock.minCombatValue = 0;
+				spellBlock.maxCombatValue = -getMaxMeleeDamage(pugi::cast<int32_t>(skillAttribute.value()),
+				                                               pugi::cast<int32_t>(attackAttribute.value()));
 			}
 
 			ConditionType_t conditionType = CONDITION_NONE;
@@ -318,7 +314,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				combat->addCondition(getDamageCondition(conditionType, maxDamage, minDamage, 0, tickInterval));
 			}
 
-			sb.range = 1;
+			spellBlock.range = 1;
 			combat->setParam(COMBAT_PARAM_TYPE, COMBAT_PHYSICALDAMAGE);
 			combat->setParam(COMBAT_PARAM_BLOCKARMOR, 1);
 			combat->setParam(COMBAT_PARAM_BLOCKSHIELD, 1);
@@ -491,8 +487,8 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 				}
 			}
 
-			int32_t minDamage = std::abs(sb.minCombatValue);
-			int32_t maxDamage = std::abs(sb.maxCombatValue);
+			int32_t minDamage = std::abs(spellBlock.minCombatValue);
+			int32_t maxDamage = std::abs(spellBlock.maxCombatValue);
 			int32_t startDamage = 0;
 
 			if ((attr = node.attribute("start"))) {
@@ -513,8 +509,9 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			return false;
 		}
 
-		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, needTarget, needDirection);
+		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
+		                              0);
+		combatSpell = std::make_unique<CombatSpell>(combat, needTarget, needDirection);
 
 		for (auto attributeNode : node.children()) {
 			if ((attr = attributeNode.attribute("key"))) {
@@ -549,14 +546,15 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		}
 	}
 
-	sb.spell = combatSpell;
 	if (combatSpell) {
-		sb.combatSpell = true;
+		spellBlock.spell = combatSpell.get();
+		spellBlock.combatSpell = true;
+		spellBlock.combatSpellPtr = std::move(combatSpell);
 	}
 	return true;
 }
 
-bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std::string& description)
+bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& spellBlock, const std::string& description)
 {
 	if (!spell->scriptName.empty()) {
 		spell->isScripted = true;
@@ -566,73 +564,71 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		return false;
 	}
 
-	sb.speed = spell->interval;
+	spellBlock.speed = spell->interval;
 
 	if (spell->chance > 100) {
-		sb.chance = 100;
+		spellBlock.chance = 100;
 	} else {
-		sb.chance = spell->chance;
+		spellBlock.chance = spell->chance;
 	}
 
 	if (spell->range > (Map::maxViewportX * 2)) {
 		spell->range = Map::maxViewportX * 2;
 	}
-	sb.range = spell->range;
+	spellBlock.range = spell->range;
 
-	sb.minCombatValue = spell->minCombatValue;
-	sb.maxCombatValue = spell->maxCombatValue;
-	if (std::abs(sb.minCombatValue) > std::abs(sb.maxCombatValue)) {
-		int32_t value = sb.maxCombatValue;
-		sb.maxCombatValue = sb.minCombatValue;
-		sb.minCombatValue = value;
+	spellBlock.minCombatValue = spell->minCombatValue;
+	spellBlock.maxCombatValue = spell->maxCombatValue;
+	if (std::abs(spellBlock.minCombatValue) > std::abs(spellBlock.maxCombatValue)) {
+		int32_t value = spellBlock.maxCombatValue;
+		spellBlock.maxCombatValue = spellBlock.minCombatValue;
+		spellBlock.minCombatValue = value;
 	}
 
-	sb.spell = g_spells->getSpellByName(spell->name);
-	if (sb.spell) {
+	spellBlock.spell = g_spells->getSpellByName(spell->name);
+	if (spellBlock.spell) {
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::unique_ptr<CombatSpell> combatSpell;
 
 	if (spell->isScripted) {
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, spell->needTarget, spell->needDirection));
-		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
-		                                spell->scriptName)) {
+		combatSpell = std::make_unique<CombatSpell>(nullptr, spell->needTarget, spell->needDirection);
+		if (!combatSpell->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
+		                             spell->scriptName)) {
 			std::cout << "cannot find file" << std::endl;
 			return false;
 		}
 
-		if (!combatSpellPtr->loadScriptCombat()) {
+		if (!combatSpell->loadScriptCombat()) {
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
-		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
-		                                                0);
+		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0,
+		                                                spellBlock.maxCombatValue, 0);
 	} else {
 		const auto combat = std::make_shared<Combat>();
-		sb.combatSpell = true;
 
 		if (spell->length > 0) {
 			spell->spread = std::max<int32_t>(0, spell->spread);
 
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(spell->length, spell->spread);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 
 			spell->needDirection = true;
 		}
 
 		if (spell->radius > 0) {
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupArea(spell->radius);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if (spell->ring > 0) {
-			AreaCombat* area = new AreaCombat();
+			auto area = std::make_unique<AreaCombat>();
 			area->setupAreaRing(spell->ring);
-			combat->setArea(area);
+			combat->setArea(std::move(area));
 		}
 
 		if (spell->conditionType != CONDITION_NONE) {
@@ -654,14 +650,14 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		std::string tmpName = boost::algorithm::to_lower_copy(spell->name);
 
 		if (tmpName == "melee") {
-			sb.isMelee = true;
+			spellBlock.isMelee = true;
 
 			if (spell->attack > 0 && spell->skill > 0) {
-				sb.minCombatValue = 0;
-				sb.maxCombatValue = -getMaxMeleeDamage(spell->skill, spell->attack);
+				spellBlock.minCombatValue = 0;
+				spellBlock.maxCombatValue = -getMaxMeleeDamage(spell->skill, spell->attack);
 			}
 
-			sb.range = 1;
+			spellBlock.range = 1;
 			combat->setParam(COMBAT_PARAM_TYPE, COMBAT_PHYSICALDAMAGE);
 			combat->setParam(COMBAT_PARAM_BLOCKARMOR, 1);
 			combat->setParam(COMBAT_PARAM_BLOCKSHIELD, 1);
@@ -786,13 +782,15 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			combat->setParam(COMBAT_PARAM_EFFECT, spell->effect);
 		}
 
-		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, spell->needTarget, spell->needDirection);
+		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, spellBlock.minCombatValue, 0, spellBlock.maxCombatValue,
+		                              0);
+		combatSpell = std::make_unique<CombatSpell>(combat, spell->needTarget, spell->needDirection);
 	}
 
-	sb.spell = combatSpell;
 	if (combatSpell) {
-		sb.combatSpell = true;
+		spellBlock.spell = combatSpell.get();
+		spellBlock.combatSpell = true;
+		spellBlock.combatSpellPtr = std::move(combatSpell);
 	}
 	return true;
 }
@@ -1109,9 +1107,9 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 
 	if ((node = monsterNode.child("attacks"))) {
 		for (auto attackNode : node.children()) {
-			spellBlock_t sb;
-			if (deserializeSpell(attackNode, sb, monsterName)) {
-				mType->info.attackSpells.emplace_back(std::move(sb));
+			spellBlock_t spellBlock;
+			if (deserializeSpell(attackNode, spellBlock, monsterName)) {
+				mType->info.attackSpells.emplace_back(std::move(spellBlock));
 			} else {
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << file << std::endl;
 			}
@@ -1128,9 +1126,9 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 		}
 
 		for (auto defenseNode : node.children()) {
-			spellBlock_t sb;
-			if (deserializeSpell(defenseNode, sb, monsterName)) {
-				mType->info.defenseSpells.emplace_back(std::move(sb));
+			spellBlock_t spellBlock;
+			if (deserializeSpell(defenseNode, spellBlock, monsterName)) {
+				mType->info.defenseSpells.emplace_back(std::move(spellBlock));
 			} else {
 				std::cout << "[Warning - Monsters::loadMonster] Cant load spell. " << file << std::endl;
 			}
