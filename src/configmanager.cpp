@@ -113,44 +113,6 @@ ExperienceStages loadLuaStages(lua_State* L)
 	return stages;
 }
 
-ExperienceStages loadXMLStages()
-{
-	pugi::xml_document doc;
-	pugi::xml_parse_result result = doc.load_file("data/XML/stages.xml");
-	if (!result) {
-		printXMLError("Error - loadXMLStages", "data/XML/stages.xml", result);
-		return {};
-	}
-
-	ExperienceStages stages;
-	for (auto stageNode : doc.child("stages").children()) {
-		if (boost::iequals(stageNode.name(), "config")) {
-			if (!stageNode.attribute("enabled").as_bool()) {
-				return {};
-			}
-		} else {
-			uint32_t minLevel = 1, maxLevel = std::numeric_limits<uint32_t>::max(), multiplier = 1;
-
-			if (auto minLevelAttribute = stageNode.attribute("minlevel")) {
-				minLevel = pugi::cast<uint32_t>(minLevelAttribute.value());
-			}
-
-			if (auto maxLevelAttribute = stageNode.attribute("maxlevel")) {
-				maxLevel = pugi::cast<uint32_t>(maxLevelAttribute.value());
-			}
-
-			if (auto multiplierAttribute = stageNode.attribute("multiplier")) {
-				multiplier = pugi::cast<uint32_t>(multiplierAttribute.value());
-			}
-
-			stages.emplace_back(minLevel, maxLevel, multiplier);
-		}
-	}
-
-	std::sort(stages.begin(), stages.end());
-	return stages;
-}
-
 } // namespace
 
 bool ConfigManager::load()
@@ -287,14 +249,7 @@ bool ConfigManager::load()
 	integer[STAMINA_REGEN_PREMIUM] = getGlobalNumber(L, "timeToRegenMinutePremiumStamina", 6 * 60);
 	integer[FOLLOW_PATH_CHECK_INTERVAL] = getGlobalNumber(L, "followPathCheckInterval", 200);
 
-	expStages = loadXMLStages();
-	if (expStages.empty()) {
-		expStages = loadLuaStages(L);
-	} else {
-		std::cout << "[Warning - ConfigManager::load] XML stages are deprecated, "
-		             "consider moving to config.lua."
-		          << std::endl;
-	}
+	expStages = loadLuaStages(L);
 	expStages.shrink_to_fit();
 
 	loaded = true;
