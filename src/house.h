@@ -167,7 +167,7 @@ private:
 	AccessList guestList;
 	AccessList subOwnerList;
 
-	Container transferContainer{ITEM_LOCKER};
+	std::shared_ptr<Container> transferContainer;
 
 	boost::container::flat_set<std::weak_ptr<HouseTile>, std::owner_less<std::weak_ptr<HouseTile>>> tiles;
 	boost::container::flat_set<std::weak_ptr<Door>, std::owner_less<std::weak_ptr<Door>>> doors;

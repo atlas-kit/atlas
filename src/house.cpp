@@ -12,7 +12,7 @@
 
 extern Game g_game;
 
-House::House(uint32_t houseId) : id(houseId) {}
+House::House(uint32_t houseId) : id(houseId), transferContainer(std::make_shared<Container>(ITEM_LOCKER)) {}
 
 void House::addTile(const std::shared_ptr<HouseTile>& tile)
 {
@@ -304,9 +304,9 @@ std::shared_ptr<HouseTransferItem> House::getTransferItem()
 		return nullptr;
 	}
 
-	transferContainer.setParent(nullptr);
+	transferContainer->setParent(nullptr);
 	const auto transferItem = HouseTransferItem::createHouseTransferItem(shared_from_this());
-	transferContainer.addThing(transferItem);
+	transferContainer->addThing(transferItem);
 	return transferItem;
 }
 
@@ -315,9 +315,9 @@ void House::resetTransferItem()
 	if (transferItem) {
 		auto tmpItem = transferItem;
 		transferItem = nullptr;
-		transferContainer.setParent(nullptr);
+		transferContainer->setParent(nullptr);
 
-		transferContainer.removeThing(tmpItem, tmpItem->getItemCount());
+		transferContainer->removeThing(tmpItem, tmpItem->getItemCount());
 	}
 }
 
