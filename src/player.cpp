@@ -1065,10 +1065,6 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 	sendEnterWorld();
 	sendMapDescription();
 
-	if (isLogin) {
-		g_game.updateCreatureWalkthrough(asPlayer());
-	}
-
 	if (magicEffect != CONST_ME_NONE) {
 		sendMagicEffect(magicEffect);
 	}
