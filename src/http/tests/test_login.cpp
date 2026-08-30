@@ -3,112 +3,17 @@
 #include "../../otpch.h"
 
 #include "../../base64.h"
+#include "../../configmanager.h"
 #include "../../database.h"
 #include "../../tools.h"
-#include "../../vocation.h"
-#include "../login.h"
+#include "../router.h"
+#include "vocations.h"
 
 #include <boost/test/unit_test.hpp>
 
-extern Vocations g_vocations;
-
-auto vocationsXml = []() {
-	return std::istringstream{R"(<?xml version="1.0" encoding="UTF-8"?>
-<vocations>
-	<vocation id="0" clientid="0" name="None" description="none" magicshield="0" gaincap="10" gainhp="5" gainmana="5" gainhpticks="6" gainhpamount="1" gainmanaticks="6" gainmanaamount="1" manamultiplier="4.0" attackspeed="2000" basespeed="220" soulmax="100" gainsoulticks="120" allowPvp="0" fromvoc="0">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.5" />
-		<skill id="1" multiplier="2.0" />
-		<skill id="2" multiplier="2.0" />
-		<skill id="3" multiplier="2.0" />
-		<skill id="4" multiplier="2.0" />
-		<skill id="5" multiplier="1.5" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="1" clientid="3" name="Sorcerer" description="a sorcerer" magicshield="1" gaincap="10" gainhp="5" gainmana="30" gainhpticks="6" gainhpamount="5" gainmanaticks="3" gainmanaamount="5" manamultiplier="1.1" attackspeed="2000" basespeed="220" soulmax="100" gainsoulticks="120" fromvoc="1" noPongKickTime="40">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.5" />
-		<skill id="1" multiplier="2.0" />
-		<skill id="2" multiplier="2.0" />
-		<skill id="3" multiplier="2.0" />
-		<skill id="4" multiplier="2.0" />
-		<skill id="5" multiplier="1.5" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="2" clientid="4" name="Druid" description="a druid" magicshield="1" gaincap="10" gainhp="5" gainmana="30" gainhpticks="6" gainhpamount="5" gainmanaticks="3" gainmanaamount="5" manamultiplier="1.1" attackspeed="2000" basespeed="220" soulmax="100" gainsoulticks="120" fromvoc="2" noPongKickTime="40">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.5" />
-		<skill id="1" multiplier="1.8" />
-		<skill id="2" multiplier="1.8" />
-		<skill id="3" multiplier="1.8" />
-		<skill id="4" multiplier="1.8" />
-		<skill id="5" multiplier="1.5" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="3" clientid="2" name="Paladin" description="a paladin" magicshield="0" gaincap="20" gainhp="10" gainmana="15" gainhpticks="4" gainhpamount="5" gainmanaticks="4" gainmanaamount="5" manamultiplier="1.4" attackspeed="2000" basespeed="220" soulmax="100" gainsoulticks="120" fromvoc="3" noPongKickTime="50">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.2" />
-		<skill id="1" multiplier="1.2" />
-		<skill id="2" multiplier="1.2" />
-		<skill id="3" multiplier="1.2" />
-		<skill id="4" multiplier="1.1" />
-		<skill id="5" multiplier="1.1" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="4" clientid="1" name="Knight" description="a knight" magicshield="0" gaincap="25" gainhp="15" gainmana="5" gainhpticks="3" gainhpamount="5" gainmanaticks="6" gainmanaamount="5" manamultiplier="3.0" attackspeed="2000" basespeed="220" soulmax="100" gainsoulticks="120" fromvoc="4">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.1" />
-		<skill id="1" multiplier="1.1" />
-		<skill id="2" multiplier="1.1" />
-		<skill id="3" multiplier="1.1" />
-		<skill id="4" multiplier="1.4" />
-		<skill id="5" multiplier="1.1" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="5" clientid="13" name="Master Sorcerer" description="a master sorcerer" magicshield="1" gaincap="10" gainhp="5" gainmana="30" gainhpticks="4" gainhpamount="10" gainmanaticks="2" gainmanaamount="10" manamultiplier="1.1" attackspeed="2000" basespeed="220" soulmax="200" gainsoulticks="15" fromvoc="1" noPongKickTime="40">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.5" />
-		<skill id="1" multiplier="2.0" />
-		<skill id="2" multiplier="2.0" />
-		<skill id="3" multiplier="2.0" />
-		<skill id="4" multiplier="2.0" />
-		<skill id="5" multiplier="1.5" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="6" clientid="14" name="Elder Druid" description="an elder druid" magicshield="1" gaincap="10" gainhp="5" gainmana="30" gainhpticks="4" gainhpamount="10" gainmanaticks="2" gainmanaamount="10" manamultiplier="1.1" attackspeed="2000" basespeed="220" soulmax="200" gainsoulticks="15" fromvoc="2" noPongKickTime="40">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.5" />
-		<skill id="1" multiplier="1.8" />
-		<skill id="2" multiplier="1.8" />
-		<skill id="3" multiplier="1.8" />
-		<skill id="4" multiplier="1.8" />
-		<skill id="5" multiplier="1.5" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="7" clientid="12" name="Royal Paladin" description="a royal paladin" magicshield="0" gaincap="20" gainhp="10" gainmana="15" gainhpticks="3" gainhpamount="10" gainmanaticks="3" gainmanaamount="10" manamultiplier="1.4" attackspeed="2000" basespeed="220" soulmax="200" gainsoulticks="15" fromvoc="3" noPongKickTime="50">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.2" />
-		<skill id="1" multiplier="1.2" />
-		<skill id="2" multiplier="1.2" />
-		<skill id="3" multiplier="1.2" />
-		<skill id="4" multiplier="1.1" />
-		<skill id="5" multiplier="1.1" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-	<vocation id="8" clientid="11" name="Elite Knight" description="an elite knight" magicshield="0" gaincap="25" gainhp="15" gainmana="5" gainhpticks="2" gainhpamount="10" gainmanaticks="4" gainmanaamount="10" manamultiplier="3.0" attackspeed="2000" basespeed="220" soulmax="200" gainsoulticks="15" fromvoc="4">
-		<formula meleeDamage="1.0" distDamage="1.0" defense="1.0" armor="1.0" />
-		<skill id="0" multiplier="1.1" />
-		<skill id="1" multiplier="1.1" />
-		<skill id="2" multiplier="1.1" />
-		<skill id="3" multiplier="1.1" />
-		<skill id="4" multiplier="1.4" />
-		<skill id="5" multiplier="1.1" />
-		<skill id="6" multiplier="1.1" />
-	</vocation>
-</vocations>)"};
-};
-
 using namespace std::chrono;
+
+namespace routes = tfs::http::routes;
 
 struct LoginFixture
 {
@@ -126,8 +31,7 @@ struct LoginFixture
 		setString(ConfigManager::MYSQL_DB, "atlas");
 		setNumber(ConfigManager::SQL_PORT, 3306);
 
-		auto is = vocationsXml();
-		g_vocations.loadFromXml(is, ":memory:");
+		tfs::http::tests::mock_vocations();
 
 		db.connect();
 		transaction.begin();
@@ -151,26 +55,22 @@ using status = boost::beast::http::status;
 
 BOOST_FIXTURE_TEST_CASE(test_login_missing_email, LoginFixture)
 {
-	auto&& [status, body] = tfs::http::handle_login({{"type", "login"}, {"password", "bar"}}, ip);
+	auto&& body = routes::handle_login({{"type", "login"}, {"password", "bar"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("errorCode").as_int64() == 3);
 }
 
 BOOST_FIXTURE_TEST_CASE(test_login_account_does_not_exist, LoginFixture)
 {
-	auto&& [status, body] =
-	    tfs::http::handle_login({{"type", "login"}, {"email", "k@example.com"}, {"password", "bar"}}, ip);
+	auto&& body = routes::handle_login({{"type", "login"}, {"email", "k@example.com"}, {"password", "bar"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("errorCode").as_int64() == 3);
 }
 
 BOOST_FIXTURE_TEST_CASE(test_login_missing_password, LoginFixture)
 {
-	auto&& [status, body] = tfs::http::handle_login({{"type", "login"}, {"email", "foo@example.com"}}, ip);
+	auto&& body = routes::handle_login({{"type", "login"}, {"email", "foo@example.com"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("errorCode").as_int64() == 3);
 }
 
@@ -179,10 +79,8 @@ BOOST_FIXTURE_TEST_CASE(test_login_invalid_password, LoginFixture)
 	BOOST_TEST(db.executeQuery(
 	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('abc', 'foo@example.com', SHA1('bar'))"));
 
-	auto&& [status, body] =
-	    tfs::http::handle_login({{"type", "login"}, {"email", "foo@example.com"}, {"password", "baz"}}, ip);
+	auto&& body = routes::handle_login({{"type", "login"}, {"email", "foo@example.com"}, {"password", "baz"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("errorCode").as_int64() == 3);
 }
 
@@ -191,7 +89,7 @@ BOOST_FIXTURE_TEST_CASE(test_login_missing_token, LoginFixture)
 	BOOST_TEST(db.executeQuery(
 	    "INSERT INTO `accounts` (`name`, `email`, `password`, `secret`) VALUES ('abcd', 'fooba@example.com', SHA1('bar'), UNHEX('48656c6c6f21dead'))"));
 
-	auto&& [status, body] = tfs::http::handle_login(
+	auto&& body = routes::handle_login(
 	    {
 	        {"type", "login"},
 	        {"email", "fooba@example.com"},
@@ -199,7 +97,6 @@ BOOST_FIXTURE_TEST_CASE(test_login_missing_token, LoginFixture)
 	    },
 	    ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("errorCode").as_int64() == 6);
 }
 
@@ -208,10 +105,8 @@ BOOST_FIXTURE_TEST_CASE(test_login_success_no_players, LoginFixture)
 	BOOST_TEST(db.executeQuery(
 	    "INSERT INTO `accounts` (`name`, `email`, `password`) VALUES ('defg', 'foobar@example.com', SHA1('bar'))"));
 
-	auto&& [status, body] =
-	    tfs::http::handle_login({{"type", "login"}, {"email", "foobar@example.com"}, {"password", "bar"}}, ip);
+	auto&& body = routes::handle_login({{"type", "login"}, {"email", "foobar@example.com"}, {"password", "bar"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	auto& characters = body.at("playdata").at("characters").as_array();
 	BOOST_TEST(characters.size() == 0);
 }
@@ -231,10 +126,7 @@ BOOST_FIXTURE_TEST_CASE(test_login_success, LoginFixture)
 	                          2597, 6, 1715719401, 1, 1094, 78, 132, 114, 0, 1));
 	BOOST_TEST(insert.execute());
 
-	auto&& [status, body] =
-	    tfs::http::handle_login({{"type", "login"}, {"email", "ghij@example.com"}, {"password", "bar"}}, ip);
-
-	BOOST_TEST(status == status::ok);
+	auto&& body = routes::handle_login({{"type", "login"}, {"email", "ghij@example.com"}, {"password", "bar"}}, ip);
 
 	auto& session = body.at("session");
 	BOOST_TEST(session.at("lastlogintime").as_uint64() == 1715719401);
@@ -283,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(test_login_success_with_token, LoginFixture)
 	insert.addRow(std::format("{:d}, \"{:s}\", {:d}, {:d}, {:d}", id, "Testtoken", 2597, 6, 1715719401));
 	BOOST_TEST(insert.execute());
 
-	auto&& [status, body] = tfs::http::handle_login(
+	auto&& body = routes::handle_login(
 	    {
 	        {"type", "login"},
 	        {"email", "nbdj@example.com"},
@@ -292,5 +184,6 @@ BOOST_FIXTURE_TEST_CASE(test_login_success_with_token, LoginFixture)
 	    },
 	    ip);
 
-	BOOST_TEST(status == status::ok);
+	BOOST_TEST(body.at("session").is_object());
+	BOOST_TEST(body.at("playdata").is_object());
 }

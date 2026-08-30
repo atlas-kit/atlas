@@ -2,11 +2,18 @@
 
 #include "error.h"
 
-std::pair<beast::http::status, json::value> tfs::http::make_error_response(detail::ErrorResponseParams params /*= {}*/)
-{
-	json::object body;
-	body["errorCode"] = params.code;
-	body["errorMessage"] = params.message;
+namespace json = boost::json;
 
-	return std::make_pair(beast::http::status::ok, body);
+json::value tfs::http::make_error_response(detail::ErrorResponseParams params /*= {}*/)
+{
+	json::object obj;
+
+	for (const auto& [key, value] : params.additional_fields) {
+		obj[key] = value;
+	}
+
+	obj["errorCode"] = params.code;
+	obj["errorMessage"] = params.message;
+
+	return obj;
 }

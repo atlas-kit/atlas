@@ -1,12 +1,24 @@
-set(tests_SRC
-    ${CMAKE_CURRENT_LIST_DIR}/test_cacheinfo.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/test_login.cpp
+set(utils_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/vocations.cpp
     )
+
+set(tests_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/test_cache_info.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_check_email.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_check_password.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_create_account.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_generate_character_name.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_login.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/test_validation.cpp
+    )
+
+add_library(http_tests_utils OBJECT ${utils_SRC})
+target_link_libraries(http_tests_utils PRIVATE tfslib)
 
 foreach(test_src ${tests_SRC})
     get_filename_component(test_name ${test_src} NAME_WE)
     add_executable(${test_name} ${test_src})
-    target_link_libraries(${test_name} PRIVATE http tfslib Boost::unit_test_framework)
+    target_link_libraries(${test_name} PRIVATE $<TARGET_OBJECTS:http_tests_utils> http tfslib Boost::unit_test_framework)
 
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()

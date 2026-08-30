@@ -1,11 +1,12 @@
 #include "../otpch.h"
 
-#include "cacheinfo.h"
-
 #include "../database.h"
 #include "error.h"
+#include "router.h"
 
-std::pair<beast::http::status, json::value> tfs::http::handle_cacheinfo(const json::object&, std::string_view)
+namespace json = boost::json;
+
+json::value tfs::http::routes::handle_cache_info(const json::object&, std::string_view)
 {
 	thread_local auto& db = Database::getInstance();
 
@@ -13,5 +14,5 @@ std::pair<beast::http::status, json::value> tfs::http::handle_cacheinfo(const js
 	if (!result) {
 		return make_error_response();
 	}
-	return {beast::http::status::ok, {{"playersonline", result->getNumber<uint32_t>("count")}}};
+	return json::object{{"playersonline", result->getNumber<uint32_t>("count")}};
 }

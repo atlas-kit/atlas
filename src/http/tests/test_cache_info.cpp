@@ -4,11 +4,13 @@
 
 #include "../../configmanager.h"
 #include "../../database.h"
-#include "../cacheinfo.h"
+#include "../router.h"
 
 #include <boost/test/unit_test.hpp>
 
 using namespace std::chrono;
+
+namespace routes = tfs::http::routes;
 
 struct CacheInfoFixture
 {
@@ -57,8 +59,7 @@ BOOST_FIXTURE_TEST_CASE(test_cacheinfo_players_online, CacheInfoFixture)
 	BOOST_TEST(db.executeQuery(std::format(
 	    "INSERT INTO `players_online` (`player_id`) SELECT `id` FROM `players` WHERE `account_id` = {:d}", id)));
 
-	auto&& [status, body] = tfs::http::handle_cacheinfo({{"type", "cacheinfo"}}, ip);
+	auto&& body = routes::handle_cache_info({{"type", "cacheinfo"}}, ip);
 
-	BOOST_TEST(status == status::ok);
 	BOOST_TEST(body.at("playersonline").as_uint64() == 3);
 }
