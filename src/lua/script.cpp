@@ -917,6 +917,10 @@ bool LuaEnvironment::initState()
 	luaL_openlibs(L);
 	registerFunctions();
 
+	// Ensure the shared_ptr userdata weak cache is initialized
+	tfs::lua::requireSharedPtrCache(L);
+	lua_pop(L, 1);
+
 	runningEventId = EVENT_ID_USER;
 	return true;
 }

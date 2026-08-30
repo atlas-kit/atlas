@@ -137,10 +137,45 @@ std::shared_ptr<T>* getRawSharedPtr(lua_State* L, int32_t arg)
 	return static_cast<std::shared_ptr<T>*>(lua_touserdata(L, arg));
 }
 
+// Pushes the weak cache table onto the stack, creating it if absent
+void requireSharedPtrCache(lua_State* L);
+
+// Push a shared_ptr as a single userdata, reusing any existing one via weak cache
+// Keyed by raw pointer address, avoids use_count inflation from duplicates
 template <class T>
-void pushSharedPtr(lua_State* L, std::shared_ptr<T> value)
+void pushSharedPtr(lua_State* L, const std::shared_ptr<T>& value)
 {
-	new (lua_newuserdata(L, sizeof(std::shared_ptr<T>))) std::shared_ptr<T>(std::move(value));
+	if (!value) {
+		lua_pushnil(L);
+		return;
+	}
+
+	// ensure the weak cache table is on the stack
+	requireSharedPtrCache(L);
+
+	// use the raw address as the cache key
+	using RawT = std::remove_const_t<T>;
+	auto* key = const_cast<RawT*>(value.get());
+
+	// look up the existing userdata
+	lua_pushlightuserdata(L, key);
+	lua_rawget(L, -2);
+	if (!lua_isnil(L, -1)) {
+		lua_remove(L, -2);
+		return;
+	}
+	lua_pop(L, 1);
+
+	// create a new userdata and copy the shared_ptr into it
+	auto* ud = static_cast<std::shared_ptr<T>*>(lua_newuserdata(L, sizeof(std::shared_ptr<T>)));
+	std::construct_at(ud, value);
+
+	// store in cache so future pushes reuse it
+	lua_pushlightuserdata(L, key);
+	lua_pushvalue(L, -2);
+	lua_rawset(L, -4);
+
+	lua_remove(L, -2);
 }
 
 // High-level converters (Lua -> C++)

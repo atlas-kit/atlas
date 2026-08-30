@@ -19,6 +19,27 @@ extern Spells* g_spells;
 
 namespace tfs::lua {
 
+void requireSharedPtrCache(lua_State* L)
+{
+	// use the function's own address as the registry key (unique, stable, zero-overhead)
+	lua_pushlightuserdata(L, reinterpret_cast<void*>(&requireSharedPtrCache));
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	if (!lua_isnil(L, -1)) {
+		return;
+	}
+
+	// not found, create a new weak table for it
+	lua_pop(L, 1);
+	lua_newtable(L);
+	lua_newtable(L);
+	lua_pushstring(L, "v");
+	lua_setfield(L, -2, "__mode");
+	lua_setmetatable(L, -2);
+	lua_pushlightuserdata(L, reinterpret_cast<void*>(&requireSharedPtrCache));
+	lua_pushvalue(L, -2);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+}
+
 bool isNumber(lua_State* L, int32_t arg) { return lua_type(L, arg) == LUA_TNUMBER; }
 
 int luaUserdataCompare(lua_State* L)
