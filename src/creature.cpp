@@ -1081,8 +1081,9 @@ bool Creature::addCondition(std::unique_ptr<Condition> condition, bool force /* 
 	}
 
 	if (condition->startCondition(asCreature())) {
-		onAddCondition(condition->getType());
+		ConditionType_t type = condition->getType();
 		conditions.push_back(std::move(condition));
+		onAddCondition(type);
 		return true;
 	}
 
@@ -1120,9 +1121,9 @@ void Creature::removeCondition(ConditionType_t type, bool force /* = false*/)
 			}
 		}
 
-		condition->endCondition(asCreature());
+		auto removedCondition = std::move(condition);
 		it = conditions.erase(it);
-
+		removedCondition->endCondition(asCreature());
 		onEndCondition(type);
 	}
 }
@@ -1146,9 +1147,9 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t conditionId, 
 			}
 		}
 
-		condition->endCondition(asCreature());
+		auto removedCondition = std::move(condition);
 		it = conditions.erase(it);
-
+		removedCondition->endCondition(asCreature());
 		onEndCondition(type);
 	}
 }
@@ -1184,9 +1185,10 @@ void Creature::removeCondition(Condition* condition, bool force /* = false*/)
 		}
 	}
 
-	condition->endCondition(asCreature());
-	onEndCondition(condition->getType());
+	auto removedCondition = std::move(*it);
 	conditions.erase(it);
+	removedCondition->endCondition(asCreature());
+	onEndCondition(removedCondition->getType());
 }
 
 Condition* Creature::getCondition(ConditionType_t type) const
@@ -1235,9 +1237,10 @@ void Creature::executeConditions(std::chrono::milliseconds interval)
 			continue;
 		}
 
-		condition->endCondition(asCreature());
-		onEndCondition(condition->getType());
+		auto removedCondition = std::move(*it);
 		conditions.erase(it);
+		removedCondition->endCondition(asCreature());
+		onEndCondition(removedCondition->getType());
 	}
 }
 

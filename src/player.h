@@ -1419,6 +1419,7 @@ private:
 	bool inMarket = false;
 	bool ghostMode = false;
 	bool pzLocked = false;
+	bool loadingStoredConditions = false;
 	bool addAttackSkillPoint = false;
 	bool inventoryAbilities[CONST_SLOT_LAST + 1] = {};
 

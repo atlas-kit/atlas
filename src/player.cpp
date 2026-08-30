@@ -1004,10 +1004,12 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 
 	if (isLogin) {
 		// Restore conditions stored during previous logout
+		loadingStoredConditions = true;
 		for (auto& condition : storedConditionList) {
 			addCondition(std::move(condition));
 		}
 		storedConditionList.clear();
+		loadingStoredConditions = false;
 
 		auto offlineTime = std::chrono::seconds::zero();
 		if (getLastLogout() != std::chrono::system_clock::time_point::min()) {
@@ -2072,9 +2074,10 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 		while (it != conditions.end()) {
 			auto& condition = *it;
 			if (condition->isPersistent()) {
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
+				auto removedCondition = std::move(condition);
 				it = conditions.erase(it);
+				removedCondition->endCondition(asPlayer());
+				onEndCondition(removedCondition->getType());
 			} else {
 				++it;
 			}
@@ -2086,9 +2089,10 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 		while (it != conditions.end()) {
 			auto& condition = *it;
 			if (condition->isPersistent()) {
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
+				auto removedCondition = std::move(condition);
 				it = conditions.erase(it);
+				removedCondition->endCondition(asPlayer());
+				onEndCondition(removedCondition->getType());
 			} else {
 				++it;
 			}
@@ -3305,6 +3309,10 @@ void Player::updateItemsLight(bool internal /*=false*/)
 void Player::onAddCondition(ConditionType_t type)
 {
 	Creature::onAddCondition(type);
+
+	if (loadingStoredConditions) {
+		return;
+	}
 
 	sendIcons();
 }
