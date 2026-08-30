@@ -55,7 +55,7 @@ void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, s
 bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell);
 bool onLogin(const std::shared_ptr<Player>& player);
 void onJoin(const std::shared_ptr<Player>& player);
-bool onLogout(const std::shared_ptr<Player>& player);
+bool onLogout(const std::shared_ptr<Player>& player, bool forced);
 void onReconnect(const std::shared_ptr<Player>& player);
 void onAdvance(const std::shared_ptr<Player>& player, skills_t skill, uint32_t oldLevel, uint32_t newLevel);
 void onModalWindow(const std::shared_ptr<Player>& player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId);

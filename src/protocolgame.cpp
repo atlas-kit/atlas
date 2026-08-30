@@ -336,7 +336,7 @@ void ProtocolGame::logout(bool displayEffect)
 			}
 		}
 
-		if (!tfs::events::player::onLogout(player)) {
+		if (!tfs::events::player::onLogout(player, false)) {
 			return;
 		}
 

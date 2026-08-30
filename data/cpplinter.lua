@@ -1038,7 +1038,7 @@ Weapon = {}
 ---@field onPlayerSpellCheck fun(player:Player, spell:Spell):boolean
 ---@field onPlayerLogin fun(player:Player):boolean
 ---@field onPlayerJoin fun(player:Player):nil
----@field onPlayerLogout fun(player:Player):boolean
+---@field onPlayerLogout fun(player:Player, forced:boolean):boolean
 ---@field onPlayerReconnect fun(player:Player):nil
 ---@field onPlayerAdvance fun(player:Player, skill:integer, oldLvl:integer, newLvl:integer):nil
 ---@field onPlayerModalWindow fun(player:Player, modalWindowId:integer, buttonId:integer, choiceId:integer):nil

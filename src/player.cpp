@@ -2180,7 +2180,7 @@ void Player::addInFightTicks(bool pzlock /*= false*/)
 
 void Player::kickPlayer(bool displayEffect)
 {
-	tfs::events::player::onLogout(asPlayer());
+	tfs::events::player::onLogout(asPlayer(), true);
 
 	if (client) {
 		client->forceLogout(displayEffect);

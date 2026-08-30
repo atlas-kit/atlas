@@ -281,9 +281,9 @@ function Player:onJoin()
 	end
 end
 
-function Player:onLogout()
+function Player:onLogout(forced)
 	if Event.onPlayerLogout then
-		return Event.onPlayerLogout(self)
+		return Event.onPlayerLogout(self, forced)
 	end
 	return true
 end

@@ -775,9 +775,9 @@ void onJoin(const std::shared_ptr<Player>& player)
 	tfs::events::getScriptInterface().callVoidFunction(1);
 }
 
-bool onLogout(const std::shared_ptr<Player>& player)
+bool onLogout(const std::shared_ptr<Player>& player, bool forced)
 {
-	// Player:onLogout()
+	// Player:onLogout(forced)
 	if (playerHandlers.onLogout == -1) {
 		return true;
 	}
@@ -794,7 +794,8 @@ bool onLogout(const std::shared_ptr<Player>& player)
 	tfs::events::getScriptInterface().pushFunction(playerHandlers.onLogout);
 
 	tfs::lua::pushThing(L, player);
-	return tfs::events::getScriptInterface().callFunction(1);
+	tfs::lua::pushBoolean(L, forced);
+	return tfs::events::getScriptInterface().callFunction(2);
 }
 
 void onReconnect(const std::shared_ptr<Player>& player)
