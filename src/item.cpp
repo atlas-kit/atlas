@@ -140,7 +140,7 @@ Item::Item(const Item& i) : Thing{}, id{i.id}, count{i.count}, loadedFromMap{i.l
 
 std::shared_ptr<Item> Item::clone() const
 {
-	const auto item = Item::CreateItem(id, count);
+	const auto& item = Item::CreateItem(id, count);
 	if (attributes) {
 		item->attributes.reset(new ItemAttributes(*attributes));
 		// Drop the inherited DECAYSTATE from the copied attributes. Calling

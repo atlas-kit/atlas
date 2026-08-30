@@ -525,7 +525,7 @@ static void combatTileEffects(const SpectatorVec& spectators, const std::shared_
 			}
 		}
 
-		const auto item = Item::CreateItem(itemId);
+		const auto& item = Item::CreateItem(itemId);
 		if (caster) {
 			item->setOwner(caster->getID());
 		}

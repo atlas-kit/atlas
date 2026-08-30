@@ -471,7 +471,7 @@ void Creature::onDeath()
 {
 	bool lastHitUnjustified = false;
 	bool mostDamageUnjustified = false;
-	auto lastHitCreature = lastAttacker.lock();
+	const auto& lastHitCreature = lastAttacker.lock();
 
 	std::shared_ptr<Creature> lastHitCreatureMaster = nullptr;
 	if (lastHitCreature) {
@@ -1048,7 +1048,7 @@ bool Creature::setMaster(const std::shared_ptr<Creature>& newMaster)
 		newMaster->summons.push_back(asCreature());
 	}
 
-	const auto oldMaster = getMaster();
+	const auto& oldMaster = getMaster();
 	master = newMaster;
 
 	if (oldMaster) {

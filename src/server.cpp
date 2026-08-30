@@ -66,7 +66,7 @@ boost::asio::ip::address getListenAddress()
 
 void openAcceptor(std::weak_ptr<ServicePort> weak_service, uint16_t port)
 {
-	if (auto service = weak_service.lock()) {
+	if (const auto& service = weak_service.lock()) {
 		service->open(port);
 	}
 }

@@ -139,7 +139,7 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool)
 				uint16_t tmpAmount = amount;
 				while (tmpAmount > 0) {
 					uint16_t stackCount = std::min<uint16_t>(ITEM_STACK_SIZE, tmpAmount);
-					const auto item = Item::CreateItem(itemType.id, stackCount);
+					const auto& item = Item::CreateItem(itemType.id, stackCount);
 					if (g_game.internalAddItem(player->getInbox(), item, INDEX_WHEREEVER, FLAG_NOLIMIT) !=
 					    RETURNVALUE_NOERROR) {
 						break;
@@ -156,7 +156,7 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool)
 				}
 
 				for (uint16_t i = 0; i < amount; ++i) {
-					const auto item = Item::CreateItem(itemType.id, subType);
+					const auto& item = Item::CreateItem(itemType.id, subType);
 					if (g_game.internalAddItem(player->getInbox(), item, INDEX_WHEREEVER, FLAG_NOLIMIT) !=
 					    RETURNVALUE_NOERROR) {
 						break;
@@ -170,7 +170,7 @@ void processExpiredOffers(std::shared_ptr<DBResult> result, bool)
 		} else {
 			uint64_t totalPrice = result->getNumber<uint64_t>("price") * amount;
 
-			auto player = g_game.getPlayerByGUID(playerId);
+			const auto& player = g_game.getPlayerByGUID(playerId);
 			if (player) {
 				player->setBankBalance(player->getBankBalance() + totalPrice);
 			} else {

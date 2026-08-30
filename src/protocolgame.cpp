@@ -3187,7 +3187,7 @@ void ProtocolGame::AddCreature(NetworkMessage& msg, const std::shared_ptr<const 
 		msg.addByte(otherPlayer ? otherPlayer->getVocation()->getClientId() : 0x00);
 	}
 
-	if (const auto npc = creature->asNpc()) {
+	if (const auto& npc = creature->asNpc()) {
 		msg.addByte(npc->getSpeechBubble());
 	} else {
 		msg.addByte(SPEECHBUBBLE_NONE);

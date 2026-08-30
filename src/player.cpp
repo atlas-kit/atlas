@@ -1039,7 +1039,7 @@ void Player::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool is
 		}
 
 		for (int32_t slot = CONST_SLOT_FIRST; slot <= CONST_SLOT_LAST; ++slot) {
-			if (const auto item = inventory[slot]) {
+			if (const auto& item = inventory[slot]) {
 				item->startDecaying();
 				g_moveEvents->onPlayerEquip(asPlayer(), item, static_cast<slots_t>(slot), false);
 				tfs::events::player::onInventoryUpdate(asPlayer(), item, static_cast<slots_t>(slot), true);
@@ -1159,7 +1159,7 @@ void Player::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool is
 		IOLoginData::updateOnlineStatus(guid, false);
 
 		for (int32_t slot = CONST_SLOT_FIRST; slot <= CONST_SLOT_LAST; ++slot) {
-			if (const auto item = inventory[slot]) {
+			if (const auto& item = inventory[slot]) {
 				g_moveEvents->onPlayerDeEquip(asPlayer(), item, static_cast<slots_t>(slot));
 				tfs::events::player::onInventoryUpdate(asPlayer(), item, static_cast<slots_t>(slot), false);
 			}
@@ -2540,7 +2540,7 @@ ReturnValue Player::queryAdd(int32_t index, const std::shared_ptr<const Thing>& 
 	if (const auto& inventoryItem = getInventoryItem(static_cast<slots_t>(index))) {
 		if (!inventoryItem->isStackable() || inventoryItem->getID() != item->getID()) {
 			if (!getBoolean(ConfigManager::CLASSIC_EQUIPMENT_SLOTS)) {
-				if (const auto topParent = item->getTopParent()) {
+				if (const auto& topParent = item->getTopParent()) {
 					if (std::dynamic_pointer_cast<const DepotChest>(topParent) ||
 					    std::dynamic_pointer_cast<const Player>(topParent)) {
 						return RETURNVALUE_NEEDEXCHANGE;
@@ -4236,7 +4236,7 @@ void Player::setGuild(const std::shared_ptr<Guild>& newGuild)
 		return;
 	}
 
-	const auto oldGuild = getGuild();
+	const auto& oldGuild = getGuild();
 
 	guildNick.clear();
 	guild.reset();

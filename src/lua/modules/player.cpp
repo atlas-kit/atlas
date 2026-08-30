@@ -792,7 +792,7 @@ int luaPlayerGetItemById(lua_State* L)
 	bool deepSearch = tfs::lua::getBoolean(L, 3);
 	int32_t subType = tfs::lua::getNumber<int32_t>(L, 4, -1);
 
-	if (auto item = g_game.findItemOfType(player, itemId, deepSearch, subType)) {
+	if (const auto& item = g_game.findItemOfType(player, itemId, deepSearch, subType)) {
 		tfs::lua::pushSharedPtr(L, item);
 		tfs::lua::setItemMetatable(L, -1, item);
 	} else {
@@ -960,7 +960,7 @@ int luaPlayerSetGuildLevel(lua_State* L)
 	}
 
 	uint8_t level = tfs::lua::getNumber<uint8_t>(L, 2);
-	if (auto rank = guild->getRankByLevel(level)) {
+	if (const auto& rank = guild->getRankByLevel(level)) {
 		player->setGuildRank(rank);
 		tfs::lua::pushBoolean(L, true);
 	} else {
@@ -1461,7 +1461,7 @@ int luaPlayerChannelSay(lua_State* L)
 		return 1;
 	}
 
-	auto speaker = tfs::lua::getCreature(L, 2);
+	const auto& speaker = tfs::lua::getCreature(L, 2);
 	SpeakClasses type = tfs::lua::getNumber<SpeakClasses>(L, 3);
 	const std::string& text = tfs::lua::getString(L, 4);
 	uint16_t channelId = tfs::lua::getNumber<uint16_t>(L, 5);

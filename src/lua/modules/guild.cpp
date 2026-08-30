@@ -94,7 +94,7 @@ int luaGuildGetRankById(lua_State* L)
 	}
 
 	uint32_t id = tfs::lua::getNumber<uint32_t>(L, 2);
-	if (auto rank = guild->getRankById(id)) {
+	if (const auto& rank = guild->getRankById(id)) {
 		lua_createtable(L, 0, 3);
 		tfs::lua::setField(L, "id", rank->id);
 		tfs::lua::setField(L, "name", rank->name);
@@ -115,7 +115,7 @@ int luaGuildGetRankByLevel(lua_State* L)
 	}
 
 	uint8_t level = tfs::lua::getNumber<uint8_t>(L, 2);
-	if (auto rank = guild->getRankByLevel(level)) {
+	if (const auto& rank = guild->getRankByLevel(level)) {
 		lua_createtable(L, 0, 3);
 		tfs::lua::setField(L, "id", rank->id);
 		tfs::lua::setField(L, "name", rank->name);

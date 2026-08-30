@@ -341,7 +341,7 @@ void Connection::handleTimeout(std::weak_ptr<Connection> connectionWeak, const b
 		return;
 	}
 
-	if (auto connection = connectionWeak.lock()) {
+	if (const auto& connection = connectionWeak.lock()) {
 		connection->close(FORCE_CLOSE);
 	}
 }

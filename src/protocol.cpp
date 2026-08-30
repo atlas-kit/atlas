@@ -140,7 +140,7 @@ bool Protocol::deflateMessage(OutputMessage& msg)
 
 Connection::Address Protocol::getIP() const
 {
-	if (auto connection = getConnection()) {
+	if (const auto& connection = getConnection()) {
 		return connection->getIP();
 	}
 

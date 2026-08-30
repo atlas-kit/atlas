@@ -26,7 +26,7 @@ Container::~Container()
 
 std::shared_ptr<Item> Container::clone() const
 {
-	const auto clone = std::static_pointer_cast<Container>(Item::clone());
+	const auto& clone = std::static_pointer_cast<Container>(Item::clone());
 	if (!clone) {
 		return nullptr;
 	}
@@ -91,7 +91,7 @@ void Container::unserializeItemNode(OTB::iterator& first, const OTB::iterator& l
 		auto it = itemNode.propsBegin;
 		auto id = OTB::read<uint16_t>(it, itemNode.propsEnd);
 
-		auto item = Item::CreateItem(Item::getPersistentId(id));
+		const auto& item = Item::CreateItem(Item::getPersistentId(id));
 		if (!item) [[unlikely]] {
 			throw std::runtime_error(std::format("[{:s}] Invalid item type: {:d}", __FUNCTION__, id));
 		}

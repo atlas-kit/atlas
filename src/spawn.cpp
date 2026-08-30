@@ -304,7 +304,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, spawnBlock_t sb, bool startup /* = fa
 bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir,
                          bool startup /*= false*/)
 {
-	const auto monster = std::make_shared<Monster>(mType);
+	const auto& monster = std::make_shared<Monster>(mType);
 	if (!tfs::events::monster::onSpawn(monster, pos, startup, false)) {
 		return false;
 	}

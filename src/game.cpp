@@ -220,11 +220,11 @@ std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& pla
 			}
 
 			case STACKPOS_USETARGET: {
-				if (const auto creature = tile->getTopVisibleCreature(player)) {
+				if (const auto& creature = tile->getTopVisibleCreature(player)) {
 					return creature;
 				}
 
-				if (const auto item = tile->getUseItem(index)) {
+				if (const auto& item = tile->getUseItem(index)) {
 					return item;
 				}
 				break;
@@ -4587,7 +4587,7 @@ void Game::checkDecay()
 		auto& decayItemBucket = decayItems[bucket];
 		auto it = decayItemBucket.begin();
 		while (it != decayItemBucket.end()) {
-			const auto item = it->item.lock();
+			const auto& item = it->item.lock();
 			if (!item) {
 				it = decayItemBucket.erase(it);
 				continue;

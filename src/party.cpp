@@ -23,7 +23,7 @@ void Party::disband()
 		return;
 	}
 
-	const auto currentLeader = leader.lock();
+	const auto& currentLeader = leader.lock();
 	leader.reset();
 
 	currentLeader->setParty(nullptr);

@@ -44,7 +44,7 @@ public:
 
 	void send(std::shared_ptr<OutputMessage> msg) const
 	{
-		if (auto connection = getConnection()) {
+		if (const auto& connection = getConnection()) {
 			connection->send(msg);
 		}
 	}
@@ -64,7 +64,7 @@ protected:
 
 	void disconnect() const
 	{
-		if (auto connection = getConnection()) {
+		if (const auto& connection = getConnection()) {
 			connection->close();
 		}
 	}
