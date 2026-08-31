@@ -454,6 +454,15 @@ if not NpcHandler then
 	function NpcHandler:onBuy(creature, itemid, subType, amount, ignoreCap, inBackpacks)
 		local cid = creature:getId()
 		local callback = self:getCallback(CALLBACK_ONBUY)
+
+		if ignoreCap then
+			local tile = Tile(creature:getPosition())
+			if tile and tile:getItemCount() >= TILE_MAX_ITEMS then
+				creature:sendCancelMessage(RETURNVALUE_NOTPOSSIBLE)
+				return false
+			end
+		end
+
 		if not callback or callback(cid, itemid, subType, amount, ignoreCap, inBackpacks) then
 			if self:processModuleCallback(CALLBACK_ONBUY, cid, itemid, subType, amount, ignoreCap, inBackpacks) then
 				--

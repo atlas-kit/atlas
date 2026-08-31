@@ -18,6 +18,8 @@ class TrashHolder;
 using CreatureVector = std::vector<std::shared_ptr<Creature>>;
 using ItemVector = std::vector<std::shared_ptr<Item>>;
 
+constexpr size_t TILE_MAX_ITEMS = 1000;
+
 enum tileflags_t : uint32_t
 {
 	TILESTATE_NONE = 0,

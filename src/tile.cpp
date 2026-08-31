@@ -595,7 +595,7 @@ ReturnValue Tile::queryAdd(int32_t, const std::shared_ptr<const Thing>& thing, u
 		}
 	} else if (const auto& item = thing->asItem()) {
 		const TileItemVector* items = getItemList();
-		if (items && items->size() >= 0xFFFF) {
+		if (items && items->size() >= TILE_MAX_ITEMS) {
 			return RETURNVALUE_NOTPOSSIBLE;
 		}
 
@@ -807,7 +807,7 @@ void Tile::addThing(int32_t, const std::shared_ptr<Thing>& thing)
 		creatures->insert(creatures->begin(), creature);
 	} else if (const auto& item = thing->asItem()) {
 		TileItemVector* items = getItemList();
-		if (items && items->size() >= 0xFFFF) {
+		if (items && items->size() >= TILE_MAX_ITEMS) {
 			return /*RETURNVALUE_NOTPOSSIBLE*/;
 		}
 
@@ -1322,9 +1322,8 @@ void Tile::postRemoveNotification(const std::shared_ptr<Thing>& thing, const std
 
 void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 {
-	thing->setParent(asTile());
-
 	if (const auto& creature = thing->asCreature()) {
+		thing->setParent(asTile());
 		g_game.map.clearSpectatorCache();
 		if (creature->asPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
@@ -1335,6 +1334,7 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 	} else if (const auto& item = thing->asItem()) {
 		const ItemType& itemType = Item::items[item->getID()];
 		if (itemType.isGroundTile()) {
+			thing->setParent(asTile());
 			if (!ground) {
 				ground = item;
 				setTileFlags(item);
@@ -1343,9 +1343,11 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 		}
 
 		TileItemVector* items = makeItemList();
-		if (items->size() >= 0xFFFF) {
+		if (items->size() >= TILE_MAX_ITEMS) {
 			return /*RETURNVALUE_NOTPOSSIBLE*/;
 		}
+
+		thing->setParent(asTile());
 
 		if (itemType.alwaysOnTop) {
 			bool isInserted = false;

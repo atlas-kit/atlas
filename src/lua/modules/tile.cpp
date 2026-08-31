@@ -760,6 +760,7 @@ void tfs::lua::registerTile(LuaScriptInterface& lsi)
 	registerEnum(lsi, TILESTATE_FLOORCHANGE_SOUTH_ALT);
 	registerEnum(lsi, TILESTATE_FLOORCHANGE_EAST_ALT);
 	registerEnum(lsi, TILESTATE_SUPPORTS_HANGABLE);
+	registerEnum(lsi, TILE_MAX_ITEMS);
 
 	registerEnum(lsi, ZONE_PROTECTION);
 	registerEnum(lsi, ZONE_NOPVP);
