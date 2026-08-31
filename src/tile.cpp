@@ -1322,9 +1322,8 @@ void Tile::postRemoveNotification(const std::shared_ptr<Thing>& thing, const std
 
 void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 {
-	thing->setParent(asTile());
-
 	if (const auto& creature = thing->asCreature()) {
+		thing->setParent(asTile());
 		g_game.map.clearSpectatorCache();
 		if (creature->asPlayer()) {
 			g_game.map.clearPlayersSpectatorCache();
@@ -1335,13 +1334,17 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 	} else if (const auto& item = thing->asItem()) {
 		const ItemType& itemType = Item::items[item->getID()];
 		if (itemType.isGroundTile()) {
-			if (!ground) {
-				ground = item;
-				setTileFlags(item);
+			if (ground) {
+				return;
 			}
+
+			thing->setParent(asTile());
+			ground = item;
+			setTileFlags(item);
 			return;
 		}
 
+		thing->setParent(asTile());
 		TileItemVector* items = makeItemList();
 		if (items->size() >= 0xFFFF) {
 			return /*RETURNVALUE_NOTPOSSIBLE*/;
@@ -1366,6 +1369,8 @@ void Tile::internalAddThing(uint32_t, const std::shared_ptr<Thing>& thing)
 		}
 
 		setTileFlags(item);
+	} else {
+		thing->setParent(asTile());
 	}
 }
 
