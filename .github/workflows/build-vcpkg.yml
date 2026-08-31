@@ -45,6 +45,9 @@ jobs:
       VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed/x64-linux
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg_cache,readwrite
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_MAXSIZE: 256M
+      CCACHE_COMPRESS: "1"
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -64,12 +67,19 @@ jobs:
           restore-keys: |
             vcpkg-linux-
 
-      - name: CCache
-        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
+      - name: Restore ccache cache
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
-          key: ${{ runner.os }}-ccache-${{ hashFiles('src/**', 'CMakeLists.txt', 'vcpkg.json') }}
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-linux-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-ccache-
+            ccache-linux-
+
+      - name: Set up ccache
+        run: |
+          sudo apt-get install -y ccache
+          ccache --zero-stats
+        shell: bash
 
       - name: Run vcpkg
         uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
@@ -78,8 +88,19 @@ jobs:
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: linux-release
-          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
+          configurePresetAdditionalArgs: "['-DOPTIONS_ENABLE_CCACHE=ON', '-DOPTIONS_ENABLE_SCCACHE=OFF']"
           buildPreset: linux-release
+
+      - name: CCache statistics
+        run: ccache --show-stats
+        shell: bash
+
+      - name: Save ccache cache
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        if: github.event_name == 'push'
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-linux-${{ github.sha }}
 
       - name: Upload build logs
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -114,13 +135,6 @@ jobs:
       - name: Get latest CMake
         uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
 
-      - name: CCache
-        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
-        with:
-          key: windows-ccache-${{ hashFiles('src/**', 'CMakeLists.txt', 'vcpkg.json') }}
-          restore-keys: |
-            windows-ccache-
-
       - name: Cache vcpkg binary packages
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
@@ -136,7 +150,6 @@ jobs:
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: windows-release
-          configurePresetAdditionalArgs: "['-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
           buildPreset: windows-release
 
       - name: Upload build logs
