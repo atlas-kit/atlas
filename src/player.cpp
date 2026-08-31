@@ -3205,7 +3205,7 @@ void Player::goToFollowCreature()
 		return;
 	}
 
-	if ((std::chrono::steady_clock::now() - lastFailedFollow) < 2s) {
+	if (std::chrono::steady_clock::now() < lastFailedFollow + 2s) {
 		return;
 	}
 
