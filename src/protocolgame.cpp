@@ -826,25 +826,40 @@ void ProtocolGame::GetTileDescription(const std::shared_ptr<const Tile>& tile, N
 		for (auto it = items->getBeginTopItem(), end = items->getEndTopItem(); it != end; ++it) {
 			msg.addItem(*it);
 
-			if (++count == MAX_STACKPOS) {
+			count++;
+			if (count == 9 && tile->getPosition() == player->getPosition()) {
 				break;
+			} else if (count == MAX_STACKPOS) {
+				return;
 			}
 		}
 	}
 
 	const CreatureVector* creatures = tile->getCreatures();
 	if (creatures) {
+		bool playerAdded = false;
 		for (auto it = creatures->rbegin(), end = creatures->rend(); it != end; ++it) {
-			const auto& creature = *it;
+			auto creature = *it;
 			if (!player->canSeeCreature(creature)) {
 				continue;
+			}
+
+			if (tile->getPosition() == player->getPosition() && count == 9 && !playerAdded) {
+				creature = player;
+			}
+
+			if (creature->getID() == player->getID()) {
+				playerAdded = true;
 			}
 
 			bool known;
 			uint32_t removedKnown;
 			checkCreatureAsKnown(creature->getID(), known, removedKnown);
 			AddCreature(msg, creature, known, removedKnown);
-			++count;
+
+			if (++count == MAX_STACKPOS) {
+				return;
+			}
 		}
 	}
 
@@ -2347,13 +2362,8 @@ void ProtocolGame::sendCreatureTurn(const std::shared_ptr<const Creature>& creat
 
 	NetworkMessage msg;
 	msg.addByte(0x6B);
-	if (stackpos >= MAX_STACKPOS) {
-		msg.add<uint16_t>(0xFFFF);
-		msg.add<uint32_t>(creature->getID());
-	} else {
-		msg.addPosition(creature->getPosition());
-		msg.addByte(stackpos);
-	}
+	msg.addPosition(creature->getPosition());
+	msg.addByte(stackpos);
 
 	msg.add<uint16_t>(0x63);
 	msg.add<uint32_t>(creature->getID());
@@ -2597,27 +2607,6 @@ void ProtocolGame::sendUpdateTileCreature(const Position& pos, uint32_t stackpos
 	writeToOutputBuffer(msg);
 }
 
-void ProtocolGame::sendRemoveTileCreature(const std::shared_ptr<const Creature>& creature, const Position& pos,
-                                          uint32_t stackpos)
-{
-	if (stackpos < MAX_STACKPOS) {
-		if (!canSee(pos)) {
-			return;
-		}
-
-		NetworkMessage msg;
-		RemoveTileThing(msg, pos, stackpos);
-		writeToOutputBuffer(msg);
-		return;
-	}
-
-	NetworkMessage msg;
-	msg.addByte(0x6C);
-	msg.add<uint16_t>(0xFFFF);
-	msg.add<uint32_t>(creature->getID());
-	writeToOutputBuffer(msg);
-}
-
 void ProtocolGame::sendUpdateTile(const std::shared_ptr<const Tile>& tile, const Position& pos)
 {
 	if (!canSee(pos)) {
@@ -2681,7 +2670,7 @@ void ProtocolGame::sendFightModes()
 }
 
 void ProtocolGame::sendAddCreature(const std::shared_ptr<const Creature>& creature, const Position& pos,
-                                   int32_t stackpos, MagicEffectClasses magicEffect /*= CONST_ME_NONE*/)
+                                   int32_t stackpos, MagicEffectClasses magicEffect)
 {
 	assert(creature != player);
 
@@ -2689,19 +2678,7 @@ void ProtocolGame::sendAddCreature(const std::shared_ptr<const Creature>& creatu
 		return;
 	}
 
-	// stack pos is always real index now, so it can exceed the limit if stack pos exceeds the limit, we need to
-	// refresh the tile instead
-	// 1. this is a rare case, and is only triggered by forcing summon in a position
-	// 2. since no stackpos will be send to the client about that creature, removing it must be done with its id if
-	// its stackpos remains >= MAX_STACKPOS. this is done to add creatures to battle list instead of rendering on
-	// screen
-	if (stackpos >= MAX_STACKPOS) {
-		// @todo: should we avoid this check?
-		if (const auto& tile = creature->getTile()) {
-			sendUpdateTile(tile, pos);
-		}
-	} else {
-		// if stackpos is -1, the client will automatically detect it
+	if (stackpos != -1) {
 		NetworkMessage msg;
 		msg.addByte(0x6A);
 		msg.addPosition(pos);
@@ -2723,22 +2700,19 @@ void ProtocolGame::sendMoveCreature(const std::shared_ptr<const Creature>& creat
                                     int32_t newStackPos, const Position& oldPos, int32_t oldStackPos, bool teleport)
 {
 	if (creature == player) {
-		if (teleport) {
-			sendRemoveTileCreature(creature, oldPos, oldStackPos);
+		if (oldStackPos >= MAX_STACKPOS) {
+			sendMapDescription(newPos);
+		} else if (teleport) {
+			sendRemoveTileThing(oldPos, oldStackPos);
 			sendMapDescription(newPos);
 		} else {
 			NetworkMessage msg;
 			if (oldPos.z == 7 && newPos.z >= 8) {
-				RemoveTileCreature(msg, creature, oldPos, oldStackPos);
+				RemoveTileThing(msg, oldPos, oldStackPos);
 			} else {
 				msg.addByte(0x6D);
-				if (oldStackPos < MAX_STACKPOS) {
-					msg.addPosition(oldPos);
-					msg.addByte(oldStackPos);
-				} else {
-					msg.add<uint16_t>(0xFFFF);
-					msg.add<uint32_t>(creature->getID());
-				}
+				msg.addPosition(oldPos);
+				msg.addByte(oldStackPos);
 				msg.addPosition(newPos);
 			}
 
@@ -2784,24 +2758,19 @@ void ProtocolGame::sendMoveCreature(const std::shared_ptr<const Creature>& creat
 			writeToOutputBuffer(msg);
 		}
 	} else if (canSee(oldPos) && canSee(creature->getPosition())) {
-		if (teleport || (oldPos.z == 7 && newPos.z >= 8)) {
-			sendRemoveTileCreature(creature, oldPos, oldStackPos);
+		if (teleport || (oldPos.z == 7 && newPos.z >= 8) || oldStackPos >= MAX_STACKPOS) {
+			sendRemoveTileThing(oldPos, oldStackPos);
 			sendAddCreature(creature, newPos, newStackPos);
 		} else {
 			NetworkMessage msg;
 			msg.addByte(0x6D);
-			if (oldStackPos < MAX_STACKPOS) {
-				msg.addPosition(oldPos);
-				msg.addByte(oldStackPos);
-			} else {
-				msg.add<uint16_t>(0xFFFF);
-				msg.add<uint32_t>(creature->getID());
-			}
+			msg.addPosition(oldPos);
+			msg.addByte(oldStackPos);
 			msg.addPosition(creature->getPosition());
 			writeToOutputBuffer(msg);
 		}
 	} else if (canSee(oldPos)) {
-		sendRemoveTileCreature(creature, oldPos, oldStackPos);
+		sendRemoveTileThing(oldPos, oldStackPos);
 	} else if (canSee(creature->getPosition())) {
 		sendAddCreature(creature, newPos, newStackPos);
 	}
@@ -3360,19 +3329,6 @@ void ProtocolGame::RemoveTileThing(NetworkMessage& msg, const Position& pos, uin
 	msg.addByte(0x6C);
 	msg.addPosition(pos);
 	msg.addByte(stackpos);
-}
-
-void ProtocolGame::RemoveTileCreature(NetworkMessage& msg, const std::shared_ptr<const Creature>& creature,
-                                      const Position& pos, uint32_t stackpos)
-{
-	if (stackpos < MAX_STACKPOS) {
-		RemoveTileThing(msg, pos, stackpos);
-		return;
-	}
-
-	msg.addByte(0x6C);
-	msg.add<uint16_t>(0xFFFF);
-	msg.add<uint32_t>(creature->getID());
 }
 
 void ProtocolGame::MoveUpCreature(NetworkMessage& msg, const std::shared_ptr<const Creature>& creature,

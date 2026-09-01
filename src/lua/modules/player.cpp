@@ -1911,8 +1911,10 @@ int luaPlayerSetGhostMode(lua_State* L)
 		const auto& spectatorPlayer = std::static_pointer_cast<Player>(spectator);
 		if (spectatorPlayer != player && !spectatorPlayer->isAccessPlayer()) {
 			if (enabled) {
-				spectatorPlayer->sendRemoveTileCreature(player, position,
-				                                        tile->getClientIndexOfCreature(spectatorPlayer, player));
+				int32_t stackpos = tile->getStackposOfCreature(spectatorPlayer, player);
+				if (stackpos != -1) {
+					spectatorPlayer->sendRemoveTileThing(position, stackpos);
+				}
 			} else {
 				spectatorPlayer->sendAddCreature(player, position, magicEffect);
 			}

@@ -1163,6 +1163,62 @@ int32_t Tile::getClientIndexOfCreature(const std::shared_ptr<const Player>& play
 	return -1;
 }
 
+int32_t Tile::getStackposOfCreature(const std::shared_ptr<const Player>& player,
+                                    const std::shared_ptr<const Creature>& creature) const
+{
+	const bool isOwnTile = (getPosition() == player->getPosition());
+	int32_t n = ground ? 1 : 0;
+
+	if (const TileItemVector* items = getItemList()) {
+		int32_t topItemCount = items->getTopItemCount();
+		if (isOwnTile) {
+			// GetTileDescription caps top items at count == MAX_STACKPOS - 1 on the
+			// viewer's own tile to reserve the final visible slot for the player.
+			n += std::min(topItemCount, (MAX_STACKPOS - 1) - n);
+		} else {
+			n += topItemCount;
+			if (n >= MAX_STACKPOS) {
+				return -1;
+			}
+		}
+	}
+
+	if (const CreatureVector* creatures = getCreatures()) {
+		bool playerAdded = false;
+		for (const auto& tileCreature : *creatures | std::views::reverse) {
+			// GetTileDescription forces the player into the final visible slot
+			// when it hasn't been serialized naturally by count == MAX_STACKPOS - 1.
+			if (isOwnTile && n == (MAX_STACKPOS - 1) && !playerAdded) {
+				if (creature->getID() == player->getID()) {
+					return n;
+				}
+				// This creature and all subsequent ones are displaced.
+				return -1;
+			}
+
+			// Match the target creature at its physical position regardless of
+			// current visibility. Callers such as ghost-mode removal need the
+			// stackpos of a creature that has just become invisible.
+			if (tileCreature == creature) {
+				return n;
+			}
+
+			if (!player->canSeeCreature(tileCreature)) {
+				continue;
+			}
+
+			if (tileCreature->getID() == player->getID()) {
+				playerAdded = true;
+			}
+
+			if (++n >= MAX_STACKPOS) {
+				return -1;
+			}
+		}
+	}
+	return -1;
+}
+
 int32_t Tile::getStackposOfItem(const std::shared_ptr<const Player>& player,
                                 const std::shared_ptr<const Item>& item) const
 {

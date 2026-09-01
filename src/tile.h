@@ -204,6 +204,8 @@ public:
 
 	int32_t getClientIndexOfCreature(const std::shared_ptr<const Player>& player,
 	                                 const std::shared_ptr<const Creature>& creature) const;
+	int32_t getStackposOfCreature(const std::shared_ptr<const Player>& player,
+	                              const std::shared_ptr<const Creature>& creature) const;
 	int32_t getStackposOfItem(const std::shared_ptr<const Player>& player,
 	                          const std::shared_ptr<const Item>& item) const;
 

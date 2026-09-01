@@ -357,8 +357,8 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 			// Use the correct stackpos
 			int32_t stackpos = oldStackPosVector[i++];
 			if (stackpos != -1) {
-				tmpPlayer->sendCreatureMove(creature, newPos, newTile->getClientIndexOfCreature(tmpPlayer, creature),
-				                            oldPos, stackpos, teleport);
+				// 0xFF is special stackpos that tells client to insert it as new object - exactly what we want
+				tmpPlayer->sendCreatureMove(creature, newPos, 0xFF, oldPos, stackpos, teleport);
 			}
 		}
 	}
