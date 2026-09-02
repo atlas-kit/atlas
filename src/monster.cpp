@@ -315,15 +315,19 @@ void Monster::removeTarget(const std::shared_ptr<Creature>& creature)
 
 void Monster::updateTargetList()
 {
-	friendList = friendList | tfs::views::lock_weak_ptrs | std::views::filter([this](const auto& creature) {
-		             return !creature->isDead() && canSee(creature->getPosition());
-	             }) |
-	             std::ranges::to<decltype(friendList)>();
+	for (auto it = friendList.begin(); it != friendList.end();) {
+		auto creature = it->lock();
+		if (!creature || creature->isDead() || !canSee(creature->getPosition())) {
+			it = friendList.erase(it);
+		} else {
+			++it;
+		}
+	}
 
-	targetList = targetList | tfs::views::lock_weak_ptrs | std::views::filter([this](const auto& creature) {
-		             return !creature->isDead() && canSee(creature->getPosition());
-	             }) |
-	             std::ranges::to<decltype(targetList)>();
+	std::erase_if(targetList, [this](const std::weak_ptr<Creature>& wp) {
+		auto creature = wp.lock();
+		return !creature || creature->isDead() || !canSee(creature->getPosition());
+	});
 
 	SpectatorVec spectators;
 	g_game.map.getSpectators(spectators, getPosition(), true);

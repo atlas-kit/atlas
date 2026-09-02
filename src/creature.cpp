@@ -876,18 +876,16 @@ void Creature::updateFollowersPaths()
 		return;
 	}
 
-	followers = followers | tfs::views::lock_weak_ptrs | std::views::filter([this](const auto& creature) {
-		            if (position.z != creature->position.z) {
-			            return false;
-		            }
-
-		            return position.getDistanceX(creature->position) < Map::maxViewportX &&
-		                   position.getDistanceY(creature->position) < Map::maxViewportY;
-	            }) |
-	            std::ranges::to<decltype(followers)>();
-
-	for (const auto& follower : followers | tfs::views::lock_weak_ptrs) {
-		follower->updateFollowPath();
+	for (auto it = followers.begin(); it != followers.end();) {
+		auto creature = it->lock();
+		if (!creature || position.z != creature->position.z ||
+		    position.getDistanceX(creature->position) >= Map::maxViewportX ||
+		    position.getDistanceY(creature->position) >= Map::maxViewportY) {
+			it = followers.erase(it);
+		} else {
+			creature->updateFollowPath();
+			++it;
+		}
 	}
 }
 
