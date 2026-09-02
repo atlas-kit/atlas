@@ -34,6 +34,10 @@ struct PositionHash
 };
 
 struct FindPathParams;
+
+static constexpr std::array<std::pair<int, int>, 8> allNeighbors = {
+    {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
+
 struct AStarNode
 {
 	AStarNode* parent;
@@ -43,30 +47,53 @@ struct AStarNode
 
 inline uint32_t hashCoord(uint16_t x, uint16_t y) { return (static_cast<uint32_t>(x) << 16) | y; }
 
+enum NodeState : uint8_t
+{
+	NONE,
+	OPEN,
+	CLOSED
+};
+
 class AStarNodes
 {
 public:
-	AStarNodes(uint16_t x, uint16_t y);
+	static constexpr int MAX_X = 9; // Same as maxViewportX
+	static constexpr int MAX_Y = 7; // Same as maxViewportY
+	static constexpr int GRID_W = MAX_X * 2 + 1;
+	static constexpr int GRID_H = MAX_Y * 2 + 1;
+	static constexpr int GRID_SIZE = GRID_W * GRID_H;
 
+	AStarNodes(uint16_t startX, uint16_t startY);
 	AStarNode* createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f);
-	AStarNode* getBestNode();
 	AStarNode* getNodeByPosition(uint16_t x, uint16_t y);
+	AStarNode* getBestNode();
 
 	static uint16_t getMapWalkCost(AStarNode* node, const Position& neighborPos);
 	static uint16_t getTileWalkCost(const std::shared_ptr<const Creature>& creature,
 	                                const std::shared_ptr<const Tile>& tile);
 
 private:
-	std::vector<AStarNode> nodes = {};
-	std::unordered_map<uint32_t, AStarNode*> nodeMap = {};
-	std::unordered_set<uint32_t> visited = {};
+	inline int index(uint16_t x, uint16_t y) const
+	{
+		int dx = static_cast<int>(x) - startX;
+		int dy = static_cast<int>(y) - startY;
+
+		if (dx < -MAX_X || dx > MAX_X || dy < -MAX_Y || dy > MAX_Y) {
+			return -1;
+		}
+
+		return (dy + MAX_Y) * GRID_W + (dx + MAX_X);
+	}
+
+	uint16_t startX;
+	uint16_t startY;
+
+	std::vector<AStarNode> nodes;
+	std::vector<NodeState> state;
 
 	struct NodeCompare
 	{
-		bool operator()(AStarNode* a, AStarNode* b) const
-		{
-			return a->f > b->f; // Min-heap based on f score
-		}
+		bool operator()(const AStarNode* a, const AStarNode* b) const { return a->f > b->f; }
 	};
 
 	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;

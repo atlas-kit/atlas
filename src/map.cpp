@@ -707,8 +707,11 @@ const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>
 
 static uint16_t calculateHeuristic(const Position& p1, const Position& p2)
 {
-	uint16_t dx = std::abs(p1.getX() - p2.getX());
-	uint16_t dy = std::abs(p1.getY() - p2.getY());
+	// This is inperfect. While it allows for realistic movement
+	// It comes at a performance cost. Alternaitivley we can use
+	// The standard for more performance but paths will look AI.
+	uint32_t dx = std::abs(p1.getX() - p2.getX());
+	uint32_t dy = std::abs(p1.getY() - p2.getY());
 	return dx * dx + dy * dy;
 }
 
@@ -743,9 +746,6 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 		return false;
 	}
 
-	static constexpr std::array<std::pair<int, int>, 8> allNeighbors = {
-	    {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
-
 	bool sightClear = isSightClear(startPos, targetPos, true, true);
 
 	Position endPos;
@@ -758,7 +758,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 	while (n) {
 		iterations++;
 
-		if (iterations >= Map::maxViewportX * Map::maxViewportY) {
+		if (iterations >= AStarNodes::GRID_SIZE) {
 			return false;
 		}
 
@@ -906,52 +906,71 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const
 }
 
 // AStarNodes
-AStarNodes::AStarNodes(uint16_t x, uint16_t y)
+AStarNodes::AStarNodes(uint16_t startX, uint16_t startY) : startX(startX), startY(startY)
 {
-	nodes.reserve(Map::nodeReserveSize);
-	nodeMap.reserve(Map::nodeReserveSize);
-	visited.reserve(Map::nodeReserveSize);
-	createNode(nullptr, x, y, 0, 0);
+	nodes.resize(GRID_SIZE);
+	state.assign(GRID_SIZE, NONE);
+
+	int idx = index(startX, startY);
+	AStarNode& n = nodes[idx];
+	n.parent = nullptr;
+	n.x = startX;
+	n.y = startY;
+	n.g = 0;
+	n.f = 0;
+
+	state[idx] = OPEN;
+	openSet.push(&n);
 }
 
 AStarNode* AStarNodes::createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f)
 {
-	if (nodes.size() == Map::nodeReserveSize) {
+	int idx = index(x, y);
+	if (idx < 0) {
 		return nullptr;
 	}
 
-	uint32_t key = hashCoord(x, y);
-	nodes.emplace_back(AStarNode{parent, x, y, g, f});
-	AStarNode* node = &nodes.back();
-	nodeMap[key] = node;
-	openSet.push(node);
-	return node;
+	AStarNode& n = nodes[idx];
+	n.parent = parent;
+	n.x = x;
+	n.y = y;
+	n.g = g;
+	n.f = f;
+
+	state[idx] = OPEN;
+	openSet.push(&n);
+	return &n;
+}
+
+AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
+{
+	int idx = index(x, y);
+	if (idx < 0 || state[idx] == NONE) {
+		return nullptr;
+	}
+	return &nodes[idx];
 }
 
 AStarNode* AStarNodes::getBestNode()
 {
 	while (!openSet.empty()) {
-		AStarNode* node = openSet.top();
+		AStarNode* n = openSet.top();
 		openSet.pop();
-		uint32_t key = hashCoord(node->x, node->y);
-		if (visited.find(key) == visited.end()) {
-			visited.insert(key);
-			return node;
+
+		int idx = index(n->x, n->y);
+		if (idx < 0 || state[idx] == CLOSED) {
+			continue; // stale entry
 		}
+
+		state[idx] = CLOSED;
+		return n;
 	}
 	return nullptr;
 }
 
-AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
-{
-	auto it = nodeMap.find(hashCoord(x, y));
-	return (it != nodeMap.end()) ? it->second : nullptr;
-}
-
 uint16_t AStarNodes::getMapWalkCost(AStarNode* node, const Position& neighborPos)
 {
-	if (std::abs(node->x - neighborPos.x) == std::abs(node->y - neighborPos.y)) {
-		// diagonal movement extra cost
+	if (node->x != neighborPos.x && node->y != neighborPos.y) {
 		return MAP_DIAGONALWALKCOST;
 	}
 	return MAP_NORMALWALKCOST;
