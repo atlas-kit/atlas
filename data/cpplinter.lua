@@ -84,7 +84,22 @@ configManager = {}
 ---@field createTile fun(position: Position): Tile
 ---@field createMonsterType fun(name: string): MonsterType
 ---@field getClientVersion fun(): string
+---@field saveMap fun(): boolean
 ---@field reload fun(reloadType: number): boolean
+---@field reloadActions fun(): boolean
+---@field reloadAll fun(): boolean
+---@field reloadChat fun(): boolean
+---@field reloadConfig fun(): boolean
+---@field reloadEvents fun(): boolean
+---@field reloadGlobal fun(): boolean, boolean
+---@field reloadItems fun(): boolean
+---@field reloadMonsters fun(): boolean
+---@field reloadMovements fun(): boolean
+---@field reloadNpcs fun(): boolean
+---@field reloadScripts fun(): boolean
+---@field reloadSpells fun(): boolean
+---@field reloadTalkActions fun(): boolean
+---@field reloadWeapons fun(): boolean
 ---@field getPlayerRecord fun(): integer
 ---@field setPlayerRecord fun(record: integer): boolean
 Game = {}
