@@ -17,8 +17,7 @@ std::array<std::string, ConfigManager::LAST_STRING_CONFIG> string = {};
 std::array<int32_t, ConfigManager::LAST_INTEGER_CONFIG> integer = {};
 std::array<bool, ConfigManager::LAST_BOOLEAN_CONFIG> boolean = {};
 
-using ExperienceStages = std::vector<std::tuple<uint32_t, uint32_t, float>>;
-ExperienceStages expStages;
+ConfigManager::ExperienceStages expStages;
 
 bool loaded = false;
 
@@ -87,68 +86,6 @@ bool getGlobalBoolean(lua_State* L, const char* identifier, const bool defaultVa
 	int val = lua_toboolean(L, -1);
 	lua_pop(L, 1);
 	return val != 0;
-}
-
-ExperienceStages loadLuaStages(lua_State* L)
-{
-	ExperienceStages stages;
-
-	lua_getglobal(L, "experienceStages");
-	if (!lua_istable(L, -1)) {
-		return {};
-	}
-
-	lua_pushnil(L);
-	while (lua_next(L, -2) != 0) {
-		const auto tableIndex = lua_gettop(L);
-		auto minLevel = tfs::lua::getField<uint32_t>(L, tableIndex, "minlevel", 1);
-		auto maxLevel = tfs::lua::getField<uint32_t>(L, tableIndex, "maxlevel", std::numeric_limits<uint32_t>::max());
-		auto multiplier = tfs::lua::getField<float>(L, tableIndex, "multiplier", 1);
-		stages.emplace_back(minLevel, maxLevel, multiplier);
-		lua_pop(L, 4);
-	}
-	lua_pop(L, 1);
-
-	std::sort(stages.begin(), stages.end());
-	return stages;
-}
-
-ExperienceStages loadXMLStages()
-{
-	pugi::xml_document doc;
-	pugi::xml_parse_result result = doc.load_file("data/XML/stages.xml");
-	if (!result) {
-		printXMLError("Error - loadXMLStages", "data/XML/stages.xml", result);
-		return {};
-	}
-
-	ExperienceStages stages;
-	for (auto stageNode : doc.child("stages").children()) {
-		if (boost::iequals(stageNode.name(), "config")) {
-			if (!stageNode.attribute("enabled").as_bool()) {
-				return {};
-			}
-		} else {
-			uint32_t minLevel = 1, maxLevel = std::numeric_limits<uint32_t>::max(), multiplier = 1;
-
-			if (auto minLevelAttribute = stageNode.attribute("minlevel")) {
-				minLevel = pugi::cast<uint32_t>(minLevelAttribute.value());
-			}
-
-			if (auto maxLevelAttribute = stageNode.attribute("maxlevel")) {
-				maxLevel = pugi::cast<uint32_t>(maxLevelAttribute.value());
-			}
-
-			if (auto multiplierAttribute = stageNode.attribute("multiplier")) {
-				multiplier = pugi::cast<uint32_t>(multiplierAttribute.value());
-			}
-
-			stages.emplace_back(minLevel, maxLevel, multiplier);
-		}
-	}
-
-	std::sort(stages.begin(), stages.end());
-	return stages;
 }
 
 } // namespace
@@ -287,16 +224,6 @@ bool ConfigManager::load()
 	integer[STAMINA_REGEN_PREMIUM] = getGlobalNumber(L, "timeToRegenMinutePremiumStamina", 6 * 60);
 	integer[FOLLOW_PATH_CHECK_INTERVAL] = getGlobalNumber(L, "followPathCheckInterval", 200);
 
-	expStages = loadXMLStages();
-	if (expStages.empty()) {
-		expStages = loadLuaStages(L);
-	} else {
-		std::cout << "[Warning - ConfigManager::load] XML stages are deprecated, "
-		             "consider moving to config.lua."
-		          << std::endl;
-	}
-	expStages.shrink_to_fit();
-
 	loaded = true;
 	lua_close(L);
 
@@ -333,16 +260,30 @@ bool ConfigManager::getBoolean(boolean_config_t what)
 
 float ConfigManager::getExperienceStage(uint32_t level)
 {
-	auto it = std::find_if(expStages.begin(), expStages.end(), [level](auto&& stage) {
-		auto&& [minLevel, maxLevel, _] = stage;
-		return level >= minLevel && level <= maxLevel;
+	auto it = std::find_if(expStages.begin(), expStages.end(), [level](const ExperienceStage& stage) {
+		return level >= stage.minLevel && level <= stage.maxLevel;
 	});
 
 	if (it == expStages.end()) {
 		return getNumber(ConfigManager::RATE_EXPERIENCE);
 	}
 
-	return std::get<2>(*it);
+	return it->multiplier;
+}
+
+void ConfigManager::setExperienceStages(ExperienceStages stages)
+{
+	std::sort(stages.begin(), stages.end(), [](const ExperienceStage& a, const ExperienceStage& b) {
+		if (a.minLevel != b.minLevel) {
+			return a.minLevel < b.minLevel;
+		}
+		if (a.maxLevel != b.maxLevel) {
+			return a.maxLevel < b.maxLevel;
+		}
+		return a.multiplier < b.multiplier;
+	});
+	stages.shrink_to_fit();
+	expStages = std::move(stages);
 }
 
 bool ConfigManager::setString(string_config_t what, std::string_view value)
