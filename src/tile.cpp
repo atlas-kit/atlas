@@ -15,7 +15,7 @@
 #include "trashholder.h"
 
 extern Game g_game;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 
 const std::shared_ptr<Tile> Tile::invalidTile = std::make_shared<StaticTile>(0xFFFF, 0xFFFF, 0xFF);
 

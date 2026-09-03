@@ -39,7 +39,7 @@ extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern Monsters g_monsters;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
 extern Spells* g_spells;
