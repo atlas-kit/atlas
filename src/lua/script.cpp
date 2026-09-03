@@ -13,6 +13,7 @@
 #include "../protocolstatus.h"
 #include "../scheduler.h"
 #include "../spells.h"
+#include "../talkaction.h"
 #include "../weapons.h"
 #include "api.h"
 #include "env.h"
@@ -28,7 +29,7 @@ extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern Spells* g_spells;
 extern Actions* g_actions;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
 

@@ -67,7 +67,7 @@ public:
 	TalkActionResult_t playerSaySpell(const std::shared_ptr<Player>& player, SpeakClasses type,
 	                                  const std::string& words) const;
 
-	bool registerLuaEvent(TalkAction* event);
+	bool registerLuaEvent(std::shared_ptr<TalkAction> event);
 	void clear(bool fromLua) override final;
 
 private:
@@ -76,7 +76,7 @@ private:
 	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
 	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
 
-	std::map<std::string, TalkAction> talkActions;
+	std::map<std::string, std::shared_ptr<TalkAction>> talkActions;
 
 	LuaScriptInterface scriptInterface;
 };

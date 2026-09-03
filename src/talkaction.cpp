@@ -16,7 +16,7 @@ TalkActions::~TalkActions() { clear(false); }
 void TalkActions::clear(bool fromLua)
 {
 	for (auto it = talkActions.begin(); it != talkActions.end();) {
-		if (fromLua == it->second.fromLua) {
+		if (fromLua == it->second->fromLua) {
 			it = talkActions.erase(it);
 		} else {
 			++it;
@@ -38,31 +38,22 @@ std::unique_ptr<Event> TalkActions::getEvent(const std::string& nodeName)
 
 bool TalkActions::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
 {
-	std::unique_ptr<TalkAction> talkAction{static_cast<TalkAction*>(event.release())};
+	std::shared_ptr<TalkAction> talkAction {static_cast<TalkAction*>(event.release())};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {
-		if (i == words.size() - 1) {
-			talkActions.emplace(words[i], std::move(*talkAction));
-		} else {
-			talkActions.emplace(words[i], *talkAction);
-		}
+		talkActions.emplace(words[i], talkAction);
 	}
 
 	return true;
 }
 
-bool TalkActions::registerLuaEvent(TalkAction* event)
+bool TalkActions::registerLuaEvent(std::shared_ptr<TalkAction> talkAction)
 {
-	const std::unique_ptr<TalkAction> talkAction{event};
 	std::vector<std::string> words = talkAction->getWordsMap();
 
 	for (size_t i = 0; i < words.size(); i++) {
-		if (i == words.size() - 1) {
-			talkActions.emplace(words[i], std::move(*talkAction));
-		} else {
-			talkActions.emplace(words[i], *talkAction);
-		}
+		talkActions.emplace(words[i], talkAction);
 	}
 
 	return true;
@@ -88,7 +79,7 @@ TalkActionResult_t TalkActions::playerSaySpell(const std::shared_ptr<Player>& pl
 			}
 			boost::algorithm::trim_left(param);
 
-			std::string separator = talkaction.getSeparator();
+			std::string separator = talkaction->getSeparator();
 			if (separator != " ") {
 				if (!param.empty()) {
 					if (param != separator) {
@@ -101,17 +92,17 @@ TalkActionResult_t TalkActions::playerSaySpell(const std::shared_ptr<Player>& pl
 			}
 		}
 
-		if (talkaction.fromLua) {
-			if (talkaction.getNeedAccess() && !player->getGroup()->access) {
+		if (talkaction->fromLua) {
+			if (talkaction->getNeedAccess() && !player->getGroup()->access) {
 				return TALKACTION_CONTINUE;
 			}
 
-			if (player->getAccountType() < talkaction.getRequiredAccountType()) {
+			if (player->getAccountType() < talkaction->getRequiredAccountType()) {
 				return TALKACTION_CONTINUE;
 			}
 		}
 
-		if (talkaction.executeSay(player, talkactionWords, param, type)) {
+		if (talkaction->executeSay(player, talkactionWords, param, type)) {
 			return TALKACTION_CONTINUE;
 		}
 		return TALKACTION_BREAK;

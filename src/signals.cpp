@@ -27,7 +27,7 @@ extern Dispatcher g_dispatcher;
 
 extern Actions* g_actions;
 extern Monsters g_monsters;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern std::unique_ptr<Weapons> g_weapons;

@@ -17,7 +17,7 @@
 Actions* g_actions = nullptr;
 Chat g_chat;
 Spells* g_spells = nullptr;
-TalkActions* g_talkActions = nullptr;
+std::unique_ptr<TalkActions> g_talkActions = nullptr;
 MoveEvents* g_moveEvents = nullptr;
 std::unique_ptr<Weapons> g_weapons = nullptr;
 Scripts* g_scripts = nullptr;
@@ -27,9 +27,9 @@ extern LuaEnvironment g_luaEnvironment;
 ScriptingManager::~ScriptingManager()
 {
 	g_weapons.reset();
+	g_talkActions.reset();
 	delete g_spells;
 	delete g_actions;
-	delete g_talkActions;
 	delete g_moveEvents;
 	delete g_scripts;
 }
@@ -57,7 +57,7 @@ bool ScriptingManager::loadScriptSystems()
 	}
 
 	g_actions = new Actions();
-	g_talkActions = new TalkActions();
+	g_talkActions = std::make_unique<TalkActions>();
 
 	g_moveEvents = new MoveEvents();
 	if (!g_moveEvents->loadFromXml()) {
