@@ -25,14 +25,14 @@ public:
 	void loadDefaults();
 	std::shared_ptr<const Weapon> getWeapon(const std::shared_ptr<const Item>& item) const;
 
-	bool registerLuaEvent(std::shared_ptr<Weapon> weapon);
+	bool registerLuaEvent(const std::shared_ptr<Weapon>& weapon);
 	void clear(bool fromLua) override final;
 
 private:
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "weapons"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
+	std::shared_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(const std::shared_ptr<Event>& event, const pugi::xml_node& node) override;
 
 	std::map<uint32_t, std::shared_ptr<Weapon>> weapons;
 
@@ -44,7 +44,16 @@ class Weapon : public Event
 public:
 	explicit Weapon(LuaScriptInterface* luaInterface) : Event(luaInterface) {}
 
+	// non-copyable
+	Weapon(const Weapon&) = delete;
+	Weapon& operator=(const Weapon&) = delete;
+
 	bool configureEvent(const pugi::xml_node&) override { return false; }
+	std::shared_ptr<Weapon> asWeapon() override final { return std::static_pointer_cast<Weapon>(shared_from_this()); }
+	std::shared_ptr<const Weapon> asWeapon() const override final
+	{
+		return std::static_pointer_cast<const Weapon>(shared_from_this());
+	}
 	bool loadFunction(const pugi::xml_attribute&, bool) final { return true; }
 	virtual void configureWeapon(const ItemType& it);
 	virtual bool interruptSwing() const { return false; }

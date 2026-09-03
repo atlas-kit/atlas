@@ -14,11 +14,11 @@
 #include "talkaction.h"
 #include "weapons.h"
 
-Actions* g_actions = nullptr;
+std::unique_ptr<Actions> g_actions = nullptr;
 Chat g_chat;
-Spells* g_spells = nullptr;
-TalkActions* g_talkActions = nullptr;
-MoveEvents* g_moveEvents = nullptr;
+std::unique_ptr<Spells> g_spells = nullptr;
+std::unique_ptr<TalkActions> g_talkActions = nullptr;
+std::unique_ptr<MoveEvents> g_moveEvents = nullptr;
 std::unique_ptr<Weapons> g_weapons = nullptr;
 Scripts* g_scripts = nullptr;
 
@@ -27,10 +27,10 @@ extern LuaEnvironment g_luaEnvironment;
 ScriptingManager::~ScriptingManager()
 {
 	g_weapons.reset();
-	delete g_spells;
-	delete g_actions;
-	delete g_talkActions;
-	delete g_moveEvents;
+	g_spells.reset();
+	g_actions.reset();
+	g_talkActions.reset();
+	g_moveEvents.reset();
 	delete g_scripts;
 }
 
@@ -50,16 +50,16 @@ bool ScriptingManager::loadScriptSystems()
 	g_weapons = std::make_unique<Weapons>();
 	g_weapons->loadDefaults();
 
-	g_spells = new Spells();
+	g_spells = std::make_unique<Spells>();
 	if (!g_spells->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load spells!" << std::endl;
 		return false;
 	}
 
-	g_actions = new Actions();
-	g_talkActions = new TalkActions();
+	g_actions = std::make_unique<Actions>();
+	g_talkActions = std::make_unique<TalkActions>();
 
-	g_moveEvents = new MoveEvents();
+	g_moveEvents = std::make_unique<MoveEvents>();
 	if (!g_moveEvents->loadFromXml()) {
 		std::cout << "> ERROR: Unable to load move events!" << std::endl;
 		return false;

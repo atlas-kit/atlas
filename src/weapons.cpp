@@ -85,34 +85,38 @@ void Weapons::loadDefaults()
 	}
 }
 
-std::unique_ptr<Event> Weapons::getEvent(const std::string& nodeName)
+std::shared_ptr<Event> Weapons::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "melee")) {
-		return std::make_unique<WeaponMelee>(&scriptInterface);
+		return std::make_shared<WeaponMelee>(&scriptInterface);
 	} else if (boost::iequals(nodeName, "distance")) {
-		return std::make_unique<WeaponDistance>(&scriptInterface);
+		return std::make_shared<WeaponDistance>(&scriptInterface);
 	} else if (boost::iequals(nodeName, "wand")) {
-		return std::make_unique<WeaponWand>(&scriptInterface);
+		return std::make_shared<WeaponWand>(&scriptInterface);
 	}
 	return nullptr;
 }
 
-bool Weapons::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
+bool Weapons::registerEvent(const std::shared_ptr<Event>& event, const pugi::xml_node&)
 {
-	std::unique_ptr<Weapon> weapon{static_cast<Weapon*>(event.release())};
+	const auto& weapon = event->asWeapon();
+	if (!weapon) {
+		return false;
+	}
+
 	uint16_t weaponId = weapon->getID();
 
-	auto result = weapons.emplace(weaponId, std::move(weapon));
+	auto result = weapons.emplace(weaponId, weapon);
 	if (!result.second) {
 		std::cout << "[Warning - Weapons::registerEvent] Duplicate registered item with id: " << weaponId << std::endl;
 	}
 	return result.second;
 }
 
-bool Weapons::registerLuaEvent(std::shared_ptr<Weapon> weapon)
+bool Weapons::registerLuaEvent(const std::shared_ptr<Weapon>& weapon)
 {
 	auto weaponId = weapon->getID();
-	weapons[weaponId] = std::move(weapon);
+	weapons[weaponId] = weapon;
 	return true;
 }
 

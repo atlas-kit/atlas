@@ -52,7 +52,7 @@ void onWrapItem(const std::shared_ptr<Player>& player, const std::shared_ptr<Ite
 void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, slots_t slot,
                        bool equip);
 void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg);
-bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell);
+bool onSpellCheck(const std::shared_ptr<Player>& player, const std::shared_ptr<const Spell>& spell);
 bool onLogin(const std::shared_ptr<Player>& player);
 void onJoin(const std::shared_ptr<Player>& player);
 bool onLogout(const std::shared_ptr<Player>& player);

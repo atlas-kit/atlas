@@ -25,11 +25,11 @@ extern Scheduler g_scheduler;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Monsters g_monsters;
-extern TalkActions* g_talkActions;
-extern MoveEvents* g_moveEvents;
-extern Spells* g_spells;
+extern std::unique_ptr<TalkActions> g_talkActions;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
+extern std::unique_ptr<Spells> g_spells;
 extern std::unique_ptr<Weapons> g_weapons;
 extern Game g_game;
 extern Chat g_chat;
@@ -63,11 +63,11 @@ void sighupHandler()
 	Npcs::reload();
 	std::cout << "Reloaded npcs." << std::endl;
 
-	g_monsters.reload();
-	std::cout << "Reloaded monsters." << std::endl;
-
 	g_spells->reload();
 	std::cout << "Reloaded spells." << std::endl;
+
+	g_monsters.reload();
+	std::cout << "Reloaded monsters." << std::endl;
 
 	g_talkActions->reload();
 	std::cout << "Reloaded talk actions." << std::endl;

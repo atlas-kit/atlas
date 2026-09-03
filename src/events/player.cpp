@@ -708,7 +708,7 @@ void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, s
 	tfs::events::getScriptInterface().callVoidFunction(3);
 }
 
-bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell)
+bool onSpellCheck(const std::shared_ptr<Player>& player, const std::shared_ptr<const Spell>& spell)
 {
 	// Player:onSpellCheck(spell)
 	if (playerHandlers.onSpellCheck == -1) {

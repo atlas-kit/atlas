@@ -890,7 +890,13 @@ int luaMonsterTypeGetAttackList(lua_State* L)
 		tfs::lua::setField(L, "maxCombatValue", spellBlock.maxCombatValue);
 		tfs::lua::setField(L, "range", spellBlock.range);
 		tfs::lua::setField(L, "speed", spellBlock.speed.count());
-		tfs::lua::pushUserdata(L, static_cast<CombatSpell*>(spellBlock.spell));
+		const auto& spell = spellBlock.spell.lock();
+		if (const auto& combatSpell = spell ? spell->asCombatSpell() : nullptr) {
+			tfs::lua::pushSharedPtr(L, combatSpell);
+			tfs::lua::setMetatable(L, -1, "CombatSpell");
+		} else {
+			lua_pushnil(L);
+		}
 		lua_setfield(L, -2, "spell");
 
 		lua_rawseti(L, -2, ++index);
@@ -943,7 +949,13 @@ int luaMonsterTypeGetDefenseList(lua_State* L)
 		tfs::lua::setField(L, "maxCombatValue", spellBlock.maxCombatValue);
 		tfs::lua::setField(L, "range", spellBlock.range);
 		tfs::lua::setField(L, "speed", spellBlock.speed.count());
-		tfs::lua::pushUserdata(L, static_cast<CombatSpell*>(spellBlock.spell));
+		const auto& spell = spellBlock.spell.lock();
+		if (const auto& combatSpell = spell ? spell->asCombatSpell() : nullptr) {
+			tfs::lua::pushSharedPtr(L, combatSpell);
+			tfs::lua::setMetatable(L, -1, "CombatSpell");
+		} else {
+			lua_pushnil(L);
+		}
 		lua_setfield(L, -2, "spell");
 
 		lua_rawseti(L, -2, ++index);
@@ -1623,6 +1635,9 @@ void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 	registerEnum(lsi, MONSTERS_EVENT_SAY);
 
 	registerEnum(lsi, MAX_LOOTCHANCE);
+
+	lsi.registerClass("CombatSpell", "");
+	lsi.registerMetaMethod("CombatSpell", "__gc", tfs::lua::luaSharedPtrDelete<CombatSpell>);
 
 	lsi.registerClass("MonsterSpell", "", luaCreateMonsterSpell);
 	lsi.registerMetaMethod("MonsterSpell", "__gc", luaDeleteMonsterSpell);

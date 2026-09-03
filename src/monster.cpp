@@ -776,6 +776,11 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 			break;
 		}
 
+		const auto& spell = spellBlock.spell.lock();
+		if (!spell) {
+			continue;
+		}
+
 		bool inRange = false;
 
 		if (canUseSpell(position, targetPosition, spellBlock, interval, inRange, resetTicks)) {
@@ -787,7 +792,7 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 
 				minCombatValue = spellBlock.minCombatValue;
 				maxCombatValue = spellBlock.maxCombatValue;
-				spellBlock.spell->castSpell(asMonster(), attackedCreature);
+				spell->castSpell(asMonster(), attackedCreature);
 
 				if (spellBlock.isMelee) {
 					lastMeleeAttack = std::chrono::steady_clock::now();
@@ -914,6 +919,11 @@ void Monster::onThinkDefense(std::chrono::milliseconds interval)
 	defenseTicks += interval;
 
 	for (const spellBlock_t& spellBlock : mType->info.defenseSpells) {
+		const auto& spell = spellBlock.spell.lock();
+		if (!spell) {
+			continue;
+		}
+
 		if (spellBlock.speed > defenseTicks) {
 			resetTicks = false;
 			continue;
@@ -927,7 +937,7 @@ void Monster::onThinkDefense(std::chrono::milliseconds interval)
 		if ((spellBlock.chance >= static_cast<uint32_t>(uniform_random(1, 100)))) {
 			minCombatValue = spellBlock.minCombatValue;
 			maxCombatValue = spellBlock.maxCombatValue;
-			spellBlock.spell->castSpell(asMonster(), asMonster());
+			spell->castSpell(asMonster(), asMonster());
 		}
 	}
 
@@ -1108,7 +1118,7 @@ static void pushCreatures(const std::shared_ptr<Tile>& tile)
 		std::shared_ptr<Monster> lastPushedMonster = nullptr;
 
 		for (size_t i = 0; i < creatures->size();) {
-			if (const auto monster = creatures->at(i)->asMonster()) {
+			if (const auto& monster = creatures->at(i)->asMonster()) {
 				if (monster->isPushable()) {
 					if (monster != lastPushedMonster && pushCreature(monster)) {
 						lastPushedMonster = monster;

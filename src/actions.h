@@ -11,13 +11,25 @@
 using ActionFunction = std::function<bool(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item,
                                           const Position& fromPosition, const std::shared_ptr<Thing>& target,
                                           const Position& toPosition, bool isHotkey)>;
+class RuneSpell;
 
 class Action : public Event
 {
 public:
 	explicit Action(LuaScriptInterface* luaInterface);
 
+	// non-copyable
+	Action(const Action&) = delete;
+	Action& operator=(const Action&) = delete;
+
 	bool configureEvent(const pugi::xml_node&) override { return false; }
+	std::shared_ptr<Action> asAction() override final { return std::static_pointer_cast<Action>(shared_from_this()); }
+	std::shared_ptr<const Action> asAction() const override final
+	{
+		return std::static_pointer_cast<const Action>(shared_from_this());
+	}
+	virtual std::shared_ptr<RuneSpell> asRuneSpell() { return nullptr; }
+	virtual std::shared_ptr<const RuneSpell> asRuneSpell() const { return nullptr; }
 
 	// scripting
 	virtual bool executeUse(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item,
@@ -71,21 +83,25 @@ public:
 	ReturnValue canUseFar(const std::shared_ptr<const Creature>& creature, const Position& toPos, bool checkLineOfSight,
 	                      bool checkFloor);
 
-	bool registerLuaEvent(Action* event);
+	bool registerLuaEvent(const std::shared_ptr<Action>& event);
 	void clear(bool fromLua) override final;
 
-	bool isValid(std::map<Action*, std::vector<uint16_t>> map, Action* action) { return map.find(action) != map.end(); }
-	void clearItemIdRange(Action* action) { ids.erase(action); }
-	const std::vector<uint16_t>& getItemIdRange(Action* action) const { return ids.at(action); }
-	void addItemId(Action* action, uint16_t id) { ids[action].emplace_back(id); }
+	bool isValid(const std::map<std::shared_ptr<Action>, std::vector<uint16_t>>& map,
+	             const std::shared_ptr<Action>& action)
+	{
+		return map.find(action) != map.end();
+	}
+	void clearItemIdRange(const std::shared_ptr<Action>& action) { ids.erase(action); }
+	const std::vector<uint16_t>& getItemIdRange(const std::shared_ptr<Action>& action) const { return ids.at(action); }
+	void addItemId(const std::shared_ptr<Action>& action, uint16_t id) { ids[action].emplace_back(id); }
 
-	void clearUniqueIdRange(Action* action) { uids.erase(action); }
-	const std::vector<uint16_t>& getUniqueIdRange(Action* action) const { return uids.at(action); }
-	void addUniqueId(Action* action, uint16_t id) { uids[action].emplace_back(id); }
+	void clearUniqueIdRange(const std::shared_ptr<Action>& action) { uids.erase(action); }
+	const std::vector<uint16_t>& getUniqueIdRange(const std::shared_ptr<Action>& action) const { return uids.at(action); }
+	void addUniqueId(const std::shared_ptr<Action>& action, uint16_t id) { uids[action].emplace_back(id); }
 
-	void clearActionIdRange(Action* action) { aids.erase(action); }
-	const std::vector<uint16_t>& getActionIdRange(Action* action) const { return aids.at(action); }
-	void addActionId(Action* action, uint16_t id) { aids[action].emplace_back(id); }
+	void clearActionIdRange(const std::shared_ptr<Action>& action) { aids.erase(action); }
+	const std::vector<uint16_t>& getActionIdRange(const std::shared_ptr<Action>& action) const { return aids.at(action); }
+	void addActionId(const std::shared_ptr<Action>& action, uint16_t id) { aids[action].emplace_back(id); }
 
 private:
 	ReturnValue internalUseItem(const std::shared_ptr<Player>& player, const Position& pos, uint8_t index,
@@ -93,18 +109,18 @@ private:
 
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "actions"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event>, const pugi::xml_node&) override { return false; }
+	std::shared_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(const std::shared_ptr<Event>&, const pugi::xml_node&) override { return false; }
 
-	using ActionUseMap = std::map<uint16_t, Action>;
+	using ActionUseMap = std::map<uint16_t, std::shared_ptr<Action>>;
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
-	std::map<Action*, std::vector<uint16_t>> ids;
-	std::map<Action*, std::vector<uint16_t>> uids;
-	std::map<Action*, std::vector<uint16_t>> aids;
+	std::map<std::shared_ptr<Action>, std::vector<uint16_t>> ids;
+	std::map<std::shared_ptr<Action>, std::vector<uint16_t>> uids;
+	std::map<std::shared_ptr<Action>, std::vector<uint16_t>> aids;
 
-	Action* getAction(const std::shared_ptr<const Item>& item);
+	std::shared_ptr<Action> getAction(const std::shared_ptr<const Item>& item);
 	void clearMap(ActionUseMap& map, bool fromLua);
 
 	LuaScriptInterface scriptInterface;

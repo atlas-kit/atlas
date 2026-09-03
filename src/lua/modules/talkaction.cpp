@@ -10,7 +10,7 @@
 #include "../script.h"
 
 extern Scripts* g_scripts;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 
 namespace {
 
@@ -23,12 +23,12 @@ int luaCreateTalkaction(lua_State* L)
 		return 1;
 	}
 
-	TalkAction* talkAction = new TalkAction(tfs::lua::getScriptEnv()->getScriptInterface());
+	auto talkAction = std::make_shared<TalkAction>(tfs::lua::getScriptEnv()->getScriptInterface());
 	for (int i = 2; i <= lua_gettop(L); i++) {
 		talkAction->setWords(tfs::lua::getString(L, i));
 	}
 	talkAction->fromLua = true;
-	tfs::lua::pushUserdata(L, talkAction);
+	tfs::lua::pushSharedPtr(L, talkAction);
 	tfs::lua::setMetatable(L, -1, "TalkAction");
 	return 1;
 }
@@ -36,7 +36,7 @@ int luaCreateTalkaction(lua_State* L)
 int luaTalkactionOnSay(lua_State* L)
 {
 	// talkAction:onSay(callback)
-	TalkAction* talk = tfs::lua::getUserdata<TalkAction>(L, 1);
+	const auto& talk = tfs::lua::getSharedPtr<TalkAction>(L, 1);
 	if (talk) {
 		if (!talk->loadCallback()) {
 			tfs::lua::pushBoolean(L, false);
@@ -52,7 +52,7 @@ int luaTalkactionOnSay(lua_State* L)
 int luaTalkactionRegister(lua_State* L)
 {
 	// talkAction:register()
-	TalkAction* talk = tfs::lua::getUserdata<TalkAction>(L, 1);
+	const auto& talk = tfs::lua::getSharedPtr<TalkAction>(L, 1);
 	if (talk) {
 		if (!talk->isScripted()) {
 			tfs::lua::pushBoolean(L, false);
@@ -68,7 +68,7 @@ int luaTalkactionRegister(lua_State* L)
 int luaTalkactionSeparator(lua_State* L)
 {
 	// talkAction:separator(sep)
-	TalkAction* talk = tfs::lua::getUserdata<TalkAction>(L, 1);
+	const auto& talk = tfs::lua::getSharedPtr<TalkAction>(L, 1);
 	if (talk) {
 		talk->setSeparator(tfs::lua::getString(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -81,7 +81,7 @@ int luaTalkactionSeparator(lua_State* L)
 int luaTalkactionAccess(lua_State* L)
 {
 	// talkAction:access(needAccess = false)
-	TalkAction* talk = tfs::lua::getUserdata<TalkAction>(L, 1);
+	const auto& talk = tfs::lua::getSharedPtr<TalkAction>(L, 1);
 	if (talk) {
 		talk->setNeedAccess(tfs::lua::getBoolean(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -94,7 +94,7 @@ int luaTalkactionAccess(lua_State* L)
 int luaTalkactionAccountType(lua_State* L)
 {
 	// talkAction:accountType(AccountType_t = ACCOUNT_TYPE_NORMAL)
-	TalkAction* talk = tfs::lua::getUserdata<TalkAction>(L, 1);
+	const auto& talk = tfs::lua::getSharedPtr<TalkAction>(L, 1);
 	if (talk) {
 		talk->setRequiredAccountType(tfs::lua::getNumber<AccountType_t>(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -109,6 +109,7 @@ int luaTalkactionAccountType(lua_State* L)
 void tfs::lua::registerTalkAction(LuaScriptInterface& lsi)
 {
 	lsi.registerClass("TalkAction", "", luaCreateTalkaction);
+	lsi.registerMetaMethod("TalkAction", "__gc", tfs::lua::luaSharedPtrDelete<TalkAction>);
 	lsi.registerMethod("TalkAction", "onSay", luaTalkactionOnSay);
 	lsi.registerMethod("TalkAction", "register", luaTalkactionRegister);
 	lsi.registerMethod("TalkAction", "separator", luaTalkactionSeparator);

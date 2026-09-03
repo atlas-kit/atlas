@@ -232,13 +232,14 @@ int luaWeaponBreakChance(lua_State* L)
 int luaWeaponWandDamage(lua_State* L)
 {
 	// weapon:damage(damage[min, max]) only use this if the weapon is a wand!
-	WeaponWand* weapon = tfs::lua::getUserdata<WeaponWand>(L, 1);
-	if (weapon) {
-		weapon->setMinChange(tfs::lua::getNumber<uint32_t>(L, 2));
+	const auto& weapon = tfs::lua::getSharedPtr<Weapon>(L, 1);
+	if (weapon && weapon->weaponType == WEAPON_WAND) {
+		const auto& wand = std::static_pointer_cast<WeaponWand>(weapon);
+		wand->setMinChange(tfs::lua::getNumber<uint32_t>(L, 2));
 		if (lua_gettop(L) > 2) {
-			weapon->setMaxChange(tfs::lua::getNumber<uint32_t>(L, 3));
+			wand->setMaxChange(tfs::lua::getNumber<uint32_t>(L, 3));
 		} else {
-			weapon->setMaxChange(tfs::lua::getNumber<uint32_t>(L, 2));
+			wand->setMaxChange(tfs::lua::getNumber<uint32_t>(L, 2));
 		}
 		tfs::lua::pushBoolean(L, true);
 	} else {
@@ -504,9 +505,10 @@ int luaWeaponSlotType(lua_State* L)
 int luaWeaponAmmoType(lua_State* L)
 {
 	// weapon:ammoType(type)
-	WeaponDistance* weapon = tfs::lua::getUserdata<WeaponDistance>(L, 1);
-	if (weapon) {
-		uint16_t id = weapon->getID();
+	const auto& weapon = tfs::lua::getSharedPtr<Weapon>(L, 1);
+	if (weapon && (weapon->weaponType == WEAPON_DISTANCE || weapon->weaponType == WEAPON_AMMO)) {
+		const auto& distanceWeapon = std::static_pointer_cast<WeaponDistance>(weapon);
+		uint16_t id = distanceWeapon->getID();
 		ItemType& it = Item::items.getItemType(id);
 		std::string type = tfs::lua::getString(L, 2);
 
@@ -614,6 +616,7 @@ void tfs::lua::registerWeapon(LuaScriptInterface& lsi)
 	registerEnum(lsi, AMMO_SNOWBALL);
 
 	lsi.registerClass("Weapon", "", luaCreateWeapon);
+	lsi.registerMetaMethod("Weapon", "__gc", tfs::lua::luaSharedPtrDelete<Weapon>);
 	lsi.registerMethod("Weapon", "action", luaWeaponAction);
 	lsi.registerMethod("Weapon", "register", luaWeaponRegister);
 	lsi.registerMethod("Weapon", "id", luaWeaponId);

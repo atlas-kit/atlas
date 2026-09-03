@@ -34,16 +34,16 @@
 #include <chrono>
 #include <fstream>
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 extern Monsters g_monsters;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
-extern Spells* g_spells;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;
 
@@ -5536,7 +5536,14 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_weapons->clear(true);
 			g_weapons->loadDefaults();
 			g_spells->clear(true);
+			if (!g_scripts->loadScripts("scripts/lib", true, true)) {
+				return false;
+			}
 			g_scripts->loadScripts("scripts", false, true);
+			if (!g_monsters.reload()) {
+				std::cout << "[Error - Game::reload] Failed to reload monsters." << std::endl;
+				std::terminate();
+			}
 			/*
 			Npcs::reload();
 			Item::items.reload();
@@ -5571,7 +5578,14 @@ bool Game::reload(ReloadTypes_t reloadType)
 			g_moveEvents->clear(true);
 			g_talkActions->clear(true);
 			g_spells->clear(true);
+			if (!g_scripts->loadScripts("scripts/lib", true, true)) {
+				return false;
+			}
 			g_scripts->loadScripts("scripts", false, true);
+			if (!g_monsters.reload()) {
+				std::cout << "[Error - Game::reload] Failed to reload monsters." << std::endl;
+				std::terminate();
+			}
 			return true;
 		}
 	}

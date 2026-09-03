@@ -28,7 +28,7 @@ enum MoveEvent_t
 
 struct MoveEventList
 {
-	std::list<MoveEvent> moveEvent[MOVE_EVENT_LAST];
+	std::list<std::shared_ptr<MoveEvent>> moveEvent[MOVE_EVENT_LAST];
 };
 
 class MoveEvents final : public BaseEvents
@@ -48,35 +48,49 @@ public:
 	ReturnValue onPlayerDeEquip(const std::shared_ptr<Player>& player, const std::shared_ptr<Item>& item, slots_t slot);
 	uint32_t onItemMove(const std::shared_ptr<Item>& item, const std::shared_ptr<Tile>& tile, bool isAdd);
 
-	MoveEvent* getEvent(const std::shared_ptr<Item>& item, MoveEvent_t eventType);
+	std::shared_ptr<MoveEvent> getEvent(const std::shared_ptr<Item>& item, MoveEvent_t eventType);
 
-	bool registerLuaEvent(MoveEvent* event);
-	bool registerLuaFunction(MoveEvent* event);
+	bool registerLuaEvent(const std::shared_ptr<MoveEvent>& event);
+	bool registerLuaFunction(const std::shared_ptr<MoveEvent>& event);
 	void clear(bool fromLua) override final;
 
-	bool isValid(std::map<MoveEvent*, std::vector<uint32_t>> map, MoveEvent* event)
+	bool isValid(const std::map<std::shared_ptr<MoveEvent>, std::vector<uint32_t>>& map,
+	             const std::shared_ptr<MoveEvent>& event)
 	{
 		return map.find(event) != map.end();
 	}
-	bool isValidPos(std::map<MoveEvent*, std::vector<Position>> map, MoveEvent* event)
+	bool isValidPos(const std::map<std::shared_ptr<MoveEvent>, std::vector<Position>>& map,
+	                const std::shared_ptr<MoveEvent>& event)
 	{
 		return map.find(event) != map.end();
 	}
-	void clearItemIdRange(MoveEvent* event) { itemIdRange.erase(event); }
-	const std::vector<uint32_t>& getItemIdRange(MoveEvent* event) const { return itemIdRange.at(event); }
-	void addItemId(MoveEvent* event, uint32_t id) { itemIdRange[event].emplace_back(id); }
+	void clearItemIdRange(const std::shared_ptr<MoveEvent>& event) { itemIdRange.erase(event); }
+	const std::vector<uint32_t>& getItemIdRange(const std::shared_ptr<MoveEvent>& event) const
+	{
+		return itemIdRange.at(event);
+	}
+	void addItemId(const std::shared_ptr<MoveEvent>& event, uint32_t id) { itemIdRange[event].emplace_back(id); }
 
-	void clearActionIdRange(MoveEvent* event) { actionIdRange.erase(event); }
-	const std::vector<uint32_t>& getActionIdRange(MoveEvent* event) const { return actionIdRange.at(event); }
-	void addActionId(MoveEvent* event, uint32_t id) { actionIdRange[event].emplace_back(id); }
+	void clearActionIdRange(const std::shared_ptr<MoveEvent>& event) { actionIdRange.erase(event); }
+	const std::vector<uint32_t>& getActionIdRange(const std::shared_ptr<MoveEvent>& event) const
+	{
+		return actionIdRange.at(event);
+	}
+	void addActionId(const std::shared_ptr<MoveEvent>& event, uint32_t id) { actionIdRange[event].emplace_back(id); }
 
-	void clearUniqueIdRange(MoveEvent* event) { uniqueIdRange.erase(event); }
-	const std::vector<uint32_t>& getUniqueIdRange(MoveEvent* event) const { return uniqueIdRange.at(event); }
-	void addUniqueId(MoveEvent* event, uint32_t id) { uniqueIdRange[event].emplace_back(id); }
+	void clearUniqueIdRange(const std::shared_ptr<MoveEvent>& event) { uniqueIdRange.erase(event); }
+	const std::vector<uint32_t>& getUniqueIdRange(const std::shared_ptr<MoveEvent>& event) const
+	{
+		return uniqueIdRange.at(event);
+	}
+	void addUniqueId(const std::shared_ptr<MoveEvent>& event, uint32_t id) { uniqueIdRange[event].emplace_back(id); }
 
-	void clearPosList(MoveEvent* event) { posList.erase(event); }
-	const std::vector<Position>& getPosList(MoveEvent* event) const { return posList.at(event); }
-	void addPosList(MoveEvent* event, Position pos) { posList[event].emplace_back(pos); }
+	void clearPosList(const std::shared_ptr<MoveEvent>& event) { posList.erase(event); }
+	const std::vector<Position>& getPosList(const std::shared_ptr<MoveEvent>& event) const
+	{
+		return posList.at(event);
+	}
+	void addPosList(const std::shared_ptr<MoveEvent>& event, Position pos) { posList[event].emplace_back(pos); }
 
 private:
 	using MoveListMap = std::map<int32_t, MoveEventList>;
@@ -86,24 +100,24 @@ private:
 
 	LuaScriptInterface& getScriptInterface() override;
 	std::string_view getScriptBaseName() const override { return "movements"; }
-	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
-	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
+	std::shared_ptr<Event> getEvent(const std::string& nodeName) override;
+	bool registerEvent(const std::shared_ptr<Event>& event, const pugi::xml_node& node) override;
 
-	void addEvent(MoveEvent moveEvent, int32_t id, MoveListMap& map);
+	void addEvent(std::shared_ptr<MoveEvent> moveEvent, int32_t id, MoveListMap& map);
 
-	void addEvent(MoveEvent moveEvent, const Position& pos, MovePosListMap& map);
-	MoveEvent* getEvent(const std::shared_ptr<const Tile>& tile, MoveEvent_t eventType);
+	void addEvent(std::shared_ptr<MoveEvent> moveEvent, const Position& pos, MovePosListMap& map);
+	std::shared_ptr<MoveEvent> getEvent(const std::shared_ptr<const Tile>& tile, MoveEvent_t eventType);
 
-	MoveEvent* getEvent(const std::shared_ptr<Item>& item, MoveEvent_t eventType, slots_t slot);
+	std::shared_ptr<MoveEvent> getEvent(const std::shared_ptr<Item>& item, MoveEvent_t eventType, slots_t slot);
 
 	MoveListMap uniqueIdMap;
 	MoveListMap actionIdMap;
 	MoveListMap itemIdMap;
 	MovePosListMap positionMap;
-	std::map<MoveEvent*, std::vector<uint32_t>> itemIdRange;
-	std::map<MoveEvent*, std::vector<uint32_t>> actionIdRange;
-	std::map<MoveEvent*, std::vector<uint32_t>> uniqueIdRange;
-	std::map<MoveEvent*, std::vector<Position>> posList;
+	std::map<std::shared_ptr<MoveEvent>, std::vector<uint32_t>> itemIdRange;
+	std::map<std::shared_ptr<MoveEvent>, std::vector<uint32_t>> actionIdRange;
+	std::map<std::shared_ptr<MoveEvent>, std::vector<uint32_t>> uniqueIdRange;
+	std::map<std::shared_ptr<MoveEvent>, std::vector<Position>> posList;
 
 	LuaScriptInterface scriptInterface;
 };
@@ -112,13 +126,27 @@ using StepFunction = std::function<uint32_t(const std::shared_ptr<Creature>& cre
                                             const std::shared_ptr<Item>& item, const Position& pos)>;
 using MoveFunction = std::function<uint32_t(const std::shared_ptr<Item>& item, const std::shared_ptr<Item>& tileItem,
                                             const Position& pos)>;
-using EquipFunction = std::function<ReturnValue(MoveEvent* moveEvent, const std::shared_ptr<Player>& player,
+using EquipFunction = std::function<ReturnValue(const std::shared_ptr<MoveEvent>& moveEvent,
+                                                const std::shared_ptr<Player>& player,
                                                 const std::shared_ptr<Item>& item, slots_t slot, bool boolean)>;
 
 class MoveEvent final : public Event
 {
 public:
 	explicit MoveEvent(LuaScriptInterface* luaInterface);
+
+	// non-copyable
+	MoveEvent(const MoveEvent&) = delete;
+	MoveEvent& operator=(const MoveEvent&) = delete;
+
+	std::shared_ptr<MoveEvent> asMoveEvent() override
+	{
+		return std::static_pointer_cast<MoveEvent>(shared_from_this());
+	}
+	std::shared_ptr<const MoveEvent> asMoveEvent() const override
+	{
+		return std::static_pointer_cast<const MoveEvent>(shared_from_this());
+	}
 
 	MoveEvent_t getEventType() const;
 	void setEventType(MoveEvent_t type);
@@ -179,9 +207,9 @@ public:
 	static uint32_t RemoveItemField(const std::shared_ptr<Item>& item, const std::shared_ptr<Item>& tileItem,
 	                                const Position& pos);
 
-	static ReturnValue EquipItem(MoveEvent* moveEvent, const std::shared_ptr<Player>& player,
+	static ReturnValue EquipItem(const std::shared_ptr<MoveEvent>& moveEvent, const std::shared_ptr<Player>& player,
 	                             const std::shared_ptr<Item>& item, slots_t slot, bool isCheck);
-	static ReturnValue DeEquipItem(MoveEvent* moveEvent, const std::shared_ptr<Player>& player,
+	static ReturnValue DeEquipItem(const std::shared_ptr<MoveEvent>& moveEvent, const std::shared_ptr<Player>& player,
 	                               const std::shared_ptr<Item>& item, slots_t slot, bool);
 
 	MoveEvent_t eventType = MOVE_EVENT_NONE;

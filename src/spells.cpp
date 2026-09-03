@@ -18,7 +18,7 @@
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
 extern Monsters g_monsters;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 Spells::Spells() { scriptInterface.initState(); }
@@ -32,7 +32,7 @@ TalkActionResult_t Spells::playerSaySpell(const std::shared_ptr<Player>& player,
 	// strip trailing spaces
 	boost::algorithm::trim(str_words);
 
-	InstantSpell* instantSpell = getInstantSpell(str_words);
+	const auto& instantSpell = getInstantSpell(str_words);
 	if (!instantSpell) {
 		return TALKACTION_CONTINUE;
 	}
@@ -82,7 +82,7 @@ TalkActionResult_t Spells::playerSaySpell(const std::shared_ptr<Player>& player,
 void Spells::clearMaps(bool fromLua)
 {
 	for (auto instant = instants.begin(); instant != instants.end();) {
-		if (fromLua == instant->second.fromLua) {
+		if (fromLua == instant->second->fromLua) {
 			instant = instants.erase(instant);
 		} else {
 			++instant;
@@ -90,7 +90,7 @@ void Spells::clearMaps(bool fromLua)
 	}
 
 	for (auto rune = runes.begin(); rune != runes.end();) {
-		if (fromLua == rune->second.fromLua) {
+		if (fromLua == rune->second->fromLua) {
 			rune = runes.erase(rune);
 		} else {
 			++rune;
@@ -107,54 +107,53 @@ void Spells::clear(bool fromLua)
 
 LuaScriptInterface& Spells::getScriptInterface() { return scriptInterface; }
 
-std::unique_ptr<Event> Spells::getEvent(const std::string& nodeName)
+std::shared_ptr<Event> Spells::getEvent(const std::string& nodeName)
 {
 	if (boost::iequals(nodeName, "rune")) {
-		return std::make_unique<RuneSpell>(&scriptInterface);
+		return std::make_shared<RuneSpell>(&scriptInterface);
 	} else if (boost::iequals(nodeName, "instant")) {
-		return std::make_unique<InstantSpell>(&scriptInterface);
+		return std::make_shared<InstantSpell>(&scriptInterface);
 	}
 	return nullptr;
 }
 
-bool Spells::registerEvent(std::unique_ptr<Event> event, const pugi::xml_node&)
+bool Spells::registerEvent(const std::shared_ptr<Event>& event, const pugi::xml_node&)
 {
-	Spell* spell = dynamic_cast<Spell*>(event.get());
-	if (!spell) {
-		return false;
+	if (const auto& talkAction = event->asTalkAction()) {
+		if (const auto& instant = talkAction->asInstantSpell()) {
+			const auto& words = instant->getWords();
+			auto result = instants.emplace(words, instant);
+			if (!result.second) {
+				std::cout << "[Warning - Spells::registerEvent] Duplicate registered instant spell with words: "
+				          << words << std::endl;
+			}
+			return result.second;
+		}
 	}
 
-	if (InstantSpell* instantPtr = spell->getInstantSpell()) {
-		std::unique_ptr<InstantSpell> instant{instantPtr};
-		auto result = instants.emplace(instant->getWords(), std::move(*instant));
-		if (!result.second) {
-			std::cout << "[Warning - Spells::registerEvent] Duplicate registered instant spell with words: "
-			          << instant->getWords() << std::endl;
+	if (const auto& action = event->asAction()) {
+		if (const auto& rune = action->asRuneSpell()) {
+			const auto id = rune->getRuneItemId();
+			auto result = runes.emplace(id, rune);
+			if (!result.second) {
+				std::cout << "[Warning - Spells::registerEvent] Duplicate registered rune with id: " << id
+				          << std::endl;
+			}
+			return result.second;
 		}
-		return result.second;
-	}
-
-	if (RuneSpell* runePtr = spell->getRuneSpell()) {
-		std::unique_ptr<RuneSpell> rune{runePtr};
-		auto result = runes.emplace(rune->getRuneItemId(), std::move(*rune));
-		if (!result.second) {
-			std::cout << "[Warning - Spells::registerEvent] Duplicate registered rune with id: "
-			          << rune->getRuneItemId() << std::endl;
-		}
-		return result.second;
 	}
 
 	return false;
 }
 
-bool Spells::registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant)
+bool Spells::registerInstantLuaEvent(const std::shared_ptr<InstantSpell>& instant)
 {
 	if (!instant) {
 		return false;
 	}
 
-	const auto words = instant->getWords();
-	auto result = instants.emplace(instant->getWords(), std::move(*instant));
+	const auto& words = instant->getWords();
+	auto result = instants.emplace(words, instant);
 	if (!result.second) {
 		std::cout << "[Warning - Spells::registerInstantLuaEvent] Duplicate registered instant spell with words: "
 		          << words << std::endl;
@@ -163,14 +162,14 @@ bool Spells::registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant)
 	return result.second;
 }
 
-bool Spells::registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune)
+bool Spells::registerRuneLuaEvent(const std::shared_ptr<RuneSpell>& rune)
 {
 	if (!rune) {
 		return false;
 	}
 
 	const auto id = rune->getRuneItemId();
-	auto result = runes.emplace(rune->getRuneItemId(), std::move(*rune));
+	auto result = runes.emplace(id, rune);
 	if (!result.second) {
 		std::cout << "[Warning - Spells::registerRuneLuaEvent] Duplicate registered rune with id: " << id << std::endl;
 	}
@@ -178,49 +177,49 @@ bool Spells::registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune)
 	return result.second;
 }
 
-Spell* Spells::getSpellByName(const std::string& name)
+std::shared_ptr<Spell> Spells::getSpellByName(const std::string& name)
 {
-	Spell* spell = getRuneSpellByName(name);
+	std::shared_ptr<Spell> spell = getRuneSpellByName(name);
 	if (!spell) {
 		spell = getInstantSpellByName(name);
 	}
 	return spell;
 }
 
-RuneSpell* Spells::getRuneSpell(uint16_t id)
+std::shared_ptr<RuneSpell> Spells::getRuneSpell(uint16_t id)
 {
 	auto it = runes.find(id);
 	if (it == runes.end()) {
-		for (auto&& rune : runes | std::views::values) {
-			if (rune.getId() == id) {
-				return &rune;
+		for (const auto& rune : runes | std::views::values) {
+			if (rune->getId() == id) {
+				return rune;
 			}
 		}
 		return nullptr;
 	}
-	return &it->second;
+	return it->second;
 }
 
-RuneSpell* Spells::getRuneSpellByName(const std::string& name)
+std::shared_ptr<RuneSpell> Spells::getRuneSpellByName(const std::string& name)
 {
-	for (auto&& rune : runes | std::views::values) {
-		if (boost::iequals(rune.getName(), name)) {
-			return &rune;
+	for (const auto& rune : runes | std::views::values) {
+		if (boost::iequals(rune->getName(), name)) {
+			return rune;
 		}
 	}
 	return nullptr;
 }
 
-InstantSpell* Spells::getInstantSpell(const std::string& words)
+std::shared_ptr<InstantSpell> Spells::getInstantSpell(const std::string& words)
 {
-	InstantSpell* result = nullptr;
+	std::shared_ptr<InstantSpell> result = nullptr;
 
-	for (auto&& spell : instants | std::views::values) {
-		const std::string& instantSpellWords = spell.getWords();
+	for (const auto& spell : instants | std::views::values) {
+		const std::string& instantSpellWords = spell->getWords();
 		size_t spellLen = instantSpellWords.length();
 		if (boost::istarts_with(words, instantSpellWords)) {
 			if (!result || spellLen > result->getWords().size()) {
-				result = &spell;
+				result = spell;
 				if (words.length() == spellLen) {
 					break;
 				}
@@ -246,11 +245,11 @@ InstantSpell* Spells::getInstantSpell(const std::string& words)
 	return nullptr;
 }
 
-InstantSpell* Spells::getInstantSpellByName(const std::string& name)
+std::shared_ptr<InstantSpell> Spells::getInstantSpellByName(const std::string& name)
 {
-	for (auto&& spell : instants | std::views::values) {
-		if (boost::iequals(spell.getName(), name)) {
-			return &spell;
+	for (const auto& spell : instants | std::views::values) {
+		if (boost::iequals(spell->getName(), name)) {
+			return spell;
 		}
 	}
 	return nullptr;
@@ -539,7 +538,14 @@ bool Spell::playerSpellCheck(const std::shared_ptr<Player>& player) const
 		return false;
 	}
 
-	if (!tfs::events::player::onSpellCheck(player, this)) {
+	std::shared_ptr<const Spell> spell;
+	if (isInstant()) {
+		spell = getInstantSpell();
+	} else {
+		spell = getRuneSpell();
+	}
+
+	if (!spell || !tfs::events::player::onSpellCheck(player, spell)) {
 		return false;
 	}
 

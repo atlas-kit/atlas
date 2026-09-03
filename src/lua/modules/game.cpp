@@ -17,7 +17,7 @@
 
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Monsters g_monsters;
 extern Scripts* g_scripts;
 extern Dispatcher g_dispatcher;
@@ -289,7 +289,7 @@ int luaGameGetRuneSpells(lua_State* L)
 
 	int index = 0;
 	for (const auto& spell : runeSpells | std::views::values) {
-		tfs::lua::pushUserdata<const Spell>(L, &spell);
+		tfs::lua::pushSharedPtr<Spell>(L, spell);
 		tfs::lua::setMetatable(L, -1, "Spell");
 		lua_rawseti(L, -2, ++index);
 	}
@@ -306,7 +306,7 @@ int luaGameGetInstantSpells(lua_State* L)
 
 	int index = 0;
 	for (const auto& spell : instantSpells | std::views::values) {
-		tfs::lua::pushUserdata<const Spell>(L, &spell);
+		tfs::lua::pushSharedPtr<Spell>(L, spell);
 		tfs::lua::setMetatable(L, -1, "Spell");
 		lua_rawseti(L, -2, ++index);
 	}

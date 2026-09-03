@@ -2,6 +2,7 @@
 
 #include "../script.h"
 
+#include "../actions.h"
 #include "../chat.h"
 #include "../combat.h"
 #include "../configmanager.h"
@@ -13,6 +14,7 @@
 #include "../protocolstatus.h"
 #include "../scheduler.h"
 #include "../spells.h"
+#include "../talkaction.h"
 #include "../weapons.h"
 #include "api.h"
 #include "env.h"
@@ -26,9 +28,9 @@ extern Chat g_chat;
 extern Game g_game;
 extern Monsters g_monsters;
 extern Vocations g_vocations;
-extern Spells* g_spells;
-extern Actions* g_actions;
-extern TalkActions* g_talkActions;
+extern std::unique_ptr<Spells> g_spells;
+extern std::unique_ptr<Actions> g_actions;
+extern std::unique_ptr<TalkActions> g_talkActions;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
 

@@ -22,7 +22,7 @@
 extern Chat g_chat;
 extern Dispatcher g_dispatcher;
 extern Game g_game;
-extern MoveEvents* g_moveEvents;
+extern std::unique_ptr<MoveEvents> g_moveEvents;
 extern Scheduler g_scheduler;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;

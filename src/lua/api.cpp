@@ -15,7 +15,7 @@
 #include <string>
 
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 
 namespace tfs::lua {
 
@@ -301,7 +301,6 @@ void pushSpell(lua_State* L, const Spell& spell)
 	setField(L, "mlevel", spell.getMagicLevel());
 	setField(L, "mana", spell.getMana());
 	setField(L, "manapercent", spell.getManaPercent());
-	setMetatable(L, -1, "Spell");
 }
 
 void pushPosition(lua_State* L, const Position& position, int32_t stackpos /* = 0*/)
