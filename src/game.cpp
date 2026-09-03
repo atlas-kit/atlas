@@ -2514,25 +2514,6 @@ void Game::playerSeekInContainer(uint32_t playerId, uint8_t containerId, uint16_
 	player->sendContainer(containerId, container, index);
 }
 
-void Game::playerUpdateHouseWindow(uint32_t playerId, uint8_t listId, uint32_t windowTextId, const std::string& text)
-{
-	const auto& player = getPlayerByID(playerId);
-	if (!player) {
-		return;
-	}
-
-	uint32_t internalWindowTextId;
-	uint32_t internalListId;
-
-	const auto& house = player->getEditHouse(internalWindowTextId, internalListId);
-	if (house && house->canEditAccessList(internalListId, player) && internalWindowTextId == windowTextId &&
-	    listId == 0) {
-		house->setAccessList(internalListId, text);
-	}
-
-	player->setEditHouse(nullptr);
-}
-
 void Game::playerWrapItem(uint32_t playerId, const Position& position, uint8_t stackPos, const uint16_t spriteId)
 {
 	const auto& player = getPlayerByID(playerId);
