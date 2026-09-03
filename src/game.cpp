@@ -42,7 +42,7 @@ extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Scheduler g_scheduler;
 extern Scripts* g_scripts;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern TalkActions* g_talkActions;
 extern Vocations g_vocations;
 extern std::unique_ptr<Weapons> g_weapons;

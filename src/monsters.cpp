@@ -14,16 +14,9 @@
 #include "weapons.h"
 
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 
 Monsters g_monsters;
-
-spellBlock_t::~spellBlock_t()
-{
-	if (combatSpell) {
-		delete spell;
-	}
-}
 
 void MonsterType::loadLoot(MonsterType* monsterType, LootBlock lootBlock)
 {
@@ -171,7 +164,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::shared_ptr<CombatSpell> combatSpell = nullptr;
 	bool needTarget = false;
 	bool needDirection = false;
 
@@ -184,7 +177,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			needTarget = attr.as_bool();
 		}
 
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, needTarget, needDirection));
+		auto combatSpellPtr = std::make_shared<CombatSpell>(nullptr, needTarget, needDirection);
 		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
 		                                scriptName)) {
 			return false;
@@ -194,7 +187,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
+		combatSpell = combatSpellPtr;
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
@@ -514,7 +507,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 		}
 
 		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, needTarget, needDirection);
+		combatSpell = std::make_shared<CombatSpell>(combat, needTarget, needDirection);
 
 		for (auto attributeNode : node.children()) {
 			if ((attr = attributeNode.attribute("key"))) {
@@ -551,6 +544,7 @@ bool Monsters::deserializeSpell(const pugi::xml_node& node, spellBlock_t& sb, co
 
 	sb.spell = combatSpell;
 	if (combatSpell) {
+		sb.ownedSpell = combatSpell;
 		sb.combatSpell = true;
 	}
 	return true;
@@ -587,15 +581,15 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		sb.minCombatValue = value;
 	}
 
-	sb.spell = g_spells->getSpellByName(spell->name);
-	if (sb.spell) {
+	if (auto spellPtr = g_spells->getSpellByName(spell->name)) {
+		sb.spell = spellPtr;
 		return true;
 	}
 
-	CombatSpell* combatSpell = nullptr;
+	std::shared_ptr<CombatSpell> combatSpell = nullptr;
 
 	if (spell->isScripted) {
-		std::unique_ptr<CombatSpell> combatSpellPtr(new CombatSpell(nullptr, spell->needTarget, spell->needDirection));
+		auto combatSpellPtr = std::make_shared<CombatSpell>(nullptr, spell->needTarget, spell->needDirection);
 		if (!combatSpellPtr->loadScript("data/" + std::string{g_spells->getScriptBaseName()} + "/scripts/" +
 		                                spell->scriptName)) {
 			std::cout << "cannot find file" << std::endl;
@@ -606,7 +600,7 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 			return false;
 		}
 
-		combatSpell = combatSpellPtr.release();
+		combatSpell = combatSpellPtr;
 		combatSpell->getCombat()->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue,
 		                                                0);
 	} else {
@@ -787,11 +781,12 @@ bool Monsters::deserializeSpell(MonsterSpell* spell, spellBlock_t& sb, const std
 		}
 
 		combat->setPlayerCombatValues(COMBAT_FORMULA_DAMAGE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, spell->needTarget, spell->needDirection);
+		combatSpell = std::make_shared<CombatSpell>(combat, spell->needTarget, spell->needDirection);
 	}
 
 	sb.spell = combatSpell;
 	if (combatSpell) {
+		sb.ownedSpell = combatSpell;
 		sb.combatSpell = true;
 	}
 	return true;

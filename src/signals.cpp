@@ -29,7 +29,7 @@ extern Actions* g_actions;
 extern Monsters g_monsters;
 extern TalkActions* g_talkActions;
 extern MoveEvents* g_moveEvents;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern std::unique_ptr<Weapons> g_weapons;
 extern Game g_game;
 extern Chat g_chat;

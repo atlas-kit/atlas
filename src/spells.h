@@ -25,33 +25,33 @@ public:
 	Spells(const Spells&) = delete;
 	Spells& operator=(const Spells&) = delete;
 
-	Spell* getSpellByName(const std::string& name);
-	RuneSpell* getRuneSpell(uint16_t id);
-	RuneSpell* getRuneSpellByName(const std::string& name);
+	std::shared_ptr<Spell> getSpellByName(const std::string& name);
+	std::shared_ptr<RuneSpell> getRuneSpell(uint16_t id);
+	std::shared_ptr<RuneSpell> getRuneSpellByName(const std::string& name);
 
-	InstantSpell* getInstantSpell(const std::string& words);
-	InstantSpell* getInstantSpellByName(const std::string& name);
+	std::shared_ptr<InstantSpell> getInstantSpell(const std::string& words);
+	std::shared_ptr<InstantSpell> getInstantSpellByName(const std::string& name);
 
 	TalkActionResult_t playerSaySpell(const std::shared_ptr<Player>& player, std::string& words);
 
 	static Position getCasterPosition(const std::shared_ptr<Creature>& creature, Direction dir);
 	std::string_view getScriptBaseName() const override { return "spells"; }
 
-	const std::map<uint16_t, RuneSpell>& getRuneSpells() const { return runes; };
-	const std::map<std::string, InstantSpell>& getInstantSpells() const { return instants; };
+	const std::map<uint16_t, std::shared_ptr<RuneSpell>>& getRuneSpells() const { return runes; };
+	const std::map<std::string, std::shared_ptr<InstantSpell>>& getInstantSpells() const { return instants; };
 
 	void clearMaps(bool fromLua);
 	void clear(bool fromLua) override final;
-	bool registerInstantLuaEvent(std::unique_ptr<InstantSpell> instant);
-	bool registerRuneLuaEvent(std::unique_ptr<RuneSpell> rune);
+	bool registerInstantLuaEvent(std::shared_ptr<InstantSpell> instant);
+	bool registerRuneLuaEvent(std::shared_ptr<RuneSpell> rune);
 
 private:
 	LuaScriptInterface& getScriptInterface() override;
 	std::unique_ptr<Event> getEvent(const std::string& nodeName) override;
 	bool registerEvent(std::unique_ptr<Event> event, const pugi::xml_node& node) override;
 
-	std::map<uint16_t, RuneSpell> runes;
-	std::map<std::string, InstantSpell> instants;
+	std::map<uint16_t, std::shared_ptr<RuneSpell>> runes;
+	std::map<std::string, std::shared_ptr<InstantSpell>> instants;
 
 	friend class CombatSpell;
 	LuaScriptInterface scriptInterface{"Spell Interface"};

@@ -13,7 +13,7 @@
 #include "spells.h"
 
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Actions* g_actions;
 
 Actions::Actions() : scriptInterface("Action Interface") { scriptInterface.initState(); }
@@ -159,7 +159,10 @@ Action* Actions::getAction(const std::shared_ptr<const Item>& item)
 	}
 
 	// rune items
-	return g_spells->getRuneSpell(item->getID());
+	if (const auto& rune = g_spells->getRuneSpell(item->getID())) {
+		return rune.get();
+	}
+	return nullptr;
 }
 
 ReturnValue Actions::internalUseItem(const std::shared_ptr<Player>& player, const Position& pos, uint8_t index,

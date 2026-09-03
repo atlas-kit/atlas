@@ -17,7 +17,7 @@
 
 extern Chat g_chat;
 extern Game g_game;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Vocations g_vocations;
 
 namespace {
@@ -1680,7 +1680,7 @@ int luaPlayerCanLearnSpell(lua_State* L)
 	}
 
 	const std::string& spellName = tfs::lua::getString(L, 2);
-	InstantSpell* spell = g_spells->getInstantSpellByName(spellName);
+	const auto& spell = g_spells->getInstantSpellByName(spellName);
 	if (!spell) {
 		tfs::lua::reportError(L, "Spell \"" + spellName + "\" not found");
 		tfs::lua::pushBoolean(L, false);
@@ -1993,18 +1993,18 @@ int luaPlayerGetContainerIndex(lua_State* L)
 int luaPlayerGetRuneSpells(lua_State* L)
 {
 	// player:getRuneSpells()
-	Player* player = tfs::lua::getUserdata<Player>(L, 1);
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
 	if (!player) {
 		lua_pushnil(L);
 		return 1;
 	}
 
-	auto runeSpells = g_spells->getRuneSpells();
+	const auto& runeSpells = g_spells->getRuneSpells();
 
-	std::vector<RuneSpell*> spells;
-	for (auto& spell : runeSpells | std::views::values) {
-		if (spell.canUse(player)) {
-			spells.push_back(&spell);
+	std::vector<std::shared_ptr<RuneSpell>> spells;
+	for (const auto& spell : runeSpells | std::views::values) {
+		if (spell->canUse(player.get())) {
+			spells.push_back(spell);
 		}
 	}
 
@@ -2012,7 +2012,7 @@ int luaPlayerGetRuneSpells(lua_State* L)
 
 	int index = 0;
 	for (auto& spell : spells) {
-		tfs::lua::pushUserdata<Spell>(L, spell);
+		tfs::lua::pushSharedPtr<Spell>(L, spell);
 		tfs::lua::setMetatable(L, -1, "Spell");
 		lua_rawseti(L, -2, ++index);
 	}
@@ -2029,10 +2029,10 @@ int luaPlayerGetInstantSpells(lua_State* L)
 		return 1;
 	}
 
-	std::vector<const InstantSpell*> spells;
-	for (auto&& spell : g_spells->getInstantSpells() | std::views::values | std::views::as_const) {
-		if (spell.canCast(player)) {
-			spells.push_back(&spell);
+	std::vector<std::shared_ptr<InstantSpell>> spells;
+	for (const auto& spell : g_spells->getInstantSpells() | std::views::values) {
+		if (spell->canCast(player)) {
+			spells.push_back(spell);
 		}
 	}
 
@@ -2050,7 +2050,6 @@ int luaPlayerGetInstantSpells(lua_State* L)
 		tfs::lua::setField(L, "manapercent", spell->getManaPercent());
 		tfs::lua::setField(L, "params", spell->getHasParam());
 
-		tfs::lua::setMetatable(L, -1, "Spell");
 		lua_rawseti(L, -2, ++index);
 	}
 	return 1;
@@ -2060,9 +2059,10 @@ int luaPlayerCanCast(lua_State* L)
 {
 	// player:canCast(spell)
 	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
-	InstantSpell* spell = tfs::lua::getUserdata<InstantSpell>(L, 2);
-	if (player && spell) {
-		tfs::lua::pushBoolean(L, spell->canCast(player));
+	std::shared_ptr<Spell> spell = lua_isuserdata(L, 2) ? tfs::lua::getSharedPtr<Spell>(L, 2) : nullptr;
+	const auto& instant = std::dynamic_pointer_cast<InstantSpell>(spell);
+	if (player && instant) {
+		tfs::lua::pushBoolean(L, instant->canCast(player));
 	} else {
 		lua_pushnil(L);
 	}
