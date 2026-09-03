@@ -14,7 +14,54 @@ namespace {
 
 int luaGroupCreate(lua_State* L)
 {
-	// Group(id)
+	// Group(id) -> returns an existing group (getter)
+	// Group({id = , name = , access = , maxDepotItems = , maxVipEntries = ,
+	//        flags = {"flagname", ...} | <bitmask number>})
+	//   -> registers (or updates) a group and returns it
+	if (lua_istable(L, 2)) {
+		Group group{};
+
+		lua_getfield(L, 2, "id");
+		group.id = tfs::lua::getNumber<uint16_t>(L, -1);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 2, "name");
+		group.name = tfs::lua::getString(L, -1);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 2, "access");
+		group.access = tfs::lua::getBoolean(L, -1, false);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 2, "maxDepotItems");
+		group.maxDepotItems = tfs::lua::getNumber<uint32_t>(L, -1, 0);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 2, "maxVipEntries");
+		group.maxVipEntries = tfs::lua::getNumber<uint32_t>(L, -1, 0);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 2, "flags");
+		if (lua_istable(L, -1)) {
+			lua_pushnil(L);
+			while (lua_next(L, -2) != 0) {
+				if (lua_type(L, -1) == LUA_TSTRING) {
+					group.flags |= Groups::getFlagFromName(tfs::lua::getString(L, -1));
+				}
+				lua_pop(L, 1);
+			}
+		} else if (tfs::lua::isNumber(L, -1)) {
+			// Raw bitmask form (used by the legacy database migration).
+			group.flags |= tfs::lua::getNumber<uint64_t>(L, -1);
+		}
+		lua_pop(L, 1);
+
+		Group& registered = g_game.groups.addGroup(std::move(group));
+		tfs::lua::pushUserdata(L, &registered);
+		tfs::lua::setMetatable(L, -1, "Group");
+		return 1;
+	}
+
 	uint32_t id = tfs::lua::getNumber<uint32_t>(L, 2);
 
 	Group* group = g_game.groups.getGroup(id);
