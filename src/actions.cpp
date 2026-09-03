@@ -14,7 +14,7 @@
 
 extern Game g_game;
 extern Spells* g_spells;
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 
 Actions::Actions() : scriptInterface("Action Interface") { scriptInterface.initState(); }
 
@@ -23,7 +23,7 @@ Actions::~Actions() { clear(false); }
 void Actions::clearMap(ActionUseMap& map, bool fromLua)
 {
 	for (auto it = map.begin(); it != map.end();) {
-		if (fromLua == it->second.fromLua) {
+		if (fromLua == it->second->fromLua) {
 			it = map.erase(it);
 		} else {
 			++it;
@@ -36,6 +36,30 @@ void Actions::clear(bool fromLua)
 	clearMap(useItemMap, fromLua);
 	clearMap(uniqueItemMap, fromLua);
 	clearMap(actionItemMap, fromLua);
+
+	for (auto it = ids.begin(); it != ids.end();) {
+		if (fromLua == it->first->fromLua) {
+			it = ids.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	for (auto it = uids.begin(); it != uids.end();) {
+		if (fromLua == it->first->fromLua) {
+			it = uids.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	for (auto it = aids.begin(); it != aids.end();) {
+		if (fromLua == it->first->fromLua) {
+			it = aids.erase(it);
+		} else {
+			++it;
+		}
+	}
 
 	reInitState(fromLua);
 }
@@ -50,13 +74,12 @@ std::unique_ptr<Event> Actions::getEvent(const std::string& nodeName)
 	return std::make_unique<Action>(&scriptInterface);
 }
 
-bool Actions::registerLuaEvent(Action* event)
+bool Actions::registerLuaEvent(std::shared_ptr<Action> event)
 {
-	const std::unique_ptr<Action> action{event};
 	if (isValid(ids, event)) {
 		const auto& range = getItemIdRange(event);
 		for (auto& id : range) {
-			auto result = useItemMap.emplace(id, *action);
+			auto result = useItemMap.emplace(id, event);
 			if (!result.second) {
 				std::cout << "[Warning - Actions::registerLuaEvent] Duplicate registered item with id: " << id
 				          << " in range from id: " << range.front() << ", to id: " << range.back() << std::endl;
@@ -66,7 +89,7 @@ bool Actions::registerLuaEvent(Action* event)
 	} else if (isValid(uids, event)) {
 		const auto& range = getUniqueIdRange(event);
 		for (auto& id : range) {
-			auto result = uniqueItemMap.emplace(id, *action);
+			auto result = uniqueItemMap.emplace(id, event);
 			if (!result.second) {
 				std::cout << "[Warning - Actions::registerLuaEvent] Duplicate registered item with uid: " << id
 				          << " in range from uid: " << range.front() << ", to uid: " << range.back() << std::endl;
@@ -76,7 +99,7 @@ bool Actions::registerLuaEvent(Action* event)
 	} else if (isValid(aids, event)) {
 		const auto& range = getActionIdRange(event);
 		for (auto& id : range) {
-			auto result = actionItemMap.emplace(id, *action);
+			auto result = actionItemMap.emplace(id, event);
 			if (!result.second) {
 				std::cout << "[Warning - Actions::registerLuaEvent] Duplicate registered item with aid: " << id
 				          << " in range from aid: " << range.front() << ", to aid: " << range.back() << std::endl;
@@ -142,20 +165,20 @@ Action* Actions::getAction(const std::shared_ptr<const Item>& item)
 	if (item->hasAttribute(ITEM_ATTRIBUTE_UNIQUEID)) {
 		auto it = uniqueItemMap.find(item->getUniqueId());
 		if (it != uniqueItemMap.end()) {
-			return &it->second;
+			return it->second.get();
 		}
 	}
 
 	if (item->hasAttribute(ITEM_ATTRIBUTE_ACTIONID)) {
 		auto it = actionItemMap.find(item->getActionId());
 		if (it != actionItemMap.end()) {
-			return &it->second;
+			return it->second.get();
 		}
 	}
 
 	auto it = useItemMap.find(item->getID());
 	if (it != useItemMap.end()) {
-		return &it->second;
+		return it->second.get();
 	}
 
 	// rune items

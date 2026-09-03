@@ -8,7 +8,7 @@
 #include "../register.h"
 #include "../script.h"
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Scripts* g_scripts;
 
 namespace {
@@ -22,9 +22,9 @@ int luaCreateAction(lua_State* L)
 		return 1;
 	}
 
-	Action* action = new Action(tfs::lua::getScriptEnv()->getScriptInterface());
+	auto action = std::make_shared<Action>(tfs::lua::getScriptEnv()->getScriptInterface());
 	action->fromLua = true;
-	tfs::lua::pushUserdata(L, action);
+	tfs::lua::pushSharedPtr(L, action);
 	tfs::lua::setMetatable(L, -1, "Action");
 	return 1;
 }
@@ -32,7 +32,7 @@ int luaCreateAction(lua_State* L)
 int luaActionOnUse(lua_State* L)
 {
 	// action:onUse(callback)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		if (!action->loadCallback()) {
 			tfs::lua::pushBoolean(L, false);
@@ -49,7 +49,7 @@ int luaActionOnUse(lua_State* L)
 int luaActionRegister(lua_State* L)
 {
 	// action:register()
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		if (!action->isScripted()) {
 			tfs::lua::pushBoolean(L, false);
@@ -68,7 +68,7 @@ int luaActionRegister(lua_State* L)
 int luaActionItemId(lua_State* L)
 {
 	// action:id(ids)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		int parameters = lua_gettop(L) - 1; // - 1 because self is a parameter aswell, which we want to skip ofc
 		if (parameters > 1) {
@@ -88,7 +88,7 @@ int luaActionItemId(lua_State* L)
 int luaActionActionId(lua_State* L)
 {
 	// action:aid(aids)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		int parameters = lua_gettop(L) - 1; // - 1 because self is a parameter aswell, which we want to skip ofc
 		if (parameters > 1) {
@@ -108,7 +108,7 @@ int luaActionActionId(lua_State* L)
 int luaActionUniqueId(lua_State* L)
 {
 	// action:uid(uids)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		int parameters = lua_gettop(L) - 1; // - 1 because self is a parameter aswell, which we want to skip ofc
 		if (parameters > 1) {
@@ -128,7 +128,7 @@ int luaActionUniqueId(lua_State* L)
 int luaActionAllowFarUse(lua_State* L)
 {
 	// action:allowFarUse(bool)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		action->setAllowFarUse(tfs::lua::getBoolean(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -141,7 +141,7 @@ int luaActionAllowFarUse(lua_State* L)
 int luaActionBlockWalls(lua_State* L)
 {
 	// action:blockWalls(bool)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		action->setCheckLineOfSight(tfs::lua::getBoolean(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -154,7 +154,7 @@ int luaActionBlockWalls(lua_State* L)
 int luaActionCheckFloor(lua_State* L)
 {
 	// action:checkFloor(bool)
-	Action* action = tfs::lua::getUserdata<Action>(L, 1);
+	const auto& action = tfs::lua::getSharedPtr<Action>(L, 1);
 	if (action) {
 		action->setCheckFloor(tfs::lua::getBoolean(L, 2));
 		tfs::lua::pushBoolean(L, true);
@@ -169,6 +169,7 @@ int luaActionCheckFloor(lua_State* L)
 void tfs::lua::registerAction(LuaScriptInterface& lsi)
 {
 	lsi.registerClass("Action", "", luaCreateAction);
+	lsi.registerMetaMethod("Action", "__gc", tfs::lua::luaSharedPtrDelete<Action>);
 	lsi.registerMethod("Action", "onUse", luaActionOnUse);
 	lsi.registerMethod("Action", "register", luaActionRegister);
 	lsi.registerMethod("Action", "id", luaActionItemId);

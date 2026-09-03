@@ -25,7 +25,7 @@ extern Scheduler g_scheduler;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Monsters g_monsters;
 extern TalkActions* g_talkActions;
 extern MoveEvents* g_moveEvents;

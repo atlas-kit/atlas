@@ -14,7 +14,7 @@
 #include "talkaction.h"
 #include "weapons.h"
 
-Actions* g_actions = nullptr;
+std::unique_ptr<Actions> g_actions = nullptr;
 Chat g_chat;
 Spells* g_spells = nullptr;
 TalkActions* g_talkActions = nullptr;
@@ -28,7 +28,7 @@ ScriptingManager::~ScriptingManager()
 {
 	g_weapons.reset();
 	delete g_spells;
-	delete g_actions;
+	g_actions.reset();
 	delete g_talkActions;
 	delete g_moveEvents;
 	delete g_scripts;
@@ -56,7 +56,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 
-	g_actions = new Actions();
+	g_actions = std::make_unique<Actions>();
 	g_talkActions = new TalkActions();
 
 	g_moveEvents = new MoveEvents();

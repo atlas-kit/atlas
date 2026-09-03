@@ -34,7 +34,7 @@
 #include <chrono>
 #include <fstream>
 
-extern Actions* g_actions;
+extern std::unique_ptr<Actions> g_actions;
 extern Chat g_chat;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
