@@ -39,6 +39,7 @@ struct PlayerHandlers
 	int32_t onInventoryUpdate = -1;
 	int32_t onNetworkMessage = -1;
 	int32_t onSpellCheck = -1;
+	int32_t onRequestAddVip = -1;
 	int32_t onLogin = -1;
 	int32_t onJoin = -1;
 	int32_t onLogout = -1;
@@ -83,6 +84,7 @@ void loadPlayerScripts()
 	playerHandlers.onInventoryUpdate = scriptInterface.getMetaEvent("Player", "onInventoryUpdate");
 	playerHandlers.onNetworkMessage = scriptInterface.getMetaEvent("Player", "onNetworkMessage");
 	playerHandlers.onSpellCheck = scriptInterface.getMetaEvent("Player", "onSpellCheck");
+	playerHandlers.onRequestAddVip = scriptInterface.getMetaEvent("Player", "onRequestAddVip");
 	playerHandlers.onLogin = scriptInterface.getMetaEvent("Player", "onLogin");
 	playerHandlers.onJoin = scriptInterface.getMetaEvent("Player", "onJoin");
 	playerHandlers.onLogout = scriptInterface.getMetaEvent("Player", "onLogout");
@@ -729,6 +731,32 @@ bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell)
 	tfs::lua::pushThing(L, player);
 	tfs::lua::pushSpell(L, *spell);
 	return tfs::events::getScriptInterface().callFunction(2);
+}
+
+bool onRequestAddVip(const std::shared_ptr<Player>& player, const std::string& name)
+{
+	// Player:onRequestAddVip(name)
+	// Returns true when a Lua handler owns this request (so the engine must not
+	// also run its fallback); false when no handler is registered.
+	if (playerHandlers.onRequestAddVip == -1) {
+		return false;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - tfs::events::player::onRequestAddVip] Call stack overflow" << std::endl;
+		return false;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(playerHandlers.onRequestAddVip, &tfs::events::getScriptInterface());
+
+	const auto L = tfs::events::getScriptInterface().getLuaState();
+	tfs::events::getScriptInterface().pushFunction(playerHandlers.onRequestAddVip);
+
+	tfs::lua::pushThing(L, player);
+	tfs::lua::pushString(L, name);
+	tfs::events::getScriptInterface().callVoidFunction(2);
+	return true;
 }
 
 bool onLogin(const std::shared_ptr<Player>& player)

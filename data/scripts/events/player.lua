@@ -268,6 +268,39 @@ function Player:onSpellCheck(spell)
 	return true
 end
 
+function Player:onRequestAddVip(name)
+	if name:len() > PLAYER_NAME_LENGTH then
+		return
+	end
+
+	local vipPlayer = Game.getPlayerByName(name)
+	if not vipPlayer then
+		local guid, specialVip, formattedName = IOLoginData.getGuidByNameEx(name)
+		if not guid then
+			self:sendTextMessage(MESSAGE_STATUS_SMALL, "A player with this name does not exist.")
+			return
+		end
+
+		if specialVip and not self:hasFlag(PlayerFlag_SpecialVIP) then
+			self:sendTextMessage(MESSAGE_STATUS_SMALL, "You can not add this player.")
+			return
+		end
+
+		self:addVip(guid, formattedName, VIPSTATUS_OFFLINE)
+	else
+		if vipPlayer:hasFlag(PlayerFlag_SpecialVIP) and not self:hasFlag(PlayerFlag_SpecialVIP) then
+			self:sendTextMessage(MESSAGE_STATUS_SMALL, "You can not add this player.")
+			return
+		end
+
+		if not vipPlayer:isInGhostMode() or self:canSeeGhostMode(vipPlayer) then
+			self:addVip(vipPlayer:getGuid(), vipPlayer:getName(), VIPSTATUS_ONLINE)
+		else
+			self:addVip(vipPlayer:getGuid(), vipPlayer:getName(), VIPSTATUS_OFFLINE)
+		end
+	end
+end
+
 function Player:onLogin()
 	if Event.onPlayerLogin then
 		return Event.onPlayerLogin(self)

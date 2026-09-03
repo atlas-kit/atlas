@@ -993,6 +993,65 @@ int luaPlayerSetGuildNick(lua_State* L)
 	return 1;
 }
 
+int luaPlayerAddVip(lua_State* L)
+{
+	// player:addVip(guid, name[, status = VIPSTATUS_OFFLINE])
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	uint32_t guid = tfs::lua::getNumber<uint32_t>(L, 2);
+	const std::string& name = tfs::lua::getString(L, 3);
+	VipStatus_t status = tfs::lua::getNumber<VipStatus_t>(L, 4, VIPSTATUS_OFFLINE);
+	tfs::lua::pushBoolean(L, player->addVIP(guid, name, status));
+	return 1;
+}
+
+int luaPlayerRemoveVip(lua_State* L)
+{
+	// player:removeVip(guid)
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, player->removeVIP(tfs::lua::getNumber<uint32_t>(L, 2)));
+	return 1;
+}
+
+int luaPlayerEditVip(lua_State* L)
+{
+	// player:editVip(guid, description[, icon = 0[, notify = false]])
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	uint32_t guid = tfs::lua::getNumber<uint32_t>(L, 2);
+	const std::string& description = tfs::lua::getString(L, 3);
+	uint32_t icon = tfs::lua::getNumber<uint32_t>(L, 4, 0);
+	bool notify = tfs::lua::getBoolean(L, 5, false);
+	tfs::lua::pushBoolean(L, player->editVIP(guid, description, icon, notify));
+	return 1;
+}
+
+int luaPlayerHasFlag(lua_State* L)
+{
+	// player:hasFlag(flag)
+	const auto& player = tfs::lua::getSharedPtr<Player>(L, 1);
+	if (!player) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushBoolean(L, player->hasFlag(tfs::lua::getNumber<PlayerFlags>(L, 2)));
+	return 1;
+}
+
 int luaPlayerGetGroup(lua_State* L)
 {
 	// player:getGroup()
@@ -2295,6 +2354,23 @@ int luaPlayerSendEnterMarket(lua_State* L)
 	return 1;
 }
 
+int luaIOLoginDataGetGuidByNameEx(lua_State* L)
+{
+	// IOLoginData.getGuidByNameEx(name)
+	std::string name = tfs::lua::getString(L, 1);
+	uint32_t guid;
+	bool specialVip;
+	if (!IOLoginData::getGuidByNameEx(guid, specialVip, name)) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	tfs::lua::pushNumber(L, guid);
+	tfs::lua::pushBoolean(L, specialVip);
+	tfs::lua::pushString(L, name);
+	return 3;
+}
+
 } // namespace
 
 void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
@@ -2428,6 +2504,12 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "getGuildNick", luaPlayerGetGuildNick);
 	lsi.registerMethod("Player", "setGuildNick", luaPlayerSetGuildNick);
 
+	lsi.registerMethod("Player", "addVip", luaPlayerAddVip);
+	lsi.registerMethod("Player", "removeVip", luaPlayerRemoveVip);
+	lsi.registerMethod("Player", "editVip", luaPlayerEditVip);
+
+	lsi.registerMethod("Player", "hasFlag", luaPlayerHasFlag);
+
 	lsi.registerMethod("Player", "getGroup", luaPlayerGetGroup);
 	lsi.registerMethod("Player", "setGroup", luaPlayerSetGroup);
 
@@ -2530,4 +2612,7 @@ void tfs::lua::registerPlayer(LuaScriptInterface& lsi)
 	lsi.registerMethod("Player", "sendResourceBalance", luaPlayerSendResourceBalance);
 
 	lsi.registerMethod("Player", "sendEnterMarket", luaPlayerSendEnterMarket);
+
+	lsi.registerTable("IOLoginData");
+	lsi.registerMethod("IOLoginData", "getGuidByNameEx", luaIOLoginDataGetGuidByNameEx);
 }

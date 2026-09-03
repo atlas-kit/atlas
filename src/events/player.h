@@ -53,6 +53,7 @@ void onInventoryUpdate(const std::shared_ptr<Player>& player, const std::shared_
                        bool equip);
 void onNetworkMessage(const std::shared_ptr<Player>& player, uint8_t recvByte, std::unique_ptr<NetworkMessage> msg);
 bool onSpellCheck(const std::shared_ptr<Player>& player, const Spell* spell);
+bool onRequestAddVip(const std::shared_ptr<Player>& player, const std::string& name);
 bool onLogin(const std::shared_ptr<Player>& player);
 void onJoin(const std::shared_ptr<Player>& player);
 bool onLogout(const std::shared_ptr<Player>& player);

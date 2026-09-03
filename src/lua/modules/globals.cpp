@@ -105,6 +105,10 @@ void tfs::lua::registerGlobals(LuaScriptInterface& lsi)
 	registerEnum(lsi, CLIENTOS_OTCLIENT_WINDOWS);
 	registerEnum(lsi, CLIENTOS_OTCLIENT_MAC);
 
+	registerEnum(lsi, VIPSTATUS_OFFLINE);
+	registerEnum(lsi, VIPSTATUS_ONLINE);
+	registerEnum(lsi, VIPSTATUS_PENDING);
+
 	registerEnum(lsi, WIELDINFO_NONE);
 	registerEnum(lsi, WIELDINFO_LEVEL);
 	registerEnum(lsi, WIELDINFO_MAGLV);

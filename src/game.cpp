@@ -3211,6 +3211,12 @@ void Game::playerRequestAddVip(uint32_t playerId, const std::string& name)
 		return;
 	}
 
+	if (tfs::events::player::onRequestAddVip(player, name)) {
+		return;
+	}
+
+	// Fallback path: only reached when no Lua handler is registered, so the
+	// original engine behavior is preserved verbatim and can never break.
 	const auto& vipPlayer = getPlayerByName(name);
 	if (!vipPlayer) {
 		uint32_t guid;

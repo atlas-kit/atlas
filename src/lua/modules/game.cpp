@@ -51,6 +51,18 @@ int luaGameGetSpectators(lua_State* L)
 	return 1;
 }
 
+int luaGameGetPlayerByName(lua_State* L)
+{
+	// Game.getPlayerByName(name)
+	if (const auto& player = g_game.getPlayerByName(tfs::lua::getString(L, 1))) {
+		tfs::lua::pushSharedPtr(L, player);
+		tfs::lua::setMetatable(L, -1, "Player");
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
 int luaGameGetPlayers(lua_State* L)
 {
 	// Game.getPlayers()
@@ -615,6 +627,8 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 
 	lsi.registerGlobalVariable("SCHEDULER_MINTICKS", SCHEDULER_MINTICKS.count());
 
+	registerEnum(lsi, PLAYER_NAME_LENGTH);
+
 	registerEnum(lsi, WORLD_TYPE_NO_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP);
 	registerEnum(lsi, WORLD_TYPE_PVP_ENFORCED);
@@ -622,6 +636,7 @@ void tfs::lua::registerGame(LuaScriptInterface& lsi)
 	lsi.registerTable("Game");
 
 	lsi.registerMethod("Game", "getSpectators", luaGameGetSpectators);
+	lsi.registerMethod("Game", "getPlayerByName", luaGameGetPlayerByName);
 	lsi.registerMethod("Game", "getPlayers", luaGameGetPlayers);
 	lsi.registerMethod("Game", "getNpcs", luaGameGetNpcs);
 	lsi.registerMethod("Game", "getMonsters", luaGameGetMonsters);
