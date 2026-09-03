@@ -23,10 +23,12 @@ private:
 	uint32_t eventId = 0;
 	std::chrono::milliseconds delay = std::chrono::milliseconds::zero();
 
-	friend std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds, TaskFunc&&);
+	friend std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds, TaskFunc&&,
+	                                                          const std::source_location);
 };
 
-std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f);
+std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f,
+                                                   const std::source_location loc = std::source_location::current());
 
 class Scheduler : public ThreadHolder<Scheduler>
 {

@@ -1,0 +1,19 @@
+usdt:*:atlas:task_execution_start
+{
+    @ts_to[tid] = nsecs;
+    @file[tid] = str(arg0);
+    @line[tid] = arg1;
+    @func[tid] = str(arg2);
+}
+
+usdt:*:atlas:task_execution_end
+/ @ts_to[tid] /
+{
+    @lat_to[@file[tid], @line[tid], @func[tid]] =
+        hist(nsecs - @ts_to[tid]);
+
+    delete(@ts_to[tid]);
+    delete(@file[tid]);
+    delete(@line[tid]);
+    delete(@func[tid]);
+}

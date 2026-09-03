@@ -140,7 +140,38 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/weapons.h
 	${CMAKE_CURRENT_LIST_DIR}/wildcardtree.h
 	${CMAKE_CURRENT_LIST_DIR}/xtea.h
+	${CMAKE_CURRENT_LIST_DIR}/probes.h
 	)
+
+if (ENABLE_USDT_PROBES)
+    find_program(DTRACE_EXE dtrace REQUIRED)
+
+    set(DTRACE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/atlas_probes.d")
+    set(PROBES_HEADER "${CMAKE_CURRENT_BINARY_DIR}/atlas_probes.h")
+    set(PROBES_OBJ    "${CMAKE_CURRENT_BINARY_DIR}/atlas_probes.o")
+
+    execute_process(
+        COMMAND "${DTRACE_EXE}" -C -h -s "${DTRACE_SOURCE}" -o "${PROBES_HEADER}"
+        RESULT_VARIABLE DTRACE_HDR_RESULT
+    )
+
+    if (NOT DTRACE_HDR_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to generate DTrace header")
+    endif()
+
+    add_custom_command(
+        OUTPUT "${PROBES_OBJ}"
+        COMMAND "${DTRACE_EXE}" -G -s "${DTRACE_SOURCE}" -o "${PROBES_OBJ}"
+        DEPENDS "${DTRACE_SOURCE}"
+        COMMENT "Generating DTrace object"
+        VERBATIM
+    )
+
+    set(DTRACE_FILES "${PROBES_OBJ}")
+
+    add_compile_definitions(ENABLE_USDT_PROBES)
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+endif()
 
 set(tfs_MAIN ${CMAKE_CURRENT_LIST_DIR}/otserv.cpp)
 
@@ -152,7 +183,7 @@ else ()
 	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database.cpp)
 endif ()
 
-add_library(tfslib ${tfs_SRC})
+add_library(tfslib ${tfs_SRC} ${DTRACE_FILES})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
 	Boost::iostreams

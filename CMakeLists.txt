@@ -121,6 +121,20 @@ if (OPTIONS_ENABLE_SCCACHE)
     endif ()
 endif ()
 
+option(ENABLE_USDT_PROBES "Enable USDT probes" OFF)
+
+if (ENABLE_USDT_PROBES)
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        log_option_enabled("USDT probes")
+    else ()
+        log_option_disabled("USDT probes: only supported on Linux")
+        set(ENABLE_USDT_PROBES OFF CACHE BOOL "USDT probes disabled" FORCE)
+    endif ()
+else ()
+    log_option_disabled("USDT probes")
+endif()
+
+
 # === Unity Build ===
 if (ENABLE_UNITY_BUILD)
     log_option_enabled("unity build")

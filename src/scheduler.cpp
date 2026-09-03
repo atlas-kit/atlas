@@ -67,7 +67,11 @@ void Scheduler::shutdown()
 	});
 }
 
-std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f)
+std::unique_ptr<SchedulerTask> createSchedulerTask(std::chrono::milliseconds delay, TaskFunc&& f,
+                                                   const std::source_location loc)
 {
-	return std::make_unique<SchedulerTask>(delay, std::move(f));
+	auto task = std::make_unique<SchedulerTask>(delay, std::move(f));
+	if (ATLAS_TASK_EXECUTION_START_ENABLED()) task->setSourceLocation(loc);
+
+	return task;
 }

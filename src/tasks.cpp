@@ -7,16 +7,26 @@
 
 #include "enums.h"
 #include "game.h"
+#include "probes.h"
 
 extern Game g_game;
 
 Dispatcher g_dispatcher;
 
-std::unique_ptr<Task> createTask(TaskFunc&& f) { return std::make_unique<Task>(std::move(f)); }
-
-std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f)
+std::unique_ptr<Task> createTask(TaskFunc&& f, const std::source_location loc)
 {
-	return std::make_unique<Task>(expiration, std::move(f));
+	auto task = std::make_unique<Task>(std::move(f));
+	if (ATLAS_TASK_EXECUTION_START_ENABLED()) task->setSourceLocation(loc);
+
+	return task;
+}
+
+std::unique_ptr<Task> createTask(uint32_t expiration, TaskFunc&& f, const std::source_location loc)
+{
+	auto task = std::make_unique<Task>(expiration, std::move(f));
+	if (ATLAS_TASK_EXECUTION_START_ENABLED()) task->setSourceLocation(loc);
+
+	return task;
 }
 
 void Dispatcher::threadMain()
@@ -33,6 +43,7 @@ void Dispatcher::threadMain()
 			taskSignal.wait(taskLockUnique);
 		}
 		tmpTaskList.swap(taskList);
+		if (ATLAS_TASK_DEQUEUE_ENABLED()) ATLAS_TASK_DEQUEUE(taskList.size());
 		taskLockUnique.unlock();
 
 		for (auto& task : tmpTaskList) {
@@ -55,6 +66,7 @@ void Dispatcher::addTask(std::unique_ptr<Task>&& task)
 	if (getState() == THREAD_STATE_RUNNING) {
 		do_signal = taskList.empty();
 		taskList.push_back(std::move(task));
+		if (ATLAS_TASK_ENQUEUE_ENABLED()) ATLAS_TASK_ENQUEUE(taskList.size());
 	}
 
 	taskLock.unlock();
@@ -74,6 +86,7 @@ void Dispatcher::shutdown()
 
 	std::lock_guard<std::mutex> lockClass(taskLock);
 	taskList.push_back(std::move(task));
+	if (ATLAS_TASK_ENQUEUE_ENABLED()) ATLAS_TASK_ENQUEUE(taskList.size());
 
 	taskSignal.notify_one();
 }
