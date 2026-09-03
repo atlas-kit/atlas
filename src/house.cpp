@@ -305,7 +305,7 @@ std::shared_ptr<HouseTransferItem> House::getTransferItem()
 	}
 
 	transferContainer.setParent(nullptr);
-	const auto transferItem = HouseTransferItem::createHouseTransferItem(shared_from_this());
+	transferItem = HouseTransferItem::createHouseTransferItem(shared_from_this());
 	transferContainer.addThing(transferItem);
 	return transferItem;
 }
