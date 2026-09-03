@@ -692,21 +692,7 @@ void Monster::onThink(std::chrono::milliseconds interval)
 	}
 
 	if (!isInSpawnRange(getPosition())) {
-		if (getBoolean(ConfigManager::MONSTER_OVERSPAWN)) {
-			if (spawn) {
-				spawn->removeMonster(asMonster());
-				spawn->startSpawnCheck();
-				spawn = nullptr;
-			}
-		} else {
-			g_game.addMagicEffect(this->getPosition(), CONST_ME_POFF);
-			if (getBoolean(ConfigManager::REMOVE_ON_DESPAWN)) {
-				g_game.removeCreature(asMonster(), false);
-			} else {
-				g_game.internalTeleport(asMonster(), masterPos);
-				setIdle(true);
-			}
-		}
+		tfs::events::monster::onDespawn(asMonster());
 	} else {
 		updateIdleStatus();
 
@@ -1860,6 +1846,17 @@ bool Monster::isInSpawnRange(const Position& pos) const
 
 	return true;
 }
+
+void Monster::removeFromSpawn()
+{
+	if (spawn) {
+		spawn->removeMonster(asMonster());
+		spawn->startSpawnCheck();
+		spawn = nullptr;
+	}
+}
+
+bool Monster::teleportToSpawn() { return g_game.internalTeleport(asMonster(), masterPos) == RETURNVALUE_NOERROR; }
 
 bool Monster::getCombatValues(int32_t& min, int32_t& max)
 {

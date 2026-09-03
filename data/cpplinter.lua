@@ -507,6 +507,8 @@ Player = {}
 ---@field searchTarget fun(self: Monster): boolean
 ---@field isWalkingToSpawn fun(self: Monster): boolean
 ---@field walkToSpawn fun(self: Monster)
+---@field removeFromSpawn fun(self: Monster)
+---@field teleportToSpawn fun(self: Monster): boolean
 ---@field hasSpecialIcon fun(self: Monster): boolean
 ---@field setSpecialIcon fun(self: Monster, iconId: number)
 ---@field getSpecialIcon fun(self: Monster): number
@@ -1046,6 +1048,7 @@ Weapon = {}
 ---@field onPlayerExtendedOpcode fun(player:Player, opcode:integer, buffer:string):nil
 ---@field onMonsterDropLoot fun(monster:Monster, corpse?:Container):nil
 ---@field onMonsterSpawn fun(monster:Monster, position:Position, startup:boolean, artificial:boolean):nil
+---@field onMonsterDespawn fun(monster:Monster):nil
 ---@operator call():Event
 Event = {}
 

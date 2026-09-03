@@ -77,6 +77,7 @@ ec.onPlayerExtendedOpcode = {}
 -- Monster
 ec.onMonsterDropLoot = {}
 ec.onMonsterSpawn = {}
+ec.onMonsterDespawn = {}
 
 local EventMeta = {
 	__newindex = function(self, key, callback)

@@ -15,3 +15,9 @@ function Monster:onSpawn(position, startup, artificial)
 	end
 	return true
 end
+
+function Monster:onDespawn()
+	if Event.onMonsterDespawn then
+		Event.onMonsterDespawn(self)
+	end
+end
