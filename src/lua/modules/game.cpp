@@ -17,9 +17,9 @@
 
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
-extern Spells* g_spells;
+extern std::unique_ptr<Spells> g_spells;
 extern Monsters g_monsters;
-extern Scripts* g_scripts;
+extern std::unique_ptr<Scripts> g_scripts;
 extern Dispatcher g_dispatcher;
 extern Vocations g_vocations;
 

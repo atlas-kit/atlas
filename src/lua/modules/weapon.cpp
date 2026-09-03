@@ -8,7 +8,7 @@
 #include "../register.h"
 #include "../script.h"
 
-extern Scripts* g_scripts;
+extern std::unique_ptr<Scripts> g_scripts;
 extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {
