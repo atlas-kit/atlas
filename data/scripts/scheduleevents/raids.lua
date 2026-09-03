@@ -7,7 +7,6 @@ local lastRaidEnd = 0
 local event = ScheduleEvent(CHECK_RAIDS_INTERVAL)
 
 event.onTrigger = function()
-	io.write(">> Executing raids event...\n")
 	if running then
 		return true
 	end
