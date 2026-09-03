@@ -32,22 +32,23 @@ std::shared_ptr<Monster> Monster::createMonster(const std::string& name)
 	return std::make_shared<Monster>(mType);
 }
 
-Monster::Monster(MonsterType* mType) : Creature(), nameDescription(mType->nameDescription), mType(mType)
+Monster::Monster(MonsterType* monsterType) :
+    Creature(), nameDescription(monsterType->nameDescription), mType(*monsterType)
 {
-	defaultOutfit = mType->info.outfit;
-	currentOutfit = mType->info.outfit;
-	setSkull(mType->info.skull);
-	health = mType->info.health;
-	healthMax = mType->info.healthMax;
-	baseSpeed = mType->info.baseSpeed;
-	internalLight = mType->info.light;
-	hiddenHealth = mType->info.hiddenHealth;
+	defaultOutfit = monsterType->info.outfit;
+	currentOutfit = monsterType->info.outfit;
+	setSkull(monsterType->info.skull);
+	health = monsterType->info.health;
+	healthMax = monsterType->info.healthMax;
+	baseSpeed = monsterType->info.baseSpeed;
+	internalLight = monsterType->info.light;
+	hiddenHealth = monsterType->info.hiddenHealth;
 }
 
 const std::string& Monster::getName() const
 {
 	if (name.empty()) {
-		return mType->name;
+		return mType.name;
 	}
 	return name;
 }
@@ -68,7 +69,7 @@ void Monster::setName(const std::string& name)
 const std::string& Monster::getNameDescription() const
 {
 	if (nameDescription.empty()) {
-		return mType->nameDescription;
+		return mType.nameDescription;
 	}
 	return nameDescription;
 }
@@ -82,11 +83,11 @@ bool Monster::canWalkOnFieldType(CombatType_t combatType) const
 {
 	switch (combatType) {
 		case COMBAT_ENERGYDAMAGE:
-			return mType->info.canWalkOnEnergy;
+			return mType.info.canWalkOnEnergy;
 		case COMBAT_FIREDAMAGE:
-			return mType->info.canWalkOnFire;
+			return mType.info.canWalkOnFire;
 		case COMBAT_EARTHDAMAGE:
-			return mType->info.canWalkOnPoison;
+			return mType.info.canWalkOnPoison;
 		default:
 			return true;
 	}
@@ -98,19 +99,19 @@ void Monster::onCreatureAppear(const std::shared_ptr<Creature>& creature, bool, 
 		setLastPosition(getPosition());
 	}
 
-	if (mType->info.creatureAppearEvent != -1) {
+	if (mType.info.creatureAppearEvent != -1) {
 		// onCreatureAppear(self, creature)
-		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+		LuaScriptInterface* scriptInterface = mType.info.scriptInterface;
 		if (!tfs::lua::reserveScriptEnv()) {
 			std::cout << "[Error - Monster::onCreatureAppear] Call stack overflow" << std::endl;
 			return;
 		}
 
 		const auto env = tfs::lua::getScriptEnv();
-		env->setScriptId(mType->info.creatureAppearEvent, scriptInterface);
+		env->setScriptId(mType.info.creatureAppearEvent, scriptInterface);
 
 		lua_State* L = scriptInterface->getLuaState();
-		scriptInterface->pushFunction(mType->info.creatureAppearEvent);
+		scriptInterface->pushFunction(mType.info.creatureAppearEvent);
 
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
@@ -140,19 +141,19 @@ void Monster::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool i
 {
 	Creature::onRemoveCreature(creature, isLogout);
 
-	if (mType->info.creatureDisappearEvent != -1) {
+	if (mType.info.creatureDisappearEvent != -1) {
 		// onCreatureDisappear(self, creature)
-		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+		LuaScriptInterface* scriptInterface = mType.info.scriptInterface;
 		if (!tfs::lua::reserveScriptEnv()) {
 			std::cout << "[Error - Monster::onCreatureDisappear] Call stack overflow" << std::endl;
 			return;
 		}
 
 		const auto env = tfs::lua::getScriptEnv();
-		env->setScriptId(mType->info.creatureDisappearEvent, scriptInterface);
+		env->setScriptId(mType.info.creatureDisappearEvent, scriptInterface);
 
 		lua_State* L = scriptInterface->getLuaState();
-		scriptInterface->pushFunction(mType->info.creatureDisappearEvent);
+		scriptInterface->pushFunction(mType.info.creatureDisappearEvent);
 
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
@@ -182,19 +183,19 @@ void Monster::onCreatureMove(const std::shared_ptr<Creature>& creature, const st
 {
 	Creature::onCreatureMove(creature, newTile, newPos, oldTile, oldPos, teleport);
 
-	if (mType->info.creatureMoveEvent != -1) {
+	if (mType.info.creatureMoveEvent != -1) {
 		// onCreatureMove(self, creature, oldPosition, newPosition)
-		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+		LuaScriptInterface* scriptInterface = mType.info.scriptInterface;
 		if (!tfs::lua::reserveScriptEnv()) {
 			std::cout << "[Error - Monster::onCreatureMove] Call stack overflow" << std::endl;
 			return;
 		}
 
 		const auto env = tfs::lua::getScriptEnv();
-		env->setScriptId(mType->info.creatureMoveEvent, scriptInterface);
+		env->setScriptId(mType.info.creatureMoveEvent, scriptInterface);
 
 		lua_State* L = scriptInterface->getLuaState();
-		scriptInterface->pushFunction(mType->info.creatureMoveEvent);
+		scriptInterface->pushFunction(mType.info.creatureMoveEvent);
 
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
@@ -240,7 +241,7 @@ void Monster::onCreatureMove(const std::shared_ptr<Creature>& creature, const st
 
 				int32_t offset_x = followPosition.getDistanceX(position);
 				int32_t offset_y = followPosition.getDistanceY(position);
-				if ((offset_x > 1 || offset_y > 1) && mType->info.changeTargetChance > 0) {
+				if ((offset_x > 1 || offset_y > 1) && mType.info.changeTargetChance > 0) {
 					Direction dir = getDirectionTo(position, followPosition);
 					const Position& checkPosition = getNextPosition(dir, position);
 
@@ -264,19 +265,19 @@ void Monster::onCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClas
 {
 	Creature::onCreatureSay(creature, type, text);
 
-	if (mType->info.creatureSayEvent != -1) {
+	if (mType.info.creatureSayEvent != -1) {
 		// onCreatureSay(self, creature, type, message)
-		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+		LuaScriptInterface* scriptInterface = mType.info.scriptInterface;
 		if (!tfs::lua::reserveScriptEnv()) {
 			std::cout << "[Error - Monster::onCreatureSay] Call stack overflow" << std::endl;
 			return;
 		}
 
 		const auto env = tfs::lua::getScriptEnv();
-		env->setScriptId(mType->info.creatureSayEvent, scriptInterface);
+		env->setScriptId(mType.info.creatureSayEvent, scriptInterface);
 
 		lua_State* L = scriptInterface->getLuaState();
-		scriptInterface->pushFunction(mType->info.creatureSayEvent);
+		scriptInterface->pushFunction(mType.info.creatureSayEvent);
 
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
@@ -568,8 +569,8 @@ BlockType_t Monster::blockHit(const std::shared_ptr<Creature>& attacker, CombatT
 
 	if (damage != 0) {
 		int32_t elementMod = 0;
-		auto it = mType->info.elementMap.find(combatType);
-		if (it != mType->info.elementMap.end()) {
+		auto it = mType.info.elementMap.find(combatType);
+		if (it != mType.info.elementMap.end()) {
 			elementMod = it->second;
 		}
 
@@ -667,19 +668,19 @@ void Monster::onThink(std::chrono::milliseconds interval)
 {
 	Creature::onThink(interval);
 
-	if (mType->info.thinkEvent != -1) {
+	if (mType.info.thinkEvent != -1) {
 		// onThink(self, interval)
 		if (!tfs::lua::reserveScriptEnv()) {
 			std::cout << "[Error - Monster::onThink] Call stack overflow" << std::endl;
 			return;
 		}
 
-		LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+		LuaScriptInterface* scriptInterface = mType.info.scriptInterface;
 		const auto env = tfs::lua::getScriptEnv();
-		env->setScriptId(mType->info.thinkEvent, scriptInterface);
+		env->setScriptId(mType.info.thinkEvent, scriptInterface);
 
 		lua_State* L = scriptInterface->getLuaState();
-		scriptInterface->pushFunction(mType->info.thinkEvent);
+		scriptInterface->pushFunction(mType.info.thinkEvent);
 
 		tfs::lua::pushSharedPtr(L, asMonster());
 		tfs::lua::setMetatable(L, -1, "Monster");
@@ -771,7 +772,7 @@ void Monster::onAttacking(std::chrono::milliseconds interval)
 	bool resetTicks = interval != std::chrono::milliseconds::zero();
 	attackTicks += interval;
 
-	for (const spellBlock_t& spellBlock : mType->info.attackSpells) {
+	for (const spellBlock_t& spellBlock : mType.info.attackSpells) {
 		if (!attackedCreature) {
 			break;
 		}
@@ -816,7 +817,7 @@ bool Monster::canUseAttack(const Position& pos, const std::shared_ptr<const Crea
 	if (isHostile()) {
 		const Position& targetPos = target->getPosition();
 		uint32_t distance = std::max<uint32_t>(pos.getDistanceX(targetPos), pos.getDistanceY(targetPos));
-		for (const spellBlock_t& spellBlock : mType->info.attackSpells) {
+		for (const spellBlock_t& spellBlock : mType.info.attackSpells) {
 			if (spellBlock.range != 0 && distance <= spellBlock.range) {
 				return g_game.isSightClear(pos, targetPos, true);
 			}
@@ -862,7 +863,7 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos, const 
 void Monster::onThinkTarget(std::chrono::milliseconds interval)
 {
 	if (!isSummon()) {
-		if (mType->info.changeTargetSpeed != std::chrono::milliseconds::zero()) {
+		if (mType.info.changeTargetSpeed != std::chrono::milliseconds::zero()) {
 			bool canChangeTarget = true;
 
 			if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
@@ -878,7 +879,7 @@ void Monster::onThinkTarget(std::chrono::milliseconds interval)
 
 				if (targetChangeCooldown <= std::chrono::milliseconds::zero()) {
 					targetChangeCooldown = std::chrono::milliseconds::zero();
-					targetChangeTicks = mType->info.changeTargetSpeed;
+					targetChangeTicks = mType.info.changeTargetSpeed;
 				} else {
 					canChangeTarget = false;
 				}
@@ -887,16 +888,16 @@ void Monster::onThinkTarget(std::chrono::milliseconds interval)
 			if (canChangeTarget) {
 				targetChangeTicks += interval;
 
-				if (targetChangeTicks >= mType->info.changeTargetSpeed) {
+				if (targetChangeTicks >= mType.info.changeTargetSpeed) {
 					targetChangeTicks = std::chrono::milliseconds::zero();
-					targetChangeCooldown = mType->info.changeTargetSpeed;
+					targetChangeCooldown = mType.info.changeTargetSpeed;
 
 					if (challengeFocusDuration > std::chrono::milliseconds::zero()) {
 						challengeFocusDuration = std::chrono::milliseconds::zero();
 					}
 
-					if (mType->info.changeTargetChance >= uniform_random(1, 100)) {
-						if (mType->info.targetDistance <= 1) {
+					if (mType.info.changeTargetChance >= uniform_random(1, 100)) {
+						if (mType.info.targetDistance <= 1) {
 							searchTarget(TARGETSEARCH_RANDOM);
 						} else {
 							searchTarget(TARGETSEARCH_NEAREST);
@@ -913,7 +914,7 @@ void Monster::onThinkDefense(std::chrono::milliseconds interval)
 	bool resetTicks = true;
 	defenseTicks += interval;
 
-	for (const spellBlock_t& spellBlock : mType->info.defenseSpells) {
+	for (const spellBlock_t& spellBlock : mType.info.defenseSpells) {
 		if (spellBlock.speed > defenseTicks) {
 			resetTicks = false;
 			continue;
@@ -932,14 +933,14 @@ void Monster::onThinkDefense(std::chrono::milliseconds interval)
 	}
 
 	const auto& summons = getSummons() | tfs::views::lock_weak_ptrs | std::ranges::to<std::vector>();
-	if (!isSummon() && summons.size() < mType->info.maxSummons && hasFollowPath) {
-		for (const summonBlock_t& summonBlock : mType->info.summons) {
+	if (!isSummon() && summons.size() < mType.info.maxSummons && hasFollowPath) {
+		for (const summonBlock_t& summonBlock : mType.info.summons) {
 			if (summonBlock.speed > defenseTicks) {
 				resetTicks = false;
 				continue;
 			}
 
-			if (summons.size() >= mType->info.maxSummons) {
+			if (summons.size() >= mType.info.maxSummons) {
 				continue;
 			}
 
@@ -983,18 +984,18 @@ void Monster::onThinkDefense(std::chrono::milliseconds interval)
 
 void Monster::onThinkYell(std::chrono::milliseconds interval)
 {
-	if (mType->info.yellSpeedTicks == std::chrono::milliseconds::zero()) {
+	if (mType.info.yellSpeedTicks == std::chrono::milliseconds::zero()) {
 		return;
 	}
 
 	yellTicks += interval;
-	if (yellTicks >= mType->info.yellSpeedTicks) {
+	if (yellTicks >= mType.info.yellSpeedTicks) {
 		yellTicks = std::chrono::milliseconds::zero();
 
-		if (!mType->info.voiceVector.empty() &&
-		    (mType->info.yellChance >= static_cast<uint32_t>(uniform_random(1, 100)))) {
-			uint32_t index = uniform_random(0, mType->info.voiceVector.size() - 1);
-			const voiceBlock_t& vb = mType->info.voiceVector[index];
+		if (!mType.info.voiceVector.empty() &&
+		    (mType.info.yellChance >= static_cast<uint32_t>(uniform_random(1, 100)))) {
+			uint32_t index = uniform_random(0, mType.info.voiceVector.size() - 1);
+			const voiceBlock_t& vb = mType.info.voiceVector[index];
 
 			if (vb.yellText) {
 				g_game.internalCreatureSay(asMonster(), TALKTYPE_MONSTER_YELL, vb.text, false);
@@ -1161,7 +1162,7 @@ bool Monster::getNextStep(Direction& direction, uint32_t& flags)
 				    attackedCreature && tfs::owner_equal(attackedCreature, getFollowCreature())) {
 					if (isFleeing()) {
 						result = getDanceStep(getPosition(), direction, false, false);
-					} else if (mType->info.staticAttackChance < static_cast<uint32_t>(uniform_random(1, 100))) {
+					} else if (mType.info.staticAttackChance < static_cast<uint32_t>(uniform_random(1, 100))) {
 						result = getDanceStep(getPosition(), direction);
 					}
 				}
@@ -1298,9 +1299,9 @@ bool Monster::getDistanceStep(const Position& targetPos, Direction& direction, b
 
 	int32_t distance = std::max(dx, dy);
 
-	if (!flee && (distance > mType->info.targetDistance || !g_game.isSightClear(creaturePos, targetPos, true))) {
+	if (!flee && (distance > mType.info.targetDistance || !g_game.isSightClear(creaturePos, targetPos, true))) {
 		return false; // let the A* calculate it
-	} else if (!flee && distance == mType->info.targetDistance) {
+	} else if (!flee && distance == mType.info.targetDistance) {
 		return true; // we don't really care here, since it's what we wanted to reach (a dance-step will take of dancing
 		             // in that position)
 	}
@@ -1911,7 +1912,7 @@ void Monster::dropLoot(const std::shared_ptr<Container>& corpse, const std::shar
 	}
 }
 
-void Monster::setNormalCreatureLight() { internalLight = mType->info.light; }
+void Monster::setNormalCreatureLight() { internalLight = mType.info.light; }
 
 void Monster::drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage)
 {
@@ -1939,7 +1940,7 @@ bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool 
 		return false;
 	}
 
-	if (!mType->info.isChallengeable && !force) {
+	if (!mType.info.isChallengeable && !force) {
 		return false;
 	}
 
@@ -1957,7 +1958,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 	Creature::getPathSearchParams(creature, fpp);
 
 	fpp.minTargetDist = 1;
-	fpp.maxTargetDist = mType->info.targetDistance;
+	fpp.maxTargetDist = mType.info.targetDistance;
 
 	if (isSummon()) {
 		if (const auto& followCreature = getFollowCreature(); followCreature && followCreature == getMaster()) {
@@ -1966,7 +1967,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 		if (getMaster() == creature) {
 			fpp.maxTargetDist = 2;
 			fpp.fullPathSearch = true;
-		} else if (mType->info.targetDistance <= 1) {
+		} else if (mType.info.targetDistance <= 1) {
 			fpp.fullPathSearch = true;
 		} else {
 			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
@@ -1977,7 +1978,7 @@ void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creatur
 		fpp.clearSight = false;
 		fpp.keepDistance = true;
 		fpp.fullPathSearch = false;
-	} else if (mType->info.targetDistance <= 1) {
+	} else if (mType.info.targetDistance <= 1) {
 		fpp.fullPathSearch = true;
 	} else {
 		fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
@@ -1988,8 +1989,8 @@ bool Monster::canPushItems() const
 {
 	if (const auto& master = this->getMaster()) {
 		if (const auto& monster = master->asMonster()) {
-			return monster->mType->info.canPushItems;
+			return monster->mType.info.canPushItems;
 		}
 	}
-	return mType->info.canPushItems;
+	return mType.info.canPushItems;
 }

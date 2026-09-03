@@ -30,7 +30,7 @@ public:
 	static int32_t despawnRange;
 	static int32_t despawnRadius;
 
-	explicit Monster(MonsterType* mType);
+	explicit Monster(MonsterType* monsterType);
 	~Monster() = default;
 
 	// non-copyable
@@ -63,18 +63,18 @@ public:
 	const Position& getMasterPos() const { return masterPos; }
 	void setMasterPos(Position pos) { masterPos = pos; }
 
-	RaceType_t getRace() const override { return mType->info.race; }
-	int32_t getArmor() const override { return mType->info.armor; }
-	int32_t getDefense() const override { return mType->info.defense; }
-	bool isPushable() const override { return mType->info.pushable && baseSpeed != 0; }
-	bool isAttackable() const override { return mType->info.isAttackable; }
+	RaceType_t getRace() const override { return mType.info.race; }
+	int32_t getArmor() const override { return mType.info.armor; }
+	int32_t getDefense() const override { return mType.info.defense; }
+	bool isPushable() const override { return mType.info.pushable && baseSpeed != 0; }
+	bool isAttackable() const override { return mType.info.isAttackable; }
 
 	bool canPushItems() const;
-	bool canPushCreatures() const { return mType->info.canPushCreatures; }
-	bool isHostile() const { return mType->info.isHostile; }
+	bool canPushCreatures() const { return mType.info.canPushCreatures; }
+	bool isHostile() const { return mType.info.isHostile; }
 	bool canSee(const Position& pos) const override;
 	bool canSeeInvisibility() const override { return isImmune(CONDITION_INVISIBLE); }
-	uint32_t getManaCost() const { return mType->info.manaCost; }
+	uint32_t getManaCost() const { return mType.info.manaCost; }
 	void setSpawn(Spawn* spawn) { this->spawn = spawn; }
 	bool canWalkOnFieldType(CombatType_t combatType) const;
 
@@ -114,7 +114,7 @@ public:
 	bool isTarget(const std::shared_ptr<const Creature>& creature) const;
 	bool isFleeing() const
 	{
-		return !isSummon() && getHealth() <= mType->info.runAwayHealth &&
+		return !isSummon() && getHealth() <= mType.info.runAwayHealth &&
 		       challengeFocusDuration <= std::chrono::milliseconds::zero();
 	}
 
@@ -148,8 +148,8 @@ public:
 
 	bool isInSpawnRange(const Position& pos) const;
 
-	MonsterType* getMonsterType() { return mType; }
-	const MonsterType* getMonsterType() const { return mType; }
+	MonsterType* getMonsterType() { return &mType; }
+	const MonsterType* getMonsterType() const { return &mType; }
 
 	static uint32_t monsterAutoID;
 
@@ -163,7 +163,7 @@ private:
 	std::string name;
 	std::string nameDescription;
 
-	MonsterType* mType;
+	MonsterType& mType;
 	Spawn* spawn = nullptr;
 
 	std::chrono::steady_clock::time_point lastMeleeAttack = std::chrono::steady_clock::time_point::min();
@@ -217,11 +217,11 @@ private:
 	void onThinkYell(std::chrono::milliseconds interval);
 	void onThinkDefense(std::chrono::milliseconds interval);
 
-	uint64_t getLostExperience() const override { return skillLoss ? mType->info.experience : 0; }
-	uint16_t getLookCorpse() const override { return mType->info.lookcorpse; }
+	uint64_t getLostExperience() const override { return skillLoss ? mType.info.experience : 0; }
+	uint16_t getLookCorpse() const override { return mType.info.lookcorpse; }
 	void dropLoot(const std::shared_ptr<Container>& corpse, const std::shared_ptr<Creature>& lastHitCreature) override;
-	uint32_t getDamageImmunities() const override { return mType->info.damageImmunities; }
-	uint32_t getConditionImmunities() const override { return mType->info.conditionImmunities; }
+	uint32_t getDamageImmunities() const override { return mType.info.damageImmunities; }
+	uint32_t getConditionImmunities() const override { return mType.info.conditionImmunities; }
 	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const override;
 
 	friend class LuaScriptInterface;
