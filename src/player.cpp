@@ -2072,9 +2072,11 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 		while (it != conditions.end()) {
 			auto& condition = *it;
 			if (condition->isPersistent()) {
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
+				auto removedCondition = std::move(condition);
 				it = conditions.erase(it);
+
+				removedCondition->endCondition(asPlayer());
+				onEndCondition(removedCondition->getType());
 			} else {
 				++it;
 			}
@@ -2086,9 +2088,11 @@ void Player::death(const std::shared_ptr<Creature>& lastHitCreature)
 		while (it != conditions.end()) {
 			auto& condition = *it;
 			if (condition->isPersistent()) {
-				condition->endCondition(asPlayer());
-				onEndCondition(condition->getType());
+				auto removedCondition = std::move(condition);
 				it = conditions.erase(it);
+
+				removedCondition->endCondition(asPlayer());
+				onEndCondition(removedCondition->getType());
 			} else {
 				++it;
 			}
