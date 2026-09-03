@@ -189,6 +189,10 @@ bool ConfigManager::load()
 		string[MYSQL_PASS] = getEnv("MYSQL_PASSWORD", getGlobalString(L, "mysqlPass", ""));
 		string[MYSQL_DB] = getEnv("MYSQL_DATABASE", getGlobalString(L, "mysqlDatabase", ""));
 		string[MYSQL_SOCK] = getEnv("MYSQL_SOCK", getGlobalString(L, "mysqlSock", ""));
+		string[MYSQL_SSL] = getEnv("MYSQL_SSL", getGlobalString(L, "mysqlSSL", "preferred"));
+		string[MYSQL_SSL_CA_FILE] = getEnv("MYSQL_SSL_CA", getGlobalString(L, "mysqlSSLCAFile", ""));
+		string[MYSQL_SSL_CERT_FILE] = getEnv("MYSQL_SSL_CERT", getGlobalString(L, "mysqlSSLCertFile", ""));
+		string[MYSQL_SSL_KEY_FILE] = getEnv("MYSQL_SSL_KEY", getGlobalString(L, "mysqlSSLKeyFile", ""));
 
 		integer[SQL_PORT] = getEnv("MYSQL_PORT", getGlobalNumber(L, "mysqlPort", 3306));
 
