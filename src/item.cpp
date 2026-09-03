@@ -184,19 +184,23 @@ bool Item::operator==(const Item& otherItem) const
 	for (const auto& attribute : attributeList) {
 		if (ItemAttributes::isIntAttrType(attribute.type)) {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && attribute.value.integer != otherAttribute.value.integer) {
+				if (attribute.type == otherAttribute.type &&
+				    std::get<int64_t>(attribute.value) != std::get<int64_t>(otherAttribute.value)) {
 					return false;
 				}
 			}
 		} else if (ItemAttributes::isStrAttrType(attribute.type)) {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && *attribute.value.string != *otherAttribute.value.string) {
+				if (attribute.type == otherAttribute.type &&
+				    std::get<std::string>(attribute.value) != std::get<std::string>(otherAttribute.value)) {
 					return false;
 				}
 			}
 		} else {
 			for (const auto& otherAttribute : otherAttributeList) {
-				if (attribute.type == otherAttribute.type && *attribute.value.custom != *otherAttribute.value.custom) {
+				if (attribute.type == otherAttribute.type &&
+				    std::get<ItemAttributes::CustomAttributeMap>(attribute.value) !=
+				        std::get<ItemAttributes::CustomAttributeMap>(otherAttribute.value)) {
 					return false;
 				}
 			}
@@ -983,7 +987,10 @@ const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 	if (!attr) {
 		return emptyString;
 	}
-	return *attr->value.string;
+	if (const auto* str = std::get_if<std::string>(&attr->value)) {
+		return *str;
+	}
+	return emptyString;
 }
 
 void ItemAttributes::setStrAttr(itemAttrTypes type, std::string_view value)
@@ -996,9 +1003,7 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, std::string_view value)
 		return;
 	}
 
-	Attribute& attr = getAttr(type);
-	delete attr.value.string;
-	attr.value.string = new std::string(value);
+	getAttr(type).value.emplace<std::string>(value);
 }
 
 void ItemAttributes::removeAttribute(itemAttrTypes type)
@@ -1014,7 +1019,7 @@ void ItemAttributes::removeAttribute(itemAttrTypes type)
 		auto it = prev_it;
 		while (++it != attributes.rend()) {
 			if ((*it).type == type) {
-				(*it) = attributes.back();
+				(*it) = std::move(attributes.back());
 				attributes.pop_back();
 				break;
 			}
@@ -1033,7 +1038,10 @@ int64_t ItemAttributes::getIntAttr(itemAttrTypes type) const
 	if (!attr) {
 		return 0;
 	}
-	return attr->value.integer;
+	if (const auto* integer = std::get_if<int64_t>(&attr->value)) {
+		return *integer;
+	}
+	return 0;
 }
 
 void ItemAttributes::setIntAttr(itemAttrTypes type, int64_t value)
@@ -1046,7 +1054,7 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, int64_t value)
 		value = 100;
 	}
 
-	getAttr(type).value.integer = value;
+	getAttr(type).value.emplace<int64_t>(value);
 }
 
 void ItemAttributes::increaseIntAttr(itemAttrTypes type, int64_t value) { setIntAttr(type, getIntAttr(type) + value); }
@@ -1101,7 +1109,7 @@ bool Item::hasMarketAttributes() const
 	// discard items with other modified attributes
 	for (const auto& attr : attributes->getList()) {
 		if (attr.type == ITEM_ATTRIBUTE_CHARGES) {
-			uint16_t charges = static_cast<uint16_t>(attr.value.integer);
+			uint16_t charges = static_cast<uint16_t>(std::get<int64_t>(attr.value));
 			if (charges != items[id].charges) {
 				return false;
 			}
