@@ -153,6 +153,7 @@ else ()
 endif ()
 
 add_library(tfslib ${tfs_SRC})
+target_include_directories(tfslib PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
 	Boost::iostreams
