@@ -1349,7 +1349,7 @@ bool Creature::isInvisible() const
 	       }) != conditions.end();
 }
 
-bool Creature::getPathTo(const Position& targetPos, std::vector<Direction>& dirList, const PathRequest& request) const
+bool Creature::getPathTo(const Position& /*targetPos*/, std::vector<Direction>& dirList, const PathRequest& request) const
 {
 	return g_game.map.getPathMatching(asCreature(), dirList, request);
 }

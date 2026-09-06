@@ -21,6 +21,7 @@ set(http_HDR
 	)
 
 add_library(http OBJECT ${http_SRC})
+target_include_directories(http PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(http PRIVATE Boost::json)
 
 if(NOT MSVC)
