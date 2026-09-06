@@ -768,7 +768,7 @@ bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, std::
 			}
 		}
 
-		uint16_t cost = 0;
+		uint16_t cost = 1;
 		if (tile->getTopVisibleCreature(creature)) {
 			cost += PATHFIND_NORMAL_COST * 3;
 		}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "path_goal.h"
-#include "position.h"
+#include "../position.h"
 #include "search_mode.h"
 
 #include <cstdint>

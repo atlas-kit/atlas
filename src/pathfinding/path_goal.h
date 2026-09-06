@@ -2,7 +2,7 @@
 
 #include "distance.h"
 #include "path_world.h"
-#include "position.h"
+#include "../position.h"
 #include "search_mode.h"
 
 #include <cstdint>

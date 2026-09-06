@@ -281,11 +281,9 @@ public:
 						continue;
 					}
 
-					if (createdNodes >= PATHFIND_NODE_BUDGET) {
+					if (!reserveNode()) {
 						return PathStatus::NoPath;
 					}
-
-					++createdNodes;
 
 					const auto heuristicValue = squaredDistance(neighbourX, neighbourY, targetX, targetY);
 					const auto exactG = currentNode->g + movementCost + tileCost;
@@ -319,9 +317,21 @@ public:
 	}
 
 private:
+	bool reserveNode()
+	{
+		if (createdNodes >= PATHFIND_NODE_BUDGET) {
+			return false;
+		}
+		++createdNodes;
+		return true;
+	}
+
 	void seedStart()
 	{
 		if (Cell* cell = getCell(startX, startY)) {
+			if (!reserveNode()) {
+				return;
+			}
 			cell->epoch = epoch;
 			cell->node.parent = nullptr;
 			cell->node.x = startX;
@@ -329,7 +339,6 @@ private:
 			cell->node.g = 0;
 			cell->node.f = 0;
 			cell->node.order = nextOrder++;
-			++createdNodes;
 			pushOpenNode(cell);
 		}
 	}
@@ -489,9 +498,12 @@ PathStatus PathFinder::find(const PathRequest& request, TileCost getTileCost, st
 	const auto distanceX = std::abs(startX - targetX);
 	const auto distanceY = std::abs(startY - targetY);
 
-	// If max target distance is at most one tile and the target is at most one tile
-	// away on each axis, return the empty path for the caller's dance-step logic.
-	if (goal.distance.max <= 1 && distanceX <= 1 && distanceY <= 1) {
+	const auto targetDistance = std::max(distanceX, distanceY);
+
+	// Reach requests at one-tile range can defer to the caller's dance-step logic
+	// when the current position already satisfies the requested distance range.
+	if (goal.mode == SearchMode::Reach && goal.distance.max == 1 &&
+	    targetDistance >= goal.distance.min && targetDistance <= goal.distance.max) {
 		return PathStatus::Found;
 	}
 
