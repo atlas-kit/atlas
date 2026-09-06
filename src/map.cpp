@@ -10,11 +10,37 @@
 #include "game.h"
 #include "iomap.h"
 #include "iomapserialize.h"
+#include "pathfinding/constants.h"
+#include "pathfinding/pathfinder.h"
 #include "pugicast.h"
 
 extern Game g_game;
 
 namespace {
+
+constexpr ConditionType_t DamageToConditionType(CombatType_t type)
+{
+	switch (type) {
+		case COMBAT_FIREDAMAGE:
+			return CONDITION_FIRE;
+		case COMBAT_ENERGYDAMAGE:
+			return CONDITION_ENERGY;
+		case COMBAT_DROWNDAMAGE:
+			return CONDITION_DROWN;
+		case COMBAT_EARTHDAMAGE:
+			return CONDITION_POISON;
+		case COMBAT_ICEDAMAGE:
+			return CONDITION_FREEZING;
+		case COMBAT_HOLYDAMAGE:
+			return CONDITION_DAZZLED;
+		case COMBAT_DEATHDAMAGE:
+			return CONDITION_CURSED;
+		case COMBAT_PHYSICALDAMAGE:
+			return CONDITION_BLEEDING;
+		default:
+			return CONDITION_NONE;
+	}
+}
 
 bool loadHousesXML(const std::filesystem::path& filename)
 {
@@ -561,9 +587,7 @@ bool Map::isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor /*= fal
 	return !tile->hasProperty(CONST_PROP_BLOCKPROJECTILE);
 }
 
-namespace {
-
-bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding /*= false*/)
+bool Map::checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const
 {
 	float dx = x1 - x0;
 	float slope = (dx == 0) ? 1 : (y1 - y0) / dx;
@@ -571,7 +595,7 @@ bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t 
 
 	for (uint16_t x = x0 + 1; x < x1; ++x) {
 		// 0.1 is necessary to avoid loss of precision during calculation
-		if (!g_game.map.isTileClear(std::floor(yi + 0.1), x, z, false, pathfinding)) {
+		if (!isTileClear(std::floor(yi + 0.1), x, z, false, pathfinding)) {
 			return false;
 		}
 		yi += slope;
@@ -580,7 +604,7 @@ bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t 
 	return true;
 }
 
-bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding /*= false*/)
+bool Map::checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const
 {
 	float dx = x1 - x0;
 	float slope = (dx == 0) ? 1 : (y1 - y0) / dx;
@@ -588,7 +612,7 @@ bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t
 
 	for (uint16_t x = x0 + 1; x < x1; ++x) {
 		// 0.1 is necessary to avoid loss of precision during calculation
-		if (!g_game.map.isTileClear(x, std::floor(yi + 0.1), z, false, pathfinding)) {
+		if (!isTileClear(x, std::floor(yi + 0.1), z, false, pathfinding)) {
 			return false;
 		}
 		yi += slope;
@@ -596,8 +620,6 @@ bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t
 
 	return true;
 }
-
-} // namespace
 
 bool Map::checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z,
                          bool pathfinding /*= false*/) const
@@ -620,19 +642,13 @@ bool Map::checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uin
 	return checkSlightLine(x0, y0, x1, y1, z, pathfinding);
 }
 
-bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor /*= false*/,
-                       bool pathfinding /*= false*/) const
+bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor /*= false*/) const
 {
 	// target is on the same floor
 	if (fromPos.z == toPos.z) {
 		// skip checks if toPos is next to us
 		if (fromPos.getDistanceX(toPos) < 2 && fromPos.getDistanceY(toPos) < 2) {
 			return true;
-		}
-
-		// Check for additional tile properties when pathfinding
-		if (pathfinding) {
-			return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z, true);
 		}
 
 		// sight is clear or sameFloor is enabled
@@ -685,6 +701,16 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool same
 	return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z);
 }
 
+bool Map::isSightClearPathfinding(const Position& fromPos, const Position& toPos) const
+{
+	// Pathfinding sight also checks BLOCK_PATHFINDING tile properties. This is
+	// used only to decide whether PathFinder may apply straight-line pruning.
+	if (fromPos.getDistanceX(toPos) <= 1 && fromPos.getDistanceY(toPos) <= 1) {
+		return true;
+	}
+	return checkSightLine(fromPos.x, fromPos.y, toPos.x, toPos.y, fromPos.z, true);
+}
+
 const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>& creature, const Position& pos) const
 {
 	const auto& tile = getTile(pos.x, pos.y, pos.z);
@@ -705,307 +731,69 @@ const std::shared_ptr<Tile> Map::canWalkTo(const std::shared_ptr<const Creature>
 	return tile;
 }
 
-static uint16_t calculateHeuristic(const Position& p1, const Position& p2)
+bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, std::vector<Direction>& dirList,
+                          const PathRequest& request) const
 {
-	uint16_t dx = std::abs(p1.getX() - p2.getX());
-	uint16_t dy = std::abs(p1.getY() - p2.getY());
-	return dx * dx + dy * dy;
-}
-
-bool Map::getPathMatching(const std::shared_ptr<const Creature>& creature, const Position& targetPos,
-                          std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
-                          const FindPathParams& fpp) const
-{
-	Position pos = creature->getPosition();
-	const Position startPos = pos;
-
 	// We can't walk, no need to create path.
 	if (creature->getSpeed() <= 0) {
 		return false;
 	}
 
-	// We can't get paths up or down floors.
-	if (startPos.getZ() != targetPos.getZ()) {
-		return false;
-	}
+	// PathFinder::find handles the remaining pre-flight rules: different floors,
+	// targets within dance-step reach, and targets beyond the search distance.
+	// Pruning uses the pathfinding-specific sight check; candidate sight checks
+	// below use the regular sight callback.
+	const auto& position = creature->getPosition();
+	uint8_t z = position.getZ();
+	const auto& targetPos = request.goal().target;
 
-	int32_t distanceX = startPos.getDistanceX(targetPos);
-	int32_t distanceY = startPos.getDistanceY(targetPos);
-	// We are next to our target. Let dance step decide.
-	if (fpp.maxTargetDist <= 1 && distanceX <= 1 && distanceY <= 1) {
-		return true;
-	}
+	auto pathRequest = request;
+	pathRequest.from(position).withLineOfSight(isSightClearPathfinding(position, targetPos));
 
-	// Don't update path. The target is too far away.
-	int32_t maxDistanceX = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportX + 1;
-	int32_t maxDistanceY = fpp.maxSearchDist ? fpp.maxSearchDist : Map::maxViewportY + 1;
-	if (distanceX > maxDistanceX || distanceY > maxDistanceY) {
-		return false;
-	}
-
-	static constexpr std::array<std::pair<int, int>, 8> allNeighbors = {
-	    {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}}};
-
-	bool sightClear = isSightClear(startPos, targetPos, true, true);
-
-	Position endPos;
-	AStarNodes nodes(pos.x, pos.y);
-
-	AStarNode* found = nullptr;
-	int32_t bestMatch = 0;
-	uint16_t iterations = 0;
-	AStarNode* n = nodes.getBestNode();
-	while (n) {
-		iterations++;
-
-		if (iterations >= Map::maxViewportX * Map::maxViewportY) {
-			return false;
+	auto getTileCost = [this, &creature, z](int32_t x, int32_t y) -> uint16_t
+	{
+		auto tile = getTile(static_cast<uint16_t>(x), static_cast<uint16_t>(y), z);
+		if (!tile) {
+			return 0;
 		}
 
-		const int32_t x = n->x;
-		const int32_t y = n->y;
-		pos.x = x;
-		pos.y = y;
-		if (pathCondition(startPos, pos, fpp, bestMatch)) {
-			found = n;
-			endPos = pos;
-			if (bestMatch == 0) {
-				break;
+		if (creature->getTile() != tile) {
+			uint32_t flags = FLAG_PATHFINDING;
+			if (!creature->asPlayer()) {
+				flags |= FLAG_IGNOREFIELDDAMAGE;
+			}
+
+			if (tile->queryAdd(0, creature, 1, flags) != RETURNVALUE_NOERROR) {
+				return 0;
 			}
 		}
 
-		for (uint8_t i = 0; i < 8; ++i) {
-			pos.x = x + allNeighbors[i].first;
-			pos.y = y + allNeighbors[i].second;
+		uint16_t cost = 0;
+		if (tile->getTopVisibleCreature(creature)) {
+			cost += PATHFIND_NORMAL_COST * 3;
+		}
 
-			int32_t startDistanceToNode = startPos.getDistanceX(pos) + startPos.getDistanceY(pos);
-			if (fpp.maxSearchDist != 0 && startDistanceToNode > fpp.maxSearchDist) {
-				continue;
-			} else if (fpp.maxSearchDist == 0 && (startDistanceToNode > (Map::maxViewportX + Map::maxViewportY))) {
-				continue;
-			}
-
-			if (fpp.keepDistance && !pathCondition.isInRange(startPos, pos, fpp)) {
-				continue;
-			}
-
-			// If sight is clear we can ignore a lot of nodes.
-			if (sightClear && !fpp.keepDistance && !fpp.summonTargetMaster && fpp.minTargetDist <= 1) {
-				int32_t startX = startPos.getX();
-				int32_t startY = startPos.getY();
-				int32_t targetX = targetPos.getX();
-				int32_t targetY = targetPos.getY();
-
-				// We don't need nodes behind us.
-				// We also do not need nodes on a different x or y if target and start is same x/y.
-				if (startX > targetX && pos.x > startX) {
-					continue;
-				} else if (startX == targetX && pos.x != startX) {
-					continue;
-				} else if (startX < targetX && pos.x < startX) {
-					continue;
-				}
-				if (startY > targetY && pos.y > startY) {
-					continue;
-				} else if (startY == targetY && pos.y != startY) {
-					continue;
-				} else if (startY < targetY && pos.y < startY) {
-					continue;
-				}
-
-				// We don't need nodes past the targetPos
-				if (startX > targetX && pos.x < targetX) {
-					continue;
-				} else if (startX < targetX && pos.x > targetX) {
-					continue;
-				}
-				if (startY > targetY && pos.y < targetY) {
-					continue;
-				} else if (startY < targetY && pos.y > targetY) {
-					continue;
-				}
-			}
-
-			std::shared_ptr<const Tile> tile;
-			AStarNode* neighborNode = nodes.getNodeByPosition(pos.x, pos.y);
-			if (neighborNode) {
-				tile = getTile(pos.x, pos.y, pos.z);
-			} else {
-				tile = canWalkTo(creature, pos);
-				if (!tile) {
-					continue;
-				}
-			}
-
-			// The cost to walk to this neighbor
-			const uint16_t g = n->g + AStarNodes::getMapWalkCost(n, pos) + AStarNodes::getTileWalkCost(creature, tile);
-			const uint16_t h = calculateHeuristic(pos, targetPos);
-			const uint16_t newf = h + g;
-
-			if (neighborNode) {
-				if (neighborNode->f <= newf) {
-					// The node on the closed/open list is cheaper than this one
-					continue;
-				}
-
-				neighborNode->g = g;
-				neighborNode->f = newf;
-				neighborNode->parent = n;
-			} else {
-				// Does not exist in the open/closed list, create a new node
-				if (!nodes.createNode(n, pos.x, pos.y, g, newf)) {
-					// Limit of nodes reached
-					return false;
-				}
+		if (const auto& field = tile->getFieldItem()) {
+			CombatType_t combatType = field->getCombatType();
+			const auto& monster = creature->asMonster();
+			if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
+			    (monster && !monster->canWalkOnFieldType(combatType))) {
+				cost += PATHFIND_NORMAL_COST * 18;
 			}
 		}
 
-		n = nodes.getBestNode();
+		return cost;
+	};
+
+	SightCheck sightCheck;
+	if (pathRequest.goal().requireSight) {
+		sightCheck = [this](const Position& fromPos, const Position& toPos) {
+			return isSightClear(fromPos, toPos, true);
+		};
 	}
 
-	if (!found) {
-		return false;
-	}
-
-	int32_t prevx = endPos.getX();
-	int32_t prevy = endPos.getY();
-
-	found = found->parent;
-	while (found) {
-		pos.x = found->x;
-		pos.y = found->y;
-
-		int32_t dx = pos.getX() - prevx;
-		int32_t dy = pos.getY() - prevy;
-
-		prevx = pos.x;
-		prevy = pos.y;
-
-		if (dx == 1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHWEST);
-		} else if (dx == -1 && dy == 1) {
-			dirList.push_back(DIRECTION_NORTHEAST);
-		} else if (dx == 1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHWEST);
-		} else if (dx == -1 && dy == -1) {
-			dirList.push_back(DIRECTION_SOUTHEAST);
-		} else if (dx == 1) {
-			dirList.push_back(DIRECTION_WEST);
-		} else if (dx == -1) {
-			dirList.push_back(DIRECTION_EAST);
-		} else if (dy == 1) {
-			dirList.push_back(DIRECTION_NORTH);
-		} else if (dy == -1) {
-			dirList.push_back(DIRECTION_SOUTH);
-		}
-
-		found = found->parent;
-	}
-
-	return true;
-}
-
-// AStarNodes
-AStarNodes::AStarNodes(uint16_t x, uint16_t y)
-{
-	nodes.reserve(Map::nodeReserveSize);
-	nodeMap.reserve(Map::nodeReserveSize);
-	visited.reserve(Map::nodeReserveSize);
-	createNode(nullptr, x, y, 0, 0);
-}
-
-AStarNode* AStarNodes::createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f)
-{
-	if (nodes.size() == Map::nodeReserveSize) {
-		return nullptr;
-	}
-
-	uint32_t key = hashCoord(x, y);
-	nodes.emplace_back(AStarNode{parent, x, y, g, f});
-	AStarNode* node = &nodes.back();
-	nodeMap[key] = node;
-	openSet.push(node);
-	return node;
-}
-
-AStarNode* AStarNodes::getBestNode()
-{
-	while (!openSet.empty()) {
-		AStarNode* node = openSet.top();
-		openSet.pop();
-		uint32_t key = hashCoord(node->x, node->y);
-		if (visited.find(key) == visited.end()) {
-			visited.insert(key);
-			return node;
-		}
-	}
-	return nullptr;
-}
-
-AStarNode* AStarNodes::getNodeByPosition(uint16_t x, uint16_t y)
-{
-	auto it = nodeMap.find(hashCoord(x, y));
-	return (it != nodeMap.end()) ? it->second : nullptr;
-}
-
-uint16_t AStarNodes::getMapWalkCost(AStarNode* node, const Position& neighborPos)
-{
-	if (std::abs(node->x - neighborPos.x) == std::abs(node->y - neighborPos.y)) {
-		// diagonal movement extra cost
-		return MAP_DIAGONALWALKCOST;
-	}
-	return MAP_NORMALWALKCOST;
-}
-
-constexpr ConditionType_t DamageToConditionType(CombatType_t type)
-{
-	switch (type) {
-		case COMBAT_FIREDAMAGE:
-			return CONDITION_FIRE;
-
-		case COMBAT_ENERGYDAMAGE:
-			return CONDITION_ENERGY;
-
-		case COMBAT_DROWNDAMAGE:
-			return CONDITION_DROWN;
-
-		case COMBAT_EARTHDAMAGE:
-			return CONDITION_POISON;
-
-		case COMBAT_ICEDAMAGE:
-			return CONDITION_FREEZING;
-
-		case COMBAT_HOLYDAMAGE:
-			return CONDITION_DAZZLED;
-
-		case COMBAT_DEATHDAMAGE:
-			return CONDITION_CURSED;
-
-		case COMBAT_PHYSICALDAMAGE:
-			return CONDITION_BLEEDING;
-
-		default:
-			return CONDITION_NONE;
-	}
-}
-
-uint16_t AStarNodes::getTileWalkCost(const std::shared_ptr<const Creature>& creature,
-                                     const std::shared_ptr<const Tile>& tile)
-{
-	uint16_t cost = 0;
-	if (tile->getTopVisibleCreature(creature)) {
-		cost += MAP_NORMALWALKCOST * 3;
-	}
-
-	if (const auto& field = tile->getFieldItem()) {
-		CombatType_t combatType = field->getCombatType();
-		const auto& monster = creature->asMonster();
-		if (!creature->isImmune(combatType) && !creature->hasCondition(DamageToConditionType(combatType)) &&
-		    (monster && !monster->canWalkOnFieldType(combatType))) {
-			cost += MAP_NORMALWALKCOST * 18;
-		}
-	}
-	return cost;
+	const auto status = PathFinder::find(pathRequest, std::move(getTileCost), dirList, std::move(sightCheck));
+	return status != PathStatus::NoPath;
 }
 
 // QTreeNode

@@ -1450,7 +1450,7 @@ private:
 	uint32_t getConditionImmunities() const override { return conditionImmunities; }
 	uint32_t getConditionSuppressions() const override { return conditionSuppressions; }
 	uint16_t getLookCorpse() const override;
-	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const override;
+	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, PathRequest& request) const override;
 
 	friend class IOLoginData;
 	friend class ProtocolGame;

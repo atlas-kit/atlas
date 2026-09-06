@@ -184,7 +184,10 @@ target_sources(tfslib PRIVATE $<TARGET_OBJECTS:luascript>)
 add_subdirectory(events)
 target_sources(tfslib PRIVATE $<TARGET_OBJECTS:events>)
 
-add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN} ${events_HDR})
+add_subdirectory(pathfinding)
+target_sources(tfslib PRIVATE $<TARGET_OBJECTS:pathfinding>)
+
+add_custom_target(format COMMAND /usr/bin/clang-format -style=file -i ${tfs_HDR} ${tfs_SRC} ${tfs_MAIN} ${events_HDR} ${pathfinding_HDR} ${pathfinding_SRC})
 
 set(tfs_RC "")
 if (WIN32)

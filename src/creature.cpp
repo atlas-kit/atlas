@@ -10,6 +10,8 @@
 #include "events/creature.h"
 #include "game.h"
 #include "party.h"
+#include "pathfinding/path_request.h"
+#include "pathfinding/search_mode.h"
 #include "scheduler.h"
 
 double Creature::speedA = 857.36;
@@ -323,12 +325,12 @@ void Creature::onRemoveCreature(const std::shared_ptr<Creature>& creature, bool)
 	}
 }
 
-void Creature::updateFollowCreaturePath(FindPathParams& fpp)
+void Creature::updateFollowCreaturePath(PathRequest& request)
 {
 	listWalkDir.clear();
 
 	if (const auto& followCreature = getFollowCreature();
-	    followCreature && getPathTo(followCreature->getPosition(), listWalkDir, fpp)) {
+	    followCreature && getPathTo(followCreature->getPosition(), listWalkDir, request)) {
 		hasFollowPath = true;
 		startAutoWalk();
 	} else {
@@ -806,13 +808,12 @@ void Creature::setAttackedCreature(const std::shared_ptr<Creature>& creature)
 	}
 }
 
-void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, FindPathParams& fpp) const
+void Creature::getPathSearchParams(const std::shared_ptr<const Creature>&, PathRequest& request) const
 {
-	fpp.fullPathSearch = !hasFollowPath;
-	fpp.clearSight = true;
-	fpp.maxSearchDist = Map::maxViewportX + Map::maxViewportY;
-	fpp.minTargetDist = 1;
-	fpp.maxTargetDist = 1;
+	request.mode(!hasFollowPath ? SearchMode::Reach : SearchMode::Approach);
+	request.requiringSight(true);
+	request.maxDistance(Map::maxViewportX + Map::maxViewportY);
+	request.distance(1, 1);
 }
 
 void Creature::setFollowCreature(const std::shared_ptr<Creature>& creature)
@@ -1341,88 +1342,6 @@ void Creature::setCreatureLight(LightInfo lightInfo) { internalLight = std::move
 
 void Creature::setNormalCreatureLight() { internalLight = {}; }
 
-bool FrozenPathingConditionCall::isInRange(const Position& startPos, const Position& testPos,
-                                           const FindPathParams& fpp) const
-{
-	if (fpp.fullPathSearch) {
-		if (testPos.x > targetPos.x + fpp.maxTargetDist) {
-			return false;
-		}
-
-		if (testPos.x < targetPos.x - fpp.maxTargetDist) {
-			return false;
-		}
-
-		if (testPos.y > targetPos.y + fpp.maxTargetDist) {
-			return false;
-		}
-
-		if (testPos.y < targetPos.y - fpp.maxTargetDist) {
-			return false;
-		}
-	} else {
-		int32_t dx = startPos.getOffsetX(targetPos);
-
-		int32_t dxMax = (dx >= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.x > targetPos.x + dxMax) {
-			return false;
-		}
-
-		int32_t dxMin = (dx <= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.x < targetPos.x - dxMin) {
-			return false;
-		}
-
-		int32_t dy = startPos.getOffsetY(targetPos);
-
-		int32_t dyMax = (dy >= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.y > targetPos.y + dyMax) {
-			return false;
-		}
-
-		int32_t dyMin = (dy <= 0 ? fpp.maxTargetDist : 0);
-		if (testPos.y < targetPos.y - dyMin) {
-			return false;
-		}
-	}
-	return true;
-}
-
-bool FrozenPathingConditionCall::operator()(const Position& startPos, const Position& testPos,
-                                            const FindPathParams& fpp, int32_t& bestMatchDist) const
-{
-	if (!isInRange(startPos, testPos, fpp)) {
-		return false;
-	}
-
-	if (fpp.clearSight && !g_game.isSightClear(testPos, targetPos, true)) {
-		return false;
-	}
-
-	int32_t testDist = std::max(targetPos.getDistanceX(testPos), targetPos.getDistanceY(testPos));
-	if (fpp.maxTargetDist == 1) {
-		if (testDist < fpp.minTargetDist || testDist > fpp.maxTargetDist) {
-			return false;
-		}
-
-		return true;
-	} else if (testDist <= fpp.maxTargetDist) {
-		if (testDist < fpp.minTargetDist) {
-			return false;
-		}
-
-		if (testDist == fpp.maxTargetDist) {
-			bestMatchDist = 0;
-			return true;
-		} else if (testDist > bestMatchDist) {
-			// not quite what we want, but the best so far
-			bestMatchDist = testDist;
-			return true;
-		}
-	}
-	return false;
-}
-
 bool Creature::isInvisible() const
 {
 	return std::find_if(conditions.begin(), conditions.end(), [](const std::unique_ptr<Condition>& condition) {
@@ -1430,22 +1349,21 @@ bool Creature::isInvisible() const
 	       }) != conditions.end();
 }
 
-bool Creature::getPathTo(const Position& targetPos, std::vector<Direction>& dirList, const FindPathParams& fpp) const
+bool Creature::getPathTo(const Position& targetPos, std::vector<Direction>& dirList, const PathRequest& request) const
 {
-	return g_game.map.getPathMatching(asCreature(), targetPos, dirList, FrozenPathingConditionCall(targetPos), fpp);
+	return g_game.map.getPathMatching(asCreature(), dirList, request);
 }
 
 bool Creature::getPathTo(const Position& targetPos, std::vector<Direction>& dirList, int32_t minTargetDist,
                          int32_t maxTargetDist, bool fullPathSearch /*= true*/, bool clearSight /*= true*/,
                          int32_t maxSearchDist /*= 0*/) const
 {
-	FindPathParams fpp;
-	fpp.fullPathSearch = fullPathSearch;
-	fpp.maxSearchDist = maxSearchDist;
-	fpp.clearSight = clearSight;
-	fpp.minTargetDist = minTargetDist;
-	fpp.maxTargetDist = maxTargetDist;
-	return getPathTo(targetPos, dirList, fpp);
+	auto request = PathRequest::to(targetPos).from(getPosition()).distance(minTargetDist, maxTargetDist)
+	                   .maxDistance(maxSearchDist).requiringSight(clearSight);
+	if (!fullPathSearch) {
+		request.mode(SearchMode::Approach);
+	}
+	return getPathTo(targetPos, dirList, request);
 }
 
 void Creature::setStorageValue(uint32_t key, std::optional<int32_t> value, bool isSpawn)

@@ -522,10 +522,10 @@ void Monster::goToFollowCreature()
 		return;
 	}
 
-	FindPathParams fpp;
-	getPathSearchParams(followCreature, fpp);
+	PathRequest request = PathRequest::to(followCreature->getPosition());
+	getPathSearchParams(followCreature, request);
 
-	const auto simpleStep = !isSummon() && (isFleeing() || fpp.maxTargetDist > 1);
+	const auto simpleStep = !isSummon() && (isFleeing() || request.goal().distance.max > 1);
 	if (simpleStep) {
 		auto direction = DIRECTION_NONE;
 		if (getDistanceStep(followCreature->getPosition(), direction, isFleeing())) {
@@ -540,7 +540,7 @@ void Monster::goToFollowCreature()
 		}
 	}
 
-	updateFollowCreaturePath(fpp);
+	updateFollowCreaturePath(request);
 	onFollowCreatureComplete();
 }
 
@@ -1952,35 +1952,33 @@ bool Monster::challengeCreature(const std::shared_ptr<Creature>& creature, bool 
 	return result;
 }
 
-void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const
+void Monster::getPathSearchParams(const std::shared_ptr<const Creature>& creature, PathRequest& request) const
 {
-	Creature::getPathSearchParams(creature, fpp);
+	Creature::getPathSearchParams(creature, request);
 
-	fpp.minTargetDist = 1;
-	fpp.maxTargetDist = mType->info.targetDistance;
+	request.distance(1, mType->info.targetDistance);
 
 	if (isSummon()) {
 		if (const auto& followCreature = getFollowCreature(); followCreature && followCreature == getMaster()) {
-			fpp.summonTargetMaster = true;
+			request.summonTargetMaster();
 		}
 		if (getMaster() == creature) {
-			fpp.maxTargetDist = 2;
-			fpp.fullPathSearch = true;
+			request.distance(1, 2);
+			request.mode(SearchMode::Reach);
 		} else if (mType->info.targetDistance <= 1) {
-			fpp.fullPathSearch = true;
+			request.mode(SearchMode::Reach);
 		} else {
-			fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+			request.mode(canUseAttack(getPosition(), creature) ? SearchMode::Approach : SearchMode::Reach);
 		}
 	} else if (isFleeing()) {
-		// Distance should be higher than the client view range (Map::maxClientViewportX/Map::maxClientViewportY)
-		fpp.maxTargetDist = Map::maxViewportX;
-		fpp.clearSight = false;
-		fpp.keepDistance = true;
-		fpp.fullPathSearch = false;
+		// Keep the flee distance within the client viewport range.
+		request.distance(1, Map::maxViewportX);
+		request.requiringSight(false);
+		request.mode(SearchMode::Flee);
 	} else if (mType->info.targetDistance <= 1) {
-		fpp.fullPathSearch = true;
+		request.mode(SearchMode::Reach);
 	} else {
-		fpp.fullPathSearch = !canUseAttack(getPosition(), creature);
+		request.mode(canUseAttack(getPosition(), creature) ? SearchMode::Approach : SearchMode::Reach);
 	}
 }
 

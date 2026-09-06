@@ -5,6 +5,8 @@
 #include "../../condition.h"
 #include "../../events/events.h"
 #include "../../game.h"
+#include "../../pathfinding/path_request.h"
+#include "../../pathfinding/search_mode.h"
 #include "../api.h"
 #include "../env.h"
 #include "../meta.h"
@@ -884,17 +886,18 @@ int luaCreatureGetPathTo(lua_State* L)
 		return 1;
 	}
 
-	const Position& position = tfs::lua::getPosition(L, 2);
+	Position position = tfs::lua::getPosition(L, 2);
 
-	FindPathParams fpp;
-	fpp.minTargetDist = tfs::lua::getNumber<int32_t>(L, 3, 0);
-	fpp.maxTargetDist = tfs::lua::getNumber<int32_t>(L, 4, 1);
-	fpp.fullPathSearch = tfs::lua::getBoolean(L, 5, fpp.fullPathSearch);
-	fpp.clearSight = tfs::lua::getBoolean(L, 6, fpp.clearSight);
-	fpp.maxSearchDist = tfs::lua::getNumber<int32_t>(L, 7, fpp.maxSearchDist);
+	auto request = PathRequest::to(position).from(creature->getPosition())
+	                   .distance(tfs::lua::getNumber<int32_t>(L, 3, 0), tfs::lua::getNumber<int32_t>(L, 4, 1))
+	                   .maxDistance(tfs::lua::getNumber<int32_t>(L, 7, 0));
+	request.requiringSight(tfs::lua::getBoolean(L, 6, true));
+	if (!tfs::lua::getBoolean(L, 5, true)) {
+		request.mode(SearchMode::Approach);
+	}
 
 	std::vector<Direction> dirList;
-	if (creature->getPathTo(position, dirList, fpp)) {
+	if (creature->getPathTo(position, dirList, request)) {
 		lua_newtable(L);
 
 		int index = 0;

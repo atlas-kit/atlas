@@ -222,7 +222,7 @@ private:
 	void dropLoot(const std::shared_ptr<Container>& corpse, const std::shared_ptr<Creature>& lastHitCreature) override;
 	uint32_t getDamageImmunities() const override { return mType->info.damageImmunities; }
 	uint32_t getConditionImmunities() const override { return mType->info.conditionImmunities; }
-	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const override;
+	void getPathSearchParams(const std::shared_ptr<const Creature>& creature, PathRequest& request) const override;
 
 	friend class LuaScriptInterface;
 };

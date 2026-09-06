@@ -222,9 +222,9 @@ std::string Npc::getDescription(int32_t) const
 void Npc::goToFollowCreature()
 {
 	if (const auto& followCreature = getFollowCreature()) {
-		FindPathParams fpp;
-		getPathSearchParams(followCreature, fpp);
-		updateFollowCreaturePath(fpp);
+		PathRequest request = PathRequest::to(followCreature->getPosition());
+		getPathSearchParams(followCreature, request);
+		updateFollowCreaturePath(request);
 	}
 }
 
