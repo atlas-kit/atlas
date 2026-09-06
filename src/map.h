@@ -149,15 +149,18 @@ public:
 	Floor* createFloor(uint32_t z);
 	Floor* getFloor(uint8_t z) const { return array[z]; }
 
-	void addCreature(std::shared_ptr<Creature> c) { creatures.emplace(std::move(c)); }
-	void removeCreature(const std::shared_ptr<Creature>& c) { creatures.erase(c); }
+	void addCreature(const std::shared_ptr<Creature>& c);
+	void removeCreature(const std::shared_ptr<Creature>& c);
 
 private:
 	static bool newLeaf;
 	QTreeLeafNode* leafS = nullptr;
 	QTreeLeafNode* leafE = nullptr;
 	Floor* array[MAP_MAX_LAYERS] = {};
-	boost::container::flat_set<std::shared_ptr<Creature>> creatures;
+	std::vector<std::shared_ptr<Creature>> creatureList;
+	std::vector<std::shared_ptr<Creature>> playerList;
+	std::vector<std::shared_ptr<Creature>> monsterList;
+	std::vector<std::shared_ptr<Creature>> npcList;
 
 	friend class Map;
 	friend class QTreeNode;
@@ -224,8 +227,17 @@ public:
 	                  bool forceTeleport = false);
 
 	void getSpectators(SpectatorVec& spectators, const Position& centerPos, bool multifloor = false,
-	                   bool onlyPlayers = false, int32_t minRangeX = 0, int32_t maxRangeX = 0, int32_t minRangeY = 0,
-	                   int32_t maxRangeY = 0);
+	                   SpectatorType_t type = SPECTATORTYPE_ALL, int32_t minRangeX = 0, int32_t maxRangeX = 0,
+	                   int32_t minRangeY = 0, int32_t maxRangeY = 0);
+
+	void getSpectators(SpectatorVec& spectators, const Position& centerPos, bool multifloor,
+	                   bool onlyPlayers, int32_t minRangeX = 0, int32_t maxRangeX = 0,
+	                   int32_t minRangeY = 0, int32_t maxRangeY = 0)
+	{
+		getSpectators(spectators, centerPos, multifloor,
+		              onlyPlayers ? SPECTATORTYPE_PLAYER : SPECTATORTYPE_ALL,
+		              minRangeX, maxRangeX, minRangeY, maxRangeY);
+	}
 
 	void clearSpectatorCache();
 	void clearPlayersSpectatorCache();
@@ -291,7 +303,7 @@ private:
 	// Actually scans the map for spectators
 	void getSpectatorsInternal(SpectatorVec& spectators, const Position& centerPos, int32_t minRangeX,
 	                           int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ,
-	                           int32_t maxRangeZ, bool onlyPlayers) const;
+	                           int32_t maxRangeZ, SpectatorType_t type) const;
 
 	friend class Game;
 };

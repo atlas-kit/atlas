@@ -130,6 +130,15 @@ enum CreatureType_t : uint8_t
 	CREATURETYPE_HIDDEN = 5,
 };
 
+enum SpectatorType_t : uint8_t
+{
+	SPECTATORTYPE_ALL = 0,
+	SPECTATORTYPE_PLAYER,
+	SPECTATORTYPE_MONSTER,
+	SPECTATORTYPE_NPC,
+};
+
+
 enum OperatingSystem_t : uint8_t
 {
 	CLIENTOS_NONE = 0,

@@ -77,14 +77,14 @@ void mergeSpectators(SpectatorVec& spectators, const SpectatorVec& additionalSpe
 	}
 
 	boost::unordered_flat_set<const Creature*> existingSpectators;
-	existingSpectators.reserve(spectators.size());
+	existingSpectators.reserve(spectators.size() + additionalSpectators.size());
 	for (const auto& spectator : spectators) {
 		existingSpectators.emplace(spectator.get());
 	}
 
 	spectators.reserve(spectators.size() + additionalSpectators.size());
 	for (const auto& spectator : additionalSpectators) {
-		if (!existingSpectators.contains(spectator.get())) {
+		if (existingSpectators.emplace(spectator.get()).second) {
 			spectators.emplace_back(spectator);
 		}
 	}
@@ -412,7 +412,7 @@ void Map::moveCreature(const std::shared_ptr<Creature>& creature, const std::sha
 
 void Map::getSpectatorsInternal(SpectatorVec& spectators, const Position& centerPos, int32_t minRangeX,
                                 int32_t maxRangeX, int32_t minRangeY, int32_t maxRangeY, int32_t minRangeZ,
-                                int32_t maxRangeZ, bool onlyPlayers) const
+                                int32_t maxRangeZ, SpectatorType_t type) const
 {
 	auto min_y = centerPos.y + minRangeY;
 	auto min_x = centerPos.x + minRangeX;
@@ -443,9 +443,11 @@ void Map::getSpectatorsInternal(SpectatorVec& spectators, const Position& center
 		leafE = leafS;
 		for (int_fast32_t nx = startx1; nx <= endx2; nx += FLOOR_SIZE) {
 			if (leafE) {
-				for (auto&& creature : leafE->creatures | std::views::filter([onlyPlayers](const auto& creature) {
-					                       return !onlyPlayers || creature->asPlayer() != nullptr;
-				                       })) {
+				const auto& creatureList = (type == SPECTATORTYPE_PLAYER)  ? leafE->playerList :
+				                           (type == SPECTATORTYPE_MONSTER) ? leafE->monsterList :
+				                           (type == SPECTATORTYPE_NPC)     ? leafE->npcList :
+				                                                             leafE->creatureList;
+				for (const auto& creature : creatureList) {
 					const Position& cpos = creature->getPosition();
 					if (minRangeZ > cpos.z || maxRangeZ < cpos.z) {
 						continue;
@@ -474,7 +476,7 @@ void Map::getSpectatorsInternal(SpectatorVec& spectators, const Position& center
 }
 
 void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, bool multifloor /*= false*/,
-                        bool onlyPlayers /*= false*/, int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
+                        SpectatorType_t type /*= SPECTATORTYPE_ALL*/, int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
                         int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
 {
 	if (centerPos.z >= MAP_MAX_LAYERS) {
@@ -491,29 +493,33 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 
 	if (minRangeX == -maxViewportX && maxRangeX == maxViewportX && minRangeY == -maxViewportY &&
 	    maxRangeY == maxViewportY && multifloor) {
-		if (onlyPlayers) {
+		if (type == SPECTATORTYPE_PLAYER) {
 			auto it = playersSpectatorCache.find(centerPos);
 			if (it != playersSpectatorCache.end()) {
 				mergeSpectators(spectators, it->second);
 				foundCache = true;
 			}
-		}
 
-		if (!foundCache) {
-			auto it = spectatorCache.find(centerPos);
-			if (it != spectatorCache.end()) {
-				if (!onlyPlayers) {
-					mergeSpectators(spectators, it->second);
-				} else {
+			if (!foundCache) {
+				auto itSpec = spectatorCache.find(centerPos);
+				if (itSpec != spectatorCache.end()) {
 					SpectatorVec playerSpectators;
-					playerSpectators.reserve(it->second.size());
-					for (const auto& spectator : it->second) {
-						if (spectator->asPlayer()) {
+					playerSpectators.reserve(itSpec->second.size());
+					for (const auto& spectator : itSpec->second) {
+						if (spectator->getType() == CREATURETYPE_PLAYER) {
 							playerSpectators.emplace_back(spectator);
 						}
 					}
 					mergeSpectators(spectators, playerSpectators);
+					foundCache = true;
+				} else {
+					cacheResult = true;
 				}
+			}
+		} else if (type == SPECTATORTYPE_ALL) {
+			auto it = spectatorCache.find(centerPos);
+			if (it != spectatorCache.end()) {
+				mergeSpectators(spectators, it->second);
 				foundCache = true;
 			} else {
 				cacheResult = true;
@@ -548,12 +554,12 @@ void Map::getSpectators(SpectatorVec& spectators, const Position& centerPos, boo
 		SpectatorVec querySpectators;
 		SpectatorVec& result = spectators.empty() ? spectators : querySpectators;
 		getSpectatorsInternal(result, centerPos, minRangeX, maxRangeX, minRangeY, maxRangeY, minRangeZ, maxRangeZ,
-		                      onlyPlayers);
+		                      type);
 
 		if (cacheResult) {
-			if (onlyPlayers) {
+			if (type == SPECTATORTYPE_PLAYER) {
 				playersSpectatorCache[centerPos] = result;
-			} else {
+			} else if (type == SPECTATORTYPE_ALL) {
 				spectatorCache[centerPos] = result;
 			}
 		}
@@ -1101,6 +1107,77 @@ Floor* QTreeLeafNode::createFloor(uint32_t z)
 		array[z] = new Floor();
 	}
 	return array[z];
+}
+
+namespace {
+
+// Removal complexity: O(N) lookup via std::find, O(1) swap-and-pop, overall O(N)
+// where N is the number of creatures in this 8x8 leaf column.
+bool removeCreatureFromVector(std::vector<std::shared_ptr<Creature>>& list, const std::shared_ptr<Creature>& c)
+{
+	auto it = std::find(list.begin(), list.end(), c);
+	if (it == list.end()) {
+		return false;
+	}
+	*it = std::move(list.back());
+	list.pop_back();
+	return true;
+}
+
+} // namespace
+
+void QTreeLeafNode::addCreature(const std::shared_ptr<Creature>& c)
+{
+	assert(std::find(creatureList.begin(), creatureList.end(), c) == creatureList.end());
+	creatureList.emplace_back(c);
+	switch (c->getType()) {
+	case CREATURETYPE_PLAYER:
+		playerList.emplace_back(c);
+		break;
+	case CREATURETYPE_MONSTER:
+		monsterList.emplace_back(c);
+		break;
+	case CREATURETYPE_NPC:
+		npcList.emplace_back(c);
+		break;
+	default:
+		break;
+	}
+	assert(creatureList.size() == playerList.size() + monsterList.size() + npcList.size());
+}
+
+void QTreeLeafNode::removeCreature(const std::shared_ptr<Creature>& c)
+{
+	const bool foundInAll = removeCreatureFromVector(creatureList, c);
+	if (!foundInAll) {
+		return;
+	}
+
+	bool foundInTyped = false;
+	switch (c->getType()) {
+	case CREATURETYPE_PLAYER:
+		foundInTyped = removeCreatureFromVector(playerList, c);
+		break;
+	case CREATURETYPE_MONSTER:
+		foundInTyped = removeCreatureFromVector(monsterList, c);
+		break;
+	case CREATURETYPE_NPC:
+		foundInTyped = removeCreatureFromVector(npcList, c);
+		break;
+	default:
+		break;
+	}
+
+	if (!foundInTyped) {
+		if (removeCreatureFromVector(playerList, c) ||
+		    removeCreatureFromVector(monsterList, c) ||
+		    removeCreatureFromVector(npcList, c)) {
+			foundInTyped = true;
+		}
+	}
+
+	assert(foundInTyped);
+	assert(creatureList.size() == playerList.size() + monsterList.size() + npcList.size());
 }
 
 uint32_t Map::clean() const

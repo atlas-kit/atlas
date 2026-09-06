@@ -27,18 +27,37 @@ namespace {
 
 int luaGameGetSpectators(lua_State* L)
 {
-	// Game.getSpectators(position[, multifloor = false[, onlyPlayer = false[, minRangeX = 0[, maxRangeX = 0[, minRangeY
+	// Game.getSpectators(position[, multifloor = false[, onlyPlayerOrType = false[, minRangeX = 0[, maxRangeX = 0[, minRangeY
 	// = 0[, maxRangeY = 0]]]]]])
 	const Position& position = tfs::lua::getPosition(L, 1);
 	bool multifloor = tfs::lua::getBoolean(L, 2, false);
-	bool onlyPlayers = tfs::lua::getBoolean(L, 3, false);
+	SpectatorType_t type = SPECTATORTYPE_ALL;
+	if (lua_isboolean(L, 3)) {
+		type = lua_toboolean(L, 3) ? SPECTATORTYPE_PLAYER : SPECTATORTYPE_ALL;
+	} else if (tfs::lua::isNumber(L, 3)) {
+		const auto val = tfs::lua::getNumber<uint32_t>(L, 3);
+		switch (val) {
+		case SPECTATORTYPE_PLAYER:
+			type = SPECTATORTYPE_PLAYER;
+			break;
+		case SPECTATORTYPE_MONSTER:
+			type = SPECTATORTYPE_MONSTER;
+			break;
+		case SPECTATORTYPE_NPC:
+			type = SPECTATORTYPE_NPC;
+			break;
+		default:
+			type = SPECTATORTYPE_ALL;
+			break;
+		}
+	}
 	int32_t minRangeX = tfs::lua::getNumber<int32_t>(L, 4, 0);
 	int32_t maxRangeX = tfs::lua::getNumber<int32_t>(L, 5, 0);
 	int32_t minRangeY = tfs::lua::getNumber<int32_t>(L, 6, 0);
 	int32_t maxRangeY = tfs::lua::getNumber<int32_t>(L, 7, 0);
 
 	SpectatorVec spectators;
-	g_game.map.getSpectators(spectators, position, multifloor, onlyPlayers, minRangeX, maxRangeX, minRangeY, maxRangeY);
+	g_game.map.getSpectators(spectators, position, multifloor, type, minRangeX, maxRangeX, minRangeY, maxRangeY);
 
 	lua_createtable(L, spectators.size(), 0);
 
