@@ -5,6 +5,7 @@
 #define FS_MAP_H
 
 #include "house.h"
+#include "pathfinding/path_request.h"
 #include "position.h"
 #include "spawn.h"
 #include "town.h"
@@ -15,9 +16,6 @@ class Creature;
 class Tile;
 
 static constexpr int32_t MAP_MAX_LAYERS = 16;
-
-static constexpr uint16_t MAP_NORMALWALKCOST = 10;
-static constexpr uint16_t MAP_DIAGONALWALKCOST = 25;
 
 using SpectatorVec = boost::container::flat_set<std::shared_ptr<Creature>, std::owner_less<std::shared_ptr<Creature>>>;
 
@@ -31,45 +29,6 @@ struct PositionHash
 		boost::hash_combine(seed, position.z);
 		return seed;
 	}
-};
-
-struct FindPathParams;
-struct AStarNode
-{
-	AStarNode* parent;
-	uint16_t x, y;
-	uint16_t g, f;
-};
-
-inline uint32_t hashCoord(uint16_t x, uint16_t y) { return (static_cast<uint32_t>(x) << 16) | y; }
-
-class AStarNodes
-{
-public:
-	AStarNodes(uint16_t x, uint16_t y);
-
-	AStarNode* createNode(AStarNode* parent, uint16_t x, uint16_t y, uint16_t g, uint16_t f);
-	AStarNode* getBestNode();
-	AStarNode* getNodeByPosition(uint16_t x, uint16_t y);
-
-	static uint16_t getMapWalkCost(AStarNode* node, const Position& neighborPos);
-	static uint16_t getTileWalkCost(const std::shared_ptr<const Creature>& creature,
-	                                const std::shared_ptr<const Tile>& tile);
-
-private:
-	std::vector<AStarNode> nodes = {};
-	std::unordered_map<uint32_t, AStarNode*> nodeMap = {};
-	std::unordered_set<uint32_t> visited = {};
-
-	struct NodeCompare
-	{
-		bool operator()(AStarNode* a, AStarNode* b) const
-		{
-			return a->f > b->f; // Min-heap based on f score
-		}
-	};
-
-	std::priority_queue<AStarNode*, std::vector<AStarNode*>, NodeCompare> openSet;
 };
 
 using SpectatorCache = std::unordered_map<Position, SpectatorVec, PositionHash>;
@@ -89,7 +48,6 @@ struct Floor
 	std::shared_ptr<Tile> tiles[FLOOR_SIZE][FLOOR_SIZE] = {};
 };
 
-class FrozenPathingConditionCall;
 class QTreeLeafNode;
 
 class QTreeNode
@@ -175,7 +133,6 @@ public:
 	static constexpr int32_t maxViewportY = 11; // min value: maxClientViewportY + 1
 	static constexpr int32_t maxClientViewportX = 8;
 	static constexpr int32_t maxClientViewportY = 6;
-	static constexpr int16_t nodeReserveSize = static_cast<int16_t>((maxViewportX * maxViewportY * 3) / 2);
 
 	uint32_t clean() const;
 
@@ -245,28 +202,15 @@ public:
 	                      int32_t rangey = Map::maxClientViewportY) const;
 
 	/**
-	 * Checks if there are no obstacles on that position
-	 *	\param blockFloor counts the ground tile as an obstacle
-	 *	\returns The result if there is an obstacle or not
+	 * Checks if path is clear from fromPos to toPos.
+	 * This only checks a straight line; for pathfinding use getPathMatching.
 	 */
-	bool isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor = false, bool pathfinding = false) const;
-
-	/**
-	 * Checks if path is clear from fromPos to toPos
-	 * Notice: This only checks a straight line if the path is clear, for path
-	 *finding use getPathTo. \param fromPos from Source point \param toPos
-	 *Destination point \param sameFloor checks if the destination is on same
-	 *floor \returns The result if there is no obstacles
-	 */
-	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor = false,
-	                  bool pathfinding = false) const;
-	bool checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding = false) const;
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor = false) const;
 
 	const std::shared_ptr<Tile> canWalkTo(const std::shared_ptr<const Creature>& creature, const Position& pos) const;
 
-	bool getPathMatching(const std::shared_ptr<const Creature>& creature, const Position& targetPos,
-	                     std::vector<Direction>& dirList, const FrozenPathingConditionCall& pathCondition,
-	                     const FindPathParams& fpp) const;
+	bool getPathMatching(const std::shared_ptr<const Creature>& creature, std::vector<Direction>& dirList,
+	                     const PathRequest& request) const;
 
 	std::map<std::string, Position> waypoints;
 
@@ -277,6 +221,14 @@ public:
 
 	Spawns spawns;
 	Towns towns;
+
+private:
+	// Line-of-sight helpers (used internally by isSightClear and getPathMatching)
+	bool isTileClear(uint16_t x, uint16_t y, uint8_t z, bool blockFloor = false, bool pathfinding = false) const;
+	bool checkSteepLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const;
+	bool checkSlightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding) const;
+	bool checkSightLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t z, bool pathfinding = false) const;
+	bool isSightClearPathfinding(const Position& fromPos, const Position& toPos) const;
 
 private:
 	SpectatorCache spectatorCache;

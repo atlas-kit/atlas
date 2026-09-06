@@ -3209,19 +3209,19 @@ void Player::goToFollowCreature()
 		return;
 	}
 
-	FindPathParams fpp;
-	getPathSearchParams(followCreature, fpp);
-	updateFollowCreaturePath(fpp);
+	PathRequest request = PathRequest::to(followCreature->getPosition());
+	getPathSearchParams(followCreature, request);
+	updateFollowCreaturePath(request);
 
 	if (!hasFollowPath) {
 		lastFailedFollow = std::chrono::steady_clock::now();
 	}
 }
 
-void Player::getPathSearchParams(const std::shared_ptr<const Creature>& creature, FindPathParams& fpp) const
+void Player::getPathSearchParams(const std::shared_ptr<const Creature>& creature, PathRequest& request) const
 {
-	Creature::getPathSearchParams(creature, fpp);
-	fpp.fullPathSearch = true;
+	Creature::getPathSearchParams(creature, request);
+	request.mode(SearchMode::Reach);
 }
 
 uint64_t Player::getGainedExperience(const std::shared_ptr<Creature>& attacker) const

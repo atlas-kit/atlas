@@ -17,3 +17,16 @@ foreach(test_src ${tests_SRC})
 
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
+
+set(pathfinding_tests_SRC
+    ${CMAKE_CURRENT_LIST_DIR}/test_pathfinding.cpp
+    )
+
+foreach(test_src ${pathfinding_tests_SRC})
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
+    target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR}/src)
+    target_link_libraries(${test_name} PRIVATE pathfinding tfslib Boost::unit_test_framework)
+
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()
