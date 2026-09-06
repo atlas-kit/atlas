@@ -1993,11 +1993,10 @@ void Game::playerCloseNpcChannel(uint32_t playerId)
 	}
 
 	SpectatorVec spectators;
-	map.getSpectators(spectators, player->getPosition());
+	map.getSpectators(spectators, player->getPosition(), false, SPECTATORTYPE_NPC);
 	for (const auto& spectator : spectators) {
-		if (const auto& npc = spectator->asNpc()) {
-			npc->onPlayerCloseChannel(player);
-		}
+		assert(spectator->getType() == CREATURETYPE_NPC);
+		std::static_pointer_cast<Npc>(spectator)->onPlayerCloseChannel(player);
 	}
 }
 
@@ -3522,11 +3521,9 @@ bool Game::playerSpeakTo(const std::shared_ptr<Player>& player, SpeakClasses typ
 void Game::playerSpeakToNpc(const std::shared_ptr<Player>& player, const std::string& text)
 {
 	SpectatorVec spectators;
-	map.getSpectators(spectators, player->getPosition());
+	map.getSpectators(spectators, player->getPosition(), false, SPECTATORTYPE_NPC);
 	for (const auto& spectator : spectators) {
-		if (spectator->asNpc()) {
-			spectator->onCreatureSay(player, TALKTYPE_PRIVATE_PN, text);
-		}
+		spectator->onCreatureSay(player, TALKTYPE_PRIVATE_PN, text);
 	}
 }
 
@@ -4478,10 +4475,9 @@ void Game::addMagicEffect(const SpectatorVec& spectators, const Position& pos, u
 
 void Game::addDistanceEffect(const Position& fromPos, const Position& toPos, uint16_t effect)
 {
-	SpectatorVec spectators, toPosSpectators;
+	SpectatorVec spectators;
 	map.getSpectators(spectators, fromPos, true, true);
-	map.getSpectators(toPosSpectators, toPos, true, true);
-	spectators.insert(toPosSpectators.begin(), toPosSpectators.end());
+	map.getSpectators(spectators, toPos, true, true);
 
 	addDistanceEffect(spectators, fromPos, toPos, effect);
 }

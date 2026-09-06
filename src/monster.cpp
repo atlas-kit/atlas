@@ -327,7 +327,7 @@ void Monster::updateTargetList()
 
 	SpectatorVec spectators;
 	g_game.map.getSpectators(spectators, getPosition(), true);
-	spectators.erase(asMonster());
+	std::erase(spectators, asMonster());
 	for (const auto& spectator : spectators) {
 		onCreatureFound(spectator);
 	}

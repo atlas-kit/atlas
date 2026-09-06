@@ -806,7 +806,7 @@ int luaCreatureSay(lua_State* L)
 
 	SpectatorVec spectators;
 	if (target) {
-		spectators.emplace(target);
+		spectators.emplace_back(target);
 	}
 
 	// Prevent infinity echo on event onHear

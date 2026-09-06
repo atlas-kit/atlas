@@ -1745,7 +1745,7 @@ void Player::removeExperience(uint64_t exp, bool sendText /* = false*/)
 
 		SpectatorVec spectators;
 		g_game.map.getSpectators(spectators, position, false, true);
-		spectators.erase(asPlayer());
+		std::erase(spectators, asPlayer());
 		if (!spectators.empty()) {
 			message.type = MESSAGE_EXPERIENCE_OTHERS;
 			message.text = getName() + " lost " + expString;

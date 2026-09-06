@@ -49,7 +49,7 @@ int luaPositionSendMagicEffect(lua_State* L)
 	SpectatorVec spectators;
 	if (lua_gettop(L) >= 3) {
 		if (const auto& player = tfs::lua::getPlayer(L, 3)) {
-			spectators.emplace(player);
+			spectators.emplace_back(player);
 		}
 	}
 
@@ -76,7 +76,7 @@ int luaPositionSendDistanceEffect(lua_State* L)
 	SpectatorVec spectators;
 	if (lua_gettop(L) >= 4) {
 		if (const auto& player = tfs::lua::getPlayer(L, 4)) {
-			spectators.emplace(player);
+			spectators.emplace_back(player);
 		}
 	}
 

@@ -99,9 +99,9 @@ function Position:isInRange(from, to)
 end
 
 function Position:notifySummonAppear(summon)
-	local spectators = Game.getSpectators(self)
+	local spectators = Game.getSpectators(self, false, SPECTATORTYPE_MONSTER)
 	for _, spectator in ipairs(spectators) do
-		if spectator:isMonster() and spectator ~= summon then
+		if spectator ~= summon then
 			spectator:addTarget(summon)
 		end
 	end
