@@ -31,7 +31,7 @@ end
 spell:group("support")
 spell:id(14)
 spell:name("Chameleon Rune")
-spell:runeId(2291)
+spell:runeId(3178)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(27)

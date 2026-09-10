@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Incredibly Old Witch" nameDescription="an incredibly old witch" race="blood" experience="0" speed="202">
 	<health now="100" max="100" />
-	<look type="54" corpse="20535" />
+	<look type="54" corpse="18254" />
 	<targetchange interval="5000" chance="20" />
 	<flags>
 		<flag summonable="0" />

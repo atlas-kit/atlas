@@ -18,7 +18,7 @@ end
 spell:group("attack")
 spell:id(7)
 spell:name("Lightest Magic Missile Rune")
-spell:runeId(19392)
+spell:runeId(17112)
 spell:allowFarUse(true)
 spell:charges(10)
 spell:runeLevel(1)

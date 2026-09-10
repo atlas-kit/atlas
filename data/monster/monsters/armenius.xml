@@ -52,13 +52,13 @@
 	</summons>
 	<loot>
 		<item name="scarab amulet" chance="2063" />
-		<item id="2142" chance="2564" /><!-- ancient amulet -->
+		<item id="3025" chance="2564" /><!-- ancient amulet -->
 		<item name="gold coin" countmax="90" chance="100000" />
 		<item name="gold coin" countmax="90" chance="100000" />
 		<item name="small emerald" countmax="3" chance="4347" />
 		<item name="small amethyst" countmax="4" chance="4166" />
 		<item name="scarab coin" countmax="2" chance="7692" />
-		<item id="2162" chance="11111" /><!-- magic lightwand -->
+		<item id="3046" chance="11111" /><!-- magic lightwand -->
 		<item name="daramian waraxe" chance="781" />
 		<item name="plate armor" chance="10000" />
 		<item name="scarab shield" chance="518" />

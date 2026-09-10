@@ -22,7 +22,7 @@ end
 spell:group("healing")
 spell:id(4)
 spell:name("Intense Healing Rune")
-spell:runeId(2265)
+spell:runeId(3152)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(15)

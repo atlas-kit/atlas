@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Shaburak Demon" nameDescription="a shaburak demon" race="fire" experience="900" speed="220" raceId="724">
 	<health now="1500" max="1500" />
-	<look type="417" corpse="13814" />
+	<look type="417" corpse="12658" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

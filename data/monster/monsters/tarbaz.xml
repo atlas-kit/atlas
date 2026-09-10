@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Tarbaz" nameDescription="Tarbaz" race="undead" experience="20000" speed="320">
 	<health now="290000" max="290000" />
-	<look type="842" head="0" body="21" legs="19" feet="3" addons="2" corpse="25151" />
+	<look type="842" head="0" body="21" legs="19" feet="3" addons="2" corpse="22495" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -46,17 +46,17 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="18413" name="blue crystal shard" chance="100000" countmax="3" />
-		<item id="6500" name="demonic essence" chance="100000" />
-		<item id="2148" name="gold coin" chance="100000" countmax="318" />
-		<item id="7590" name="great mana potion" chance="100000" countmax="8" />
-		<item id="8472" name="great spirit potion" chance="100000" countmax="3" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="23" />
-		<item id="25172" name="silver token" chance="100000" />
-		<item id="2158" name="blue gem" chance="50000" />
-		<item id="2167" name="energy ring" chance="50000" />
-		<item id="7896" name="glacier kilt" chance="50000" />
-		<item id="18415" name="green crystal shard" chance="50000" />
-		<item id="2149" name="small emerald" chance="50000" countmax="9" />
+		<item id="16119" name="blue crystal shard" chance="100000" countmax="3" />
+		<item id="6499" name="demonic essence" chance="100000" />
+		<item id="3031" name="gold coin" chance="100000" countmax="318" />
+		<item id="238" name="great mana potion" chance="100000" countmax="8" />
+		<item id="7642" name="great spirit potion" chance="100000" countmax="3" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="23" />
+		<item id="22516" name="silver token" chance="100000" />
+		<item id="3041" name="blue gem" chance="50000" />
+		<item id="3051" name="energy ring" chance="50000" />
+		<item id="823" name="glacier kilt" chance="50000" />
+		<item id="16121" name="green crystal shard" chance="50000" />
+		<item id="3032" name="small emerald" chance="50000" countmax="9" />
 	</loot>
 </monster>

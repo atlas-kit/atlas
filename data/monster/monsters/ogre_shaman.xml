@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ogre Shaman" nameDescription="an ogre shaman" race="blood" experience="625" speed="105" raceId="1163">
 	<health now="800" max="800" />
-	<look type="859" corpse="24795" />
+	<look type="859" corpse="22139" />
 	<targetchange interval="2000" chance="20" />
 	<flags>
 		<flag summonable="0" />
@@ -68,7 +68,7 @@
 		<item name="skull fetish" chance="10920" />
 		<item name="shamanic talisman" chance="10350" />
 		<item name="ogre nose ring" chance="10040" />
-		<item id="2229" chance="9700" /><!-- skull -->
+		<item id="3114" chance="9700" /><!-- skull -->
 		<item name="prickly pear" countmax="2" chance="9240" />
 		<item name="broken shamanic staff" chance="6680" />
 		<item name="bone fetish" chance="5080" />
@@ -82,6 +82,6 @@
 		<item name="shamanic mask" chance="880" />
 		<item name="ogre scepta" chance="500" />
 		<item name="didgeridoo" chance="460" />
-		<item id="3955" chance="40" /><!-- voodoo doll -->
+		<item id="3002" chance="40" /><!-- voodoo doll -->
 	</loot>
 </monster>

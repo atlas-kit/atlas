@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Professor Maxxen" nameDescription="Professor Maxxen" race="energy" experience="15500" speed="340">
 	<health now="90000" max="90000" />
-	<look type="679" corpse="24279" />
+	<look type="679" corpse="21910" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -47,11 +47,11 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="55130" countmax="10" />
-		<item id="2152" name="platinum coin" chance="71279" countmax="4" />
-		<item id="23574" name="glooth bag" chance="100000" countmax="3" />
-		<item id="24270" name="glooth glider casing" chance="55130" countmax="10" />
-		<item id="9809" name="rusted armor" chance="12500" />
-		<item id="9971" name="gold ingot" chance="1914" />
+		<item id="3031" name="gold coin" chance="55130" countmax="10" />
+		<item id="3035" name="platinum coin" chance="71279" countmax="4" />
+		<item id="21203" name="glooth bag" chance="100000" countmax="3" />
+		<item id="21901" name="glooth glider casing" chance="55130" countmax="10" />
+		<item id="8895" name="rusted armor" chance="12500" />
+		<item id="9058" name="gold ingot" chance="1914" />
 	</loot>
 </monster>

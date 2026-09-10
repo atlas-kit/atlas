@@ -6,6 +6,7 @@
 #include "items.h"
 
 #include "movement.h"
+#include "protobuf/appearances.h"
 #include "pugicast.h"
 #include "weapons.h"
 
@@ -13,82 +14,6 @@ extern MoveEvents* g_moveEvents;
 extern std::unique_ptr<Weapons> g_weapons;
 
 namespace {
-
-constexpr uint8_t ROOT_ATTR_VERSION = 0x01;
-
-enum itemattrib_t
-{
-	ITEM_ATTR_FIRST = 0x10,
-	ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
-	ITEM_ATTR_CLIENTID,
-	ITEM_ATTR_NAME,
-	ITEM_ATTR_DESCR,
-	ITEM_ATTR_SPEED,
-	ITEM_ATTR_SLOT,
-	ITEM_ATTR_MAXITEMS,
-	ITEM_ATTR_WEIGHT,
-	ITEM_ATTR_WEAPON,
-	ITEM_ATTR_AMU,
-	ITEM_ATTR_ARMOR,
-	ITEM_ATTR_MAGLEVEL,
-	ITEM_ATTR_MAGFIELDTYPE,
-	ITEM_ATTR_WRITEABLE,
-	ITEM_ATTR_ROTATETO,
-	ITEM_ATTR_DECAY,
-	ITEM_ATTR_SPRITEHASH,
-	ITEM_ATTR_MINIMAPCOLOR,
-	ITEM_ATTR_07,
-	ITEM_ATTR_08,
-	ITEM_ATTR_LIGHT,
-
-	// 1-byte aligned
-	ITEM_ATTR_DECAY2,     // deprecated
-	ITEM_ATTR_WEAPON2,    // deprecated
-	ITEM_ATTR_AMU2,       // deprecated
-	ITEM_ATTR_ARMOR2,     // deprecated
-	ITEM_ATTR_WRITEABLE2, // deprecated
-	ITEM_ATTR_LIGHT2,
-	ITEM_ATTR_TOPORDER,
-	ITEM_ATTR_WRITEABLE3, // deprecated
-
-	ITEM_ATTR_WAREID,
-	ITEM_ATTR_CLASSIFICATION,
-
-	ITEM_ATTR_LAST
-};
-
-enum itemflags_t
-{
-	FLAG_BLOCK_SOLID = 1 << 0,
-	FLAG_BLOCK_PROJECTILE = 1 << 1,
-	FLAG_BLOCK_PATHFIND = 1 << 2,
-	FLAG_HAS_HEIGHT = 1 << 3,
-	FLAG_USEABLE = 1 << 4,
-	FLAG_PICKUPABLE = 1 << 5,
-	FLAG_MOVEABLE = 1 << 6,
-	FLAG_STACKABLE = 1 << 7,
-	FLAG_FLOORCHANGEDOWN = 1 << 8,   // unused
-	FLAG_FLOORCHANGENORTH = 1 << 9,  // unused
-	FLAG_FLOORCHANGEEAST = 1 << 10,  // unused
-	FLAG_FLOORCHANGESOUTH = 1 << 11, // unused
-	FLAG_FLOORCHANGEWEST = 1 << 12,  // unused
-	FLAG_ALWAYSONTOP = 1 << 13,
-	FLAG_READABLE = 1 << 14,
-	FLAG_ROTATABLE = 1 << 15,
-	FLAG_HANGABLE = 1 << 16,
-	FLAG_VERTICAL = 1 << 17,
-	FLAG_HORIZONTAL = 1 << 18,
-	FLAG_CANNOTDECAY = 1 << 19, // unused
-	FLAG_ALLOWDISTREAD = 1 << 20,
-	FLAG_CLIENTDURATION = 1 << 21,
-	FLAG_CLIENTCHARGES = 1 << 22,
-	FLAG_LOOKTHROUGH = 1 << 23,
-	FLAG_ANIMATION = 1 << 24,
-	FLAG_FULLTILE = 1 << 25, // unused
-	FLAG_FORCEUSE = 1 << 26,
-	FLAG_AMMO = 1 << 27,       // unused
-	FLAG_REPORTABLE = 1 << 28, // unused
-};
 
 const std::unordered_map<std::string, ItemParseAttributes_t> ItemParseAttributesMap = {
     {"type", ITEM_PARSE_TYPE},
@@ -316,12 +241,12 @@ const std::unordered_map<std::string, FluidTypes_t> FluidTypesMap = {
     {"wine", FLUID_WINE},
     {"mud", FLUID_MUD},
     {"fruitjuice", FLUID_FRUITJUICE},
-    {"lava", FLUID_LAVA},
     {"rum", FLUID_RUM},
-    {"swamp", FLUID_SWAMP},
     {"tea", FLUID_TEA},
     {"mead", FLUID_MEAD},
     {"ink", FLUID_INK},
+    {"candyfluid", FLUID_CANDY},
+    {"chocolate", FLUID_CHOCOLATE},
 };
 
 } // namespace
@@ -335,7 +260,6 @@ Items::Items()
 void Items::clear()
 {
 	items.clear();
-	clientIdToServerIdMap.clear();
 	nameToItems.clear();
 	currencyItems.clear();
 	inventory.clear();
@@ -344,7 +268,10 @@ void Items::clear()
 bool Items::reload()
 {
 	clear();
-	loadFromOtb("data/items/items.otb");
+
+	if (!loadFromAppearances("data/items/appearances.dat")) {
+		return false;
+	}
 
 	if (!loadFromXml()) {
 		return false;
@@ -352,216 +279,6 @@ bool Items::reload()
 
 	g_moveEvents->reload();
 	g_weapons->loadDefaults();
-	return true;
-}
-
-bool Items::loadFromOtb(const std::string& file)
-{
-	auto loader = OTB::load(file, "OTBI");
-
-	auto first = loader.begin(), last = loader.end();
-
-	// 4 byte flags
-	// attributes
-	// 0x01 = version data
-	// auto flags = OTB::read<uint32_t>(first, last); // unused
-	OTB::skip(first, last, sizeof(uint32_t));
-
-	if (auto attr = OTB::read<uint8_t>(first, last); attr != ROOT_ATTR_VERSION) {
-		throw std::invalid_argument(std::format("Unknown root node: {:d}.", attr));
-	}
-
-	constexpr auto VERSION_INFO_SIZE = 140u;
-	if (auto length = OTB::read<uint16_t>(first, last); length != VERSION_INFO_SIZE) {
-		throw std::invalid_argument(
-		    std::format("Invalid data length for version info: expected 140, got {:d}", length));
-	}
-
-	majorVersion = OTB::read<uint32_t>(first, last); // items otb format file version
-	minorVersion = OTB::read<uint32_t>(first, last); // client version
-	buildNumber = OTB::read<uint32_t>(first, last);  // revision
-	OTB::skip(first, last, VERSION_INFO_SIZE - 3 * sizeof(uint32_t));
-
-	if (majorVersion == std::numeric_limits<uint32_t>::max()) {
-		std::cout << "[Warning - Items::loadFromOtb] items.otb using generic client version." << std::endl;
-	} else if (majorVersion != 3) {
-		std::cout << "Old version detected, a newer version of items.otb is required." << std::endl;
-		return false;
-	} else if (minorVersion < CLIENT_VERSION_LAST) {
-		std::cout << "A newer version of items.otb is required." << std::endl;
-		return false;
-	}
-
-	for (auto& itemNode : loader.children()) {
-		auto it = itemNode.propsBegin;
-		auto flags = OTB::read<uint32_t>(it, itemNode.propsEnd);
-		uint16_t serverId = 0;
-		uint16_t clientId = 0;
-		uint16_t speed = 0;
-		uint16_t wareId = 0;
-		uint8_t lightLevel = 0;
-		uint8_t lightColor = 0;
-		uint8_t alwaysOnTopOrder = 0;
-		uint8_t classification = 0;
-
-		while (it != itemNode.propsEnd) {
-			auto attr = OTB::read<uint8_t>(it, itemNode.propsEnd);
-			auto length = OTB::read<uint16_t>(it, itemNode.propsEnd);
-
-			switch (attr) {
-				case ITEM_ATTR_SERVERID: {
-					if (length != sizeof(uint16_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid server ID attribute length: expected {:d}, got {:d}", sizeof(uint16_t), length));
-					}
-
-					serverId = OTB::read<uint16_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				case ITEM_ATTR_CLIENTID: {
-					if (length != sizeof(uint16_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid client ID attribute length: expected {:d}, got {:d}", sizeof(uint16_t), length));
-					}
-
-					clientId = OTB::read<uint16_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				case ITEM_ATTR_SPEED: {
-					if (length != sizeof(uint16_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid speed attribute length: expected {:d}, got {:d}", sizeof(uint16_t), length));
-					}
-
-					speed = OTB::read<uint16_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				case ITEM_ATTR_LIGHT2: {
-					if (length != 2 * sizeof(uint16_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid light2 attribute length: expected {:d}, got {:d}", 2 * sizeof(uint16_t), length));
-					}
-
-					lightLevel = static_cast<uint8_t>(OTB::read<uint16_t>(it, itemNode.propsEnd));
-					lightColor = static_cast<uint8_t>(OTB::read<uint16_t>(it, itemNode.propsEnd));
-					break;
-				}
-
-				case ITEM_ATTR_TOPORDER: {
-					if (length != sizeof(uint8_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid top order attribute length: expected {:d}, got {:d}", sizeof(uint8_t), length));
-					}
-
-					alwaysOnTopOrder = OTB::read<uint8_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				case ITEM_ATTR_WAREID: {
-					if (length != sizeof(uint16_t)) [[unlikely]] {
-						throw std::invalid_argument(std::format(
-						    "Invalid ware ID attribute length: expected {:d}, got {:d}", sizeof(uint16_t), length));
-					}
-
-					wareId = OTB::read<uint16_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				case ITEM_ATTR_CLASSIFICATION: {
-					if (length != sizeof(uint8_t)) [[unlikely]] {
-						throw std::invalid_argument(
-						    std::format("Invalid classification attribute length: expected {:d}, got {:d}",
-						                sizeof(uint8_t), length));
-					}
-
-					classification = OTB::read<uint8_t>(it, itemNode.propsEnd);
-					break;
-				}
-
-				default: {
-					// skip unknown attributes
-					OTB::skip(it, itemNode.propsEnd, length);
-					break;
-				}
-			}
-		}
-
-		clientIdToServerIdMap.emplace(clientId, serverId);
-
-		// store the found item
-		if (serverId >= items.size()) {
-			items.resize(serverId + 1);
-		}
-		ItemType& iType = items[serverId];
-
-		iType.group = static_cast<itemgroup_t>(itemNode.type);
-		switch (itemNode.type) {
-			case ITEM_GROUP_CONTAINER:
-				iType.type = ITEM_TYPE_CONTAINER;
-				break;
-			case ITEM_GROUP_DOOR:
-				// not used
-				iType.type = ITEM_TYPE_DOOR;
-				break;
-			case ITEM_GROUP_MAGICFIELD:
-				// not used
-				iType.type = ITEM_TYPE_MAGICFIELD;
-				break;
-			case ITEM_GROUP_TELEPORT:
-				// not used
-				iType.type = ITEM_TYPE_TELEPORT;
-				break;
-			case ITEM_GROUP_NONE:
-			case ITEM_GROUP_GROUND:
-			case ITEM_GROUP_SPLASH:
-			case ITEM_GROUP_FLUID:
-			case ITEM_GROUP_CHARGES:
-			case ITEM_GROUP_DEPRECATED:
-				break;
-			case ITEM_GROUP_PODIUM:
-				iType.type = ITEM_TYPE_PODIUM;
-				break;
-			default:
-				return false;
-		}
-
-		iType.blockSolid = hasBitSet(FLAG_BLOCK_SOLID, flags);
-		iType.blockProjectile = hasBitSet(FLAG_BLOCK_PROJECTILE, flags);
-		iType.blockPathFind = hasBitSet(FLAG_BLOCK_PATHFIND, flags);
-		iType.hasHeight = hasBitSet(FLAG_HAS_HEIGHT, flags);
-		iType.useable = hasBitSet(FLAG_USEABLE, flags);
-		iType.pickupable = hasBitSet(FLAG_PICKUPABLE, flags);
-		iType.moveable = hasBitSet(FLAG_MOVEABLE, flags);
-		iType.stackable = hasBitSet(FLAG_STACKABLE, flags);
-
-		iType.alwaysOnTop = hasBitSet(FLAG_ALWAYSONTOP, flags);
-		iType.isVertical = hasBitSet(FLAG_VERTICAL, flags);
-		iType.isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
-		iType.isHangable = hasBitSet(FLAG_HANGABLE, flags);
-		iType.allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
-		iType.rotatable = hasBitSet(FLAG_ROTATABLE, flags);
-		iType.canReadText = hasBitSet(FLAG_READABLE, flags);
-		iType.lookThrough = hasBitSet(FLAG_LOOKTHROUGH, flags);
-		iType.isAnimation = hasBitSet(FLAG_ANIMATION, flags);
-		// iType.walkStack = !hasBitSet(FLAG_FULLTILE, flags);
-		iType.forceUse = hasBitSet(FLAG_FORCEUSE, flags);
-		iType.showClientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
-		iType.showClientDuration = hasBitSet(FLAG_CLIENTDURATION, flags);
-
-		iType.id = serverId;
-		iType.clientId = clientId;
-		iType.speed = speed;
-		iType.lightLevel = lightLevel;
-		iType.lightColor = lightColor;
-		iType.wareId = wareId;
-		iType.classification = classification;
-		iType.alwaysOnTopOrder = alwaysOnTopOrder;
-	}
-
-	items.shrink_to_fit();
 	return true;
 }
 
@@ -1853,10 +1570,8 @@ const ItemType& Items::getItemType(size_t id) const
 
 const ItemType& Items::getItemIdByClientId(uint16_t spriteId) const
 {
-	if (spriteId >= 100) {
-		if (uint16_t serverId = clientIdToServerIdMap.getServerId(spriteId)) {
-			return getItemType(serverId);
-		}
+	if (spriteId >= 100 && spriteId < items.size() && items[spriteId].id != 0) {
+		return getItemType(spriteId);
 	}
 	return items.front();
 }
@@ -1871,4 +1586,221 @@ uint16_t Items::getItemIdByName(const std::string& name)
 	if (result == nameToItems.end()) return 0;
 
 	return result->second;
+}
+
+// appearances.dat only provides client-side visual/behavioral flags.
+// Server-side gameplay data (armor, attack, decay, corpse type, ammo type,
+// type assignment, ...) still comes from items.xml.
+bool Items::loadFromAppearances(const std::string& file)
+{
+	if (!g_appearances.loadFromFile(file)) {
+		return false;
+	}
+
+	const auto& objects = g_appearances.getObjects();
+
+	// Resize once: the map iterates in arbitrary order, growing per id
+	// would reallocate repeatedly
+	uint16_t maxId = 0;
+	for (const auto& [id, appearance] : objects) {
+		maxId = std::max(maxId, id);
+	}
+	if (maxId >= items.size()) {
+		items.resize(maxId + 1);
+	}
+
+	for (const auto& [id, appearance] : objects) {
+		if (id == 0) {
+			continue;
+		}
+
+		ItemType& iType = items[id];
+
+		iType.id = id;
+		iType.clientId = id;
+
+		// Name/description come from items.xml: a non-empty name here would
+		// make parseItemNode() treat the item as a duplicate and skip its
+		// server-side attributes.
+
+		// Map appearance flags to ItemType properties
+		if (appearance.isGround) {
+			iType.group = ITEM_GROUP_GROUND;
+			iType.speed = static_cast<uint16_t>(appearance.groundSpeed);
+		}
+
+		if (appearance.isContainer) {
+			iType.group = ITEM_GROUP_CONTAINER;
+			iType.type = ITEM_TYPE_CONTAINER;
+		}
+
+		if (appearance.isFluidPool) {
+			iType.group = ITEM_GROUP_SPLASH;
+		}
+
+		if (appearance.isFluidContainer) {
+			iType.group = ITEM_GROUP_FLUID;
+		}
+
+		// Boolean properties
+		iType.blockSolid = appearance.isUnpassable;
+		iType.blockProjectile = appearance.isBlockMissile;
+		iType.blockPathFind = appearance.isBlockPath;
+		iType.hasHeight = appearance.hasElevation;
+		iType.useable = appearance.isUsable || appearance.isMultiUse;
+		iType.pickupable = appearance.isPickupable;
+		iType.moveable = !appearance.isUnmovable;
+		iType.stackable = appearance.isStackable;
+		iType.isVertical = (appearance.hookDirection == 1);
+		iType.isHorizontal = (appearance.hookDirection == 2);
+		iType.isHangable = appearance.isHangable;
+		iType.allowDistRead = false;
+		iType.rotatable = appearance.isRotatable;
+		iType.canReadText = appearance.isWritable || appearance.isWritableOnce;
+		iType.canWriteText = appearance.isWritable;
+		iType.lookThrough = appearance.isIgnoreLook;
+		iType.isAnimation = appearance.isAnimateAlways;
+		iType.forceUse = appearance.isForceUse;
+		iType.wrapContainer = appearance.isWrap || appearance.isUnwrap;
+
+		// Light properties
+		if (appearance.hasLight) {
+			iType.lightLevel = appearance.lightLevel;
+			iType.lightColor = appearance.lightColor;
+		}
+
+		// Text properties
+		if (appearance.isWritable || appearance.isWritableOnce) {
+			iType.maxTextLen = appearance.maxTextLength;
+		}
+
+		// Cloth/Equipment slot. OR into the default so the SLOTP_HAND bits
+		// are kept and equipment can still be held in a hand slot.
+		if (appearance.isCloth) {
+			switch (appearance.clothSlot) {
+				case 1:
+					iType.slotPosition |= SLOTP_HEAD;
+					break;
+				case 2:
+					iType.slotPosition |= SLOTP_NECKLACE;
+					break;
+				case 3:
+					iType.slotPosition |= SLOTP_BACKPACK;
+					break;
+				case 4:
+					iType.slotPosition |= SLOTP_ARMOR;
+					break;
+				case 5:
+					iType.slotPosition |= SLOTP_RIGHT;
+					break;
+				case 6:
+					iType.slotPosition |= SLOTP_LEFT;
+					break;
+				case 7:
+					iType.slotPosition |= SLOTP_LEGS;
+					break;
+				case 8:
+					iType.slotPosition |= SLOTP_FEET;
+					break;
+				case 9:
+					iType.slotPosition |= SLOTP_RING;
+					break;
+				case 10:
+					iType.slotPosition |= SLOTP_AMMO;
+					break;
+				default:
+					iType.slotPosition |= SLOTP_HAND;
+					break;
+			}
+		}
+
+		// Classification (tier upgrade)
+		iType.classification = appearance.classification;
+
+		// Market properties
+		if (appearance.marketCategory > 0) {
+			iType.wareId = appearance.marketTradeAs > 0 ? appearance.marketTradeAs : id;
+		}
+
+		// AlwaysOnTop order
+		if (appearance.isGroundBorder) {
+			iType.alwaysOnTopOrder = 1;
+		} else if (appearance.isOnBottom) {
+			iType.alwaysOnTopOrder = 2;
+		} else if (appearance.isOnTop) {
+			iType.alwaysOnTopOrder = 3;
+		}
+
+		// Tile stacking uses the flag while the client-stackpos calculation
+		// uses the order; they must agree (clip/bottom count as top items too).
+		iType.alwaysOnTop = iType.alwaysOnTopOrder != 0;
+
+		// Expiration flags
+		iType.stopTime = appearance.expireStop;
+
+		// Wire-format flags consumed by NetworkMessage::addItem
+		iType.isCorpse = appearance.isCorpse || appearance.isPlayerCorpse;
+		iType.isPodiumAppearance = appearance.isShowOffSocket;
+		iType.wearOut = appearance.wearout;
+		iType.clockExpire = appearance.clockExpire;
+		iType.expire = appearance.expire;
+		iType.expireStop = appearance.expireStop;
+		iType.isWrapKit = appearance.decoItemKit;
+
+		// Weapon type (proto enum → server enum)
+		if (appearance.weaponType > 0) {
+			switch (appearance.weaponType) {
+				case 1: // WEAPON_TYPE_SWORD
+					iType.weaponType = WEAPON_SWORD;
+					break;
+				case 2: // WEAPON_TYPE_AXE
+					iType.weaponType = WEAPON_AXE;
+					break;
+				case 3: // WEAPON_TYPE_CLUB
+					iType.weaponType = WEAPON_CLUB;
+					break;
+				case 5: // WEAPON_TYPE_BOW
+				case 6: // WEAPON_TYPE_CROSSBOW
+				case 8: // WEAPON_TYPE_THROW
+					iType.weaponType = WEAPON_DISTANCE;
+					break;
+				case 7: // WEAPON_TYPE_WAND_ROD
+					iType.weaponType = WEAPON_WAND;
+					break;
+				default:
+					break;
+			}
+		}
+
+		// Minimum level requirement
+		if (appearance.minimumLevel > 0) {
+			iType.minReqLevel = appearance.minimumLevel;
+			iType.wieldInfo |= WIELDINFO_LEVEL;
+		}
+
+		// Vocation restrictions
+		if (!appearance.restrictedVocations.empty()) {
+			iType.wieldInfo |= WIELDINFO_VOCREQ;
+		}
+
+		// Imbuement slots
+		iType.imbuementSlots = static_cast<uint8_t>(appearance.imbueableSlotCount);
+
+		// Dual wielding
+		iType.dualWielding = appearance.dualWielding;
+
+		// Skill wheel gem (server-side identifiers for gem system)
+		iType.gemQualityId = static_cast<uint16_t>(appearance.gemQualityId);
+		iType.gemVocationId = static_cast<uint16_t>(appearance.gemVocationId);
+
+		// Proficiency (proficiency system identifier)
+		iType.proficiencyId = static_cast<uint16_t>(appearance.proficiencyId);
+
+		// Cyclopedia entry type
+		iType.cyclopediaType = static_cast<uint16_t>(appearance.cyclopediaType);
+	}
+
+	items.shrink_to_fit();
+	std::cout << ">> Loaded " << objects.size() << " items from appearances" << std::endl;
+	return true;
 }

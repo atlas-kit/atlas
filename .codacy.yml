@@ -1,0 +1,9 @@
+---
+# Codacy configuration.
+#
+# src/protobuf/**   protobuf integration glue around generated code; Cppcheck
+#                   reports false "Include file: <...> not found" for standard
+#                   library headers here because it runs without the toolchain
+#                   include paths (it explicitly states it does not need them).
+exclude_paths:
+  - 'src/protobuf/**'

@@ -186,8 +186,13 @@ void parseTileArea(const OTB::Node& node, Map& map)
 					auto id = OTB::read<uint16_t>(it, tileNode.propsEnd);
 					auto item = Item::CreateItem(Item::getPersistentId(id));
 					if (!item) [[unlikely]] {
-						throw std::runtime_error(std::format("[{:s}:{:d} - {:s}] Invalid item id: {:d}", __FILE__,
-						                                     __LINE__, __FUNCTION__, id));
+						// Skip ids without an appearance entry instead of
+						// aborting the whole map load.
+						std::println(
+						    "[Warning - IOMap::loadMap] Skipping invalid ground item ID {}"
+						    " at position [x: {}, y: {}, z: {}].",
+						    id, x, y, z);
+						break;
 					}
 
 					if (isHouseTile && item->isMoveable()) {
@@ -234,8 +239,13 @@ void parseTileArea(const OTB::Node& node, Map& map)
 			auto id = OTB::read<uint16_t>(itemIt, itemNode.propsEnd);
 			auto item = Item::CreateItem(Item::getPersistentId(id));
 			if (!item) [[unlikely]] {
-				throw std::runtime_error(
-				    std::format("[{:s}:{:d} - {:s}] Invalid item id: {:d}", __FILE__, __LINE__, __FUNCTION__, id));
+				// Skip ids without an appearance entry instead of
+				// aborting the whole map load.
+				std::println(
+				    "[Warning - IOMap::loadMap] Skipping invalid item ID {} at"
+				    " position [x: {}, y: {}, z: {}].",
+				    id, x, y, z);
+				continue;
 			}
 
 			item->unserializeItemNode(itemIt, itemNode.propsEnd, itemNode);
@@ -332,26 +342,7 @@ MapAttributes loadMap(Map& map, std::filesystem::path fileName)
 
 	auto width = OTB::read<uint16_t>(first, last);
 	auto height = OTB::read<uint16_t>(first, last);
-	auto majorVersionItems = OTB::read<uint32_t>(first, last);
-	auto minorVersionItems = OTB::read<uint32_t>(first, last);
-
-	if (majorVersionItems < 3) {
-		throw std::invalid_argument(
-		    "This map need to be upgraded by using the latest map editor version to be able to load correctly.");
-	}
-
-	if (majorVersionItems > Item::items.majorVersion) {
-		throw std::invalid_argument(
-		    "The map was saved with a different items.otb version, an upgraded items.otb is required.");
-	}
-
-	if (minorVersionItems < CLIENT_VERSION_810) {
-		throw std::invalid_argument("This map needs to be updated.");
-	}
-
-	if (minorVersionItems > Item::items.minorVersion) {
-		std::println("[Warning - IOMap::loadMap] This map needs an updated items.otb.");
-	}
+	OTB::skip(first, last, sizeof(uint32_t) + sizeof(uint32_t)); // skip legacy OTB version fields
 
 	std::println("> Map size: {:d}x{:d}.", width, height);
 

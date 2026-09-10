@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Humongous Fungus" nameDescription="a humongous fungus" race="blood" experience="2600" speed="270" raceId="881">
 	<health now="3400" max="3400" />
-	<look type="488" corpse="18382" />
+	<look type="488" corpse="15872" />
 	<targetchange interval="4000" chance="15" />
 	<flags>
 		<flag summonable="0" />

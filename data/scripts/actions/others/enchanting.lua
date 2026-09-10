@@ -1,34 +1,34 @@
 local action = Action()
 
 local equipment = {
-	[2147] = { -- small ruby
+	[3030] = { -- small ruby
 		[COMBAT_FIREDAMAGE] = {id = 2343, targetId = 2147} -- helmet of the ancients (enchanted)
 	},
-	[2383] = { -- spike sword
+	[3271] = { -- spike sword
 		[COMBAT_FIREDAMAGE] = {id = 7744}, [COMBAT_ICEDAMAGE] = {id = 7763},
 		[COMBAT_EARTHDAMAGE] = {id = 7854}, [COMBAT_ENERGYDAMAGE] = {id = 7869}
 	},
-	[2391] = { -- war hammer
+	[3279] = { -- war hammer
 		[COMBAT_FIREDAMAGE] = {id = 7758}, [COMBAT_ICEDAMAGE] = {id = 7777},
 		[COMBAT_EARTHDAMAGE] = {id = 7868}, [COMBAT_ENERGYDAMAGE] = {id = 7883}
 	},
-	[2423] = { -- clerical mace
+	[3311] = { -- clerical mace
 		[COMBAT_FIREDAMAGE] = {id = 7754}, [COMBAT_ICEDAMAGE] = {id = 7773},
 		[COMBAT_EARTHDAMAGE] = {id = 7864}, [COMBAT_ENERGYDAMAGE] = {id = 7879}
 	},
-	[2429] = { -- barbarian axe
+	[3317] = { -- barbarian axe
 		[COMBAT_FIREDAMAGE] = {id = 7749}, [COMBAT_ICEDAMAGE] = {id = 7768},
 		[COMBAT_EARTHDAMAGE] = {id = 7859}, [COMBAT_ENERGYDAMAGE] = {id = 7874}
 	},
-	[2430] = { -- knight axe
+	[3318] = { -- knight axe
 		[COMBAT_FIREDAMAGE] = {id = 7750}, [COMBAT_ICEDAMAGE] = {id = 7769},
 		[COMBAT_EARTHDAMAGE] = {id = 7860}, [COMBAT_ENERGYDAMAGE] = {id = 7875}
 	},
-	[2445] = { -- crystal mace
+	[3333] = { -- crystal mace
 		[COMBAT_FIREDAMAGE] = {id = 7755}, [COMBAT_ICEDAMAGE] = {id = 7774},
 		[COMBAT_EARTHDAMAGE] = {id = 7865}, [COMBAT_ENERGYDAMAGE] = {id = 7880}
 	},
-	[2454] = { -- war axe
+	[3342] = { -- war axe
 		[COMBAT_FIREDAMAGE] = {id = 7753}, [COMBAT_ICEDAMAGE] = {id = 7772},
 		[COMBAT_EARTHDAMAGE] = {id = 7863}, [COMBAT_ENERGYDAMAGE] = {id = 7878}
 	},
@@ -64,35 +64,35 @@ local equipment = {
 		[COMBAT_FIREDAMAGE] = {id = 7756}, [COMBAT_ICEDAMAGE] = {id = 7775},
 		[COMBAT_EARTHDAMAGE] = {id = 7866}, [COMBAT_ENERGYDAMAGE] = {id = 7881}
 	},
-	[8905] = { -- rainbow shield
+	[8077] = { -- rainbow shield
 		[COMBAT_FIREDAMAGE] = {id = 8906}, [COMBAT_ICEDAMAGE] = {id = 8907},
 		[COMBAT_EARTHDAMAGE] = {id = 8909}, [COMBAT_ENERGYDAMAGE] = {id = 8908}
 	},
-	[9949] = { -- dracoyle statue
+	[9035] = { -- dracoyle statue
 		[COMBAT_EARTHDAMAGE] = {id = 9948} -- dracoyle statue (enchanted)
 	},
-	[9954] = { -- dracoyle statue
+	[9040] = { -- dracoyle statue
 		[COMBAT_EARTHDAMAGE] = {id = 9953} -- dracoyle statue (enchanted)
 	},
-	[10022] = { -- worn firewalker boots
+	[9020] = { -- worn firewalker boots
 		[COMBAT_FIREDAMAGE] = {id = 9933, say = {text = "Take the boots off first."}},
 		slot = {type = CONST_SLOT_FEET, check = true}
 	},
-	[24716] = { -- werewolf amulet
+	[22060] = { -- werewolf amulet
 		[COMBAT_NONE] = {
-			id = 24717,
+			id = 22061,
 			effects = {failure = CONST_ME_POFF, success = CONST_ME_THUNDER},
 			message = {text = "The amulet cannot be enchanted while worn."}
 		},
 		slot = {type = CONST_SLOT_NECKLACE, check = true}
 	},
-	[24718] = { -- werewolf helmet
+	[22062] = { -- werewolf helmet
 		[COMBAT_NONE] = {
 			id = {
-				[SKILL_CLUB] = {id = 24783},
-				[SKILL_SWORD] = {id = 24783},
-				[SKILL_AXE] = {id = 24783},
-				[SKILL_DISTANCE] = {id = 24783},
+				[SKILL_CLUB] = {id = 22127},
+				[SKILL_SWORD] = {id = 22127},
+				[SKILL_AXE] = {id = 22127},
+				[SKILL_DISTANCE] = {id = 22127},
 				[SKILL_MAGLEVEL] = {id = 24783}
 			},
 			effects = {failure = CONST_ME_POFF, success = CONST_ME_THUNDER},
@@ -104,10 +104,10 @@ local equipment = {
 }
 
 local valuables = {
-	[2146] = {id = 7759, shrine = {7508, 7509, 7510, 7511}}, -- small sapphire
-	[2147] = {id = 7760, shrine = {7504, 7505, 7506, 7507}}, -- small ruby
-	[2149] = {id = 7761, shrine = {7516, 7517, 7518, 7519}}, -- small emerald
-	[2150] = {id = 7762, shrine = {7512, 7513, 7514, 7515}}, -- small amethyst
+	[3029] = {id = 675, shrine = {150, 151, 152, 153}}, -- small sapphire
+	[3030] = {id = 676, shrine = {146, 147, 148, 149}}, -- small ruby
+	[3032] = {id = 677, shrine = {158, 159, 160, 161}}, -- small emerald
+	[3033] = {id = 678, shrine = {154, 155, 156, 157}}, -- small amethyst
 }
 
 local items = {
@@ -195,7 +195,7 @@ function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)
 				end
 
 				if target:hasAttribute(ITEM_ATTRIBUTE_CHARGES) then
-					target:setAttribute(ITEM_ATTRIBUTE_CHARGES, 1000)
+					target:setAttribute(ITEM_ATTRIBUTE_CHARGES, 1245)
 				end
 				player:sendSupplyUsed(item)
 				item:remove(1)

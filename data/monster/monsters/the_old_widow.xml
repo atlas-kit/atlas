@@ -64,7 +64,7 @@
 		<item name="knight armor" chance="42000" />
 		<item name="energy ring" chance="33333" />
 		<item name="stealth ring" chance="33333" />
-		<item id="2169" chance="33333" /><!-- time ring -->
+		<item id="3053" chance="33333" /><!-- time ring -->
 		<item name="knight legs" chance="26000" />
 		<item name="platinum amulet" chance="21000" />
 		<item name="sweet smelling bait" chance="21000" />

@@ -20,7 +20,7 @@ local instruments = {
 	[2332] = {effect = CONST_ME_SOUND_GREEN}, -- Waldo's post horn
 	[2367] = {effect = CONST_ME_SOUND_GREEN}, -- drum (immovable)
 	[2368] = {effect = CONST_ME_SOUND_GREEN}, -- simple fanfare (immovable)
-	[2369] = {effect = CONST_ME_SOUND_YELLOW, itemId = 2681, itemCount = 10, chance = 80, remove = true}, -- cornucopia (immovable)
+	[2369] = {effect = CONST_ME_SOUND_YELLOW, itemId = 3592, itemCount = 10, chance = 80, remove = true}, -- cornucopia (immovable)
 	[2370] = {effect = CONST_ME_SOUND_GREEN}, -- lute (immovable)
 	[2371] = {effect = CONST_ME_SOUND_BLUE}, -- the horn of sundering (actual effect is unknown; immovable)
 	[2372] = {effect = CONST_ME_SOUND_GREEN}, -- lyre (immovable)
@@ -28,7 +28,7 @@ local instruments = {
 	[3951] = {effect = CONST_ME_SOUND_BLUE}, -- bongo drum (actual effect is unknown)
 	[3952] = {effects = {failure = CONST_ME_POFF, success = CONST_ME_SOUND_GREEN}, chance = 20}, -- didgeridoo
 	[3953] = {effect = CONST_ME_SOUND_RED}, -- war drum
-	[3957] = {effect = CONST_ME_SOUND_YELLOW, itemId = 2681, itemCount = 10, chance = 80, remove = true}, -- cornucopia
+	[3957] = {effect = CONST_ME_SOUND_YELLOW, itemId = 3592, itemCount = 10, chance = 80, remove = true}, -- cornucopia
 	[5786] = {effects = {failure = CONST_ME_SOUND_RED, success = CONST_ME_SOUND_YELLOW}, monster = "war wolf", chance = 60, remove = true}, -- wooden whistle
 	[6572] = {effect = CONST_ME_SOUND_GREEN, text = "TOOOOOOT", transformId = 13578, decayId = 6572}, -- party trumpet
 	[6573] = {effect = CONST_ME_SOUND_GREEN, text = "TOOOOOOT", transformId = 13578, decayId = 6573}, -- party trumpet

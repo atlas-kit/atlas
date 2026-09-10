@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Spitter" nameDescription="a spitter" race="venom" experience="1100" speed="190" raceId="791">
 	<health now="1500" max="1500" />
-	<look type="461" corpse="15392" />
+	<look type="461" corpse="13979" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -49,7 +49,7 @@
 		<item name="small amethyst" countmax="2" chance="8000" />
 		<item name="platinum coin" chance="75250" />
 		<item name="green gem" chance="210" />
-		<item id="2169" chance="2400" /><!-- time ring -->
+		<item id="3053" chance="2400" /><!-- time ring -->
 		<item name="platinum amulet" chance="260" />
 		<item name="crusader helmet" chance="230" />
 		<item name="brown mushroom" countmax="3" chance="7500" />

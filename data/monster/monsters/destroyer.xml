@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Destroyer" nameDescription="a destroyer" race="blood" experience="2500" speed="300" raceId="287">
 	<health now="3700" max="3700" />
-	<look type="236" corpse="6320" />
+	<look type="236" corpse="6319" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -49,25 +49,25 @@
 		<voice sentence="It's a good day to destroy!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="92584" countmax="282" />
-		<item id="2666" name="meat" chance="39280" />
-		<item id="6500" name="demonic essence" chance="13803" />
-		<item id="2416" name="crowbar" chance="10573" />
-		<item id="2546" name="burst arrow" chance="8590" countmax="12" />
-		<item id="2489" name="dark armor" chance="5947" />
-		<item id="2150" name="small amethyst" chance="5947" countmax="2" />
+		<item id="3031" name="gold coin" chance="92584" countmax="282" />
+		<item id="3577" name="meat" chance="39280" />
+		<item id="6499" name="demonic essence" chance="13803" />
+		<item id="3304" name="crowbar" chance="10573" />
+		<item id="3449" name="burst arrow" chance="8590" countmax="12" />
+		<item id="3383" name="dark armor" chance="5947" />
+		<item id="3033" name="small amethyst" chance="5947" countmax="2" />
 		<item id="5944" name="soul orb" chance="5433" />
-		<item id="3456" name="pick" chance="4699" />
-		<item id="11215" name="metal spike" chance="4552" />
-		<item id="2463" name="plate armor" chance="3304" />
-		<item id="2152" name="platinum coin" chance="2203" countmax="3" />
-		<item id="2393" name="giant sword" chance="1248" />
-		<item id="7591" name="great health potion" chance="1101" />
+		<item id="1545" name="pick" chance="4699" />
+		<item id="10298" name="metal spike" chance="4552" />
+		<item id="3357" name="plate armor" chance="3304" />
+		<item id="3035" name="platinum coin" chance="2203" countmax="3" />
+		<item id="3281" name="giant sword" chance="1248" />
+		<item id="239" name="great health potion" chance="1101" />
 		<item id="7427" name="chaos mace" chance="808" />
-		<item id="2125" name="crystal necklace" chance="514" />
+		<item id="3008" name="crystal necklace" chance="514" />
 		<item id="7419" name="dreaded cleaver" chance="294" />
-		<item id="2645" name="steel boots" chance="294" />
-		<item id="6300" name="death ring" chance="220" />
-		<item id="2178" name="mind stone" chance="73" />
+		<item id="3554" name="steel boots" chance="294" />
+		<item id="6299" name="death ring" chance="220" />
+		<item id="3062" name="mind stone" chance="73" />
 	</loot>
 </monster>

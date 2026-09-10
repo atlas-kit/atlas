@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Drillworm" nameDescription="a drillworm" race="blood" experience="858" speed="220" raceId="878">
 	<health now="1500" max="1500" />
-	<look type="527" corpse="19705" />
+	<look type="527" corpse="17425" />
 	<targetchange interval="4000" chance="20" />
 	<flags>
 		<flag summonable="0" />
@@ -48,21 +48,21 @@
 		<voice sentence="Knarrrk!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="150" />
-		<item id="11222" name="lump of earth" chance="15049" />
-		<item id="13757" name="coal" chance="12155" />
-		<item id="18417" name="brown crystal splinter" chance="10095" />
-		<item id="18416" name="green crystal splinter" chance="10029" />
-		<item id="18418" name="blue crystal splinter" chance="9978" />
-		<item id="18429" name="vein of ore" chance="7329" />
-		<item id="18427" name="pulverized ore" chance="5172" />
-		<item id="3456" name="pick" chance="5087" />
-		<item id="18436" name="drill bolt" chance="5000" countmax="2" />
-		<item id="3976" name="worm" chance="5000" countmax="5" />
-		<item id="7887" name="terra amulet" chance="2571" />
-		<item id="2213" name="dwarven ring" chance="2387" />
+		<item id="3031" name="gold coin" chance="100000" countmax="150" />
+		<item id="10305" name="lump of earth" chance="15049" />
+		<item id="12600" name="coal" chance="12155" />
+		<item id="16123" name="brown crystal splinter" chance="10095" />
+		<item id="16122" name="green crystal splinter" chance="10029" />
+		<item id="16124" name="blue crystal splinter" chance="9978" />
+		<item id="16135" name="vein of ore" chance="7329" />
+		<item id="16133" name="pulverized ore" chance="5172" />
+		<item id="1545" name="pick" chance="5087" />
+		<item id="16142" name="drill bolt" chance="5000" countmax="2" />
+		<item id="3492" name="worm" chance="5000" countmax="5" />
+		<item id="814" name="terra amulet" chance="2571" />
+		<item id="3097" name="dwarven ring" chance="2387" />
 		<item id="5880" name="iron ore" chance="1537" />
-		<item id="11339" name="clay lump" chance="751" />
+		<item id="10422" name="clay lump" chance="751" />
 		<item id="7452" name="spiked squelcher" chance="519" />
 	</loot>
 </monster>

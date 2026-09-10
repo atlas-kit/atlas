@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Barbarian Headsplitter" nameDescription="a barbarian headsplitter" race="blood" experience="85" speed="168" manacost="450" raceId="333">
 	<health now="100" max="100" />
-	<look type="253" head="115" body="86" legs="119" feet="113" corpse="20343" />
+	<look type="253" head="115" body="86" legs="119" feet="113" corpse="18062" />
 	<targetchange interval="60000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -44,16 +44,16 @@
 		<voice sentence="Die! Die! Die!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="75228" countmax="30" />
-		<item id="2050" name="torch" chance="59812" />
-		<item id="2460" name="brass helmet" chance="20170" />
-		<item id="2403" name="knife" chance="14928" />
-		<item id="2473" name="viking helmet" chance="4960" />
-		<item id="2483" name="scale armor" chance="4046" />
-		<item id="2229" name="skull (item)" chance="3194" />
+		<item id="3031" name="gold coin" chance="75228" countmax="30" />
+		<item id="2920" name="torch" chance="59812" />
+		<item id="3354" name="brass helmet" chance="20170" />
+		<item id="3291" name="knife" chance="14928" />
+		<item id="3367" name="viking helmet" chance="4960" />
+		<item id="3377" name="scale armor" chance="4046" />
+		<item id="3114" name="skull (item)" chance="3194" />
 		<item id="5913" name="brown piece of cloth" chance="968" />
-		<item id="7618" name="health potion" chance="531" />
-		<item id="2168" name="life ring" chance="228" />
+		<item id="266" name="health potion" chance="531" />
+		<item id="3052" name="life ring" chance="228" />
 		<item id="7461" name="krimhorn helmet" chance="112" />
 		<item id="7457" name="fur boots" chance="87" />
 	</loot>

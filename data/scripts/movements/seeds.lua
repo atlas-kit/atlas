@@ -1,13 +1,13 @@
 local moveevent = MoveEvent()
 
 function moveevent.onAddItem(moveitem, tileitem, position)
-	if moveitem:getId() == 7732 then -- seeds
-		tileitem:transform(7665) -- flower pot
+	if moveitem:getId() == 647 then -- seeds
+		tileitem:transform(316) -- flower pot
 		tileitem:decay()
 		moveitem:remove(1)
 		position:sendMagicEffect(CONST_ME_MAGIC_GREEN)
-	elseif moveitem:getId() == 15271 then -- ice flower seeds
-		tileitem:transform(15442) -- flower pot
+	elseif moveitem:getId() == 13844 then -- ice flower seeds
+		tileitem:transform(14030) -- flower pot
 		tileitem:decay()
 		moveitem:remove(1)
 		position:sendMagicEffect(CONST_ME_MAGIC_BLUE)
@@ -15,6 +15,6 @@ function moveevent.onAddItem(moveitem, tileitem, position)
 	return true
 end
 
-moveevent:id(7655) -- empty flower pot
+moveevent:id(306) -- empty flower pot
 moveevent:tileItem(true)
 moveevent:register()

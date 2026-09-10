@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(130)
 spell:name("Holy Missile Rune")
-spell:runeId(2295)
+spell:runeId(3182)
 spell:allowFarUse(true)
 spell:charges(5)
 spell:runeLevel(27)

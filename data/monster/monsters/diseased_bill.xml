@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Diseased Bill" nameDescription="a diseased Bill" race="venom" experience="300" speed="250">
 	<health now="1000" max="1000" />
-	<look type="299" corpse="8951" />
+	<look type="299" corpse="8123" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

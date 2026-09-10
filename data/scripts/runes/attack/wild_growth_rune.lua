@@ -11,7 +11,7 @@ end
 spell:group("attack")
 spell:id(94)
 spell:name("Wild Growth Rune")
-spell:runeId(2269)
+spell:runeId(3156)
 spell:allowFarUse(true)
 spell:charges(2)
 spell:runeLevel(27)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Silencer" nameDescription="a silencer" race="blood" experience="5100" speed="470" raceId="1014">
 	<health now="5400" max="5400" />
-	<look type="585" corpse="22489" />
+	<look type="585" corpse="20155" />
 	<targetchange interval="4000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -54,21 +54,21 @@
 		<voice sentence="Hussssssh!!" />
 	</voices>
 	<loot>
-		<item id="2152" name="platinum coin" chance="99919" countmax="8" />
-		<item id="2148" name="gold coin" chance="99717" countmax="100" />
-		<item id="22534" name="silencer claws" chance="16350" />
-		<item id="22535" name="silencer resonating chamber" chance="9528" />
+		<item id="3035" name="platinum coin" chance="99919" countmax="8" />
+		<item id="3031" name="gold coin" chance="99717" countmax="100" />
+		<item id="20200" name="silencer claws" chance="16350" />
+		<item id="20201" name="silencer resonating chamber" chance="9528" />
 		<item id="7368" name="assassin star" chance="8357" countmax="10" />
 		<item id="7454" name="glorious axe" chance="2584" />
 		<item id="7413" name="titan axe" chance="1978" />
 		<item id="7407" name="haunted blade" chance="1938" />
-		<item id="2165" name="stealth ring" chance="1534" />
-		<item id="2521" name="dark shield" chance="1453" />
+		<item id="3049" name="stealth ring" chance="1534" />
+		<item id="3421" name="dark shield" chance="1453" />
 		<item id="7387" name="diamond sceptre" chance="1373" />
 		<item id="7451" name="shadow sceptre" chance="1090" />
-		<item id="7886" name="terra boots" chance="929" />
-		<item id="7885" name="terra legs" chance="888" />
-		<item id="22396" name="cluster of solace" chance="686" />
-		<item id="2195" name="boots of haste" chance="444" />
+		<item id="813" name="terra boots" chance="929" />
+		<item id="812" name="terra legs" chance="888" />
+		<item id="20062" name="cluster of solace" chance="686" />
+		<item id="3079" name="boots of haste" chance="444" />
 	</loot>
 </monster>

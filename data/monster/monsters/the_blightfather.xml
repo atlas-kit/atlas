@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Blightfather" nameDescription="The Blightfather" race="venom" experience="600" speed="290">
 	<health now="400" max="400" />
-	<look type="348" corpse="11375" />
+	<look type="348" corpse="10458" />
 	<targetchange interval="5000" chance="12" />
 	<flags>
 		<flag summonable="0" />

@@ -27,7 +27,7 @@ end
 spell:group("support")
 spell:id(83)
 spell:name("Animate Dead Rune")
-spell:runeId(2316)
+spell:runeId(3203)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(27)

@@ -1,6 +1,6 @@
 local action = Action()
 
-local depotTiles = {11062, 11063}
+local depotTiles = {10145, 10146}
 local diceEnabledOnDepot = true
 
 function action.onUse(player, item, fromPosition, target, toPosition, isHotkey)

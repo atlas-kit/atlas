@@ -14,7 +14,7 @@ end
 spell:group("attack")
 spell:id(55)
 spell:name("Energy Bomb Rune")
-spell:runeId(2262)
+spell:runeId(3149)
 spell:allowFarUse(true)
 spell:charges(2)
 spell:runeLevel(37)

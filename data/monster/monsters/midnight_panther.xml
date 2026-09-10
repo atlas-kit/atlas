@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Midnight Panther" nameDescription="a midnight panther" race="blood" experience="900" speed="250" raceId="698">
 	<health now="1200" max="1200" />
-	<look type="385" corpse="13327" />
+	<look type="385" corpse="12340" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

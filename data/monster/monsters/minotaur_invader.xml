@@ -35,23 +35,23 @@
 		<voice sentence="We will crush the enemy!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="200" />
-		<item id="2152" name="platinum coin" chance="49284" countmax="4" />
-		<item id="12438" name="piece of warrior armor" chance="14792" />
-		<item id="9970" name="small topaz" chance="10395" countmax="2" />
-		<item id="12428" name="minotaur horn" chance="8248" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="200" />
+		<item id="3035" name="platinum coin" chance="49284" countmax="4" />
+		<item id="11482" name="piece of warrior armor" chance="14792" />
+		<item id="9057" name="small topaz" chance="10395" countmax="2" />
+		<item id="11472" name="minotaur horn" chance="8248" countmax="2" />
 		<item id="5878" name="minotaur leather" chance="5521" />
-		<item id="2150" name="small amethyst" chance="5249" />
-		<item id="2147" name="small ruby" chance="4618" />
-		<item id="23537" name="mooh'tah plate" chance="937" />
+		<item id="3033" name="small amethyst" chance="5249" />
+		<item id="3030" name="small ruby" chance="4618" />
+		<item id="21166" name="mooh'tah plate" chance="937" />
 		<item id="5912" name="blue piece of cloth" chance="801" />
-		<item id="2156" name="red gem" chance="784" />
-		<item id="2430" name="knight axe" chance="750" />
-		<item id="2515" name="guardian shield" chance="699" />
+		<item id="3039" name="red gem" chance="784" />
+		<item id="3318" name="knight axe" chance="750" />
+		<item id="3415" name="guardian shield" chance="699" />
 		<item id="5911" name="red piece of cloth" chance="682" />
-		<item id="2475" name="warrior helmet" chance="596" />
+		<item id="3369" name="warrior helmet" chance="596" />
 		<item id="7413" name="titan axe" chance="204" />
-		<item id="2158" name="blue gem" chance="187" />
+		<item id="3041" name="blue gem" chance="187" />
 		<item id="7401" name="minotaur trophy" chance="187" />
 	</loot>
 </monster>

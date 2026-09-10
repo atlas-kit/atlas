@@ -79,13 +79,13 @@
 		<item name="small sapphire" chance="6200" />
 		<item name="heavy machete" chance="4700" />
 		<item name="blue piece of cloth" chance="3750" />
-		<item id="1872" chance="2560" /><!-- blue tapestry -->
+		<item id="2659" chance="2560" /><!-- blue tapestry -->
 		<item name="seeds" chance="2400" />
 		<item name="hailstorm rod" chance="770" />
 		<item name="noble turban" chance="530" />
 		<item name="mystic turban" chance="290" />
 		<item name="magma monocle" chance="260" />
-		<item id="2374" chance="260" /><!-- wooden flute -->
+		<item id="3262" chance="260" /><!-- wooden flute -->
 		<item name="small oil lamp" chance="130" />
 		<item name="blue gem" chance="80" />
 	</loot>

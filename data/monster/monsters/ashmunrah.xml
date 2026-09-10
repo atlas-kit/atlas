@@ -73,12 +73,12 @@
 		<item name="gold coin" countmax="100" chance="33000" />
 		<item name="gold coin" countmax="100" chance="33000" />
 		<item name="gold coin" countmax="4" chance="50000" />
-		<item id="7590" name="great mana potion" chance="12005" />
-		<item id="2164" name="might ring" chance="4662" />
-		<item id="2134" name="silver brooch" chance="4196" />
-		<item id="2487" name="crown armor" chance="466" />
-		<item id="11207" name="mini mummy" chance="175" />
-		<item id="2444" name="hammer of wrath" chance="117" />
-		<item id="2140" name="holy scarab" chance="117" />
+		<item id="238" name="great mana potion" chance="12005" />
+		<item id="3048" name="might ring" chance="4662" />
+		<item id="3017" name="silver brooch" chance="4196" />
+		<item id="3381" name="crown armor" chance="466" />
+		<item id="10290" name="mini mummy" chance="175" />
+		<item id="3332" name="hammer of wrath" chance="117" />
+		<item id="3023" name="holy scarab" chance="117" />
 	</loot>
 </monster>

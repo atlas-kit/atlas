@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lost Thrower" nameDescription="a lost thrower" race="blood" experience="1200" speed="220" raceId="926">
 	<health now="1700" max="1700" />
-	<look type="539" corpse="19998" />
+	<look type="539" corpse="17718" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -64,7 +64,7 @@
 		<item name="iron ore" chance="9470" />
 		<item name="great mana potion" chance="13470" />
 		<item name="great health potion" chance="14730" />
-		<item id="13757" chance="12180" /><!-- coal -->
+		<item id="12600" chance="12180" /><!-- coal -->
 		<item name="lost basher's spike" chance="11410" />
 		<item name="buckle" chance="850" />
 		<item name="holy ash" chance="15670" />

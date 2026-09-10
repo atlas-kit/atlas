@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Massive Fire Elemental" nameDescription="a massive fire elemental" race="fire" experience="1400" speed="210" raceId="313">
 	<health now="1200" max="1200" />
-	<look type="242" corpse="6324" />
+	<look type="242" corpse="6323" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -56,6 +56,6 @@
 		<item name="magma amulet" chance="1300" />
 		<item name="magma boots" chance="560" />
 		<item name="magma legs" chance="210" />
-		<item id="9809" chance="1330" /><!-- rusty armor (semi-rare) -->
+		<item id="8895" chance="1330" /><!-- rusty armor (semi-rare) -->
 	</loot>
 </monster>

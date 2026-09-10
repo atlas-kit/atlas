@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fernfang" nameDescription="Fernfang" race="blood" experience="600" speed="240">
 	<health now="400" max="400" />
-	<look type="206" corpse="20566" />
+	<look type="206" corpse="18285" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -70,8 +70,8 @@
 		<item name="blank rune" chance="17000" />
 		<item name="brown flask" chance="12000" />
 		<item name="bread" chance="12000" />
-		<item id="2044" chance="12000" /><!-- lamp -->
-		<item id="2401" chance="12000" /><!-- staff -->
+		<item id="2914" chance="12000" /><!-- lamp -->
+		<item id="3289" chance="12000" /><!-- staff -->
 		<item name="green tunic" chance="12000" />
 		<item name="strong mana potion" chance="10200" />
 		<item name="wooden whistle" chance="7600" />

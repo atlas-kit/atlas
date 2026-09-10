@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Slug" nameDescription="a slug" race="venom" experience="70" speed="150" raceId="731">
 	<health now="255" max="255" />
-	<look type="407" corpse="13515" />
+	<look type="407" corpse="12526" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="0" />

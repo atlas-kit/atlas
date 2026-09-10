@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Doctor Perhaps" nameDescription="Doctor Perhaps" race="blood" experience="325" speed="200">
 	<health now="475" max="475" />
-	<look type="133" head="95" body="0" legs="94" feet="114" addons="1" corpse="20439" />
+	<look type="133" head="95" body="0" legs="94" feet="114" addons="1" corpse="18158" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -50,8 +50,8 @@
 		<voice sentence="You can't beat what you can't comprehend!" />
 	</voices>
 	<loot>
-		<item id="10290" name="glutton's mace" chance="40000" />
-		<item id="10300" name="trousers of the ancients" chance="20000" />
-		<item id="10289" name="meat shield" chance="40000" />
+		<item id="9373" name="glutton's mace" chance="40000" />
+		<item id="9383" name="trousers of the ancients" chance="20000" />
+		<item id="9372" name="meat shield" chance="40000" />
 	</loot>
 </monster>

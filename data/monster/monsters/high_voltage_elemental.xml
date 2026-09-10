@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="High Voltage Elemental" nameDescription="a high voltage elemental" race="energy" experience="1500" speed="278" raceId="1116">
 	<health now="1500" max="1500" />
-	<look type="293" corpse="8966" />
+	<look type="293" corpse="8138" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag ignorespawnblock="1" />
@@ -41,21 +41,21 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="199" />
-		<item id="7838" name="flash arrow" chance="19856" countmax="20" />
+		<item id="3031" name="gold coin" chance="100000" countmax="199" />
+		<item id="761" name="flash arrow" chance="19856" countmax="20" />
 		<item id="7449" name="crystal sword" chance="7157" />
-		<item id="7620" name="mana potion" chance="4589" />
-		<item id="2124" name="crystal ring" chance="4502" />
-		<item id="2425" name="obsidian lance" chance="4444" />
-		<item id="2150" name="small amethyst" chance="4387" countmax="3" />
-		<item id="7589" name="strong mana potion" chance="3954" />
-		<item id="2167" name="energy ring" chance="2742" />
-		<item id="8901" name="spellbook of warding" chance="664" />
-		<item id="2189" name="wand of cosmic energy" chance="664" />
-		<item id="7889" name="lightning pendant" chance="577" />
-		<item id="7895" name="lightning legs" chance="202" />
-		<item id="10221" name="shockwave amulet" chance="173" />
-		<item id="7898" name="lightning robe" chance="144" />
-		<item id="7901" name="lightning headband" chance="115" />
+		<item id="268" name="mana potion" chance="4589" />
+		<item id="3007" name="crystal ring" chance="4502" />
+		<item id="3313" name="obsidian lance" chance="4444" />
+		<item id="3033" name="small amethyst" chance="4387" countmax="3" />
+		<item id="237" name="strong mana potion" chance="3954" />
+		<item id="3051" name="energy ring" chance="2742" />
+		<item id="8073" name="spellbook of warding" chance="664" />
+		<item id="3073" name="wand of cosmic energy" chance="664" />
+		<item id="816" name="lightning pendant" chance="577" />
+		<item id="822" name="lightning legs" chance="202" />
+		<item id="9304" name="shockwave amulet" chance="173" />
+		<item id="825" name="lightning robe" chance="144" />
+		<item id="828" name="lightning headband" chance="115" />
 	</loot>
 </monster>

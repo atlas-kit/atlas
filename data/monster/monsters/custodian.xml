@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Custodian" nameDescription="Custodian" race="blood" experience="27500" speed="210">
 	<health now="47000" max="47000" />
-	<look type="1217" head="1" body="1" legs="19" feet="19" addons="1" corpse="34579" />
+	<look type="1217" head="1" body="1" legs="19" feet="19" addons="1" corpse="31923" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -37,8 +37,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" countmax="23" />
-		<item id="34334" name="cobra crest" chance="21053" />
-		<item id="2432" name="fire axe" chance="10526" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="23" />
+		<item id="31678" name="cobra crest" chance="21053" />
+		<item id="3320" name="fire axe" chance="10526" />
 	</loot>
 </monster>

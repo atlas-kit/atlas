@@ -1025,7 +1025,11 @@ void ProtocolGame::parseOpenPrivateChannel(NetworkMessage& msg)
 void ProtocolGame::parseAutoWalk(NetworkMessage& msg)
 {
 	uint8_t numdirs = msg.getByte();
-	if (numdirs == 0 || (msg.getBufferPosition() + numdirs) != (msg.getLength() + 8)) {
+	// The directions must fill exactly the rest of the message. length
+	// includes the XTEA padding-size byte that precedes the payload, so the
+	// payload ends at length + (INITIAL_BUFFER_POSITION - 1).
+	if (numdirs == 0 ||
+	    (msg.getBufferPosition() + numdirs) != (msg.getLength() + NetworkMessage::INITIAL_BUFFER_POSITION - 1)) {
 		return;
 	}
 
@@ -3478,7 +3482,7 @@ void ProtocolGame::AddShopItem(NetworkMessage& msg, const ShopInfo& item)
 	msg.add<uint16_t>(it.clientId);
 
 	if (it.isSplash() || it.isFluidContainer()) {
-		msg.addByte(serverFluidToClient(item.subType));
+		msg.addByte(static_cast<uint8_t>(item.subType));
 	} else {
 		msg.addByte(0x00);
 	}

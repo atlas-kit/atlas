@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Tirecz" nameDescription="Tirecz" race="blood" experience="6000" speed="220">
 	<health now="25000" max="25000" />
-	<look type="334" corpse="11103" />
+	<look type="334" corpse="10186" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

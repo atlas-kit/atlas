@@ -1,5 +1,5 @@
 local weapon = Weapon(WEAPON_CLUB)
-weapon:id(7757)
+weapon:id(673)
 weapon:level(35)
 weapon:action("removecharge")
 weapon:register()

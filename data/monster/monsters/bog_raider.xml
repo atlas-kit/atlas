@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Bog Raider" nameDescription="a bog raider" race="venom" experience="800" speed="250" raceId="460">
 	<health now="1300" max="1300" />
-	<look type="299" corpse="8951" />
+	<look type="299" corpse="8123" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

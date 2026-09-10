@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Humorless Fungus" nameDescription="a humorless fungus" race="venom" experience="0" speed="230">
 	<health now="2500" max="2500" />
-	<look type="517" corpse="17428" />
+	<look type="517" corpse="16083" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

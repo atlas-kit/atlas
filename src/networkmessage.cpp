@@ -99,6 +99,21 @@ void NetworkMessage::addPosition(const Position& pos)
 	addByte(pos.z);
 }
 
+// Wire layout for items in protocol 15.x. Every check below is independent —
+// the client reads each optional section in order based on the flags in its
+// own appearances.dat, so a single item can carry several sections.
+//
+// Order must match the client's read sequence:
+//   1. clientId               u16
+//   2. stackable              u8 count
+//   3. fluid/splash           u8 fluidType
+//   4. container              u8 containerType + (variant payload)
+//   5. podium                 outfit + mount + u8 direction + u8 visible
+//   6. upgradeClassification  u8 tier
+//   7. clock/expire/expireStop u32 decay + u8 brandNew
+//   8. wearOut                u32 charges + u8 brandNew
+//   9. isWrapKit              u16 unWrapId
+
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
 	const ItemType& it = Item::items[id];
@@ -107,26 +122,40 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 	if (it.stackable) {
 		addByte(count);
-	} else if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[count & 7]);
-	} else if (it.isContainer()) {
-		addByte(0x00); // assigned loot container icon
-	} else if (it.isPodium()) {
+	}
+
+	if (it.isSplash() || it.isFluidContainer()) {
+		addByte(count);
+	}
+
+	if (it.isContainer()) {
+		addByte(std::to_underlying(ContainerSpecial_t::None));
+	}
+
+	if (it.isPodium()) {
 		add<uint16_t>(0); // looktype
 		add<uint16_t>(0); // lookTypeEx
 		add<uint16_t>(0); // lookmount
 		addByte(2);       // direction
 		addByte(0x01);    // is visible (bool)
-	} else if (it.classification > 0) {
+	}
+
+	if (it.classification > 0) {
 		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
+	}
+
+	if (it.clockExpire || it.expire || it.expireStop) {
 		add<uint32_t>(floor<std::chrono::seconds>(it.decayTimeMin).count());
-		addByte(0x00); // is brand new
-	} else if (it.showClientCharges) {
+		addByte(0x01); // brand-new
+	}
+
+	if (it.wearOut) {
 		add<uint32_t>(it.charges);
-		addByte(0x00); // is brand new
-	} else if (it.wrapContainer) {
-		add<uint16_t>(0x00); // unWrapId (no wrapped item by default)
+		addByte(0x01); // brand-new
+	}
+
+	if (it.isWrapKit) {
+		add<uint16_t>(0x00); // unWrapId
 	}
 }
 
@@ -138,17 +167,23 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 	if (it.stackable) {
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
-	} else if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[item->getFluidType() & 7]);
-	} else if (it.isContainer()) {
+	}
+
+	if (it.isSplash() || it.isFluidContainer()) {
+		addByte(static_cast<uint8_t>(item->getFluidType()));
+	}
+
+	if (it.isContainer()) {
 		const auto& container = item->asContainer();
 		if (container && it.weaponType == WEAPON_QUIVER) {
-			addByte(0x01);
+			addByte(std::to_underlying(ContainerSpecial_t::ContentCounter));
 			add<uint32_t>(container->getAmmoCount());
 		} else {
-			addByte(0x00);
+			addByte(std::to_underlying(ContainerSpecial_t::None));
 		}
-	} else if (it.isPodium()) {
+	}
+
+	if (it.isPodium()) {
 		const auto& podium = item->asPodium();
 		const Outfit_t& outfit = podium->getOutfit();
 
@@ -184,16 +219,24 @@ void NetworkMessage::addItem(const std::shared_ptr<const Item>& item)
 
 		addByte(podium->getDirection());
 		addByte(podium->hasFlag(PODIUM_SHOW_PLATFORM) ? 0x01 : 0x00);
-	} else if (it.classification > 0) {
-		addByte(0x00); // item tier (0-10)
-	} else if (it.showClientDuration) {
+	}
+
+	if (it.classification > 0) {
+		addByte(0x00); // item tier (0-10) — not persisted yet
+	}
+
+	if (it.clockExpire || it.expire || it.expireStop) {
 		add<uint32_t>(floor<std::chrono::seconds>(item->getDuration()).count());
-		addByte(0); // is brand new
-	} else if (it.showClientCharges) {
+		addByte(0x01); // brand-new
+	}
+
+	if (it.wearOut) {
 		add<uint32_t>(item->getCharges());
-		addByte(0); // is brand new
-	} else if (it.wrapContainer) {
-		add<uint16_t>(0x00); // unWrapId (atlas does not store wrapped item id yet)
+		addByte(0x01); // brand-new
+	}
+
+	if (it.isWrapKit) {
+		add<uint16_t>(0x00); // unWrapId — not persisted yet
 	}
 }
 

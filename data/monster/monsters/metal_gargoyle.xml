@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Metal Gargoyle" nameDescription="a metal gargoyle" race="energy" experience="1400" speed="190" raceId="1039">
 	<health now="2100" max="2100" />
-	<look type="601" corpse="23347" />
+	<look type="601" corpse="20976" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -47,19 +47,19 @@
 		<voice sentence="*stomp*" />
 	</voices>
 	<loot>
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2148" countmax="100" chance="60000" /><!-- gold coin -->
-		<item id="24124" chance="1490" /><!-- bronze gear wheel -->
-		<item id="23564" chance="17160" /><!-- metal jaw -->
-		<item id="2152" countmax="2" chance="43280" /><!-- platinum coin -->
-		<item id="7588" countmax="2" chance="9700" /><!-- strong health potion -->
-		<item id="7589" countmax="2" chance="9700" /><!-- strong mana potion -->
-		<item id="23542" chance="1490" /><!-- metal bat -->
-		<item id="2167" chance="2240" /><!-- energy ring -->
-		<item id="2168" chance="750" /><!-- life ring -->
-		<item id="11227" chance="2240" /><!-- shiny stone -->
-		<item id="23540" chance="1490" /><!-- metal spats -->
-		<item id="23539" chance="1490" /><!-- alloy legs -->
-		<item id="9810" chance="2990" /><!-- rusty armor(rare) -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3031" countmax="100" chance="60000" /><!-- gold coin -->
+		<item id="21755" chance="1490" /><!-- bronze gear wheel -->
+		<item id="21193" chance="17160" /><!-- metal jaw -->
+		<item id="3035" countmax="2" chance="43280" /><!-- platinum coin -->
+		<item id="236" countmax="2" chance="9700" /><!-- strong health potion -->
+		<item id="237" countmax="2" chance="9700" /><!-- strong mana potion -->
+		<item id="21171" chance="1490" /><!-- metal bat -->
+		<item id="3051" chance="2240" /><!-- energy ring -->
+		<item id="3052" chance="750" /><!-- life ring -->
+		<item id="10310" chance="2240" /><!-- shiny stone -->
+		<item id="21169" chance="1490" /><!-- metal spats -->
+		<item id="21168" chance="1490" /><!-- alloy legs -->
+		<item id="8896" chance="2990" /><!-- rusty armor(rare) -->
 	</loot>
 </monster>

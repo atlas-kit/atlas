@@ -21,7 +21,7 @@ end
 spell:group("attack")
 spell:id(116)
 spell:name("Stone Shower Rune")
-spell:runeId(2288)
+spell:runeId(3175)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(28)

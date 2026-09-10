@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Shock Head" nameDescription="a shock head" race="blood" experience="2300" speed="250" raceId="1004">
 	<health now="4200" max="4200" />
-	<look type="579" corpse="22392" />
+	<look type="579" corpse="20058" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

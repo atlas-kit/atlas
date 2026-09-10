@@ -271,8 +271,8 @@ std::shared_ptr<Thing> Game::internalGetThing(const std::shared_ptr<Player>& pla
 		}
 
 		int32_t subType;
-		if (it.isFluidContainer() && index < static_cast<int32_t>(sizeof(reverseFluidMap) / sizeof(uint8_t))) {
-			subType = reverseFluidMap[index];
+		if (it.isFluidContainer()) {
+			subType = index;
 		} else {
 			subType = -1;
 		}
@@ -2985,7 +2985,7 @@ void Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 
 	uint8_t subType;
 	if (it.isSplash() || it.isFluidContainer()) {
-		subType = clientFluidToServer(count);
+		subType = count;
 	} else {
 		subType = count;
 	}
@@ -3022,7 +3022,7 @@ void Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, u
 
 	uint8_t subType;
 	if (it.isSplash() || it.isFluidContainer()) {
-		subType = clientFluidToServer(count);
+		subType = count;
 	} else {
 		subType = count;
 	}
@@ -3058,7 +3058,7 @@ void Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 
 	int32_t subType;
 	if (it.isFluidContainer() || it.isSplash()) {
-		subType = clientFluidToServer(count);
+		subType = count;
 	} else {
 		subType = count;
 	}

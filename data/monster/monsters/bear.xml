@@ -34,8 +34,8 @@
 		<voice sentence="Groar" />
 	</voices>
 	<loot>
-		<item id="2666" name="meat" chance="39964" />
-		<item id="2671" name="ham" chance="19987" />
+		<item id="3577" name="meat" chance="39964" />
+		<item id="3582" name="ham" chance="19987" />
 		<item id="5896" name="bear paw" chance="1973" />
 		<item id="5902" name="honeycomb" chance="480" />
 	</loot>

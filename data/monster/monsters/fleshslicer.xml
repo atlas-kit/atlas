@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Fleshslicer" nameDescription="Fleshslicer" race="venom" experience="5500" speed="360">
 	<health now="5700" max="5700" />
-	<look type="457" corpse="15296" />
+	<look type="457" corpse="13870" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -36,19 +36,19 @@
 		<immunity invisible="1" />
 	</immunities>
 	<loot>
-		<item id="15486" name="compound eye" chance="100000" countmax="2" />
-		<item id="2148" name="gold coin" chance="100000" countmax="185" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="5" />
-		<item id="15485" name="spidris mandible" chance="100000" />
-		<item id="7590" name="great mana potion" chance="82353" countmax="2" />
-		<item id="16096" name="dung ball (quest)" chance="76471" countmax="2" />
-		<item id="2147" name="small ruby" chance="35294" countmax="5" />
-		<item id="3964" name="ripper lance" chance="29412" />
-		<item id="2143" name="white pearl" chance="29412" countmax="5" />
-		<item id="2156" name="red gem" chance="23529" />
-		<item id="8473" name="ultimate health potion" chance="17647" />
-		<item id="7632" name="giant shimmering pearl" chance="11765" />
+		<item id="14083" name="compound eye" chance="100000" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="185" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="5" />
+		<item id="14082" name="spidris mandible" chance="100000" />
+		<item id="238" name="great mana potion" chance="82353" countmax="2" />
+		<item id="14753" name="dung ball (quest)" chance="76471" countmax="2" />
+		<item id="3030" name="small ruby" chance="35294" countmax="5" />
+		<item id="3346" name="ripper lance" chance="29412" />
+		<item id="3026" name="white pearl" chance="29412" countmax="5" />
+		<item id="3039" name="red gem" chance="23529" />
+		<item id="7643" name="ultimate health potion" chance="17647" />
+		<item id="281" name="giant shimmering pearl" chance="11765" />
 		<item id="7413" name="titan axe" chance="11765" />
-		<item id="6300" name="death ring" chance="5882" />
+		<item id="6299" name="death ring" chance="5882" />
 	</loot>
 </monster>

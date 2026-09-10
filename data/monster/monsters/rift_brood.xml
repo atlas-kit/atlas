@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Rift Brood" nameDescription="a rift brood" race="energy" experience="1600" speed="300">
 	<health now="2950" max="2950" />
-	<look type="290" corpse="1495" />
+	<look type="290" corpse="2126" />
 	<targetchange interval="20000" chance="15" />
 	<flags>
 		<flag summonable="0" />

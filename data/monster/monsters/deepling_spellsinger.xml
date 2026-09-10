@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Deepling Spellsinger" nameDescription="a deepling spellsinger" race="blood" experience="1000" speed="190" raceId="772">
 	<health now="850" max="850" />
-	<look type="443" corpse="15208" />
+	<look type="443" corpse="13771" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -56,7 +56,7 @@
 		<item name="gold coin" countmax="60" chance="70000" />
 		<item name="platinum coin" chance="80000" />
 		<item name="life ring" chance="2439" />
-		<item id="2667" chance="3448" /><!-- fish -->
+		<item id="3578" chance="3448" /><!-- fish -->
 		<item name="fish fin" chance="498" />
 		<item name="eye of a deepling" chance="2500" />
 		<item name="deepling staff" chance="2000" />

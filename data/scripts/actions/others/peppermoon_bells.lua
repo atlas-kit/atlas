@@ -1,10 +1,10 @@
 local drunk = Condition(CONDITION_DRUNK)
-drunk:setParameter(CONDITION_PARAM_TICKS, 5000)
+drunk:setParameter(CONDITION_PARAM_TICKS, 4999)
 
 local peppermoonBells = Action()
 
 function peppermoonBells.onUse(player, item, fromPosition, target, toPosition, isHotkey)
-	if item.itemid == 23461 then
+	if item.itemid == 21090 then
 		player:say("This flower has no pollen left. It will take a little before it has new pollen.", TALKTYPE_MONSTER_SAY, false, player, item:getPosition())
 		return true
 	else
@@ -16,12 +16,12 @@ function peppermoonBells.onUse(player, item, fromPosition, target, toPosition, i
 		player:say("You collected the smelly pollen into a bag.", TALKTYPE_MONSTER_SAY, false, player, item:getPosition())
 		item:getPosition():sendMagicEffect(CONST_ME_MAGIC_BLUE)
 	end
-	player:addItem(23460, 1) -- blue pollen
-	item:transform(23461)
+	player:addItem(21089, 1) -- blue pollen
+	item:transform(21090)
 	item:decay()
 	return true
 	end
 end
 
-peppermoonBells:id(23459, 23461)
+peppermoonBells:id(21088, 21090)
 peppermoonBells:register()

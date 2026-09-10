@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gnome Pack Crawler" nameDescription="a gnome pack crawler" race="fire" experience="0" speed="220">
 	<health now="5000" max="5000" />
-	<look type="492" corpse="17336" />
+	<look type="492" corpse="15991" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -19,6 +19,6 @@
 	</immunities>
 	<defenses armor="30" defense="30" />
 	<loot>
-		<item id="2148" name="gold coin" chance="33333" countmax="9" />
+		<item id="3031" name="gold coin" chance="33333" countmax="9" />
 	</loot>
 </monster>

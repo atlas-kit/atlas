@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Hellfire Fighter" nameDescription="a hellfire fighter" race="fire" experience="3900" speed="220" raceId="295">
 	<health now="3800" max="3800" />
-	<look type="243" corpse="6324" />
+	<look type="243" corpse="6323" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -46,7 +46,7 @@
 	</immunities>
 	<loot>
 		<item name="emerald bangle" chance="2200" />
-		<item id="2136" chance="190" /><!-- demonbone amulet -->
+		<item id="3019" chance="190" /><!-- demonbone amulet -->
 		<item name="small diamond" chance="1400" />
 		<item name="gold coin" countmax="100" chance="50000" />
 		<item name="gold coin" countmax="100" chance="40000" />
@@ -63,6 +63,6 @@
 		<item name="magma coat" chance="470" />
 		<item name="fiery heart" chance="9570" />
 		<item name="piece of hellfire armor" chance="5060" />
-		<item id="13757" chance="670" /><!-- coal -->
+		<item id="12600" chance="670" /><!-- coal -->
 	</loot>
 </monster>

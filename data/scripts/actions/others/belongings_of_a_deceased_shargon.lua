@@ -1,8 +1,8 @@
 local config = {
 	{chanceFrom = 0, chanceTo = 2500, itemId = 5741}, -- skull helmet
-	{chanceFrom = 2501, chanceTo = 5000, itemId = 2160}, -- crystal coin
-	{chanceFrom = 5001, chanceTo = 7500, itemId = 2436}, -- skull staff
-	{chanceFrom = 7501, chanceTo = 10000, itemId = 9969} -- black skull
+	{chanceFrom = 2501, chanceTo = 5000, itemId = 3043}, -- crystal coin
+	{chanceFrom = 5001, chanceTo = 7500, itemId = 3324}, -- skull staff
+	{chanceFrom = 7501, chanceTo = 10000, itemId = 9056} -- black skull
 }
 
 local belongingsShargon = Action()
@@ -30,5 +30,5 @@ function belongingsShargon.onUse(player, item, fromPosition, target, toPosition,
 	return false
 end
 
-belongingsShargon:id(23705)
+belongingsShargon:id(21334)
 belongingsShargon:register()

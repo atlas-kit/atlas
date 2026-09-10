@@ -66,37 +66,37 @@
 		<voice sentence="After all those aeons I smell freedom at last!" />
 	</voices>
 	<loot>
-		<item id="22396" chance="100000" /><!-- cluster of solace -->
+		<item id="20062" chance="100000" /><!-- cluster of solace -->
 		<item id="5954" chance="100000" /><!-- demon horn -->
-		<item id="6500" chance="100000" /><!-- demonic essence -->
-		<item id="22397" chance="13850" /><!-- dream matter -->
-		<item id="22610" chance="5380" /><!-- dream warden mask -->
-		<item id="2148" countmax="100" chance="50000" /><!-- gold coin -->
-		<item id="2148" countmax="100" chance="50000" /><!-- gold coin -->
-		<item id="2152" countmax="50" chance="100000" /><!-- platinum coin -->
-		<item id="22598" chance="100000" /><!-- unrealized dream -->
-		<item id="8903" chance="5130" /><!-- spellbook of lost souls -->
-		<item id="8901" chance="35900" /><!-- spellbook of warding -->
-		<item id="8902" chance="10260" /><!-- spellbook of mind control -->
-		<item id="3962" chance="33330" /><!-- beastslayer axe -->
+		<item id="6499" chance="100000" /><!-- demonic essence -->
+		<item id="20063" chance="13850" /><!-- dream matter -->
+		<item id="20276" chance="5380" /><!-- dream warden mask -->
+		<item id="3031" countmax="100" chance="50000" /><!-- gold coin -->
+		<item id="3031" countmax="100" chance="50000" /><!-- gold coin -->
+		<item id="3035" countmax="50" chance="100000" /><!-- platinum coin -->
+		<item id="20264" chance="100000" /><!-- unrealized dream -->
+		<item id="8075" chance="5130" /><!-- spellbook of lost souls -->
+		<item id="8073" chance="35900" /><!-- spellbook of warding -->
+		<item id="8074" chance="10260" /><!-- spellbook of mind control -->
+		<item id="3344" chance="33330" /><!-- beastslayer axe -->
 		<item id="7456" chance="12820" /><!-- noble axe -->
 		<item id="7453" chance="2560" /><!-- executioner -->
 		<item id="7388" chance="2560" /><!-- vile axe -->
-		<item id="2466" chance="1220" /><!-- golden armor -->
-		<item id="2656" chance="1220" /><!-- blue robe -->
-		<item id="2487" chance="17950" /><!-- crown armor -->
-		<item id="2470" chance="250" /><!-- golden legs -->
-		<item id="2415" chance="90" /><!-- great axe -->
-		<item id="8926" chance="90" /><!-- demoonwing axe -->
-		<item id="7895" chance="1750" /><!-- lightning legs -->
-		<item id="2477" chance="1750" /><!-- knight legs -->
-		<item id="2488" chance="20510" /><!-- crown legs -->
-		<item id="2645" chance="15380" /><!-- steel boots -->
-		<item id="2145" countmax="25" chance="17950" /><!-- small diamond -->
-		<item id="2150" countmax="25" chance="5130" /><!-- small amethyst -->
-		<item id="2149" countmax="25" chance="10260" /><!-- small emerald -->
-		<item id="2146" countmax="25" chance="28210" /><!-- small sapphire -->
-		<item id="9970" countmax="25" chance="15380" /><!-- small topaz -->
-		<item id="2147" countmax="25" chance="20510" /><!-- small ruby -->
+		<item id="3360" chance="1220" /><!-- golden armor -->
+		<item id="3567" chance="1220" /><!-- blue robe -->
+		<item id="3381" chance="17950" /><!-- crown armor -->
+		<item id="3364" chance="250" /><!-- golden legs -->
+		<item id="3303" chance="90" /><!-- great axe -->
+		<item id="8098" chance="90" /><!-- demoonwing axe -->
+		<item id="822" chance="1750" /><!-- lightning legs -->
+		<item id="3371" chance="1750" /><!-- knight legs -->
+		<item id="3382" chance="20510" /><!-- crown legs -->
+		<item id="3554" chance="15380" /><!-- steel boots -->
+		<item id="3028" countmax="25" chance="17950" /><!-- small diamond -->
+		<item id="3033" countmax="25" chance="5130" /><!-- small amethyst -->
+		<item id="3032" countmax="25" chance="10260" /><!-- small emerald -->
+		<item id="3029" countmax="25" chance="28210" /><!-- small sapphire -->
+		<item id="9057" countmax="25" chance="15380" /><!-- small topaz -->
+		<item id="3030" countmax="25" chance="20510" /><!-- small ruby -->
 	</loot>
 </monster>

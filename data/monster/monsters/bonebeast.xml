@@ -59,9 +59,9 @@
 		<voice sentence="Knooorrrrr!" />
 	</voices>
 	<loot>
-		<item id="2230" chance="49750" /><!-- bone -->
+		<item id="3115" chance="49750" /><!-- bone -->
 		<item name="gold coin" countmax="90" chance="30000" />
-		<item id="2229" chance="20000" /><!-- skull -->
+		<item id="3114" chance="20000" /><!-- skull -->
 		<item name="bony tail" chance="9980" />
 		<item name="plate armor" chance="8000" />
 		<item name="bone club" chance="4950" />

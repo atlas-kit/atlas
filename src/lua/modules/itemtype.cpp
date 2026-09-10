@@ -1076,11 +1076,12 @@ void tfs::lua::registerItemType(LuaScriptInterface& lsi)
 	registerEnum(lsi, FLUID_WINE);
 	registerEnum(lsi, FLUID_MUD);
 	registerEnum(lsi, FLUID_FRUITJUICE);
-	registerEnum(lsi, FLUID_LAVA);
 	registerEnum(lsi, FLUID_RUM);
-	registerEnum(lsi, FLUID_SWAMP);
 	registerEnum(lsi, FLUID_TEA);
 	registerEnum(lsi, FLUID_MEAD);
+	registerEnum(lsi, FLUID_INK);
+	registerEnum(lsi, FLUID_CANDY);
+	registerEnum(lsi, FLUID_CHOCOLATE);
 
 	lsi.registerClass("ItemType", "", luaItemTypeCreate);
 	lsi.registerMetaMethod("ItemType", "__eq", tfs::lua::luaUserdataCompare);

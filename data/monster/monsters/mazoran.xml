@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mazoran" nameDescription="Mazoran" race="fire" experience="50000" speed="400">
 	<health now="290000" max="290000" />
-	<look type="842" head="97" body="80" legs="79" feet="0" addons="3" corpse="25151" />
+	<look type="842" head="97" body="80" legs="79" feet="0" addons="3" corpse="22495" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -58,35 +58,35 @@
 		<voice sentence="UNLEASH THE FIRE!" />
 	</voices>
 	<loot>
-		<item id="25172" chance="100000" /><!-- silver token -->
-		<item id="18419" countmax="5" chance="23000" /><!-- cyan crystal fragment -->
-		<item id="18420" countmax="5" chance="23000" /><!-- red crystal fragment -->
-		<item id="18421" countmax="5" chance="23000" /><!-- green crystal fragment -->
-		<item id="2143" countmax="8" chance="12000" /><!-- white pearl -->
-		<item id="2146" countmax="9" chance="12000" /><!-- small sapphire -->
-		<item id="2148" countmax="100" chance="49000" /><!-- gold coin -->
-		<item id="2148" countmax="100" chance="49000" /><!-- gold coin -->
-		<item id="2150" countmax="5" chance="10000" /><!-- small amethyst -->
-		<item id="2152" countmax="58" chance="8000" /><!-- platinum coin -->
-		<item id="2155" chance="1000" /><!-- green gem -->
-		<item id="2158" chance="1000" /><!-- blue gem -->
-		<item id="2167" chance="4000" /><!-- energy ring -->
-		<item id="2432" chance="3000" /><!-- fire axe -->
-		<item id="25416" chance="500" /><!-- impaler of igniter -->
-		<item id="2542" chance="500" /><!-- tempest shield -->
-		<item id="25522" chance="500" /><!-- rift bow -->
-		<item id="25523" chance="500" /><!-- rift crossbow -->
-		<item id="6500" chance="11000" /><!-- demonic essence -->
+		<item id="22516" chance="100000" /><!-- silver token -->
+		<item id="16125" countmax="5" chance="23000" /><!-- cyan crystal fragment -->
+		<item id="16126" countmax="5" chance="23000" /><!-- red crystal fragment -->
+		<item id="16127" countmax="5" chance="23000" /><!-- green crystal fragment -->
+		<item id="3026" countmax="8" chance="12000" /><!-- white pearl -->
+		<item id="3029" countmax="9" chance="12000" /><!-- small sapphire -->
+		<item id="3031" countmax="100" chance="49000" /><!-- gold coin -->
+		<item id="3031" countmax="100" chance="49000" /><!-- gold coin -->
+		<item id="3033" countmax="5" chance="10000" /><!-- small amethyst -->
+		<item id="3035" countmax="58" chance="8000" /><!-- platinum coin -->
+		<item id="3038" chance="1000" /><!-- green gem -->
+		<item id="3041" chance="1000" /><!-- blue gem -->
+		<item id="3051" chance="4000" /><!-- energy ring -->
+		<item id="3320" chance="3000" /><!-- fire axe -->
+		<item id="22760" chance="500" /><!-- impaler of igniter -->
+		<item id="3442" chance="500" /><!-- tempest shield -->
+		<item id="22866" chance="500" /><!-- rift bow -->
+		<item id="22867" chance="500" /><!-- rift crossbow -->
+		<item id="6499" chance="11000" /><!-- demonic essence -->
 		<item id="7382" chance="1000" /><!-- demonrange sword -->
-		<item id="7590" countmax="5" chance="23000" /><!-- great mana potion -->
-		<item id="7632" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
-		<item id="7633" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
-		<item id="7890" chance="1000" /><!-- magma amulet -->
-		<item id="7894" chance="1000" /><!-- magma legs-->
-		<item id="7899" chance="1000" /><!-- magma coat-->
-		<item id="8472" countmax="5" chance="46100" /><!-- great spirit potion -->
-		<item id="8473" countmax="5" chance="23000" /><!-- ultimate health potion -->
-		<item id="9970" countmax="8" chance="10000" /><!-- small topaz -->
-		<item id="9971" chance="3000" /><!-- gold ingot-->
+		<item id="238" countmax="5" chance="23000" /><!-- great mana potion -->
+		<item id="281" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
+		<item id="282" countmax="5" chance="14000" /><!-- giant shimmering pearl -->
+		<item id="817" chance="1000" /><!-- magma amulet -->
+		<item id="821" chance="1000" /><!-- magma legs-->
+		<item id="826" chance="1000" /><!-- magma coat-->
+		<item id="7642" countmax="5" chance="46100" /><!-- great spirit potion -->
+		<item id="7643" countmax="5" chance="23000" /><!-- ultimate health potion -->
+		<item id="9057" countmax="8" chance="10000" /><!-- small topaz -->
+		<item id="9058" chance="3000" /><!-- gold ingot-->
 	</loot>
 </monster>

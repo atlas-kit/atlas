@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Souleater" nameDescription="a souleater" race="undead" experience="1300" speed="200" raceId="675">
 	<health now="1100" max="1100" />
-	<look type="355" corpse="12631" />
+	<look type="355" corpse="11675" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -66,7 +66,7 @@
 		<item name="necrotic rod" chance="980" />
 		<item name="wand of cosmic energy" chance="910" />
 		<item name="spirit container" chance="140" />
-		<item id="6300" chance="300" /><!-- death ring -->
+		<item id="6299" chance="300" /><!-- death ring -->
 		<item name="great mana potion" chance="8000" />
 		<item name="ultimate health potion" chance="9400" />
 		<item name="souleater trophy" chance="20" />

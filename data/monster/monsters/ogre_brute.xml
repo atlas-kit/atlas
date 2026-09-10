@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ogre Brute" nameDescription="an ogre brute" race="blood" experience="800" speed="102" raceId="1161">
 	<health now="1000" max="1000" />
-	<look type="857" corpse="24799" />
+	<look type="857" corpse="22143" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -70,7 +70,7 @@
 		<item name="opal" countmax="2" chance="1560" />
 		<item name="ogre klubba" chance="1040" />
 		<item name="pot" chance="310" />
-		<item id="9821" chance="260" /><!-- rusty helmet -->
+		<item id="8907" chance="260" /><!-- rusty helmet -->
 		<item name="ancient stone" chance="1900" />
 		<item name="bonebreaker" chance="140" />
 		<item name="shamanic mask" chance="140" />

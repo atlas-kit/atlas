@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Glooth Anemone" nameDescription="a glooth anemone" race="venom" experience="1800" speed="180" raceId="1042">
 	<health now="2400" max="2400" />
-	<look type="604" corpse="23359" />
+	<look type="604" corpse="20988" />
 	<targetchange interval="2000" chance="3" />
 	<flags>
 		<flag summonable="0" />
@@ -54,24 +54,24 @@
 		<voice sentence="*shglib*" />
 	</voices>
 	<loot>
-		<item id="23515" chance="10190" /><!-- bowl of glooth soup -->
-		<item id="23568" chance="21020" /><!-- slimy leaf tentacle -->
-		<item id="2796" chance="3180" /><!-- green mushroom -->
-		<item id="23554" chance="320" /><!-- glooth amulet -->
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2148" countmax="70" chance="60000" /><!-- gold coin -->
-		<item id="7588" countmax="2" chance="6690" /><!-- strong health potion -->
-		<item id="7589" countmax="2" chance="6690" /><!-- strong mana potion -->
-		<item id="8473" chance="960" /><!-- ultimate health potion -->
-		<item id="2152" countmax="3" chance="57320" /><!-- platinum coin -->
-		<item id="9970" countmax="3" chance="9240" /><!-- small topaz -->
-		<item id="2149" countmax="3" chance="8600" /><!-- small emerald -->
-		<item id="2147" countmax="3" chance="11150" /><!-- small rubies -->
-		<item id="23534" chance="640" /><!-- glooth cape -->
-		<item id="23543" chance="5100" /><!-- glooth whip -->
-		<item id="23550" chance="320" /><!-- glooth blade -->
-		<item id="23549" chance="1270" /><!-- glooth club -->
-		<item id="23551" chance="640" /><!-- glooth axe -->
-		<item id="23529" chance="1270" /><!-- glooth spear -->
+		<item id="21144" chance="10190" /><!-- bowl of glooth soup -->
+		<item id="21197" chance="21020" /><!-- slimy leaf tentacle -->
+		<item id="3732" chance="3180" /><!-- green mushroom -->
+		<item id="21183" chance="320" /><!-- glooth amulet -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3031" countmax="70" chance="60000" /><!-- gold coin -->
+		<item id="236" countmax="2" chance="6690" /><!-- strong health potion -->
+		<item id="237" countmax="2" chance="6690" /><!-- strong mana potion -->
+		<item id="7643" chance="960" /><!-- ultimate health potion -->
+		<item id="3035" countmax="3" chance="57320" /><!-- platinum coin -->
+		<item id="9057" countmax="3" chance="9240" /><!-- small topaz -->
+		<item id="3032" countmax="3" chance="8600" /><!-- small emerald -->
+		<item id="3030" countmax="3" chance="11150" /><!-- small rubies -->
+		<item id="21163" chance="640" /><!-- glooth cape -->
+		<item id="21172" chance="5100" /><!-- glooth whip -->
+		<item id="21179" chance="320" /><!-- glooth blade -->
+		<item id="21178" chance="1270" /><!-- glooth club -->
+		<item id="21180" chance="640" /><!-- glooth axe -->
+		<item id="21158" chance="1270" /><!-- glooth spear -->
 	</loot>
 </monster>

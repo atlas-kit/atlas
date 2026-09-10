@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Rage of Mazoran" nameDescription="Rage of Mazoran" race="fire" experience="300" speed="330">
 	<health now="4500" max="4500" />
-	<look type="243" corpse="6324" />
+	<look type="243" corpse="6323" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

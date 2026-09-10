@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Sun-Marked Goanna" nameDescription="a sun-marked goanna" race="blood" experience="7600" speed="190">
 	<health now="7800" max="7800" />
-	<look type="1195" corpse="34061" />
+	<look type="1195" corpse="31405" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -45,12 +45,12 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" countmax="3" />
-		<item id="34084" name="goanna hide with sun symbol" chance="75000" />
-		<item id="18437" name="envenomed arrow" chance="50000" />
-		<item id="7850" name="earth arrow" chance="25000" countmax="14" />
-		<item id="34084" name="goanna hide with sun symbol" chance="25000" />
-		<item id="7903" name="terra hood" chance="25000" />
-		<item id="2181" name="terra rod" chance="25000" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="3" />
+		<item id="31428" name="goanna hide with sun symbol" chance="75000" />
+		<item id="16143" name="envenomed arrow" chance="50000" />
+		<item id="774" name="earth arrow" chance="25000" countmax="14" />
+		<item id="31428" name="goanna hide with sun symbol" chance="25000" />
+		<item id="830" name="terra hood" chance="25000" />
+		<item id="3065" name="terra rod" chance="25000" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Golden Servant Replica" nameDescription="a golden servant replica" race="energy" experience="450" speed="210" raceId="1327">
 	<health now="2000" max="2000" />
-	<look type="396" corpse="13484" />
+	<look type="396" corpse="12495" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -48,15 +48,15 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="85419" countmax="137" />
-		<item id="7620" name="mana potion" chance="5290" />
-		<item id="7618" name="health potion" chance="4559" />
-		<item id="2381" name="halberd" chance="2280" />
-		<item id="2796" name="green mushroom" chance="1634" />
-		<item id="9690" name="gear wheel" chance="989" />
-		<item id="8900" name="spellbook of enlightenment" chance="430" />
-		<item id="2165" name="stealth ring" chance="301" />
-		<item id="13758" name="slime mould" chance="258" />
-		<item id="13938" name="golden can of oil" chance="43" />
+		<item id="3031" name="gold coin" chance="85419" countmax="137" />
+		<item id="268" name="mana potion" chance="5290" />
+		<item id="266" name="health potion" chance="4559" />
+		<item id="3269" name="halberd" chance="2280" />
+		<item id="3732" name="green mushroom" chance="1634" />
+		<item id="8775" name="gear wheel" chance="989" />
+		<item id="8072" name="spellbook of enlightenment" chance="430" />
+		<item id="3049" name="stealth ring" chance="301" />
+		<item id="12601" name="slime mould" chance="258" />
+		<item id="12801" name="golden can of oil" chance="43" />
 	</loot>
 </monster>

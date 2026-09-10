@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Deepling Master Librarian" nameDescription="a deepling master librarian" race="blood" experience="1900" speed="190" raceId="860">
 	<health now="1700" max="1700" />
-	<look type="443" corpse="15211" />
+	<look type="443" corpse="13774" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -53,7 +53,7 @@
 		<item name="gold coin" countmax="100" chance="100000" />
 		<item name="platinum coin" countmax="3" chance="90000" />
 		<item name="life ring" chance="3200" />
-		<item id="2667" countmax="2" chance="9090" /><!-- fish -->
+		<item id="3578" countmax="2" chance="9090" /><!-- fish -->
 		<item name="fish fin" chance="1950" />
 		<item name="eye of a deepling" chance="9380" />
 		<item name="deepling staff" chance="3130" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Damned Soul" nameDescription="a damned soul" race="undead" experience="300" speed="380">
 	<health now="800" max="800" />
-	<look type="232" corpse="25354" />
+	<look type="232" corpse="22698" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

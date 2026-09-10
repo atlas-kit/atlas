@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Voidshard" nameDescription="a voidshard" race="energy" experience="0" speed="200">
 	<health now="3500" max="3500" />
-	<look type="878" corpse="26209" />
+	<look type="878" corpse="23553" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

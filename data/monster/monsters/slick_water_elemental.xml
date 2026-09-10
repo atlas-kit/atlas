@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Slick Water Elemental" nameDescription="a slick water elemental" race="undead" experience="450" speed="280">
 	<health now="550" max="550" />
-	<look type="286" corpse="8965" />
+	<look type="286" corpse="8137" />
 	<targetchange interval="20000" chance="15" />
 	<flags>
 		<flag summonable="0" />

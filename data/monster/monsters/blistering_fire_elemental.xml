@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Blistering Fire Elemental" nameDescription="a blistering fire elemental" race="fire" experience="1300" speed="230">
 	<health now="1500" max="1500" />
-	<look type="242" corpse="8964" />
+	<look type="242" corpse="8136" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -51,6 +51,6 @@
 		<item name="glimmering soil" chance="9500" />
 		<item name="small ruby" countmax="3" chance="5000" />
 		<item name="wand of draconia" chance="500" />
-		<item id="13757" chance="500" /><!-- coal -->
+		<item id="12600" chance="500" /><!-- coal -->
 	</loot>
 </monster>

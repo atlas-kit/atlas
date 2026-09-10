@@ -36,6 +36,6 @@
 	</immunities>
 	<defenses armor="10" defense="5" />
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="52" />
+		<item id="3031" name="gold coin" chance="100000" countmax="52" />
 	</loot>
 </monster>

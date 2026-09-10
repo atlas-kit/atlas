@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Dragon Lord Hatchling" nameDescription="a dragon lord hatchling" race="blood" experience="645" speed="190" raceId="386">
 	<health now="750" max="750" />
-	<look type="272" corpse="7622" />
+	<look type="272" corpse="270" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

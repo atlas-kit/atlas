@@ -13,7 +13,7 @@ end
 spell:group("attack")
 spell:id(17)
 spell:name("Fire Bomb Rune")
-spell:runeId(2305)
+spell:runeId(3192)
 spell:allowFarUse(true)
 spell:charges(2)
 spell:runeLevel(27)

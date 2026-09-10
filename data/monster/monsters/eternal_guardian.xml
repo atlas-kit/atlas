@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Eternal Guardian" nameDescription="an eternal guardian" race="undead" experience="1800" speed="204" raceId="615">
 	<health now="2500" max="2500" />
-	<look type="345" corpse="11300" />
+	<look type="345" corpse="10383" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -41,19 +41,19 @@
 		<voice sentence="&lt;crackle&gt;" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="99955" countmax="100" />
-		<item id="2152" name="platinum coin" chance="99708" countmax="4" />
-		<item id="1294" name="small stone" chance="30268" countmax="10" />
-		<item id="10549" name="ancient stone" chance="20024" />
-		<item id="11325" name="spiked iron ball" chance="10020" />
-		<item id="11323" name="zaoan halberd" chance="1991" />
+		<item id="3031" name="gold coin" chance="99955" countmax="100" />
+		<item id="3035" name="platinum coin" chance="99708" countmax="4" />
+		<item id="1781" name="small stone" chance="30268" countmax="10" />
+		<item id="9632" name="ancient stone" chance="20024" />
+		<item id="10408" name="spiked iron ball" chance="10020" />
+		<item id="10406" name="zaoan halberd" chance="1991" />
 		<item id="5880" name="iron ore" chance="1682" />
-		<item id="11227" name="shiny stone" chance="819" />
-		<item id="2528" name="tower shield" chance="807" />
-		<item id="11339" name="clay lump" chance="729" />
-		<item id="2427" name="guardian halberd" chance="566" />
-		<item id="11343" name="piece of marble rock" chance="499" />
-		<item id="13757" name="coal" chance="443" />
-		<item id="11307" name="zaoan sword" chance="107" />
+		<item id="10310" name="shiny stone" chance="819" />
+		<item id="3428" name="tower shield" chance="807" />
+		<item id="10422" name="clay lump" chance="729" />
+		<item id="3315" name="guardian halberd" chance="566" />
+		<item id="10426" name="piece of marble rock" chance="499" />
+		<item id="12600" name="coal" chance="443" />
+		<item id="10390" name="zaoan sword" chance="107" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Undead Dragon" nameDescription="an undead dragon" race="undead" experience="7200" speed="330" raceId="282">
 	<health now="8350" max="8350" />
-	<look type="231" corpse="6306" />
+	<look type="231" corpse="6305" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -69,30 +69,30 @@
 		<voice sentence="I SENSE LIFE" yell="1" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="200" />
-		<item id="2152" name="platinum coin" chance="49699" countmax="5" />
-		<item id="11233" name="unholy bone" chance="33778" />
-		<item id="2146" name="small sapphire" chance="27571" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="200" />
+		<item id="3035" name="platinum coin" chance="49699" countmax="5" />
+		<item id="10316" name="unholy bone" chance="33778" />
+		<item id="3029" name="small sapphire" chance="27571" countmax="2" />
 		<item id="7368" name="assassin star" chance="25090" countmax="5" />
-		<item id="7590" name="great mana potion" chance="24723" countmax="3" />
-		<item id="7591" name="great health potion" chance="24647" countmax="3" />
-		<item id="2144" name="black pearl" chance="22363" countmax="2" />
-		<item id="6500" name="demonic essence" chance="15402" />
+		<item id="238" name="great mana potion" chance="24723" countmax="3" />
+		<item id="239" name="great health potion" chance="24647" countmax="3" />
+		<item id="3027" name="black pearl" chance="22363" countmax="2" />
+		<item id="6499" name="demonic essence" chance="15402" />
 		<item id="5925" name="hardened bone" chance="15320" />
-		<item id="2547" name="power bolt" chance="14573" countmax="15" />
-		<item id="2033" name="golden mug" chance="5126" />
-		<item id="2476" name="knight armor" chance="4904" />
+		<item id="3450" name="power bolt" chance="14573" countmax="15" />
+		<item id="2903" name="golden mug" chance="5126" />
+		<item id="3370" name="knight armor" chance="4904" />
 		<item id="7430" name="dragonbone staff" chance="4138" />
-		<item id="6300" name="death ring" chance="1822" />
-		<item id="2177" name="life crystal" chance="1588" />
-		<item id="2454" name="war axe" chance="1329" />
-		<item id="2498" name="royal helmet" chance="1120" />
-		<item id="2158" name="blue gem" chance="1095" />
-		<item id="9971" name="gold ingot" chance="1031" />
+		<item id="6299" name="death ring" chance="1822" />
+		<item id="3061" name="life crystal" chance="1588" />
+		<item id="3342" name="war axe" chance="1329" />
+		<item id="3392" name="royal helmet" chance="1120" />
+		<item id="3041" name="blue gem" chance="1095" />
+		<item id="9058" name="gold ingot" chance="1031" />
 		<item id="7402" name="dragon slayer" chance="993" />
-		<item id="11355" name="spellweaver's robe" chance="924" />
-		<item id="2466" name="golden armor" chance="658" />
-		<item id="8885" name="divine plate" chance="437" />
-		<item id="8889" name="skullcracker armor" chance="304" />
+		<item id="10438" name="spellweaver's robe" chance="924" />
+		<item id="3360" name="golden armor" chance="658" />
+		<item id="8057" name="divine plate" chance="437" />
+		<item id="8061" name="skullcracker armor" chance="304" />
 	</loot>
 </monster>

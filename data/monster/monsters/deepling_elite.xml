@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Deepling Elite" nameDescription="a deepling elite" race="blood" experience="3000" speed="210" raceId="862">
 	<health now="3200" max="3200" />
-	<look type="441" corpse="15176" />
+	<look type="441" corpse="13713" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mutated Rat" nameDescription="a mutated rat" race="blood" experience="450" speed="230" raceId="502">
 	<health now="550" max="550" />
-	<look type="305" corpse="9871" />
+	<look type="305" corpse="8957" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -61,17 +61,17 @@
 		<voice sentence="Fcccccchhhhhh" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="78725" countmax="130" />
-		<item id="2229" name="skull (item)" chance="20298" />
-		<item id="2799" name="stone herb" chance="4874" />
-		<item id="10585" name="mutated rat tail" chance="3852" />
-		<item id="2510" name="plate shield" chance="3777" />
-		<item id="2381" name="halberd" chance="2957" />
-		<item id="2796" name="green mushroom" chance="1370" />
-		<item id="2235" name="mouldy cheese" chance="950" />
-		<item id="2165" name="stealth ring" chance="562" />
-		<item id="7618" name="health potion" chance="507" />
-		<item id="8900" name="spellbook of enlightenment" chance="297" />
-		<item id="2528" name="tower shield" chance="50" />
+		<item id="3031" name="gold coin" chance="78725" countmax="130" />
+		<item id="3114" name="skull (item)" chance="20298" />
+		<item id="3735" name="stone herb" chance="4874" />
+		<item id="9668" name="mutated rat tail" chance="3852" />
+		<item id="3410" name="plate shield" chance="3777" />
+		<item id="3269" name="halberd" chance="2957" />
+		<item id="3732" name="green mushroom" chance="1370" />
+		<item id="3120" name="mouldy cheese" chance="950" />
+		<item id="3049" name="stealth ring" chance="562" />
+		<item id="266" name="health potion" chance="507" />
+		<item id="8072" name="spellbook of enlightenment" chance="297" />
+		<item id="3428" name="tower shield" chance="50" />
 	</loot>
 </monster>

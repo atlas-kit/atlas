@@ -26,7 +26,7 @@ burstarrow.onUseWeapon = function(player, variant)
 	return combat:execute(player, variant)
 end
 
-burstarrow:id(2546)
+burstarrow:id(3449)
 burstarrow:attack(27)
 burstarrow:shootType(CONST_ANI_BURSTARROW)
 burstarrow:ammoType("arrow")
@@ -39,7 +39,7 @@ burstarrow:register()
 
 ]]
 local wov = Weapon(WEAPON_WAND)
-wov:id(2190)
+wov:id(3074)
 wov:damage(8, 18)
 wov:element("energy")
 wov:level(7)
@@ -70,7 +70,7 @@ arbalest:register()
 
 ]]
 local eba = Weapon(WEAPON_AXE)
-eba:id(7859)
+eba:id(784)
 eba:attack(23)
 eba:defense(18, 1)
 eba:extraElement(5, COMBAT_EARTHDAMAGE)

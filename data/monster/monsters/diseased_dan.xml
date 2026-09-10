@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Diseased Dan" nameDescription="a diseased Dan" race="venom" experience="300" speed="250">
 	<health now="800" max="800" />
-	<look type="299" corpse="8951" />
+	<look type="299" corpse="8123" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

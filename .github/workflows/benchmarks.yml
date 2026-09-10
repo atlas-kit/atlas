@@ -96,9 +96,13 @@ jobs:
           tool: 'googlecpp'
           output-file-path: ${{ env.BENCH_OUTPUT_DIR }}/combined.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-push: true
+          # The GITHUB_TOKEN of pull_request runs (notably from forks) is
+          # read-only: pushing to gh-pages or commenting fails with 403.
+          # Only publish results when running on push to dev.
+          auto-push: ${{ github.event_name == 'push' }}
+          save-data-file: ${{ github.event_name == 'push' }}
           alert-threshold: '200%'
-          comment-on-alert: true
+          comment-on-alert: ${{ github.event_name == 'push' }}
           fail-on-alert: false
 
       - name: Upload benchmark results as artifact

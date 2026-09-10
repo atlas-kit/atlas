@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Source Of Corruption" nameDescription="The Source Of Corruption" race="undead" experience="0" speed="120">
 	<health now="500000" max="500000" />
-	<look type="979" corpse="26223" />
+	<look type="979" corpse="23567" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -25,20 +25,20 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="10549" name="ancient stone" chance="100000" />
-		<item id="26163" name="crystallized anger" chance="100000" />
-		<item id="7632" name="giant shimmering pearl" chance="100000" />
-		<item id="2148" name="gold coin" chance="100000" countmax="200" />
-		<item id="25377" name="gold token" chance="100000" />
+		<item id="9632" name="ancient stone" chance="100000" />
+		<item id="23507" name="crystallized anger" chance="100000" />
+		<item id="281" name="giant shimmering pearl" chance="100000" />
+		<item id="3031" name="gold coin" chance="100000" countmax="200" />
+		<item id="22721" name="gold token" chance="100000" />
 		<item id="5904" name="magic sulphur" chance="100000" />
 		<item id="7418" name="nightmare blade" chance="100000" />
-		<item id="24849" name="onyx chip" chance="100000" />
+		<item id="22193" name="onyx chip" chance="100000" />
 		<item id="5888" name="piece of hell steel" chance="100000" countmax="5" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="30" />
-		<item id="25172" name="silver token" chance="100000" countmax="2" />
-		<item id="2146" name="small sapphire" chance="100000" countmax="20" />
-		<item id="26173" name="solid rage" chance="100000" />
-		<item id="8473" name="ultimate health potion" chance="100000" countmax="10" />
-		<item id="2154" name="yellow gem" chance="100000" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="30" />
+		<item id="22516" name="silver token" chance="100000" countmax="2" />
+		<item id="3029" name="small sapphire" chance="100000" countmax="20" />
+		<item id="23517" name="solid rage" chance="100000" />
+		<item id="7643" name="ultimate health potion" chance="100000" countmax="10" />
+		<item id="3037" name="yellow gem" chance="100000" />
 	</loot>
 </monster>

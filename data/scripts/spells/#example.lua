@@ -1,7 +1,7 @@
 local conjureRune = Spell(SPELL_INSTANT)
 
 function conjureRune.onCastSpell(creature, variant)
-	return creature:conjureItem(2260, 2275, 25)
+	return creature:conjureItem(2260, 3162, 25)
 end
 
 conjureRune:name("Test")

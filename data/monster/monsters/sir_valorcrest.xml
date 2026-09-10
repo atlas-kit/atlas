@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Sir Valorcrest" nameDescription="Sir Valorcrest" race="undead" experience="1800" speed="270">
 	<health now="1600" max="1600" />
-	<look type="287" corpse="8937" />
+	<look type="287" corpse="8109" />
 	<targetchange interval="5000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -53,7 +53,7 @@
 		<item name="platinum coin" chance="50000" countmax="5" />
 		<item name="sword ring" chance="1400" />
 		<item name="ring of healing" chance="17111" />
-		<item id="2229" chance="15000" /><!-- skull -->
+		<item id="3114" chance="15000" /><!-- skull -->
 		<item name="vampire shield" chance="6300" />
 		<item name="chaos mace" chance="250" />
 		<item name="strong health potion" chance="1500" />

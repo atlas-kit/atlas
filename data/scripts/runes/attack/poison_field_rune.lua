@@ -12,7 +12,7 @@ end
 spell:group("attack")
 spell:id(26)
 spell:name("Poison Field Rune")
-spell:runeId(2285)
+spell:runeId(3172)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(14)

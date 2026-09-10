@@ -55,14 +55,14 @@
 	<loot>
 		<item name="gold coin" countmax="100" chance="50000" />
 		<item name="gold coin" countmax="87" chance="50000" />
-		<item id="2162" chance="10300" /><!-- magic lightwand -->
+		<item id="3046" chance="10300" /><!-- magic lightwand -->
 		<item name="scarab coin" countmax="2" chance="8100" />
 		<item name="scarab pincers" chance="7140" />
 		<item name="small emerald" countmax="3" chance="6000" />
 		<item name="small amethyst" countmax="4" chance="6000" />
 		<item name="plate armor" chance="5000" />
 		<item name="scarab amulet" chance="3510" />
-		<item id="2142" chance="2670" /><!-- ancient amulet -->
+		<item id="3025" chance="2670" /><!-- ancient amulet -->
 		<item name="strong health potion" chance="1660" />
 		<item name="springsprout rod" chance="1000" />
 		<item name="scarab shield" chance="500" />

@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(21)
 spell:name("Sudden Death Rune")
-spell:runeId(2268)
+spell:runeId(3155)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(45)

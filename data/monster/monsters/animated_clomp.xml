@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Animated Clomp" nameDescription="an animated clomp" race="blood" experience="475" speed="430">
 	<health now="900" max="900" />
-	<look type="860" corpse="25398" />
+	<look type="860" corpse="22742" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -23,8 +23,8 @@
 	</attacks>
 	<defenses armor="30" defense="30" />
 	<loot>
-		<item id="24842" name="raw meat" chance="21875" />
-		<item id="11224" name="thick fur" chance="6250" />
+		<item id="22186" name="raw meat" chance="21875" />
+		<item id="10307" name="thick fur" chance="6250" />
 		<item id="5925" name="hardened bone" chance="3125" />
 	</loot>
 </monster>

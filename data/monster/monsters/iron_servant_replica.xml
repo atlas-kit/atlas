@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Iron Servant Replica" nameDescription="an iron servant replica" race="energy" experience="210" speed="190" raceId="1325">
 	<health now="1000" max="1000" />
-	<look type="395" corpse="13483" />
+	<look type="395" corpse="12494" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -46,11 +46,11 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="82462" countmax="55" />
-		<item id="9690" name="gear wheel" chance="5374" />
-		<item id="7618" name="health potion" chance="2320" />
-		<item id="2381" name="halberd" chance="953" />
-		<item id="9808" name="heavily rusted armor" chance="489" />
-		<item id="13758" name="slime mould" chance="269" />
+		<item id="3031" name="gold coin" chance="82462" countmax="55" />
+		<item id="8775" name="gear wheel" chance="5374" />
+		<item id="266" name="health potion" chance="2320" />
+		<item id="3269" name="halberd" chance="953" />
+		<item id="8894" name="heavily rusted armor" chance="489" />
+		<item id="12601" name="slime mould" chance="269" />
 	</loot>
 </monster>

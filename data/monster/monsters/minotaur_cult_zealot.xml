@@ -35,24 +35,24 @@
 		<element deathPercent="-10" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="150" />
-		<item id="2152" name="platinum coin" chance="39292" countmax="3" />
-		<item id="12429" name="purple robe" chance="16608" />
-		<item id="2182" name="snakebite rod" chance="12128" />
-		<item id="7589" name="strong mana potion" chance="11776" countmax="3" />
-		<item id="10556" name="cultish robe" chance="9782" />
+		<item id="3031" name="gold coin" chance="100000" countmax="150" />
+		<item id="3035" name="platinum coin" chance="39292" countmax="3" />
+		<item id="11473" name="purple robe" chance="16608" />
+		<item id="3066" name="snakebite rod" chance="12128" />
+		<item id="237" name="strong mana potion" chance="11776" countmax="3" />
+		<item id="9639" name="cultish robe" chance="9782" />
 		<item id="7425" name="taurus mace" chance="6474" />
 		<item id="5878" name="minotaur leather" chance="5114" />
-		<item id="2150" name="small amethyst" chance="2979" countmax="2" />
-		<item id="2149" name="small emerald" chance="2815" countmax="2" />
-		<item id="12428" name="minotaur horn" chance="2745" countmax="2" />
-		<item id="2146" name="small sapphire" chance="2651" countmax="2" />
-		<item id="2145" name="small diamond" chance="2322" countmax="2" />
-		<item id="9970" name="small topaz" chance="2275" countmax="2" />
+		<item id="3033" name="small amethyst" chance="2979" countmax="2" />
+		<item id="3032" name="small emerald" chance="2815" countmax="2" />
+		<item id="11472" name="minotaur horn" chance="2745" countmax="2" />
+		<item id="3029" name="small sapphire" chance="2651" countmax="2" />
+		<item id="3028" name="small diamond" chance="2322" countmax="2" />
+		<item id="9057" name="small topaz" chance="2275" countmax="2" />
 		<item id="5911" name="red piece of cloth" chance="2064" />
-		<item id="2147" name="small ruby" chance="2064" countmax="2" />
-		<item id="2156" name="red gem" chance="516" />
-		<item id="2154" name="yellow gem" chance="446" />
+		<item id="3030" name="small ruby" chance="2064" countmax="2" />
+		<item id="3039" name="red gem" chance="516" />
+		<item id="3037" name="yellow gem" chance="446" />
 		<item id="7401" name="minotaur trophy" chance="94" />
 	</loot>
 </monster>

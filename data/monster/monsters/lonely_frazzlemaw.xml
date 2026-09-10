@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lonely Frazzlemaw" nameDescription="a lonely frazzlemaw" race="blood" experience="0" speed="400">
 	<health now="4100" max="4100" />
-	<look type="594" corpse="22567" />
+	<look type="594" corpse="20233" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Rift Phantom" nameDescription="a rift phantom" race="undead" experience="0" speed="160">
 	<health now="100" max="100" />
-	<look type="48" corpse="10015" />
+	<look type="48" corpse="9102" />
 	<targetchange interval="2000" chance="8" />
 	<flags>
 		<flag summonable="0" />

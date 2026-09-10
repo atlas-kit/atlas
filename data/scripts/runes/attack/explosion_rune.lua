@@ -22,7 +22,7 @@ end
 spell:group("attack")
 spell:id(18)
 spell:name("Explosion Rune")
-spell:runeId(2313)
+spell:runeId(3200)
 spell:allowFarUse(true)
 spell:charges(6)
 spell:runeLevel(31)

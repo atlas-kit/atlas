@@ -35,9 +35,9 @@
 		<voice sentence="Trooooot!" />
 	</voices>
 	<loot>
-		<item id="2666" name="meat" chance="40494" />
-		<item id="2671" name="ham" chance="29278" />
-		<item id="3956" name="tusk" chance="1089" countmax="2" />
-		<item id="3973" name="tusk shield" chance="151" />
+		<item id="3577" name="meat" chance="40494" />
+		<item id="3582" name="ham" chance="29278" />
+		<item id="3044" name="tusk" chance="1089" countmax="2" />
+		<item id="3443" name="tusk shield" chance="151" />
 	</loot>
 </monster>

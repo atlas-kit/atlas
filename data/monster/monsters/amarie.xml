@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Amarie" nameDescription="Amarie" race="blood" experience="42" speed="190">
 	<health now="100" max="100" />
-	<look type="159" head="70" body="16" legs="9" feet="116" corpse="20593" />
+	<look type="159" head="70" body="16" legs="9" feet="116" corpse="18312" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />

@@ -820,7 +820,7 @@ public:
 	bool hasProperty(ITEMPROPERTY prop) const;
 	bool isBlocking() const { return items[id].blockSolid; }
 	bool isStackable() const { return items[id].stackable; }
-	bool isAlwaysOnTop() const { return items[id].alwaysOnTop; }
+	bool isAlwaysOnTop() const { return items[id].alwaysOnTopOrder != 0; }
 	bool isGroundTile() const { return items[id].isGroundTile(); }
 	bool isMagicField() const { return items[id].isMagicField(); }
 	bool isMoveable() const { return items[id].moveable; }

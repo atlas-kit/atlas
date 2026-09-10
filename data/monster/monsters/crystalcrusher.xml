@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Crystalcrusher" nameDescription="a crystalcrusher" race="venom" experience="500" speed="230" raceId="869">
 	<health now="570" max="570" />
-	<look type="511" corpse="18487" />
+	<look type="511" corpse="16197" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

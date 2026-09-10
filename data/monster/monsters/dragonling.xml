@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Dragonling" nameDescription="a dragonling" race="blood" experience="2200" speed="330" raceId="894">
 	<health now="2600" max="2600" />
-	<look type="505" corpse="18438" />
+	<look type="505" corpse="16144" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

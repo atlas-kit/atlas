@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Zamulosh" nameDescription="Zamulosh" race="undead" experience="50000" speed="320">
 	<health now="300000" max="300000" />
-	<look type="862" head="16" body="12" legs="73" feet="55" corpse="25151" />
+	<look type="862" head="16" body="12" legs="73" feet="55" corpse="22495" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -44,22 +44,22 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="18418" name="blue crystal splinter" chance="100000" countmax="10" />
-		<item id="2148" name="gold coin" chance="100000" countmax="179" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="28" />
-		<item id="25172" name="silver token" chance="100000" />
-		<item id="2165" name="stealth ring" chance="100000" />
-		<item id="2169" name="time ring" chance="100000" />
-		<item id="8473" name="ultimate health potion" chance="100000" countmax="8" />
-		<item id="18417" name="brown crystal splinter" chance="66667" countmax="5" />
-		<item id="6500" name="demonic essence" chance="66667" />
+		<item id="16124" name="blue crystal splinter" chance="100000" countmax="10" />
+		<item id="3031" name="gold coin" chance="100000" countmax="179" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="28" />
+		<item id="22516" name="silver token" chance="100000" />
+		<item id="3049" name="stealth ring" chance="100000" />
+		<item id="3053" name="time ring" chance="100000" />
+		<item id="7643" name="ultimate health potion" chance="100000" countmax="8" />
+		<item id="16123" name="brown crystal splinter" chance="66667" countmax="5" />
+		<item id="6499" name="demonic essence" chance="66667" />
 		<item id="6558" name="flask of demonic blood" chance="66667" countmax="6" />
-		<item id="8472" name="great spirit potion" chance="66667" countmax="7" />
-		<item id="18416" name="green crystal splinter" chance="66667" countmax="11" />
-		<item id="2158" name="blue gem" chance="33333" />
-		<item id="25411" name="book of lies" chance="33333" />
-		<item id="7632" name="giant shimmering pearl" chance="33333" />
-		<item id="2150" name="small amethyst" chance="33333" countmax="9" />
-		<item id="2146" name="small sapphire" chance="33333" countmax="3" />
+		<item id="7642" name="great spirit potion" chance="66667" countmax="7" />
+		<item id="16122" name="green crystal splinter" chance="66667" countmax="11" />
+		<item id="3041" name="blue gem" chance="33333" />
+		<item id="22755" name="book of lies" chance="33333" />
+		<item id="281" name="giant shimmering pearl" chance="33333" />
+		<item id="3033" name="small amethyst" chance="33333" countmax="9" />
+		<item id="3029" name="small sapphire" chance="33333" countmax="3" />
 	</loot>
 </monster>

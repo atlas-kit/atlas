@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Undead Cavebear" nameDescription="Undead Cavebear" race="blood" experience="600" speed="250" raceId="696">
 	<health now="450" max="450" />
-	<look type="384" corpse="13323" />
+	<look type="384" corpse="12336" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

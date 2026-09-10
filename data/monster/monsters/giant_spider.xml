@@ -57,7 +57,7 @@
 		<item name="strong health potion" chance="3571" />
 		<item name="spider silk" chance="2000" />
 		<item name="knight legs" chance="870" />
-		<item id="2169" chance="710" /><!-- time ring -->
+		<item id="3053" chance="710" /><!-- time ring -->
 		<item name="knight armor" chance="500" />
 		<item name="platinum amulet" chance="280" />
 		<item name="lightning headband" chance="270" />

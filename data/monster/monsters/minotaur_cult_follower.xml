@@ -39,29 +39,29 @@
 		<voice sentence="We will rule!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="155" />
-		<item id="2152" name="platinum coin" chance="65104" countmax="3" />
-		<item id="2671" name="ham" chance="59356" />
-		<item id="23575" name="cowbell" chance="22228" />
-		<item id="2510" name="plate shield" chance="20071" />
-		<item id="10556" name="cultish robe" chance="15197" />
-		<item id="2172" name="bronze amulet" chance="15039" />
-		<item id="12428" name="minotaur horn" chance="14202" countmax="2" />
-		<item id="23546" name="mino shield" chance="12370" />
+		<item id="3031" name="gold coin" chance="100000" countmax="155" />
+		<item id="3035" name="platinum coin" chance="65104" countmax="3" />
+		<item id="3582" name="ham" chance="59356" />
+		<item id="21204" name="cowbell" chance="22228" />
+		<item id="3410" name="plate shield" chance="20071" />
+		<item id="9639" name="cultish robe" chance="15197" />
+		<item id="3056" name="bronze amulet" chance="15039" />
+		<item id="11472" name="minotaur horn" chance="14202" countmax="2" />
+		<item id="21175" name="mino shield" chance="12370" />
 		<item id="5878" name="minotaur leather" chance="11784" />
-		<item id="7591" name="great health potion" chance="11775" />
-		<item id="2666" name="meat" chance="7701" />
-		<item id="2214" name="ring of healing" chance="3274" />
-		<item id="2149" name="small emerald" chance="3153" countmax="2" />
-		<item id="2147" name="small ruby" chance="3125" countmax="2" />
-		<item id="2150" name="small amethyst" chance="2958" countmax="2" />
-		<item id="9970" name="small topaz" chance="2734" countmax="2" />
-		<item id="23545" name="mino lance" chance="1897" />
-		<item id="9971" name="gold ingot" chance="977" />
+		<item id="239" name="great health potion" chance="11775" />
+		<item id="3577" name="meat" chance="7701" />
+		<item id="3098" name="ring of healing" chance="3274" />
+		<item id="3032" name="small emerald" chance="3153" countmax="2" />
+		<item id="3030" name="small ruby" chance="3125" countmax="2" />
+		<item id="3033" name="small amethyst" chance="2958" countmax="2" />
+		<item id="9057" name="small topaz" chance="2734" countmax="2" />
+		<item id="21174" name="mino lance" chance="1897" />
+		<item id="9058" name="gold ingot" chance="977" />
 		<item id="5911" name="red piece of cloth" chance="902" />
-		<item id="2475" name="warrior helmet" chance="530" />
-		<item id="2154" name="yellow gem" chance="223" />
+		<item id="3369" name="warrior helmet" chance="530" />
+		<item id="3037" name="yellow gem" chance="223" />
 		<item id="7401" name="minotaur trophy" chance="205" />
-		<item id="2156" name="red gem" chance="149" />
+		<item id="3039" name="red gem" chance="149" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Vile Grandmaster" nameDescription="a vile grandmaster" race="blood" experience="1500" speed="210" raceId="1147">
 	<health now="1700" max="1700" />
-	<look type="268" head="59" body="19" legs="95" feet="94" addons="1" corpse="20418" />
+	<look type="268" head="59" body="19" legs="95" feet="94" addons="1" corpse="18137" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -49,21 +49,21 @@
 		<voice sentence="Your gods won't help you!" />
 	</voices>
 	<loot>
-		<item id="12406" chance="724" /><!-- small notebook -->
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2148" countmax="55" chance="60000" /><!-- gold coin -->
-		<item id="2152" countmax="2" chance="73188" /><!-- platinum coin -->
-		<item id="2121" chance="7246" /><!-- wedding ring -->
-		<item id="12466" chance="8695" /><!-- scroll of heroic deeds -->
-		<item id="2666" chance="7971" /><!-- meat -->
-		<item id="2147" chance="2173" /><!-- small ruby -->
-		<item id="2146" chance="2173" /><!-- small sapphire -->
-		<item id="2391" chance="1449" /><!-- war hammer -->
+		<item id="11450" chance="724" /><!-- small notebook -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3031" countmax="55" chance="60000" /><!-- gold coin -->
+		<item id="3035" countmax="2" chance="73188" /><!-- platinum coin -->
+		<item id="3004" chance="7246" /><!-- wedding ring -->
+		<item id="11510" chance="8695" /><!-- scroll of heroic deeds -->
+		<item id="3577" chance="7971" /><!-- meat -->
+		<item id="3030" chance="2173" /><!-- small ruby -->
+		<item id="3029" chance="2173" /><!-- small sapphire -->
+		<item id="3279" chance="1449" /><!-- war hammer -->
 		<item id="5911" chance="2898" /><!-- red piece of cloth -->
-		<item id="2487" chance="1449" /><!-- crown armor -->
-		<item id="2491" chance="1449" /><!-- crown helmet -->
-		<item id="2392" chance="2173" /><!-- fire sword -->
-		<item id="7591" chance="9420" /><!-- great health potion -->
-		<item id="2488" chance="724" /><!-- crown legs -->
+		<item id="3381" chance="1449" /><!-- crown armor -->
+		<item id="3385" chance="1449" /><!-- crown helmet -->
+		<item id="3280" chance="2173" /><!-- fire sword -->
+		<item id="239" chance="9420" /><!-- great health potion -->
+		<item id="3382" chance="724" /><!-- crown legs -->
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mozradek" nameDescription="Mozradek" race="fire" experience="21000" speed="210">
 	<health now="28000" max="28000" />
-	<look type="240" corpse="13973" />
+	<look type="240" corpse="12838" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -41,10 +41,10 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2156" name="red gem" chance="85294" />
-		<item id="33980" name="golden mask" chance="8824" />
-		<item id="33979" name="sea horse figurine" chance="2941" />
-		<item id="33058" name="enchanted theurgic amulet" chance="1471" />
-		<item id="34273" name="winged boots" chance="1471" />
+		<item id="3039" name="red gem" chance="85294" />
+		<item id="31324" name="golden mask" chance="8824" />
+		<item id="31323" name="sea horse figurine" chance="2941" />
+		<item id="30402" name="enchanted theurgic amulet" chance="1471" />
+		<item id="31617" name="winged boots" chance="1471" />
 	</loot>
 </monster>

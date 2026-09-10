@@ -38,8 +38,8 @@
 		<voice sentence="Yoooohhuuuu!" yell="1" />
 	</voices>
 	<loot>
-		<item id="2671" name="ham" chance="39170" />
-		<item id="11235" name="warwolf fur" chance="4951" />
+		<item id="3582" name="ham" chance="39170" />
+		<item id="10318" name="warwolf fur" chance="4951" />
 		<item id="5897" name="wolf paw" chance="993" />
 		<item id="7394" name="wolf trophy" chance="48" />
 	</loot>

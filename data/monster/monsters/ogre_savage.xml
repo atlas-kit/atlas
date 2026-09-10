@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ogre Savage" nameDescription="an ogre savage" race="blood" experience="625" speed="105" raceId="1162">
 	<health now="800" max="800" />
-	<look type="858" corpse="24803" />
+	<look type="858" corpse="22147" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Cult Believer" nameDescription="a cult believer" race="blood" experience="850" speed="260" raceId="1512">
 	<health now="975" max="975" />
-	<look type="132" head="98" body="96" legs="39" feet="38" addons="1" corpse="24673" />
+	<look type="132" head="98" body="96" legs="39" feet="38" addons="1" corpse="22017" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -36,15 +36,15 @@
 		<voice sentence="Death to the unbelievers!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="70" />
-		<item id="2666" name="meat" chance="12877" />
-		<item id="7591" name="great health potion" chance="6066" />
-		<item id="10556" name="cultish robe" chance="4432" />
-		<item id="2145" name="small diamond" chance="2547" />
-		<item id="2150" name="small amethyst" chance="2455" />
-		<item id="2149" name="small emerald" chance="2388" />
-		<item id="2661" name="scarf" chance="1022" />
-		<item id="2164" name="might ring" chance="168" />
-		<item id="2114" name="piggy bank" chance="84" />
+		<item id="3031" name="gold coin" chance="100000" countmax="70" />
+		<item id="3577" name="meat" chance="12877" />
+		<item id="239" name="great health potion" chance="6066" />
+		<item id="9639" name="cultish robe" chance="4432" />
+		<item id="3028" name="small diamond" chance="2547" />
+		<item id="3033" name="small amethyst" chance="2455" />
+		<item id="3032" name="small emerald" chance="2388" />
+		<item id="3572" name="scarf" chance="1022" />
+		<item id="3048" name="might ring" chance="168" />
+		<item id="2995" name="piggy bank" chance="84" />
 	</loot>
 </monster>

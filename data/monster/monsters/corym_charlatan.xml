@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Corym Charlatan" nameDescription="a corym charlatan" race="blood" experience="150" speed="180" manacost="490" raceId="916">
 	<health now="250" max="250" />
-	<look type="532" head="0" body="78" legs="59" feet="0" corpse="19725" />
+	<look type="532" head="0" body="78" legs="59" feet="0" corpse="17445" />
 	<targetchange interval="5000" chance="0" />
 	<flags>
 		<flag summonable="1" />
@@ -36,7 +36,7 @@
 	</voices>
 	<loot>
 		<item name="gold coin" countmax="35" chance="50000" />
-		<item id="2696" chance="10000" /><!-- cheese -->
+		<item id="3607" chance="10000" /><!-- cheese -->
 		<item name="bola" chance="7692" />
 		<item name="spike shield" chance="492" />
 		<item name="ratana" chance="909" />

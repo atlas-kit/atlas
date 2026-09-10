@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Askarak Lord" nameDescription="an askarak lord" race="venom" experience="1200" speed="230" raceId="728">
 	<health now="2100" max="2100" />
-	<look type="410" corpse="13956" />
+	<look type="410" corpse="12821" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

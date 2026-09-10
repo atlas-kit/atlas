@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Gaz'haragoth" nameDescription="Gaz'haragoth" race="fire" experience="1000000" speed="400">
 	<health now="350000" max="350000" />
-	<look type="591" corpse="22562" />
+	<look type="591" corpse="20228" />
 	<targetchange interval="10000" chance="20" />
 	<flags>
 		<flag attackable="1" />
@@ -62,48 +62,48 @@
 		<voice sentence="How dare you come to this place!" />
 	</voices>
 	<loot>
-		<item id="22396" name="cluster of solace" chance="100000" countmax="13" />
-		<item id="2160" name="crystal coin" chance="100000" countmax="10" />
-		<item id="22397" name="dream matter" chance="100000" />
-		<item id="11258" name="phoenix charm" chance="100000" />
-		<item id="11262" name="solitude charm" chance="100000" />
-		<item id="11260" name="spiritual charm" chance="100000" />
-		<item id="11261" name="twin sun charm" chance="100000" />
-		<item id="11259" name="unity charm" chance="100000" />
-		<item id="6500" name="demonic essence" chance="92857" />
-		<item id="22598" name="unrealized dream" chance="92857" countmax="3" />
+		<item id="20062" name="cluster of solace" chance="100000" countmax="13" />
+		<item id="3043" name="crystal coin" chance="100000" countmax="10" />
+		<item id="20063" name="dream matter" chance="100000" />
+		<item id="10341" name="phoenix charm" chance="100000" />
+		<item id="10345" name="solitude charm" chance="100000" />
+		<item id="10343" name="spiritual charm" chance="100000" />
+		<item id="10344" name="twin sun charm" chance="100000" />
+		<item id="10342" name="unity charm" chance="100000" />
+		<item id="6499" name="demonic essence" chance="92857" />
+		<item id="20264" name="unrealized dream" chance="92857" countmax="3" />
 		<item id="5911" name="red piece of cloth" chance="71429" />
 		<item id="5914" name="yellow piece of cloth" chance="71429" />
-		<item id="18416" name="green crystal splinter" chance="50000" countmax="23" />
-		<item id="18413" name="blue crystal shard" chance="35714" countmax="22" />
-		<item id="8472" name="great spirit potion" chance="35714" countmax="183" />
-		<item id="8473" name="ultimate health potion" chance="35714" countmax="119" />
-		<item id="2158" name="blue gem" chance="28571" />
+		<item id="16122" name="green crystal splinter" chance="50000" countmax="23" />
+		<item id="16119" name="blue crystal shard" chance="35714" countmax="22" />
+		<item id="7642" name="great spirit potion" chance="35714" countmax="183" />
+		<item id="7643" name="ultimate health potion" chance="35714" countmax="119" />
+		<item id="3041" name="blue gem" chance="28571" />
 		<item id="5954" name="demon horn" chance="28571" />
-		<item id="7632" name="giant shimmering pearl" chance="28571" />
-		<item id="7590" name="great mana potion" chance="28571" countmax="181" />
-		<item id="18415" name="green crystal shard" chance="28571" countmax="20" />
-		<item id="6529" name="infernal bolt" chance="28571" countmax="194" />
-		<item id="18418" name="blue crystal splinter" chance="21429" countmax="27" />
-		<item id="18417" name="brown crystal splinter" chance="21429" countmax="28" />
-		<item id="22401" name="crude umbral slayer" chance="21429" />
+		<item id="281" name="giant shimmering pearl" chance="28571" />
+		<item id="238" name="great mana potion" chance="28571" countmax="181" />
+		<item id="16121" name="green crystal shard" chance="28571" countmax="20" />
+		<item id="6528" name="infernal bolt" chance="28571" countmax="194" />
+		<item id="16124" name="blue crystal splinter" chance="21429" countmax="27" />
+		<item id="16123" name="brown crystal splinter" chance="21429" countmax="28" />
+		<item id="20067" name="crude umbral slayer" chance="21429" />
 		<item id="7368" name="assassin star" chance="14286" countmax="109" />
-		<item id="22404" name="crude umbral axe" chance="14286" />
-		<item id="22398" name="crude umbral blade" chance="14286" />
-		<item id="22614" name="nightmare beacon" chance="14286" />
-		<item id="2195" name="boots of haste" chance="7143" />
-		<item id="22419" name="crude umbral crossbow" chance="7143" />
-		<item id="22413" name="crude umbral hammer" chance="7143" />
-		<item id="22422" name="crude umbral spellbook" chance="7143" />
-		<item id="22610" name="dream warden mask" chance="7143" />
-		<item id="22613" name="eye pod" chance="7143" />
-		<item id="2168" name="life ring" chance="7143" />
-		<item id="7899" name="magma coat" chance="7143" />
-		<item id="22616" name="nightmare hook" chance="7143" />
-		<item id="22608" name="nightmare horn" chance="7143" />
-		<item id="22611" name="psychedelic tapestry" chance="7143" />
-		<item id="22408" name="umbral chopper" chance="7143" />
-		<item id="22400" name="umbral masterblade" chance="7143" />
-		<item id="18414" name="violet crystal shard" chance="7143" countmax="26" />
+		<item id="20070" name="crude umbral axe" chance="14286" />
+		<item id="20064" name="crude umbral blade" chance="14286" />
+		<item id="20280" name="nightmare beacon" chance="14286" />
+		<item id="3079" name="boots of haste" chance="7143" />
+		<item id="20085" name="crude umbral crossbow" chance="7143" />
+		<item id="20079" name="crude umbral hammer" chance="7143" />
+		<item id="20088" name="crude umbral spellbook" chance="7143" />
+		<item id="20276" name="dream warden mask" chance="7143" />
+		<item id="20279" name="eye pod" chance="7143" />
+		<item id="3052" name="life ring" chance="7143" />
+		<item id="826" name="magma coat" chance="7143" />
+		<item id="20282" name="nightmare hook" chance="7143" />
+		<item id="20274" name="nightmare horn" chance="7143" />
+		<item id="20277" name="psychedelic tapestry" chance="7143" />
+		<item id="20074" name="umbral chopper" chance="7143" />
+		<item id="20066" name="umbral masterblade" chance="7143" />
+		<item id="16120" name="violet crystal shard" chance="7143" countmax="26" />
 	</loot>
 </monster>

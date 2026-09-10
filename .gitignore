@@ -185,3 +185,8 @@ pip-log.txt
 ## TFS / OT
 #############
 /config.lua
+
+# Generated protobuf sources (produced by CMake protobuf_generate_cpp and the
+# vcxproj CustomBuild step from src/protobuf/appearances.proto)
+src/protobuf/*.pb.cc
+src/protobuf/*.pb.h

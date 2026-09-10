@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ghost Of A Planegazer" nameDescription="a ghost of a planegazer" race="undead" experience="1100" speed="220">
 	<health now="1450" max="1450" />
-	<look type="319" corpse="30269" />
+	<look type="319" corpse="27613" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -29,10 +29,10 @@
 	</elements>
 	<defenses armor="30" defense="30" />
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="172" />
-		<item id="7589" name="strong mana potion" chance="29412" />
-		<item id="7590" name="great mana potion" chance="11765" />
-		<item id="2152" name="platinum coin" chance="5882" />
-		<item id="2150" name="small amethyst" chance="2941" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="172" />
+		<item id="237" name="strong mana potion" chance="29412" />
+		<item id="238" name="great mana potion" chance="11765" />
+		<item id="3035" name="platinum coin" chance="5882" />
+		<item id="3033" name="small amethyst" chance="2941" countmax="2" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Phantasm" nameDescription="a phantasm" race="undead" experience="4400" speed="340" raceId="292">
 	<health now="3950" max="3950" />
-	<look type="241" corpse="6344" />
+	<look type="241" corpse="6343" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -70,21 +70,21 @@
 		<voice sentence="Give in!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="87839" countmax="238" />
-		<item id="2152" name="platinum coin" chance="87839" countmax="4" />
-		<item id="7590" name="great mana potion" chance="30634" countmax="2" />
-		<item id="2804" name="shadow herb" chance="25739" />
-		<item id="2260" name="blank rune" chance="21552" countmax="2" />
-		<item id="8473" name="ultimate health potion" chance="17518" />
-		<item id="6500" name="demonic essence" chance="16964" />
-		<item id="2150" name="small amethyst" chance="14286" countmax="3" />
-		<item id="9970" name="small topaz" chance="13147" countmax="3" />
-		<item id="2147" name="small ruby" chance="11576" countmax="3" />
-		<item id="2149" name="small emerald" chance="11115" countmax="3" />
+		<item id="3031" name="gold coin" chance="87839" countmax="238" />
+		<item id="3035" name="platinum coin" chance="87839" countmax="4" />
+		<item id="238" name="great mana potion" chance="30634" countmax="2" />
+		<item id="3740" name="shadow herb" chance="25739" />
+		<item id="3147" name="blank rune" chance="21552" countmax="2" />
+		<item id="7643" name="ultimate health potion" chance="17518" />
+		<item id="6499" name="demonic essence" chance="16964" />
+		<item id="3033" name="small amethyst" chance="14286" countmax="3" />
+		<item id="9057" name="small topaz" chance="13147" countmax="3" />
+		<item id="3030" name="small ruby" chance="11576" countmax="3" />
+		<item id="3032" name="small emerald" chance="11115" countmax="3" />
 		<item id="7451" name="shadow sceptre" chance="862" />
-		<item id="2165" name="stealth ring" chance="800" />
-		<item id="2487" name="crown armor" chance="708" />
+		<item id="3049" name="stealth ring" chance="800" />
+		<item id="3381" name="crown armor" chance="708" />
 		<item id="7414" name="abyss hammer" chance="493" />
-		<item id="6300" name="death ring" chance="369" />
+		<item id="6299" name="death ring" chance="369" />
 	</loot>
 </monster>

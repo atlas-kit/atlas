@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Deathstrike" nameDescription="Deathstrike" race="undead" experience="40000" speed="470">
 	<health now="200000" max="200000" />
-	<look type="500" corpse="18384" />
+	<look type="500" corpse="16088" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

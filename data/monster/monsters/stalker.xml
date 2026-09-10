@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Stalker" nameDescription="a stalker" race="blood" experience="90" speed="260" raceId="72">
 	<health now="120" max="120" />
-	<look type="128" head="97" body="116" legs="95" feet="95" corpse="20511" />
+	<look type="128" head="97" body="116" legs="95" feet="95" corpse="18230" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -41,13 +41,13 @@
 		<immunity lifedrain="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="13123" countmax="8" />
-		<item id="2410" name="throwing knife" chance="11116" countmax="2" />
-		<item id="2260" name="blank rune" chance="8811" />
-		<item id="2511" name="brass shield" chance="5617" />
-		<item id="2478" name="brass legs" chance="3531" />
-		<item id="12430" name="miraculum" chance="1543" />
-		<item id="2425" name="obsidian lance" chance="1198" />
-		<item id="2412" name="katana" chance="519" />
+		<item id="3031" name="gold coin" chance="13123" countmax="8" />
+		<item id="3298" name="throwing knife" chance="11116" countmax="2" />
+		<item id="3147" name="blank rune" chance="8811" />
+		<item id="3411" name="brass shield" chance="5617" />
+		<item id="3372" name="brass legs" chance="3531" />
+		<item id="11474" name="miraculum" chance="1543" />
+		<item id="3313" name="obsidian lance" chance="1198" />
+		<item id="3300" name="katana" chance="519" />
 	</loot>
 </monster>

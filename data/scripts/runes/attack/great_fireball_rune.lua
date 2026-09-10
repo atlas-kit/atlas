@@ -21,7 +21,7 @@ end
 spell:group("attack")
 spell:id(16)
 spell:name("Great Fireball Rune")
-spell:runeId(2304)
+spell:runeId(3191)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(30)

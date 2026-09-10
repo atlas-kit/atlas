@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ugly Monster" nameDescription="an ugly monster" race="blood" experience="1000" speed="280">
 	<health now="10000" max="10000" />
-	<look type="1218" corpse="34207" />
+	<look type="1218" corpse="31551" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -40,8 +40,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="33052" name="cobra axe" chance="719" />
-		<item id="33049" name="cobra crossbow" chance="719" />
-		<item id="33053" name="cobra hood" chance="719" />
+		<item id="30396" name="cobra axe" chance="719" />
+		<item id="30393" name="cobra crossbow" chance="719" />
+		<item id="30397" name="cobra hood" chance="719" />
 	</loot>
 </monster>

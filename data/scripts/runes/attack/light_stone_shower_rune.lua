@@ -23,7 +23,7 @@ end
 spell:group("attack")
 spell:id(116)
 spell:name("Light Stone Shower Rune")
-spell:runeId(23722)
+spell:runeId(21351)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(1)

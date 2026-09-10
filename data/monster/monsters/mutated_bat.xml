@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mutated Bat" nameDescription="a mutated bat" race="blood" experience="615" speed="210" raceId="509">
 	<health now="900" max="900" />
-	<look type="307" corpse="9829" />
+	<look type="307" corpse="8915" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -50,19 +50,19 @@
 		<voice sentence="Shriiiiiek" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="92495" countmax="130" />
-		<item id="9808" name="heavily rusted armor" chance="12568" />
-		<item id="2513" name="battle shield" chance="8554" />
-		<item id="2425" name="obsidian lance" chance="6597" />
-		<item id="10579" name="mutated bat ear" chance="5205" />
-		<item id="2800" name="star herb" chance="4862" />
+		<item id="3031" name="gold coin" chance="92495" countmax="130" />
+		<item id="8894" name="heavily rusted armor" chance="12568" />
+		<item id="3413" name="battle shield" chance="8554" />
+		<item id="3313" name="obsidian lance" chance="6597" />
+		<item id="9662" name="mutated bat ear" chance="5205" />
+		<item id="3736" name="star herb" chance="4862" />
 		<item id="5894" name="bat wing" chance="4761" countmax="2" />
-		<item id="2167" name="energy ring" chance="1029" />
-		<item id="2144" name="black pearl" chance="908" countmax="3" />
-		<item id="9809" name="rusted armor" chance="726" />
-		<item id="2150" name="small amethyst" chance="625" countmax="2" />
-		<item id="10016" name="batwing hat" chance="141" />
-		<item id="2529" name="black shield" chance="121" />
+		<item id="3051" name="energy ring" chance="1029" />
+		<item id="3027" name="black pearl" chance="908" countmax="3" />
+		<item id="8895" name="rusted armor" chance="726" />
+		<item id="3033" name="small amethyst" chance="625" countmax="2" />
+		<item id="9103" name="batwing hat" chance="141" />
+		<item id="3429" name="black shield" chance="121" />
 		<item id="7386" name="mercenary sword" chance="121" />
 	</loot>
 </monster>

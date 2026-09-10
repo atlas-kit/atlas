@@ -13,7 +13,7 @@ end
 spell:group("healing")
 spell:id(31)
 spell:name("Cure Poison Rune")
-spell:runeId(2266)
+spell:runeId(3153)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(15)

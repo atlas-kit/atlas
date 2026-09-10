@@ -1,5 +1,5 @@
 FROM debian:forky-slim AS build
-RUN apt-get update -q && apt-get install -yq \
+RUN apt-get update -q && apt-get install -yq --no-install-recommends \
   build-essential \
   cmake \
   libboost-iostreams1.83-dev \
@@ -7,11 +7,13 @@ RUN apt-get update -q && apt-get install -yq \
   libboost-system1.83-dev \
   liblua5.4-dev \
   libmariadb-dev \
+  libprotobuf-dev \
   libpugixml-dev \
   libsimdutf-dev \
   libspdlog-dev \
   libssl-dev \
-  ninja-build
+  ninja-build \
+  protobuf-compiler
 
 COPY cmake /usr/src/atlas/cmake/
 COPY src /usr/src/atlas/src/
@@ -21,11 +23,12 @@ RUN cmake -G Ninja -B build/docker-release -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   && cmake --build build/docker-release
 
 FROM debian:forky-slim
-RUN apt-get update -q && apt-get install -yq \
+RUN apt-get update -q && apt-get install -yq --no-install-recommends \
   libboost-iostreams1.83.0 \
   libboost-json1.83.0 \
   liblua5.4-0 \
   libmariadb3 \
+  libprotobuf32 \
   libpugixml1v5 \
   libsimdutf33 \
   libspdlog1.15 \

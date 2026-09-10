@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ogre Ruffian" nameDescription="an ogre ruffian" race="blood" experience="5000" speed="430" raceId="1820">
 	<health now="5500" max="5500" />
-	<look type="1212" corpse="34183" />
+	<look type="1212" corpse="31527" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -41,25 +41,25 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" />
-		<item id="24845" name="ogre nose ring" chance="17820" />
-		<item id="24844" name="ogre ear stud" chance="16771" />
-		<item id="2146" name="small sapphire" chance="12998" countmax="2" />
-		<item id="2666" name="meat" chance="10063" />
+		<item id="3035" name="platinum coin" chance="100000" />
+		<item id="22189" name="ogre nose ring" chance="17820" />
+		<item id="22188" name="ogre ear stud" chance="16771" />
+		<item id="3029" name="small sapphire" chance="12998" countmax="2" />
+		<item id="3577" name="meat" chance="10063" />
 		<item id="7387" name="diamond sceptre" chance="5031" />
-		<item id="2149" name="small emerald" chance="4193" />
-		<item id="2197" name="stone skin amulet" chance="3564" />
-		<item id="2391" name="war hammer" chance="2935" />
-		<item id="2156" name="red gem" chance="2725" />
-		<item id="24847" name="skull fetish" chance="2725" />
-		<item id="23540" name="metal spats" chance="1677" />
-		<item id="20108" name="pair of iron fists" chance="1677" />
-		<item id="18419" name="cyan crystal fragment" chance="1468" />
-		<item id="24849" name="onyx chip" chance="1468" />
-		<item id="2154" name="yellow gem" chance="1468" />
-		<item id="2158" name="blue gem" chance="1048" />
-		<item id="18416" name="green crystal splinter" chance="419" />
-		<item id="7761" name="small enchanted emerald" chance="419" />
-		<item id="24827" name="ogre klubba" chance="210" />
+		<item id="3032" name="small emerald" chance="4193" />
+		<item id="3081" name="stone skin amulet" chance="3564" />
+		<item id="3279" name="war hammer" chance="2935" />
+		<item id="3039" name="red gem" chance="2725" />
+		<item id="22191" name="skull fetish" chance="2725" />
+		<item id="21169" name="metal spats" chance="1677" />
+		<item id="17828" name="pair of iron fists" chance="1677" />
+		<item id="16125" name="cyan crystal fragment" chance="1468" />
+		<item id="22193" name="onyx chip" chance="1468" />
+		<item id="3037" name="yellow gem" chance="1468" />
+		<item id="3041" name="blue gem" chance="1048" />
+		<item id="16122" name="green crystal splinter" chance="419" />
+		<item id="677" name="small enchanted emerald" chance="419" />
+		<item id="22171" name="ogre klubba" chance="210" />
 	</loot>
 </monster>

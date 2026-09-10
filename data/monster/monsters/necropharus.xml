@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Necropharus" nameDescription="Necropharus" race="blood" experience="1050" speed="240">
 	<health now="750" max="750" />
-	<look type="209" corpse="20574" />
+	<look type="209" corpse="18293" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />
@@ -57,10 +57,10 @@
 		<item name="skull staff" chance="44000" />
 		<item name="bone club" chance="36000" />
 		<item name="green mushroom" chance="25000" />
-		<item id="2229" chance="13000" /><!-- skull -->
+		<item id="3114" chance="13000" /><!-- skull -->
 		<item name="mystic turban" chance="11000" />
 		<item name="moonlight rod" chance="8300" />
-		<item id="2231" chance="5500" /><!-- big bone -->
+		<item id="3116" chance="5500" /><!-- big bone -->
 		<item name="bone shield" chance="5500" />
 		<item name="boots of haste" chance="2700" />
 		<item name="strong mana potion" chance="2700" />

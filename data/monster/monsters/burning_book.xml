@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Burning Book" nameDescription="a burning book" race="ink" experience="11934" speed="440" raceId="1663">
 	<health now="18000" max="18000" />
-	<look type="1061" head="79" body="113" legs="78" feet="112" addons="0" corpse="31410" />
+	<look type="1061" head="79" body="113" legs="78" feet="112" addons="0" corpse="28754" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -39,20 +39,20 @@
 	</attacks>
 	<defenses armor="82" defense="82" />
 	<loot>
-		<item id="2152" name="platinum coin" chance="60807" countmax="35" />
-		<item id="31225" name="book page" chance="49228" countmax="4" />
+		<item id="3035" name="platinum coin" chance="60807" countmax="35" />
+		<item id="28569" name="book page" chance="49228" countmax="4" />
 		<item id="6558" name="flask of demonic blood" chance="42667" />
-		<item id="31222" name="silken bookmark" chance="19530" />
-		<item id="6500" name="demonic essence" chance="18858" />
-		<item id="7899" name="magma coat" chance="11811" />
-		<item id="2515" name="guardian shield" chance="8723" />
-		<item id="2150" name="small amethyst" chance="5591" countmax="7" />
+		<item id="28566" name="silken bookmark" chance="19530" />
+		<item id="6499" name="demonic essence" chance="18858" />
+		<item id="826" name="magma coat" chance="11811" />
+		<item id="3415" name="guardian shield" chance="8723" />
+		<item id="3033" name="small amethyst" chance="5591" countmax="7" />
 		<item id="5944" name="soul orb" chance="5183" />
-		<item id="2419" name="scimitar" chance="4610" />
-		<item id="2185" name="necrotic rod" chance="3760" />
-		<item id="6300" name="death ring" chance="2415" />
-		<item id="7900" name="magma monocle" chance="1489" />
-		<item id="2165" name="stealth ring" chance="728" />
+		<item id="3307" name="scimitar" chance="4610" />
+		<item id="3069" name="necrotic rod" chance="3760" />
+		<item id="6299" name="death ring" chance="2415" />
+		<item id="827" name="magma monocle" chance="1489" />
+		<item id="3049" name="stealth ring" chance="728" />
 		<item id="7451" name="shadow sceptre" chance="353" />
 	</loot>
 </monster>

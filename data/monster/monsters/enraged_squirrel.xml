@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Enraged Squirrel" nameDescription="an enraged squirrel" race="blood" experience="15" speed="300" manacost="220">
 	<health now="35" max="35" />
-	<look type="274" corpse="7628" />
+	<look type="274" corpse="276" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="1" />
@@ -24,6 +24,6 @@
 		<voice sentence="Chchch" />
 	</voices>
 	<loot>
-		<item id="7909" name="walnut" chance="2564" />
+		<item id="836" name="walnut" chance="2564" />
 	</loot>
 </monster>

@@ -14,7 +14,7 @@ end
 spell:group("attack")
 spell:id(33)
 spell:name("Energy Wall Rune")
-spell:runeId(2279)
+spell:runeId(3166)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(41)

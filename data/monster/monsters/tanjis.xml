@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Tanjis" nameDescription="Tanjis" race="blood" experience="15000" speed="560">
 	<health now="30000" max="30000" />
-	<look type="446" corpse="15228" />
+	<look type="446" corpse="13801" />
 	<targetchange interval="2000" chance="50" />
 	<flags>
 		<flag summonable="0" />

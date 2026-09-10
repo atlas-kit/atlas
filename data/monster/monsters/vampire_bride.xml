@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Vampire Bride" nameDescription="a vampire bride" race="blood" experience="1050" speed="230" raceId="483">
 	<health now="1200" max="1200" />
-	<look type="312" corpse="9658" />
+	<look type="312" corpse="8742" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -72,11 +72,11 @@
 		<item name="enigmatic voodoo skull" chance="170" />
 		<item name="strong health potion" chance="5000" />
 		<item name="strong mana potion" chance="10210" />
-		<item id="7733" chance="200" /><!-- flower bouquet -->
+		<item id="649" chance="200" /><!-- flower bouquet -->
 		<item name="hibiscus dress" chance="1030" />
 		<item name="blood goblet" chance="60" />
-		<item id="9809" chance="1010" /><!-- rusty armor (semi-rare) -->
-		<item id="9837" chance="970" /><!-- velvet tapestry -->
+		<item id="8895" chance="1010" /><!-- rusty armor (semi-rare) -->
+		<item id="8923" chance="970" /><!-- velvet tapestry -->
 		<item name="vampire teeth" chance="10000" />
 		<item name="blood preservation" chance="4950" />
 		<item name="leather whip" chance="20" />

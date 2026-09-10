@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(114)
 spell:name("Icicle Rune")
-spell:runeId(2271)
+spell:runeId(3158)
 spell:allowFarUse(true)
 spell:charges(5)
 spell:runeLevel(28)

@@ -26,7 +26,7 @@
 	</attacks>
 	<defenses armor="1" defense="1" />
 	<loot>
-		<item id="9114" name="bulb of garlic" chance="4472" />
-		<item id="11191" name="skunk tail" chance="884" />
+		<item id="8197" name="bulb of garlic" chance="4472" />
+		<item id="10274" name="skunk tail" chance="884" />
 	</loot>
 </monster>

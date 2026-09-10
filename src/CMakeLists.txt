@@ -97,7 +97,6 @@ set(tfs_HDR
 	${CMAKE_CURRENT_LIST_DIR}/iomapserialize.h
 	${CMAKE_CURRENT_LIST_DIR}/iomarket.h
 	${CMAKE_CURRENT_LIST_DIR}/item.h
-	${CMAKE_CURRENT_LIST_DIR}/itemloader.h
 	${CMAKE_CURRENT_LIST_DIR}/items.h
 	${CMAKE_CURRENT_LIST_DIR}/lockfree.h
 	${CMAKE_CURRENT_LIST_DIR}/luavariant.h
@@ -152,9 +151,13 @@ else ()
 	list(APPEND tfs_SRC ${CMAKE_CURRENT_LIST_DIR}/database.cpp)
 endif ()
 
+# Add protobuf subdirectory
+add_subdirectory(protobuf)
+
 add_library(tfslib ${tfs_SRC})
 target_compile_definitions(tfslib PRIVATE SPDLOG_HEADER_ONLY)
 target_link_libraries(tfslib PRIVATE
+	appearances_proto
 	Boost::iostreams
 	OpenSSL::Crypto
 	pugixml::pugixml

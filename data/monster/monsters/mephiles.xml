@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mephiles" nameDescription="Mephiles" race="blood" experience="415" speed="300">
 	<health now="415" max="415" />
-	<look type="237" corpse="10323" />
+	<look type="237" corpse="9406" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

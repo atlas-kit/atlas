@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Noble Lion" nameDescription="a noble lion" race="blood" experience="400" speed="230" raceId="1118">
 	<health now="1000" max="1000" />
-	<look type="570" corpse="21420" />
+	<look type="570" corpse="19103" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -40,9 +40,9 @@
 		<voice sentence="Groarrrr! Rwarrrr!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="74" />
-		<item id="2666" name="meat" chance="25278" />
-		<item id="2671" name="ham" chance="23609" />
-		<item id="10608" name="lion's mane" chance="20581" />
+		<item id="3031" name="gold coin" chance="100000" countmax="74" />
+		<item id="3577" name="meat" chance="25278" />
+		<item id="3582" name="ham" chance="23609" />
+		<item id="9691" name="lion's mane" chance="20581" />
 	</loot>
 </monster>

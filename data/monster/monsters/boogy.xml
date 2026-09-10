@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Boogy" nameDescription="a boogy" race="blood" experience="950" speed="210" raceId="1439">
 	<health now="1300" max="1300" />
-	<look type="981" corpse="28475" />
+	<look type="981" corpse="25819" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />
@@ -49,22 +49,22 @@
 		<voice sentence="Go to sleep!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="193" />
-		<item id="28349" name="shimmering beetles" chance="17498" />
-		<item id="28350" name="fairy wings" chance="15272" />
-		<item id="7588" name="strong health potion" chance="15190" />
-		<item id="28391" name="leaf star" chance="7997" countmax="7" />
-		<item id="2791" name="wood mushroom" chance="4349" />
-		<item id="18420" name="red crystal fragment" chance="3442" countmax="2" />
-		<item id="27618" name="prismatic quartz" chance="3277" countmax="2" />
-		<item id="2802" name="sling herb" chance="3256" />
-		<item id="27046" name="ancient coin" chance="2927" countmax="3" />
-		<item id="7887" name="terra amulet" chance="2906" />
-		<item id="7761" name="small enchanted emerald" chance="2391" countmax="3" />
+		<item id="3031" name="gold coin" chance="100000" countmax="193" />
+		<item id="25693" name="shimmering beetles" chance="17498" />
+		<item id="25694" name="fairy wings" chance="15272" />
+		<item id="236" name="strong health potion" chance="15190" />
+		<item id="25735" name="leaf star" chance="7997" countmax="7" />
+		<item id="3727" name="wood mushroom" chance="4349" />
+		<item id="16126" name="red crystal fragment" chance="3442" countmax="2" />
+		<item id="24962" name="prismatic quartz" chance="3277" countmax="2" />
+		<item id="3738" name="sling herb" chance="3256" />
+		<item id="24390" name="ancient coin" chance="2927" countmax="3" />
+		<item id="814" name="terra amulet" chance="2906" />
+		<item id="677" name="small enchanted emerald" chance="2391" countmax="3" />
 		<item id="7439" name="berserk potion" chance="1237" />
-		<item id="2418" name="golden sickle" chance="845" />
-		<item id="28355" name="wooden spellbook" chance="453" />
-		<item id="9980" name="crystal of power" chance="144" />
-		<item id="5015" name="mandrake" chance="103" />
+		<item id="3306" name="golden sickle" chance="845" />
+		<item id="25699" name="wooden spellbook" chance="453" />
+		<item id="9067" name="crystal of power" chance="144" />
+		<item id="5014" name="mandrake" chance="103" />
 	</loot>
 </monster>

@@ -21,5 +21,5 @@ function checkBless.onUse(player, item, fromPosition, target, toPosition, isHotk
 	return true
 end
 
-checkBless:id(12424, 6561)
+checkBless:id(11468, 6561)
 checkBless:register()

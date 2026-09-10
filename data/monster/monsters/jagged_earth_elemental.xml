@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Jagged Earth Elemental" nameDescription="a jagged earth elemental" race="undead" experience="1300" speed="280">
 	<health now="1500" max="1500" />
-	<look type="285" corpse="8933" />
+	<look type="285" corpse="8105" />
 	<targetchange interval="20000" chance="50" />
 	<flags>
 		<flag summonable="0" />
@@ -41,15 +41,15 @@
 		<voice sentence="*STOMP STOMP*" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="87298" countmax="175" />
-		<item id="11222" name="lump of earth" chance="48625" />
-		<item id="1294" name="small stone" chance="24919" countmax="10" />
-		<item id="2245" name="twigs" chance="20874" />
-		<item id="8298" name="natural soil" chance="7686" />
-		<item id="2149" name="small emerald" chance="5502" countmax="2" />
-		<item id="7732" name="seeds" chance="2184" />
-		<item id="11339" name="clay lump" chance="1133" />
-		<item id="13757" name="coal" chance="485" />
+		<item id="3031" name="gold coin" chance="87298" countmax="175" />
+		<item id="10305" name="lump of earth" chance="48625" />
+		<item id="1781" name="small stone" chance="24919" countmax="10" />
+		<item id="3130" name="twigs" chance="20874" />
+		<item id="940" name="natural soil" chance="7686" />
+		<item id="3032" name="small emerald" chance="5502" countmax="2" />
+		<item id="647" name="seeds" chance="2184" />
+		<item id="10422" name="clay lump" chance="1133" />
+		<item id="12600" name="coal" chance="485" />
 		<item id="5880" name="iron ore" chance="324" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Renegade Knight" nameDescription="a renegade knight" race="blood" experience="1200" speed="210" raceId="1146">
 	<health now="1450" max="1450" />
-	<look type="268" head="97" body="113" legs="76" feet="98" addons="2" corpse="20418" />
+	<look type="268" head="97" body="113" legs="76" feet="98" addons="2" corpse="18137" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -47,19 +47,19 @@
 		<voice sentence="A challenge at last!" />
 	</voices>
 	<loot>
-		<item id="12406" chance="1655" /><!-- small notebook -->
-		<item id="2148" countmax="100" chance="100000" /><!-- gold coin -->
-		<item id="2152" countmax="2" chance="25165" /><!-- platinum coin -->
-		<item id="12466" chance="4635" /><!-- scroll of heroic deeds -->
-		<item id="2666" chance="7615" /><!-- meat -->
-		<item id="2377" chance="5960" /><!-- two handed sword -->
-		<item id="2391" chance="993" /><!-- war hammer -->
+		<item id="11450" chance="1655" /><!-- small notebook -->
+		<item id="3031" countmax="100" chance="100000" /><!-- gold coin -->
+		<item id="3035" countmax="2" chance="25165" /><!-- platinum coin -->
+		<item id="11510" chance="4635" /><!-- scroll of heroic deeds -->
+		<item id="3577" chance="7615" /><!-- meat -->
+		<item id="3265" chance="5960" /><!-- two handed sword -->
+		<item id="3279" chance="993" /><!-- war hammer -->
 		<item id="5911" chance="2317" /><!-- red piece of cloth -->
-		<item id="2487" chance="662" /><!-- crown armor -->
-		<item id="2491" chance="331" /><!-- crown helmet -->
-		<item id="7591" chance="7284" /><!-- great health potion -->
-		<item id="2147" chance="6622" /><!-- small ruby -->
-		<item id="2114" chance="331" /><!-- piggy bank -->
-		<item id="2488" chance="331" /><!-- crown legs -->
+		<item id="3381" chance="662" /><!-- crown armor -->
+		<item id="3385" chance="331" /><!-- crown helmet -->
+		<item id="239" chance="7284" /><!-- great health potion -->
+		<item id="3030" chance="6622" /><!-- small ruby -->
+		<item id="2995" chance="331" /><!-- piggy bank -->
+		<item id="3382" chance="331" /><!-- crown legs -->
 	</loot>
 </monster>

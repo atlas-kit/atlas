@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Zorvorax" nameDescription="Zorvorax" race="undead" experience="9000" speed="350">
 	<health now="10000" max="10000" />
-	<look type="928" corpse="6306" />
+	<look type="928" corpse="6305" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -54,22 +54,22 @@
 		<immunity drown="1" />
 	</immunities>
 	<loot>
-		<item id="27598" name="bones of zorvorax" chance="100000" />
-		<item id="6300" name="death ring" chance="100000" />
-		<item id="2148" name="gold coin" chance="100000" countmax="100" />
-		<item id="11233" name="unholy bone" chance="100000" countmax="2" />
-		<item id="9971" name="gold ingot" chance="76440" />
-		<item id="2152" name="platinum coin" chance="65969" countmax="3" />
+		<item id="24942" name="bones of zorvorax" chance="100000" />
+		<item id="6299" name="death ring" chance="100000" />
+		<item id="3031" name="gold coin" chance="100000" countmax="100" />
+		<item id="10316" name="unholy bone" chance="100000" countmax="2" />
+		<item id="9058" name="gold ingot" chance="76440" />
+		<item id="3035" name="platinum coin" chance="65969" countmax="3" />
 		<item id="7430" name="dragonbone staff" chance="35602" />
-		<item id="7590" name="great mana potion" chance="35602" countmax="3" />
-		<item id="7591" name="great health potion" chance="33508" countmax="4" />
-		<item id="8472" name="great spirit potion" chance="33508" countmax="3" />
+		<item id="238" name="great mana potion" chance="35602" countmax="3" />
+		<item id="239" name="great health potion" chance="33508" countmax="4" />
+		<item id="7642" name="great spirit potion" chance="33508" countmax="3" />
 		<item id="5925" name="hardened bone" chance="30366" />
-		<item id="9810" name="slightly rusted armor" chance="27749" />
-		<item id="6500" name="demonic essence" chance="25131" />
+		<item id="8896" name="slightly rusted armor" chance="27749" />
+		<item id="6499" name="demonic essence" chance="25131" />
 		<item id="5741" name="skull helmet" chance="5759" />
 		<item id="5944" name="soul orb" chance="4188" />
-		<item id="2173" name="amulet of loss" chance="1571" />
-		<item id="13291" name="maxilla maximus" chance="1047" />
+		<item id="3057" name="amulet of loss" chance="1571" />
+		<item id="12304" name="maxilla maximus" chance="1047" />
 	</loot>
 </monster>

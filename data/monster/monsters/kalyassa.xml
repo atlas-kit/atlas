@@ -56,20 +56,20 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="27593" name="dragon blood" chance="100000" />
-		<item id="27594" name="dragon tongue" chance="100000" />
-		<item id="27597" name="horn of kalyassa" chance="100000" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="10" />
+		<item id="24937" name="dragon blood" chance="100000" />
+		<item id="24938" name="dragon tongue" chance="100000" />
+		<item id="24941" name="horn of kalyassa" chance="100000" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="10" />
 		<item id="5948" name="red dragon leather" chance="97207" />
-		<item id="2672" name="dragon ham" chance="70391" />
-		<item id="2547" name="power bolt" chance="52514" countmax="10" />
-		<item id="2167" name="energy ring" chance="19553" />
-		<item id="2392" name="fire sword" chance="9497" />
-		<item id="7591" name="great health potion" chance="9497" countmax="2" />
-		<item id="7590" name="great mana potion" chance="9497" countmax="2" />
+		<item id="3583" name="dragon ham" chance="70391" />
+		<item id="3450" name="power bolt" chance="52514" countmax="10" />
+		<item id="3051" name="energy ring" chance="19553" />
+		<item id="3280" name="fire sword" chance="9497" />
+		<item id="239" name="great health potion" chance="9497" countmax="2" />
+		<item id="238" name="great mana potion" chance="9497" countmax="2" />
 		<item id="7365" name="onyx arrow" chance="9497" countmax="10" />
-		<item id="2498" name="royal helmet" chance="3352" />
-		<item id="2492" name="dragon scale mail" chance="2793" />
-		<item id="2177" name="life crystal" chance="2793" />
+		<item id="3392" name="royal helmet" chance="3352" />
+		<item id="3386" name="dragon scale mail" chance="2793" />
+		<item id="3061" name="life crystal" chance="2793" />
 	</loot>
 </monster>

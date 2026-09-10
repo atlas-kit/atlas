@@ -69,22 +69,22 @@
 		<voice sentence="Chill out!" />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="95017" countmax="243" />
-		<item id="2672" name="dragon ham" chance="79868" />
-		<item id="2796" name="green mushroom" chance="12151" />
-		<item id="1976" name="book (gemmed)" chance="8835" />
-		<item id="2547" name="power bolt" chance="5895" countmax="6" />
-		<item id="2146" name="small sapphire" chance="5092" />
-		<item id="2167" name="energy ring" chance="4952" />
+		<item id="3031" name="gold coin" chance="95017" countmax="243" />
+		<item id="3583" name="dragon ham" chance="79868" />
+		<item id="3732" name="green mushroom" chance="12151" />
+		<item id="2842" name="book (gemmed)" chance="8835" />
+		<item id="3450" name="power bolt" chance="5895" countmax="6" />
+		<item id="3029" name="small sapphire" chance="5092" />
+		<item id="3051" name="energy ring" chance="4952" />
 		<item id="7441" name="ice cube" chance="4089" />
-		<item id="2033" name="golden mug" chance="3081" />
-		<item id="2177" name="life crystal" chance="608" />
+		<item id="2903" name="golden mug" chance="3081" />
+		<item id="3061" name="life crystal" chance="608" />
 		<item id="7290" name="shard" chance="524" />
-		<item id="2479" name="strange helmet" chance="453" />
-		<item id="2396" name="ice rapier" chance="342" />
-		<item id="2528" name="tower shield" chance="291" />
-		<item id="2498" name="royal helmet" chance="206" />
-		<item id="2492" name="dragon scale mail" chance="111" />
+		<item id="3373" name="strange helmet" chance="453" />
+		<item id="3284" name="ice rapier" chance="342" />
+		<item id="3428" name="tower shield" chance="291" />
+		<item id="3392" name="royal helmet" chance="206" />
+		<item id="3386" name="dragon scale mail" chance="111" />
 		<item id="7402" name="dragon slayer" chance="97" />
 	</loot>
 </monster>

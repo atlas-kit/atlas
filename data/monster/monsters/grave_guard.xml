@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Grave Guard" nameDescription="a grave guard" race="undead" experience="485" speed="200" raceId="707">
 	<health now="720" max="720" />
-	<look type="234" corpse="13975" />
+	<look type="234" corpse="12840" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -36,12 +36,12 @@
 		<immunity fire="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="95445" countmax="129" />
-		<item id="2747" name="grave flower" chance="69968" />
-		<item id="7620" name="mana potion" chance="20318" />
-		<item id="7618" name="health potion" chance="19920" />
-		<item id="2159" name="scarab coin" chance="4802" />
-		<item id="6300" name="death ring" chance="2181" />
-		<item id="2440" name="daramian waraxe" chance="933" />
+		<item id="3031" name="gold coin" chance="95445" countmax="129" />
+		<item id="3661" name="grave flower" chance="69968" />
+		<item id="268" name="mana potion" chance="20318" />
+		<item id="266" name="health potion" chance="19920" />
+		<item id="3042" name="scarab coin" chance="4802" />
+		<item id="6299" name="death ring" chance="2181" />
+		<item id="3328" name="daramian waraxe" chance="933" />
 	</loot>
 </monster>

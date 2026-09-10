@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ogre Sage" nameDescription="an ogre sage" race="blood" experience="5500" speed="460" raceId="1822">
 	<health now="4800" max="4800" />
-	<look type="1214" corpse="34191" />
+	<look type="1214" corpse="31535" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -55,20 +55,20 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2152" name="platinum coin" chance="100000" />
-		<item id="24845" name="ogre nose ring" chance="12795" />
-		<item id="24844" name="ogre ear stud" chance="10774" />
-		<item id="24840" name="shamanic talisman" chance="9428" />
-		<item id="12408" name="broken shamanic staff" chance="9091" />
-		<item id="24847" name="skull fetish" chance="8081" />
-		<item id="7886" name="terra boots" chance="7071" />
-		<item id="7887" name="terra amulet" chance="6061" />
-		<item id="18414" name="violet crystal shard" chance="6061" />
-		<item id="18421" name="green crystal fragment" chance="5051" />
-		<item id="20111" name="bone fetish" chance="4040" />
-		<item id="2154" name="yellow gem" chance="3704" />
-		<item id="10219" name="sacred tree amulet" chance="2694" />
-		<item id="2153" name="violet gem" chance="2694" />
-		<item id="24839" name="ogre scepta" chance="1010" />
+		<item id="3035" name="platinum coin" chance="100000" />
+		<item id="22189" name="ogre nose ring" chance="12795" />
+		<item id="22188" name="ogre ear stud" chance="10774" />
+		<item id="22184" name="shamanic talisman" chance="9428" />
+		<item id="11452" name="broken shamanic staff" chance="9091" />
+		<item id="22191" name="skull fetish" chance="8081" />
+		<item id="813" name="terra boots" chance="7071" />
+		<item id="814" name="terra amulet" chance="6061" />
+		<item id="16120" name="violet crystal shard" chance="6061" />
+		<item id="16127" name="green crystal fragment" chance="5051" />
+		<item id="17831" name="bone fetish" chance="4040" />
+		<item id="3037" name="yellow gem" chance="3704" />
+		<item id="9302" name="sacred tree amulet" chance="2694" />
+		<item id="3036" name="violet gem" chance="2694" />
+		<item id="22183" name="ogre scepta" chance="1010" />
 	</loot>
 </monster>

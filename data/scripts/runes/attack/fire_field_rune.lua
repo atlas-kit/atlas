@@ -12,7 +12,7 @@ end
 spell:group("attack")
 spell:id(25)
 spell:name("Fire Field Rune")
-spell:runeId(2301)
+spell:runeId(3188)
 spell:allowFarUse(true)
 spell:charges(3)
 spell:runeLevel(15)

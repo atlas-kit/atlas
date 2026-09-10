@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lizard Gate Guardian" nameDescription="a lizard gate guardian" race="blood" experience="2500" speed="276">
 	<health now="5000" max="5000" />
-	<look type="343" corpse="11284" />
+	<look type="343" corpse="10367" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -32,13 +32,13 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="130" />
-		<item id="8473" name="ultimate health potion" chance="57143" />
+		<item id="3031" name="gold coin" chance="100000" countmax="130" />
+		<item id="7643" name="ultimate health potion" chance="57143" />
 		<item id="5876" name="lizard leather" chance="14286" />
 		<item id="5881" name="lizard scale" chance="14286" />
-		<item id="2152" name="platinum coin" chance="14286" countmax="4" />
-		<item id="11303" name="zaoan shoes" chance="14286" />
-		<item id="11301" name="zaoan armor" chance="4762" />
-		<item id="11304" name="zaoan legs" chance="4762" />
+		<item id="3035" name="platinum coin" chance="14286" countmax="4" />
+		<item id="10386" name="zaoan shoes" chance="14286" />
+		<item id="10384" name="zaoan armor" chance="4762" />
+		<item id="10387" name="zaoan legs" chance="4762" />
 	</loot>
 </monster>

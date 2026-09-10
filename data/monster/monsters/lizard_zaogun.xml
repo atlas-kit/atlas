@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Lizard Zaogun" nameDescription="a lizard zaogun" race="blood" experience="1700" speed="276" raceId="616">
 	<health now="2955" max="2955" />
-	<look type="343" corpse="11284" />
+	<look type="343" corpse="10367" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />
@@ -41,19 +41,19 @@
 		<immunity invisible="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="94142" countmax="268" />
-		<item id="2152" name="platinum coin" chance="49665" countmax="2" />
-		<item id="11331" name="zaogun shoulderplates" chance="14974" />
+		<item id="3031" name="gold coin" chance="94142" countmax="268" />
+		<item id="3035" name="platinum coin" chance="49665" countmax="2" />
+		<item id="10414" name="zaogun shoulderplates" chance="14974" />
 		<item id="5876" name="lizard leather" chance="14674" />
 		<item id="5881" name="lizard scale" chance="12054" />
-		<item id="11330" name="zaogun flag" chance="8381" />
-		<item id="7591" name="great health potion" chance="7211" countmax="3" />
-		<item id="2149" name="small emerald" chance="4993" countmax="5" />
-		<item id="11206" name="red lantern" chance="2087" />
-		<item id="7588" name="strong health potion" chance="1951" />
-		<item id="11303" name="zaoan shoes" chance="1118" />
-		<item id="2528" name="tower shield" chance="1020" />
-		<item id="11304" name="zaoan legs" chance="912" />
-		<item id="11301" name="zaoan armor" chance="519" />
+		<item id="10413" name="zaogun flag" chance="8381" />
+		<item id="239" name="great health potion" chance="7211" countmax="3" />
+		<item id="3032" name="small emerald" chance="4993" countmax="5" />
+		<item id="10289" name="red lantern" chance="2087" />
+		<item id="236" name="strong health potion" chance="1951" />
+		<item id="10386" name="zaoan shoes" chance="1118" />
+		<item id="3428" name="tower shield" chance="1020" />
+		<item id="10387" name="zaoan legs" chance="912" />
+		<item id="10384" name="zaoan armor" chance="519" />
 	</loot>
 </monster>

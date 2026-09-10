@@ -13,7 +13,7 @@ end
 spell:group("attack")
 spell:id(32)
 spell:name("Poison Wall Rune")
-spell:runeId(2289)
+spell:runeId(3176)
 spell:allowFarUse(true)
 spell:charges(4)
 spell:runeLevel(29)

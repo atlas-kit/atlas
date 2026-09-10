@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Bragrumol" nameDescription="Bragrumol" race="fire" experience="18000" speed="220">
 	<health now="38000" max="38000" />
-	<look type="856" corpse="13973" />
+	<look type="856" corpse="12838" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -48,8 +48,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2156" name="red gem" chance="85156" />
-		<item id="33979" name="sea horse figurine" chance="10938" />
-		<item id="33980" name="golden mask" chance="3906" />
+		<item id="3039" name="red gem" chance="85156" />
+		<item id="31323" name="sea horse figurine" chance="10938" />
+		<item id="31324" name="golden mask" chance="3906" />
 	</loot>
 </monster>

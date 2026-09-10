@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Imperor" nameDescription="The Imperor" race="fire" experience="8000" speed="330">
 	<health now="15000" max="15000" />
-	<look type="237" corpse="6364" />
+	<look type="237" corpse="6363" />
 	<targetchange interval="5000" chance="5" />
 	<flags>
 		<flag summonable="0" />
@@ -65,7 +65,7 @@
 		<voice sentence="He he he!" />
 	</voices>
 	<loot>
-		<item id="2050" chance="15000" /><!-- torch -->
+		<item id="2920" chance="15000" /><!-- torch -->
 		<item name="gold coin" countmax="79" chance="100000" />
 		<item name="small amethyst" chance="8888" />
 		<item name="stealth ring" chance="4555" />
@@ -76,7 +76,7 @@
 		<item name="brass armor" chance="6577" />
 		<item name="pitchfork" chance="20000" />
 		<item name="soul orb" chance="5666" />
-		<item id="6300" chance="999" /><!-- death ring -->
+		<item id="6299" chance="999" /><!-- death ring -->
 		<item name="demonic essence" chance="7777" />
 		<item name="infernal bolt" countmax="5" chance="5000" />
 		<item name="the Imperor's trident" chance="100000" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Dazed Leaf Golem" nameDescription="a dazed leaf golem" race="undead" experience="8000" speed="350">
 	<health now="10000" max="10000" />
-	<look type="567" corpse="21434" />
+	<look type="567" corpse="19117" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag ignorespawnblock="1" />
@@ -34,8 +34,8 @@
 		<element earthPercent="50" />
 	</elements>
 	<loot>
-		<item id="2148" name="gold coin" chance="90000" countmax="924" />
-		<item id="21428" name="fir cone" chance="40000" countmax="3" />
-		<item id="21427" name="dowser" chance="30000" countmax="2" />
+		<item id="3031" name="gold coin" chance="90000" countmax="924" />
+		<item id="19111" name="fir cone" chance="40000" countmax="3" />
+		<item id="19110" name="dowser" chance="30000" countmax="2" />
 	</loot>
 </monster>

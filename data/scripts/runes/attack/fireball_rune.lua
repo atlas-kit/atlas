@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(15)
 spell:name("Fireball Rune")
-spell:runeId(2302)
+spell:runeId(3189)
 spell:allowFarUse(true)
 spell:charges(5)
 spell:runeLevel(27)

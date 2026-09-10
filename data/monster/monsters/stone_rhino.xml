@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Stone Rhino" nameDescription="a stone rhino" race="blood" experience="1800" speed="290" raceId="1395">
 	<health now="3000" max="3000" />
-	<look type="936" corpse="27738" />
+	<look type="936" corpse="25082" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -44,10 +44,10 @@
 		<voice sentence="SNIFF!" />
 	</voices>
 	<loot>
-		<item id="24842" name="raw meat" chance="17625" />
+		<item id="22186" name="raw meat" chance="17625" />
 		<item id="5925" name="hardened bone" chance="10024" />
-		<item id="27044" name="rhino hide" chance="8694" />
-		<item id="27045" name="rhino horn" chance="4608" />
-		<item id="3973" name="tusk shield" chance="1378" />
+		<item id="24388" name="rhino hide" chance="8694" />
+		<item id="24389" name="rhino horn" chance="4608" />
+		<item id="3443" name="tusk shield" chance="1378" />
 	</loot>
 </monster>

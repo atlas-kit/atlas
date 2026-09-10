@@ -1,32 +1,32 @@
 local config = {
 	{chanceFrom = 0, chanceTo = 216}, -- nothing
-	{chanceFrom = 217, chanceTo = 1659, itemId = 2238}, -- worn leather boots
-	{chanceFrom = 1660, chanceTo = 3069, itemId = 2237}, -- dirty cape
-	{chanceFrom = 3070, chanceTo = 4465, itemId = 2115}, -- broken piggy bank
-	{chanceFrom = 4466, chanceTo = 5025, itemId = 2148, count = 6}, -- gold coin
-	{chanceFrom = 5026, chanceTo = 5546, itemId = 2787}, -- white mushroom
+	{chanceFrom = 217, chanceTo = 1659, itemId = 3123}, -- worn leather boots
+	{chanceFrom = 1660, chanceTo = 3069, itemId = 3122}, -- dirty cape
+	{chanceFrom = 3070, chanceTo = 4465, itemId = 2996}, -- broken piggy bank
+	{chanceFrom = 4466, chanceTo = 5025, itemId = 3031, count = 6}, -- gold coin
+	{chanceFrom = 5026, chanceTo = 5546, itemId = 3723}, -- white mushroom
 	{chanceFrom = 5547, chanceTo = 6025, itemId = 5890}, -- chicken feather
-	{chanceFrom = 6026, chanceTo = 6513, itemId = 3976, count = 4}, -- worm
-	{chanceFrom = 6514, chanceTo = 6999, itemId = 2695}, -- egg
+	{chanceFrom = 6026, chanceTo = 6513, itemId = 3492, count = 4}, -- worm
+	{chanceFrom = 6514, chanceTo = 6999, itemId = 3606}, -- egg
 	{chanceFrom = 7000, chanceTo = 7398, itemId = 5899}, -- turtle shell
 	{chanceFrom = 7399, chanceTo = 7806, itemId = 5894}, -- bat wing
-	{chanceFrom = 7807, chanceTo = 8191, itemId = 2403}, -- knife
-	{chanceFrom = 8192, chanceTo = 8560, itemId = 10606}, -- bunch of troll hair
-	{chanceFrom = 8561, chanceTo = 8915, itemId = 8859}, -- spider fangs
+	{chanceFrom = 7807, chanceTo = 8191, itemId = 3291}, -- knife
+	{chanceFrom = 8192, chanceTo = 8560, itemId = 9689}, -- bunch of troll hair
+	{chanceFrom = 8561, chanceTo = 8915, itemId = 8031}, -- spider fangs
 	{chanceFrom = 8916, chanceTo = 9211, itemId = 5902}, -- honeycomb
-	{chanceFrom = 9212, chanceTo = 9344, itemId = 2661}, -- scarf
-	{chanceFrom = 9345, chanceTo = 9440, itemId = 2199}, -- garlic necklace
-	{chanceFrom = 8441, chanceTo = 9525, itemId = 13926}, -- plague bell
-	{chanceFrom = 9526, chanceTo = 9598, itemId = 2143}, -- white pearl
+	{chanceFrom = 9212, chanceTo = 9344, itemId = 3572}, -- scarf
+	{chanceFrom = 9345, chanceTo = 9440, itemId = 3083}, -- garlic necklace
+	{chanceFrom = 8441, chanceTo = 9525, itemId = 12787}, -- plague bell
+	{chanceFrom = 9526, chanceTo = 9598, itemId = 3026}, -- white pearl
 	{chanceFrom = 9599, chanceTo = 9664, itemId = 5879}, -- spider silk
-	{chanceFrom = 9665, chanceTo = 9728, itemId = 2114}, -- piggy bank
-	{chanceFrom = 9729, chanceTo = 9792, itemId = 13925}, -- plague mask
-	{chanceFrom = 9793, chanceTo = 9842, itemId = 10563}, -- book of prayers
-	{chanceFrom = 9843, chanceTo = 9886, itemId = 2110}, -- doll
+	{chanceFrom = 9665, chanceTo = 9728, itemId = 2995}, -- piggy bank
+	{chanceFrom = 9729, chanceTo = 9792, itemId = 12786}, -- plague mask
+	{chanceFrom = 9793, chanceTo = 9842, itemId = 9646}, -- book of prayers
+	{chanceFrom = 9843, chanceTo = 9886, itemId = 2991}, -- doll
 	{chanceFrom = 9887, chanceTo = 9929, itemId = 5880}, -- iron ore
 	{chanceFrom = 9930, chanceTo = 9968, itemId = 5895}, -- fish fin
-	{chanceFrom = 9969, chanceTo = 9995, itemId = 13508}, -- slug drug
-	{chanceFrom = 9996, chanceTo = 9997, itemId = 2195}, -- boots of haste
+	{chanceFrom = 9969, chanceTo = 9995, itemId = 12519}, -- slug drug
+	{chanceFrom = 9996, chanceTo = 9997, itemId = 3079}, -- boots of haste
 	{chanceFrom = 9998, chanceTo = 9999, itemId = 5885}, -- flask of warrior's sweat
 	{chanceFrom = 9999, chanceTo = 10000, itemId = 5804} -- nose ring
 }
@@ -60,5 +60,5 @@ function belongings.onUse(player, item, fromPosition, target, toPosition, isHotk
 	return false
 end
 
-belongings:id(13670)
+belongings:id(12413)
 belongings:register()

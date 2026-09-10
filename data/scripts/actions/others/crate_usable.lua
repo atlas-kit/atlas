@@ -1,14 +1,14 @@
 local rewards = { -- chanceMin, chanceMax, itemID, count
 	{1, 36}, -- nothing
-	{37, 46, 2148, 80}, -- gold coin
-	{47, 55, 2148, 50}, -- gold coin
-	{56, 64, 2671, 5}, -- ham
-	{65, 73, 2789, 5}, -- brown mushroom
+	{37, 46, 3031, 80}, -- gold coin
+	{47, 55, 3031, 50}, -- gold coin
+	{56, 64, 3582, 5}, -- ham
+	{65, 73, 3725, 5}, -- brown mushroom
 	{74, 81, 7620}, -- mana potion
-	{82, 87, 7618}, -- health potion
-	{88, 92, 9811}, -- rusty legs (common)
-	{93, 96, 9808}, -- rusty armor (common)
-	{97, 100, 2213} -- dwarven ring
+	{82, 87, 266}, -- health potion
+	{88, 92, 8897}, -- rusty legs (common)
+	{93, 96, 8894}, -- rusty armor (common)
+	{97, 100, 3097} -- dwarven ring
 }
 
 local crateUsable = Action()
@@ -39,5 +39,5 @@ function crateUsable.onUse(player, item, fromPosition, target, toPosition, isHot
 	return true
 end
 
-crateUsable:id(9661)
+crateUsable:id(8745)
 crateUsable:register()

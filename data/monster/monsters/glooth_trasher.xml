@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Glooth Trasher" nameDescription="a glooth trasher" race="venom" experience="2200" speed="260">
 	<health now="2700" max="2700" />
-	<look type="600" corpse="23343" />
+	<look type="600" corpse="20972" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag pushable="0" />

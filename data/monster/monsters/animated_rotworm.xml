@@ -23,12 +23,12 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="70707" countmax="17" />
-		<item id="2666" name="meat" chance="22222" />
-		<item id="2671" name="ham" chance="19192" />
-		<item id="10609" name="lump of dirt" chance="13131" />
-		<item id="3976" name="worm" chance="4040" countmax="3" />
-		<item id="2398" name="mace" chance="3030" />
-		<item id="2376" name="sword" chance="2020" />
+		<item id="3031" name="gold coin" chance="70707" countmax="17" />
+		<item id="3577" name="meat" chance="22222" />
+		<item id="3582" name="ham" chance="19192" />
+		<item id="9692" name="lump of dirt" chance="13131" />
+		<item id="3492" name="worm" chance="4040" countmax="3" />
+		<item id="3286" name="mace" chance="3030" />
+		<item id="3264" name="sword" chance="2020" />
 	</loot>
 </monster>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Unarmored Voidborn" nameDescription="The Unarmored Voidborn" race="undead" experience="15000" speed="250">
 	<health now="250000" max="250000" />
-	<look type="987" corpse="28789" />
+	<look type="987" corpse="26133" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -37,16 +37,16 @@
 		<element deathPercent="-300" />
 	</elements>
 	<loot>
-		<item id="26191" name="energy bar" chance="100000" countmax="6" />
-		<item id="2148" name="gold coin" chance="100000" countmax="53" />
-		<item id="8472" name="great spirit potion" chance="100000" />
+		<item id="23535" name="energy bar" chance="100000" countmax="6" />
+		<item id="3031" name="gold coin" chance="100000" countmax="53" />
+		<item id="7642" name="great spirit potion" chance="100000" />
 		<item id="5904" name="magic sulphur" chance="100000" />
-		<item id="26165" name="mysterious remains" chance="100000" />
-		<item id="2152" name="platinum coin" chance="100000" countmax="20" />
-		<item id="2156" name="red gem" chance="100000" />
-		<item id="26187" name="ring of blue plasma" chance="100000" />
-		<item id="24847" name="skull fetish" chance="100000" />
-		<item id="2146" name="small sapphire" chance="100000" countmax="13" />
-		<item id="8473" name="ultimate health potion" chance="100000" countmax="7" />
+		<item id="23509" name="mysterious remains" chance="100000" />
+		<item id="3035" name="platinum coin" chance="100000" countmax="20" />
+		<item id="3039" name="red gem" chance="100000" />
+		<item id="23531" name="ring of blue plasma" chance="100000" />
+		<item id="22191" name="skull fetish" chance="100000" />
+		<item id="3029" name="small sapphire" chance="100000" countmax="13" />
+		<item id="7643" name="ultimate health potion" chance="100000" countmax="7" />
 	</loot>
 </monster>

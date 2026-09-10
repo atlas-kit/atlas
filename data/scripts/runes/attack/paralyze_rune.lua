@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(54)
 spell:name("Paralyze Rune")
-spell:runeId(2278)
+spell:runeId(3165)
 spell:allowFarUse(true)
 spell:charges(1)
 spell:runeLevel(54)

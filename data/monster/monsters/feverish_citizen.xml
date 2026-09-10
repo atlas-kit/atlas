@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Feverish Citizen" nameDescription="a feverish citizen" race="blood" experience="30" speed="185" raceId="719">
 	<health now="125" max="125" />
-	<look type="425" addons="2" corpse="20395" />
+	<look type="425" addons="2" corpse="18114" />
 	<targetchange interval="4000" chance="0" />
 	<flags>
 		<flag summonable="0" />
@@ -49,7 +49,7 @@
 	</voices>
 	<loot>
 		<item name="gold coin" countmax="35" chance="30300" />
-		<item id="2230" chance="4920" /><!-- bone -->
+		<item id="3115" chance="4920" /><!-- bone -->
 		<item name="worm" countmax="3" chance="25730" />
 		<item name="ominous piece of cloth" chance="1660" />
 		<item name="dubious piece of cloth" chance="1720" />

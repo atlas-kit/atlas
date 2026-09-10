@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Mutated Pumpkin" nameDescription="The Mutated Pumpkin" race="venom" experience="30000" speed="330">
 	<health now="500000" max="500000" />
-	<look type="292" corpse="8960" />
+	<look type="292" corpse="8132" />
 	<targetchange interval="5000" chance="25" />
 	<flags>
 		<flag summonable="0" />
@@ -48,9 +48,9 @@
 	<loot>
 		<item name="yummy gummy worm" countmax="10" chance="100000" />
 		<item name="pumpkin" countmax="5" chance="100000" />
-		<item id="6492" chance="300" /><!-- bat decoration -->
+		<item id="6491" chance="300" /><!-- bat decoration -->
 		<item name="skeleton decoration" chance="300" />
 		<item name="spiderwebs" chance="250" />
-		<item id="9006" chance="250" /><!-- toy spider -->
+		<item id="8178" chance="250" /><!-- toy spider -->
 	</loot>
 </monster>

@@ -9,7 +9,7 @@ local conditions = {
 	CONDITION_BLEEDING
 }
 
-local ids = {4620, 4621, 4622, 4623, 4624, 4625, 4820, 4821, 4822, 4823, 4824, 4825}
+local ids = {629, 630, 631, 632, 633, 634, 4809, 4810, 4811, 4812, 4813, 4814}
 
 do
 	local event = MoveEvent()

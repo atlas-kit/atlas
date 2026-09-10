@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Ice Dragon" nameDescription="an ice dragon" race="undead" experience="2300" speed="212" raceId="1380">
 	<health now="2500" max="2500" />
-	<look type="947" body="9" corpse="27841" />
+	<look type="947" body="9" corpse="25185" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag attackable="1" />
@@ -53,21 +53,21 @@
 		<immunity invisible="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="96552" countmax="219" />
-		<item id="2672" name="dragon ham" chance="78796" />
-		<item id="27593" name="dragon blood" chance="19506" />
-		<item id="27594" name="dragon tongue" chance="12043" />
-		<item id="7839" name="shiver arrow" chance="7977" countmax="10" />
+		<item id="3031" name="gold coin" chance="96552" countmax="219" />
+		<item id="3583" name="dragon ham" chance="78796" />
+		<item id="24937" name="dragon blood" chance="19506" />
+		<item id="24938" name="dragon tongue" chance="12043" />
+		<item id="762" name="shiver arrow" chance="7977" countmax="10" />
 		<item id="7441" name="ice cube" chance="4426" />
-		<item id="2167" name="energy ring" chance="4117" />
-		<item id="2146" name="small sapphire" chance="3911" />
-		<item id="7590" name="great mana potion" chance="3500" countmax="2" />
-		<item id="2033" name="golden mug" chance="2934" />
-		<item id="2183" name="hailstorm rod" chance="2213" />
-		<item id="7902" name="glacier mask" chance="1081" />
-		<item id="7888" name="glacier amulet" chance="978" />
+		<item id="3051" name="energy ring" chance="4117" />
+		<item id="3029" name="small sapphire" chance="3911" />
+		<item id="238" name="great mana potion" chance="3500" countmax="2" />
+		<item id="2903" name="golden mug" chance="2934" />
+		<item id="3067" name="hailstorm rod" chance="2213" />
+		<item id="829" name="glacier mask" chance="1081" />
+		<item id="815" name="glacier amulet" chance="978" />
 		<item id="7290" name="shard" chance="978" />
-		<item id="2177" name="life crystal" chance="669" />
-		<item id="2492" name="dragon scale mail" chance="257" />
+		<item id="3061" name="life crystal" chance="669" />
+		<item id="3386" name="dragon scale mail" chance="257" />
 	</loot>
 </monster>

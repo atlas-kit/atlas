@@ -36,15 +36,15 @@
 		<voice sentence="Prek tars, dekklep zurk." />
 	</voices>
 	<loot>
-		<item id="2148" name="gold coin" chance="84724" countmax="14" />
-		<item id="2666" name="meat" chance="9613" />
-		<item id="2484" name="studded armor" chance="8232" />
-		<item id="2526" name="studded shield" chance="6685" />
-		<item id="2385" name="sabre" chance="5580" />
-		<item id="2386" name="axe" chance="5442" />
-		<item id="2482" name="studded helmet" chance="2873" />
-		<item id="26642" name="heavy old tome" chance="2238" />
-		<item id="12435" name="orc leather" chance="359" />
-		<item id="11113" name="orc tooth" chance="55" />
+		<item id="3031" name="gold coin" chance="84724" countmax="14" />
+		<item id="3577" name="meat" chance="9613" />
+		<item id="3378" name="studded armor" chance="8232" />
+		<item id="3426" name="studded shield" chance="6685" />
+		<item id="3273" name="sabre" chance="5580" />
+		<item id="3274" name="axe" chance="5442" />
+		<item id="3376" name="studded helmet" chance="2873" />
+		<item id="23986" name="heavy old tome" chance="2238" />
+		<item id="11479" name="orc leather" chance="359" />
+		<item id="10196" name="orc tooth" chance="55" />
 	</loot>
 </monster>

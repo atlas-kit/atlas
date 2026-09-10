@@ -1,70 +1,70 @@
 local transformID = {
-	[25393] = 25392, [25392] = 25393, -- rift carpet
-	[26193] = 26192, [26192] = 26193, -- void carpet
-	[26087] = 26109, [26109] = 26087, -- yalaharian carpet
-	[26088] = 26110, [26110] = 26088, -- white fur carpet
-	[26089] = 26111, [26111] = 26089, -- bamboo mat carpet
-	[26371] = 26363, [26363] = 26371, -- crimson carpet
-	[26366] = 26372, [26372] = 26366, -- azure carpet
-	[26367] = 26373, [26373] = 26367, -- emerald carpet
-	[26368] = 26374, [26374] = 26368, -- light parquet carpet
-	[26369] = 26375, [26375] = 26369, -- dark parquet carpet
-	[26370] = 26376, [26376] = 26370, -- marble floor
-	[27072] = 27080, [27080] = 27072, -- colourful carpet
-	[27073] = 27081, [27081] = 27073, -- flowery carpet
-	[27074] = 27082, [27082] = 27074, -- striped carpet
-	[27075] = 27083, [27083] = 27075, -- fur carpet
-	[27076] = 27084, [27084] = 27076, -- diamond carpet
-	[27077] = 27085, [27085] = 27077, -- patterned carpet
-	[27078] = 27086, [27086] = 27078, -- night sky carpet
-	[27079] = 27087, [27087] = 27079, -- star carpet
-	[28770] = 28771, [28771] = 28770, -- verdant carpet
-	[28772] = 28773, [28773] = 28772, -- shaggy carpet
-	[28774] = 28775, [28775] = 28774, -- mystic carpet
-	[28776] = 28777, [28777] = 28776, -- stone tiles
-	[28778] = 28779, [28779] = 28778, -- wooden planks
-	[28806] = 28807, [28807] = 28806, -- wheat carpet
-	[28808] = 28809, [28809] = 28808, -- crested carpet
-	[28810] = 28811, [28811] = 28810, -- decorated carpet
-	[34122] = 34124, [34124] = 34122, -- tournament carpet
-	[34123] = 34125, [34125] = 34123, -- sublime tournament carpet
-	[38543] = 38544, [38544] = 38543, -- lilac carpet
-	[38545] = 38546, [38546] = 38545, -- colourful pom-pom carpet
-	[38547] = 38548, [38548] = 38547, -- natural pom-pom carpet
-	[38549] = 38550, [38550] = 38549, -- owin rug
-	[38551] = 38552, [38552] = 38551, -- midnight panther rug
-	[38553] = 38554, [38554] = 38553, -- moon carpet
-	[38555] = 38556, [38556] = 38555, -- romantic carpet
-	[38597] = 38598, [38598] = 38597, -- grandiose carpet
-	[39152] = 39494, [39494] = 39152, -- eldritch carpet
-	[40505] = 40506, [40506] = 40505, -- dragon lord carpet
-	[40507] = 40509, [40509] = 40507, -- dragon carpet
-	[40508] = 40510, [40510] = 40508, -- fire elemental carpet
-	[40511] = 40512, [40512] = 40511, -- Morgaroth carpet
-	[40513] = 40514, [40514] = 40513, -- Ghazbaran carpet
-	[40515] = 40516, [40516] = 40515, -- Orshabaal carpet
-	[40517] = 40518, [40518] = 40517, -- red cake carpet
-	[40519] = 40526, [40526] = 40519, -- orange cake carpet
-	[40520] = 40527, [40527] = 40520, -- yellow cake carpet
-	[40521] = 40528, [40528] = 40521, -- green cake carpet
-	[40522] = 40529, [40529] = 40522, -- sky cake carpet
-	[40523] = 40530, [40530] = 40523, -- blue cake carpet
-	[40524] = 40531, [40531] = 40524, -- purple cake carpet
-	[40525] = 40532, [40532] = 40525, -- pink cake carpet
-	[40533] = 40534, [40534] = 40533, -- red t carpet
-	[40535] = 40542, [40542] = 40535, -- orange t carpet
-	[40536] = 40543, [40543] = 40536, -- yellow t carpet
-	[40537] = 40544, [40544] = 40537, -- green t carpet
-	[40538] = 40545, [40545] = 40538, -- sky t carpet
-	[40539] = 40546, [40546] = 40539, -- blue t carpet
-	[40540] = 40547, [40547] = 40540, -- purple t carpet
-	[40541] = 40548, [40548] = 40541, -- pink t carpet
-	[40911] = 40912, [40912] = 40911, -- Zaoan bamboo tiles
-	[40913] = 40914, [40914] = 40913, -- Zaoan bamboo tiles
-	[40915] = 40916, [40916] = 40915, -- Zaoan bamboo tiles
-	[40917] = 40918, [40918] = 40917, -- Zaoan bamboo tiles
-	[40919] = 40920, [40920] = 40919, -- Zaoan bamboo tiles
-	[40921] = 40922, [40922] = 40921, -- Zaoan bamboo tiles
+	[22737] = 22736, [22736] = 22737, -- rift carpet
+	[23537] = 23536, [23536] = 23537, -- void carpet
+	[23431] = 23453, [23453] = 23431, -- yalaharian carpet
+	[23432] = 23454, [23454] = 23432, -- white fur carpet
+	[23433] = 23455, [23455] = 23433, -- bamboo mat carpet
+	[23715] = 23707, [23707] = 23715, -- crimson carpet
+	[23710] = 23716, [23716] = 23710, -- azure carpet
+	[23711] = 23717, [23717] = 23711, -- emerald carpet
+	[23712] = 23718, [23718] = 23712, -- light parquet carpet
+	[23713] = 23719, [23719] = 23713, -- dark parquet carpet
+	[23714] = 23720, [23720] = 23714, -- marble floor
+	[24416] = 24424, [24424] = 24416, -- colourful carpet
+	[24417] = 24425, [24425] = 24417, -- flowery carpet
+	[24418] = 24426, [24426] = 24418, -- striped carpet
+	[24419] = 24427, [24427] = 24419, -- fur carpet
+	[24420] = 24428, [24428] = 24420, -- diamond carpet
+	[24421] = 24429, [24429] = 24421, -- patterned carpet
+	[24422] = 24430, [24430] = 24422, -- night sky carpet
+	[24423] = 24431, [24431] = 24423, -- star carpet
+	[26114] = 26115, [26115] = 26114, -- verdant carpet
+	[26116] = 26117, [26117] = 26116, -- shaggy carpet
+	[26118] = 26119, [26119] = 26118, -- mystic carpet
+	[26120] = 26121, [26121] = 26120, -- stone tiles
+	[26122] = 26123, [26123] = 26122, -- wooden planks
+	[26150] = 26151, [26151] = 26150, -- wheat carpet
+	[26152] = 26153, [26153] = 26152, -- crested carpet
+	[26154] = 26155, [26155] = 26154, -- decorated carpet
+	[31466] = 31468, [31468] = 31466, -- tournament carpet
+	[31467] = 31469, [31469] = 31467, -- sublime tournament carpet
+	[35887] = 35888, [35888] = 35887, -- lilac carpet
+	[35889] = 35890, [35890] = 35889, -- colourful pom-pom carpet
+	[35891] = 35892, [35892] = 35891, -- natural pom-pom carpet
+	[35893] = 35894, [35894] = 35893, -- owin rug
+	[35895] = 35896, [35896] = 35895, -- midnight panther rug
+	[35897] = 35898, [35898] = 35897, -- moon carpet
+	[35899] = 35900, [35900] = 35899, -- romantic carpet
+	[35941] = 35942, [35942] = 35941, -- grandiose carpet
+	[36496] = 36838, [36838] = 36496, -- eldritch carpet
+	[37353] = 37354, [37354] = 37353, -- dragon lord carpet
+	[37355] = 37357, [37357] = 37355, -- dragon carpet
+	[37356] = 37358, [37358] = 37356, -- fire elemental carpet
+	[37359] = 37360, [37360] = 37359, -- Morgaroth carpet
+	[37361] = 37362, [37362] = 37361, -- Ghazbaran carpet
+	[37363] = 37364, [37364] = 37363, -- Orshabaal carpet
+	[37365] = 37366, [37366] = 37365, -- red cake carpet
+	[37367] = 37374, [37374] = 37367, -- orange cake carpet
+	[37368] = 37375, [37375] = 37368, -- yellow cake carpet
+	[37369] = 37376, [37376] = 37369, -- green cake carpet
+	[37370] = 37377, [37377] = 37370, -- sky cake carpet
+	[37371] = 37378, [37378] = 37371, -- blue cake carpet
+	[37372] = 37379, [37379] = 37372, -- purple cake carpet
+	[37373] = 37380, [37380] = 37373, -- pink cake carpet
+	[37381] = 37382, [37382] = 37381, -- red t carpet
+	[37383] = 37390, [37390] = 37383, -- orange t carpet
+	[37384] = 37391, [37391] = 37384, -- yellow t carpet
+	[37385] = 37392, [37392] = 37385, -- green t carpet
+	[37386] = 37393, [37393] = 37386, -- sky t carpet
+	[37387] = 37394, [37394] = 37387, -- blue t carpet
+	[37388] = 37395, [37395] = 37388, -- purple t carpet
+	[37389] = 37396, [37396] = 37389, -- pink t carpet
+	[37763] = 37764, [37764] = 37763, -- Zaoan bamboo tiles
+	[37765] = 37766, [37766] = 37765, -- Zaoan bamboo tiles
+	[37767] = 37768, [37768] = 37767, -- Zaoan bamboo tiles
+	[37769] = 37770, [37770] = 37769, -- Zaoan bamboo tiles
+	[37771] = 37772, [37772] = 37771, -- Zaoan bamboo tiles
+	[37773] = 37774, [37774] = 37773, -- Zaoan bamboo tiles
 }
 
 local carpets = Action()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Crawler" nameDescription="a crawler" race="venom" experience="1000" speed="200" raceId="786">
 	<health now="1450" max="1450" />
-	<look type="456" corpse="15292" />
+	<look type="456" corpse="13865" />
 	<targetchange interval="4000" chance="10" />
 	<flags>
 		<flag summonable="0" />

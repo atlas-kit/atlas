@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Mimic" nameDescription="a mimic" race="blood" experience="0" speed="170">
 	<health now="30" max="30" />
-	<look type="92" corpse="1740" />
+	<look type="92" corpse="2472" />
 	<targetchange interval="5000" chance="8" />
 	<flags>
 		<flag summonable="0" />

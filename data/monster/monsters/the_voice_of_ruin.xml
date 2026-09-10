@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="The Voice Of Ruin" nameDescription="The Voice Of Ruin" race="blood" experience="3500" speed="460">
 	<health now="5500" max="5500" />
-	<look type="344" corpse="11288" />
+	<look type="344" corpse="10371" />
 	<targetchange interval="2000" chance="5" />
 	<flags>
 		<flag isboss="1" />
@@ -38,8 +38,8 @@
 		<immunity drunk="1" />
 	</immunities>
 	<loot>
-		<item id="2148" name="gold coin" chance="100000" countmax="43" />
-		<item id="11326" name="corrupted flag" chance="50000" />
-		<item id="2152" name="platinum coin" chance="50000" countmax="2" />
+		<item id="3031" name="gold coin" chance="100000" countmax="43" />
+		<item id="10409" name="corrupted flag" chance="50000" />
+		<item id="3035" name="platinum coin" chance="50000" countmax="2" />
 	</loot>
 </monster>

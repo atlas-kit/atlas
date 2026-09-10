@@ -20,7 +20,7 @@ end
 spell:group("attack")
 spell:id(77)
 spell:name("Stalagmite Rune")
-spell:runeId(2292)
+spell:runeId(3179)
 spell:allowFarUse(true)
 spell:charges(10)
 spell:runeLevel(24)
