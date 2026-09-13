@@ -474,7 +474,7 @@ void Party::clearPlayerPoints(const std::shared_ptr<Player>& player)
 bool Party::canOpenCorpse(uint32_t ownerId) const
 {
 	if (const auto& player = g_game.getPlayerByID(ownerId)) {
-		return getLeader()->getID() == ownerId || tfs::owner_equal(player->getParty(), shared_from_this());
+		return tfs::owner_equal(player->getParty(), shared_from_this());
 	}
 	return false;
 }

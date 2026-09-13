@@ -483,11 +483,12 @@ void Creature::onDeath()
 
 	const auto timeNow = std::chrono::steady_clock::now();
 	const auto inFightTicks = std::chrono::milliseconds{getNumber(ConfigManager::PZ_LOCKED)};
+	const bool isVictimPlayer = asPlayer() != nullptr;
 	int32_t mostDamage = 0;
 	std::map<std::shared_ptr<Creature>, uint64_t> experienceMap;
 	for (const auto& [id, cb] : damageMap | std::views::as_const) {
 		if (auto attacker = g_game.getCreatureByID(id)) {
-			if ((cb.total > mostDamage && (timeNow - cb.ticks <= inFightTicks))) {
+			if (cb.total > mostDamage && (!isVictimPlayer || (timeNow - cb.ticks <= inFightTicks))) {
 				mostDamage = cb.total;
 				mostDamageCreature = attacker;
 			}
