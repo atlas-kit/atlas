@@ -133,9 +133,9 @@ void ServicePort::accept()
 
 	auto connection = ConnectionManager::getInstance().createConnection(io_context, shared_from_this());
 	acceptor->async_accept(connection->getSocket(),
-	                       [=, thisPtr = shared_from_this()](const boost::system::error_code& error) {
+	                       recycled([connection, thisPtr = shared_from_this()](const boost::system::error_code& error) {
 		                       thisPtr->onAccept(connection, error);
-	                       });
+	                       }));
 }
 
 void ServicePort::onAccept(std::shared_ptr<Connection> connection, const boost::system::error_code& error)

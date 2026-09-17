@@ -23,6 +23,12 @@ class OutputMessage;
 class Connection;
 class ServicePort;
 
+template <typename Handler>
+decltype(auto) recycled(Handler&& h)
+{
+	return boost::asio::bind_allocator(boost::asio::recycling_allocator<void>{}, std::forward<Handler>(h));
+}
+
 class ConnectionManager
 {
 public:
