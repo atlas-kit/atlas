@@ -219,6 +219,14 @@ do
 			self:eventType(MONSTERS_EVENT_SAY)
 			self:onSay(value)
 			return
+		elseif key == "onHealthChange" then
+			self:eventType(MONSTERS_EVENT_HEALTHCHANGE)
+			self:onHealthChange(value)
+			return
+		elseif key == "onManaChange" then
+			self:eventType(MONSTERS_EVENT_MANACHANGE)
+			self:onManaChange(value)
+			return
 		end
 		rawset(self, key, value)
 	end

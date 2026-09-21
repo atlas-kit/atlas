@@ -1081,6 +1081,8 @@ int luaMonsterTypeEventOnCallback(lua_State* L)
 	// monsterType:onDisappear(callback)
 	// monsterType:onMove(callback)
 	// monsterType:onSay(callback)
+	// monsterType:onHealthChange(callback)
+	// monsterType:onManaChange(callback)
 	MonsterType* monsterType = tfs::lua::getUserdata<MonsterType>(L, 1);
 	if (monsterType) {
 		if (monsterType->loadCallback(&g_scripts->getScriptInterface())) {
@@ -1621,6 +1623,8 @@ void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 	registerEnum(lsi, MONSTERS_EVENT_DISAPPEAR);
 	registerEnum(lsi, MONSTERS_EVENT_MOVE);
 	registerEnum(lsi, MONSTERS_EVENT_SAY);
+	registerEnum(lsi, MONSTERS_EVENT_HEALTHCHANGE);
+	registerEnum(lsi, MONSTERS_EVENT_MANACHANGE);
 
 	registerEnum(lsi, MAX_LOOTCHANCE);
 
@@ -1707,6 +1711,8 @@ void tfs::lua::registerMonsters(LuaScriptInterface& lsi)
 	lsi.registerMethod("MonsterType", "onDisappear", luaMonsterTypeEventOnCallback);
 	lsi.registerMethod("MonsterType", "onMove", luaMonsterTypeEventOnCallback);
 	lsi.registerMethod("MonsterType", "onSay", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onHealthChange", luaMonsterTypeEventOnCallback);
+	lsi.registerMethod("MonsterType", "onManaChange", luaMonsterTypeEventOnCallback);
 
 	lsi.registerMethod("MonsterType", "getSummonList", luaMonsterTypeGetSummonList);
 	lsi.registerMethod("MonsterType", "addSummon", luaMonsterTypeAddSummon);

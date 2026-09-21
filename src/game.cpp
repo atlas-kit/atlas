@@ -4327,6 +4327,13 @@ bool Game::combatChangeMana(const std::shared_ptr<Creature>& attacker, const std
 {
 	const auto& targetPlayer = target->asPlayer();
 	if (!targetPlayer) {
+		if (damage.origin != ORIGIN_NONE) {
+			if (target->asMonster()) {
+				tfs::events::creature::onChangeMana(target, attacker, damage);
+				damage.origin = ORIGIN_NONE;
+				return combatChangeMana(attacker, target, damage);
+			}
+		}
 		return true;
 	}
 

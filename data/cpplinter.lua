@@ -779,6 +779,8 @@ Outfit = {}
 ---@field onDisappear fun(self: MonsterType, callback: function)
 ---@field onMove fun(self: MonsterType, callback: function)
 ---@field onSay fun(self: MonsterType, callback: function)
+---@field onHealthChange fun(self: MonsterType, callback: function)
+---@field onManaChange fun(self: MonsterType, callback: function)
 ---@field getSummonList fun(self: MonsterType): table
 ---@field addSummon fun(self: MonsterType, summon: table)
 ---@field maxSummons fun(self: MonsterType): number

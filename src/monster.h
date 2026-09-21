@@ -87,6 +87,8 @@ public:
 
 	void drainHealth(const std::shared_ptr<Creature>& attacker, int32_t damage) override;
 	void changeHealth(int32_t healthChange, bool sendHealthChange = true) override;
+	bool onHealthChange(const std::shared_ptr<Creature>& attacker, CombatDamage& damage);
+	bool onManaChange(const std::shared_ptr<Creature>& attacker, CombatDamage& damage);
 
 	bool isWalkingToSpawn() const { return walkingToSpawn; }
 	bool walkToSpawn();

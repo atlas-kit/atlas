@@ -8,6 +8,7 @@
 #include "../lua/env.h"
 #include "../lua/error.h"
 #include "../lua/script.h"
+#include "../monster.h"
 #include "events.h"
 
 namespace {
@@ -262,6 +263,10 @@ void onUpdateStorage(const std::shared_ptr<Creature>& creature, uint32_t key, st
 void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
                     CombatDamage& damage)
 {
+	if (const auto& monster = creature->asMonster()) {
+		monster->onHealthChange(attacker, damage);
+	}
+
 	// Creature:onChangeHealth(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	if (creatureHandlers.onChangeHealth == -1) {
 		return;
@@ -315,6 +320,10 @@ void onChangeHealth(const std::shared_ptr<Creature>& creature, const std::shared
 void onChangeMana(const std::shared_ptr<Creature>& creature, const std::shared_ptr<Creature>& attacker,
                   CombatDamage& damage)
 {
+	if (const auto& monster = creature->asMonster()) {
+		monster->onManaChange(attacker, damage);
+	}
+
 	// Creature:onChangeMana(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
 	if (creatureHandlers.onChangeMana == -1) {
 		return;

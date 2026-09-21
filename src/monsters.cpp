@@ -897,6 +897,8 @@ MonsterType* Monsters::loadMonster(const std::string& file, const std::string& m
 			mType->info.creatureMoveEvent = scriptInterface->getEvent("onCreatureMove");
 			mType->info.creatureSayEvent = scriptInterface->getEvent("onCreatureSay");
 			mType->info.thinkEvent = scriptInterface->getEvent("onThink");
+			mType->info.healthChangeEvent = scriptInterface->getEvent("onHealthChange");
+			mType->info.manaChangeEvent = scriptInterface->getEvent("onManaChange");
 		} else {
 			std::cout << "[Warning - Monsters::loadMonster] Can not load script: " << script << std::endl;
 			std::cout << scriptInterface->getLastLuaError() << std::endl;
@@ -1490,6 +1492,10 @@ bool MonsterType::loadCallback(LuaScriptInterface* scriptInterface)
 		info.creatureMoveEvent = id;
 	} else if (info.eventType == MONSTERS_EVENT_SAY) {
 		info.creatureSayEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_HEALTHCHANGE) {
+		info.healthChangeEvent = id;
+	} else if (info.eventType == MONSTERS_EVENT_MANACHANGE) {
+		info.manaChangeEvent = id;
 	}
 	return true;
 }

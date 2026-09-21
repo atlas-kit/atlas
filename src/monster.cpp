@@ -291,6 +291,110 @@ void Monster::onCreatureSay(const std::shared_ptr<Creature>& creature, SpeakClas
 	}
 }
 
+bool Monster::onHealthChange(const std::shared_ptr<Creature>& attacker, CombatDamage& damage)
+{
+	if (mType->info.healthChangeEvent == -1) {
+		return false;
+	}
+
+	LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+	if (!scriptInterface) {
+		return false;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - Monster::onHealthChange] Call stack overflow" << std::endl;
+		return false;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(mType->info.healthChangeEvent, scriptInterface);
+
+	lua_State* L = scriptInterface->getLuaState();
+	scriptInterface->pushFunction(mType->info.healthChangeEvent);
+
+	tfs::lua::pushSharedPtr(L, asMonster());
+	tfs::lua::setMetatable(L, -1, "Monster");
+
+	if (attacker) {
+		tfs::lua::pushSharedPtr(L, attacker);
+		tfs::lua::setCreatureMetatable(L, -1, attacker);
+	} else {
+		lua_pushnil(L);
+	}
+
+	tfs::lua::pushNumber(L, damage.primary.value);
+	tfs::lua::pushNumber(L, damage.primary.type);
+	tfs::lua::pushNumber(L, damage.secondary.value);
+	tfs::lua::pushNumber(L, damage.secondary.type);
+	tfs::lua::pushNumber(L, damage.origin);
+
+	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
+		tfs::lua::reportError(L, tfs::lua::popString(L));
+	} else {
+		damage.primary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value));
+		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
+		damage.secondary.value = std::abs(tfs::lua::getNumber<int32_t>(L, -2, damage.secondary.value));
+		damage.secondary.type = tfs::lua::getNumber<CombatType_t>(L, -1, damage.secondary.type);
+		lua_pop(L, 4);
+	}
+
+	tfs::lua::resetScriptEnv();
+	return true;
+}
+
+bool Monster::onManaChange(const std::shared_ptr<Creature>& attacker, CombatDamage& damage)
+{
+	if (mType->info.manaChangeEvent == -1) {
+		return false;
+	}
+
+	LuaScriptInterface* scriptInterface = mType->info.scriptInterface;
+	if (!scriptInterface) {
+		return false;
+	}
+
+	if (!tfs::lua::reserveScriptEnv()) {
+		std::cout << "[Error - Monster::onManaChange] Call stack overflow" << std::endl;
+		return false;
+	}
+
+	const auto env = tfs::lua::getScriptEnv();
+	env->setScriptId(mType->info.manaChangeEvent, scriptInterface);
+
+	lua_State* L = scriptInterface->getLuaState();
+	scriptInterface->pushFunction(mType->info.manaChangeEvent);
+
+	tfs::lua::pushSharedPtr(L, asMonster());
+	tfs::lua::setMetatable(L, -1, "Monster");
+
+	if (attacker) {
+		tfs::lua::pushSharedPtr(L, attacker);
+		tfs::lua::setCreatureMetatable(L, -1, attacker);
+	} else {
+		lua_pushnil(L);
+	}
+
+	tfs::lua::pushNumber(L, damage.primary.value);
+	tfs::lua::pushNumber(L, damage.primary.type);
+	tfs::lua::pushNumber(L, damage.secondary.value);
+	tfs::lua::pushNumber(L, damage.secondary.type);
+	tfs::lua::pushNumber(L, damage.origin);
+
+	if (tfs::lua::protectedCall(L, 7, 4) != 0) {
+		tfs::lua::reportError(L, tfs::lua::popString(L));
+	} else {
+		damage.primary.value = tfs::lua::getNumber<int32_t>(L, -4, damage.primary.value);
+		damage.primary.type = tfs::lua::getNumber<CombatType_t>(L, -3, damage.primary.type);
+		damage.secondary.value = tfs::lua::getNumber<int32_t>(L, -2, damage.secondary.value);
+		damage.secondary.type = tfs::lua::getNumber<CombatType_t>(L, -1, damage.secondary.type);
+		lua_pop(L, 4);
+	}
+
+	tfs::lua::resetScriptEnv();
+	return true;
+}
+
 void Monster::addTarget(const std::shared_ptr<Creature>& creature, bool pushFront /* = false*/)
 {
 	assert(creature.get() != this);

@@ -129,4 +129,12 @@ mType.onSay = function(monster, creature, type, message)
 	print(monster:getId(), creature:getId(), type, message)
 end
 
+mType.onHealthChange = function(monster, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
+	return primaryDamage, primaryType, secondaryDamage, secondaryType
+end
+
+mType.onManaChange = function(monster, attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
+	return primaryDamage, primaryType, secondaryDamage, secondaryType
+end
+
 mType:register(monster)

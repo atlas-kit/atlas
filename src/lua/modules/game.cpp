@@ -550,6 +550,8 @@ int luaGameCreateMonsterType(lua_State* L)
 		monsterType->info.creatureDisappearEvent = -1;
 		monsterType->info.creatureMoveEvent = -1;
 		monsterType->info.creatureSayEvent = -1;
+		monsterType->info.healthChangeEvent = -1;
+		monsterType->info.manaChangeEvent = -1;
 	}
 
 	tfs::lua::pushUserdata(L, monsterType);
