@@ -35,11 +35,6 @@ event.onPlayerJoin = function(self)
 	if not self:getStorageValue(PlayerStorageKeys.achievementsTotal) then
 		self:setStorageValue(PlayerStorageKeys.achievementsTotal, self:getAchievementPoints())
 	end
-
-	-- initialize ping-pong timestamps
-	local timeNow = os.time()
-	self:setLastPing(timeNow)
-	self:setLastPong(timeNow)
 end
 
 event:register()

@@ -300,18 +300,6 @@ int luaVocationAllowsPvp(lua_State* L)
 	return 1;
 }
 
-int luaVocationGetNoPongKickTime(lua_State* L)
-{
-	// vocation:getNoPongKickTime()
-	Vocation* vocation = tfs::lua::getUserdata<Vocation>(L, 1);
-	if (vocation) {
-		tfs::lua::pushNumber(L, vocation->getNoPongKickTime().count());
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
 } // namespace
 
 void tfs::lua::registerVocation(LuaScriptInterface& lsi)
@@ -347,5 +335,4 @@ void tfs::lua::registerVocation(LuaScriptInterface& lsi)
 	lsi.registerMethod("Vocation", "getPromotion", luaVocationGetPromotion);
 
 	lsi.registerMethod("Vocation", "allowsPvp", luaVocationAllowsPvp);
-	lsi.registerMethod("Vocation", "getNoPongKickTime", luaVocationGetNoPongKickTime);
 }

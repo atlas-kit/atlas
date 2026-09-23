@@ -182,6 +182,8 @@ private:
 	void sendMagicEffect(const Position& pos, uint16_t type, SourceEffect_t source = SourceEffect_t::GLOBAL);
 	void sendCreatureHealth(const std::shared_ptr<const Creature>& creature);
 	void sendSkills();
+	void sendPing();
+	void sendPingBack();
 	void sendCreatureTurn(const std::shared_ptr<const Creature>& creature, uint32_t stackpos);
 	void sendCreatureSay(const std::shared_ptr<const Creature>& creature, SpeakClasses type, const std::string& text,
 	                     const Position* pos = nullptr);

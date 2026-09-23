@@ -791,6 +791,42 @@ std::shared_ptr<DepotLocker> Player::getDepotLocker()
 
 void Player::sendCancelMessage(ReturnValue message) const { sendCancelMessage(getReturnMessage(message)); }
 
+void Player::sendPing()
+{
+	const auto timeNow = std::chrono::steady_clock::now();
+
+	bool hasLostConnection = false;
+	if (timeNow - lastPing >= 5s) {
+		lastPing = timeNow;
+		if (client) {
+			client->sendPing();
+		} else {
+			hasLostConnection = true;
+		}
+	}
+
+	const auto noPongTime = timeNow - lastPong;
+	if (const auto& attackedCreature = getAttackedCreature()) {
+		if ((hasLostConnection || noPongTime >= 7s) && attackedCreature->asPlayer()) {
+			setAttackedCreature(nullptr);
+		}
+	}
+
+	auto noPongKickTime = vocation ? vocation->getNoPongKickTime() : 60s;
+	if (pzLocked && noPongKickTime < 60s) {
+		noPongKickTime = 60s;
+	}
+
+	if (noPongTime >= noPongKickTime) {
+		const auto& tile = getTile();
+		if (tile && tile->hasFlag(TILESTATE_NOLOGOUT)) {
+			return;
+		}
+
+		kickPlayer(true);
+	}
+}
+
 void Player::sendStats()
 {
 	if (client) {
@@ -1412,6 +1448,8 @@ std::chrono::milliseconds Player::getNextActionTime() const
 void Player::onThink(std::chrono::milliseconds interval)
 {
 	Creature::onThink(interval);
+
+	sendPing();
 
 	messageBufferTicks += interval;
 	if (messageBufferTicks >= 1500ms) {

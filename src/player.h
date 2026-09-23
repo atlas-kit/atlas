@@ -1018,6 +1018,18 @@ public:
 			client->sendMagicEffect(pos, type, source);
 		}
 	}
+	void sendPing();
+	void sendPingBack() const
+	{
+		if (client) {
+			client->sendPingBack();
+		}
+	}
+	void receivePing() { lastPong = std::chrono::steady_clock::now(); }
+	void resetPing() { lastPing = lastPong = std::chrono::steady_clock::now(); }
+	std::chrono::steady_clock::time_point getLastPing() const { return lastPing; }
+	std::chrono::steady_clock::time_point getLastPong() const { return lastPong; }
+
 	void sendStats();
 
 	void sendExperienceTracker(int64_t rawExp, int64_t finalExp) const
@@ -1343,6 +1355,8 @@ private:
 	std::chrono::steady_clock::time_point lastWalkthroughAttempt = std::chrono::steady_clock::time_point::min();
 	std::chrono::steady_clock::time_point lastToggleMount = std::chrono::steady_clock::time_point::min();
 	std::chrono::steady_clock::time_point nextAction = std::chrono::steady_clock::time_point::min();
+	std::chrono::steady_clock::time_point lastPing = std::chrono::steady_clock::now();
+	std::chrono::steady_clock::time_point lastPong = lastPing;
 
 	std::shared_ptr<ProtocolGame> client;
 	Connection::Address lastIP = {};

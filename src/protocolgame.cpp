@@ -252,6 +252,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 		if (foundPlayer->client) {
 			foundPlayer->disconnect();
+			foundPlayer->resetPing();
 
 			eventConnect = g_scheduler.addEvent(createSchedulerTask(
 			    1s, [=, self = std::static_pointer_cast<ProtocolGame>(shared_from_this()),
@@ -292,6 +293,7 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 	player->lastIP = player->getIP();
 	player->lastLoginSaved = std::max(std::chrono::system_clock::now(), player->lastLoginSaved + 1s);
 	player->resetIdleTime();
+	player->resetPing();
 	acceptPackets = true;
 
 	tfs::events::player::onReconnect(player);
@@ -560,6 +562,12 @@ void ProtocolGame::parsePacket(NetworkMessage& msg)
 		case 0x14:
 			g_dispatcher.addTask(
 			    [self = std::static_pointer_cast<ProtocolGame>(shared_from_this())]() { self->logout(true); });
+			break;
+		case 0x1D:
+			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerReceivePingBack(playerID); });
+			break;
+		case 0x1E:
+			g_dispatcher.addTask([playerID = player->getID()]() { g_game.playerReceivePing(playerID); });
 			break;
 		// case 0x2A: break; // bestiary tracker
 		// case 0x2C: break; // team finder (leader)
@@ -2524,6 +2532,20 @@ void ProtocolGame::sendFYIBox(const std::string& message)
 	NetworkMessage msg;
 	msg.addByte(0x15);
 	msg.addString(message);
+	writeToOutputBuffer(msg);
+}
+
+void ProtocolGame::sendPing()
+{
+	NetworkMessage msg;
+	msg.addByte(0x1D);
+	writeToOutputBuffer(msg);
+}
+
+void ProtocolGame::sendPingBack()
+{
+	NetworkMessage msg;
+	msg.addByte(0x1E);
 	writeToOutputBuffer(msg);
 }
 
