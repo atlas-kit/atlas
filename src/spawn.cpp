@@ -173,10 +173,16 @@ bool Spawns::loadFromXml(const std::filesystem::path& filename, bool isCalledByL
 					continue;
 				}
 
+				Direction dir;
+
 				pugi::xml_attribute directionAttribute = childNode.attribute("direction");
 				if (directionAttribute) {
-					npc->setDirection(static_cast<Direction>(pugi::cast<uint16_t>(directionAttribute.value())));
+					dir = static_cast<Direction>(pugi::cast<uint16_t>(directionAttribute.value()));
+				} else {
+					dir = DIRECTION_NORTH;
 				}
+
+				npc->setDirection(dir);
 
 				npc->setMasterPos(
 				    Position(centerPos.x + pugi::cast<uint16_t>(childNode.attribute("x").value()),
