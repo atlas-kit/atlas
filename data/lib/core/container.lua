@@ -55,7 +55,7 @@ function Container.createLootItem(self, item)
 		end
 
 		if item.text and item.text ~= "" then
-			tmpItem:setText(item.text)
+			tmpItem:setAttribute(ITEM_ATTRIBUTE_TEXT, item.text)
 		end
 
 		local ret = self:addItemEx(tmpItem)
