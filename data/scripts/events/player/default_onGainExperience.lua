@@ -79,8 +79,9 @@ local message = Event()
 message.onPlayerGainExperience = function(self, source, exp, rawExp, sendText)
 	if sendText and exp ~= 0 then
 		local pos = self:getPosition()
-		local expString = exp .. (exp ~= 1 and " experience points." or " experience point.")
-		self:sendTextMessage(MESSAGE_EXPERIENCE, "You gained " .. expString, pos, exp, TEXTCOLOR_WHITE_EXP)
+		local displayExp = math.floor(exp)
+		local expString = displayExp .. (displayExp ~= 1 and " experience points." or " experience point.")
+		self:sendTextMessage(MESSAGE_EXPERIENCE, "You gained " .. expString, pos, displayExp, TEXTCOLOR_WHITE_EXP)
 
 		local spectators = Game.getSpectators(pos, false, true)
 		for _, spectator in ipairs(spectators) do
