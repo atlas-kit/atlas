@@ -1061,6 +1061,7 @@ void LuaEnvironment::executeTimerEvent(uint32_t eventIndex)
 		callFunction(timerEventDesc.parameters.size());
 	} else {
 		std::cout << "[Error - LuaScriptInterface::executeTimerEvent] Call stack overflow\n";
+		lua_pop(L, timerEventDesc.parameters.size() + 1);
 	}
 
 	// free resources

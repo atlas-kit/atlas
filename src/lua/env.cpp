@@ -174,7 +174,14 @@ ScriptEnvironment* getScriptEnv()
 	return &scriptEnv[scriptEnvIndex];
 }
 
-bool reserveScriptEnv() { return ++scriptEnvIndex < static_cast<int32_t>(scriptEnv.size()); }
+bool reserveScriptEnv()
+{
+	if (scriptEnvIndex + 1 >= static_cast<int32_t>(scriptEnv.size())) {
+		return false;
+	}
+	++scriptEnvIndex;
+	return true;
+}
 
 void resetScriptEnv()
 {
