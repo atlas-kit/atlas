@@ -274,8 +274,6 @@ private:
 	void sendRemoveTileThing(const Position& pos, uint32_t stackpos);
 	void sendUpdateTileCreature(const Position& pos, uint32_t stackpos,
 	                            const std::shared_ptr<const Creature>& creature);
-	void sendRemoveTileCreature(const std::shared_ptr<const Creature>& creature, const Position& pos,
-	                            uint32_t stackpos);
 	void sendUpdateTile(const std::shared_ptr<const Tile>& tile, const Position& pos);
 
 	void sendUpdateCreatureIcons(const std::shared_ptr<const Creature>& creature);
@@ -324,8 +322,6 @@ private:
 
 	// tiles
 	static void RemoveTileThing(NetworkMessage& msg, const Position& pos, uint32_t stackpos);
-	static void RemoveTileCreature(NetworkMessage& msg, const std::shared_ptr<const Creature>& creature,
-	                               const Position& pos, uint32_t stackpos);
 
 	void MoveUpCreature(NetworkMessage& msg, const std::shared_ptr<const Creature>& creature, const Position& newPos,
 	                    const Position& oldPos);

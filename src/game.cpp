@@ -536,8 +536,8 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	oldStackPosVector.reserve(spectators.size());
 	for (const auto& spectator : spectators) {
 		if (const auto& player = spectator->asPlayer()) {
-			oldStackPosVector.push_back(
-			    player->canSeeCreature(creature) ? tile->getClientIndexOfCreature(player, creature) : -1);
+			oldStackPosVector.push_back(player->canSeeCreature(creature) ? tile->getStackposOfCreature(player, creature)
+			                                                             : -1);
 		}
 	}
 
@@ -549,7 +549,7 @@ bool Game::removeCreature(const std::shared_ptr<Creature>& creature, bool isLogo
 	size_t i = 0;
 	for (const auto& spectator : spectators) {
 		if (const auto& player = spectator->asPlayer()) {
-			player->sendRemoveTileCreature(creature, tilePosition, oldStackPosVector[i++]);
+			player->sendRemoveTileThing(tilePosition, oldStackPosVector[i++]);
 		}
 	}
 

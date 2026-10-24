@@ -583,14 +583,10 @@ public:
 	void sendUpdateTileCreature(const std::shared_ptr<const Creature>& creature)
 	{
 		if (client) {
-			client->sendUpdateTileCreature(
-			    creature->getPosition(), creature->getTile()->getClientIndexOfCreature(asPlayer(), creature), creature);
-		}
-	}
-	void sendRemoveTileCreature(const std::shared_ptr<const Creature>& creature, const Position& pos, int32_t stackpos)
-	{
-		if (client) {
-			client->sendRemoveTileCreature(creature, pos, stackpos);
+			int32_t stackpos = creature->getTile()->getStackposOfCreature(asPlayer(), creature);
+			if (stackpos != -1) {
+				client->sendUpdateTileCreature(creature->getPosition(), stackpos, creature);
+			}
 		}
 	}
 	void sendUpdateTile(const std::shared_ptr<const Tile>& tile, const Position& pos)
@@ -623,7 +619,7 @@ public:
 	                     MagicEffectClasses magicEffect = CONST_ME_NONE)
 	{
 		if (client) {
-			client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfCreature(asPlayer(), creature),
+			client->sendAddCreature(creature, pos, creature->getTile()->getStackposOfCreature(asPlayer(), creature),
 			                        magicEffect);
 		}
 	}
@@ -637,7 +633,7 @@ public:
 	void sendCreatureTurn(const std::shared_ptr<const Creature>& creature)
 	{
 		if (client && canSeeCreature(creature)) {
-			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(asPlayer(), creature);
+			int32_t stackpos = creature->getTile()->getStackposOfCreature(asPlayer(), creature);
 			if (stackpos != -1) {
 				client->sendCreatureTurn(creature, stackpos);
 			}
@@ -684,7 +680,7 @@ public:
 		} else if (canSeeInvisibility()) {
 			client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
 		} else {
-			int32_t stackpos = creature->getTile()->getClientIndexOfCreature(asPlayer(), creature);
+			int32_t stackpos = creature->getTile()->getStackposOfCreature(asPlayer(), creature);
 			if (stackpos == -1) {
 				return;
 			}
@@ -692,7 +688,7 @@ public:
 			if (visible) {
 				client->sendAddCreature(creature, creature->getPosition(), stackpos);
 			} else {
-				client->sendRemoveTileCreature(creature, creature->getPosition(), stackpos);
+				client->sendRemoveTileThing(creature->getPosition(), stackpos);
 			}
 		}
 	}
